@@ -1,0 +1,405 @@
+<div class="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8">
+  <!-- <p-toast></p-toast> -->
+
+  <div class="max-w-4xl mx-auto">
+    <!-- Header -->
+    <div class="mb-6 flex items-center justify-between">
+      <div class="flex items-center">
+        <!-- Back Button -->
+        <button
+          routerLink="./dashboard"
+          class="mr-4 flex items-center text-gray-600 hover:text-gray-900 transition-colors"
+        >
+          <i class="pi pi-arrow-left mr-2"></i>
+          <span>Back to Dashboard</span>
+        </button>
+      </div>
+    </div>
+    <div>
+      <h1 class="text-3xl font-bold text-gray-900">My Profile</h1>
+      <p class="mt-2 text-sm text-gray-600">
+        Manage your personal information and settings
+      </p>
+    </div>
+
+    <!-- Loading Skeleton -->
+    <div *ngIf="loading" class="space-y-4">
+      <p-card>
+        <div class="flex items-center space-x-4 mb-6">
+          <p-skeleton shape="circle" size="6rem"></p-skeleton>
+          <div class="flex-1">
+            <p-skeleton
+              width="200px"
+              height="2rem"
+              styleClass="mb-2"
+            ></p-skeleton>
+            <p-skeleton width="150px" height="1rem"></p-skeleton>
+          </div>
+        </div>
+        <p-divider></p-divider>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <p-skeleton
+            height="3rem"
+            *ngFor="let i of [1, 2, 3, 4, 5, 6]"
+          ></p-skeleton>
+        </div>
+      </p-card>
+    </div>
+
+    <!-- Profile Content -->
+    <div *ngIf="!loading && userProfile">
+      <!-- Profile Picture Card -->
+      <p-card styleClass="mb-6">
+        <div
+          class="flex flex-col md:flex-row items-center md:items-start gap-6"
+        >
+          <!-- Avatar -->
+          <div class="relative group">
+            <p-avatar
+              *ngIf="!userProfile.profileImageUrl"
+              [label]="getInitials()"
+              size="xlarge"
+              shape="circle"
+              styleClass="text-2xl bg-blue-500 text-white"
+              [style]="{
+                width: '120px',
+                height: '120px',
+                'font-size': '2.5rem',
+              }"
+            >
+            </p-avatar>
+
+            <p-avatar
+              *ngIf="userProfile.profileImageUrl"
+              [image]="getSafeProfileImageUrl()"
+              size="xlarge"
+              shape="circle"
+              [style]="{ width: '120px', height: '120px' }"
+            >
+            </p-avatar>
+            <!-- <img
+              [src]="getSafeProfileImageUrl()"
+              alt="Preview"
+              class="max-w-full max-h-60 rounded-lg mx-auto mb-3 object-contain"
+            /> -->
+
+            <!-- Upload overlay -->
+            <div
+              class="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 rounded-full opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
+            >
+              <p-fileUpload
+                mode="basic"
+                accept="image/*"
+                [maxFileSize]="20000000"
+                [auto]="true"
+                chooseLabel="Upload"
+                chooseIcon="pi pi-camera"
+                (onSelect)="onImageSelect($event)"
+                [disabled]="uploadingImage"
+                styleClass="custom-file-upload"
+              >
+              </p-fileUpload>
+            </div>
+          </div>
+
+          <!-- User Info -->
+          <div class="flex-1 text-center md:text-left">
+            <h2 class="text-2xl font-bold text-gray-900">
+              {{ userProfile.firstName }} {{ userProfile.lastName }}
+            </h2>
+            <p class="text-gray-600 mt-1">{{ userProfile.email }}</p>
+            <div
+              class="flex flex-wrap gap-2 mt-3 justify-center md:justify-start"
+            >
+              <span
+                class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800"
+              >
+                <i class="pi pi-briefcase mr-2"></i>
+                {{ userProfile.role }}
+              </span>
+              <span
+                class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-purple-100 text-purple-800"
+              >
+                <i class="pi pi-building mr-2"></i>
+                {{ userProfile.department }}
+              </span>
+              <span
+                class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-gray-100 text-gray-800"
+              >
+                <i class="pi pi-id-card mr-2"></i>
+                {{ userProfile.employeeId }}
+              </span>
+            </div>
+          </div>
+
+          <!-- Action Button -->
+          <div class="flex gap-2">
+            <p-button
+              *ngIf="!editMode"
+              label="Edit Profile"
+              icon="pi pi-pencil"
+              (onClick)="toggleEditMode()"
+              styleClass="p-button-outlined"
+            >
+            </p-button>
+            <p-button
+              *ngIf="editMode"
+              label="Cancel"
+              icon="pi pi-times"
+              (onClick)="toggleEditMode()"
+              styleClass="p-button-outlined p-button-secondary"
+            >
+            </p-button>
+          </div>
+        </div>
+      </p-card>
+
+      <!-- Profile Details Card -->
+      <p-card>
+        <ng-template pTemplate="header">
+          <div class="px-6 pt-6 pb-3">
+            <h3 class="text-xl font-semibold text-gray-900">
+              Profile Information
+            </h3>
+            <p class="text-sm text-gray-600 mt-1">
+              Update your personal details
+            </p>
+          </div>
+        </ng-template>
+
+        <form [formGroup]="profileForm" class="space-y-6">
+          <!-- Personal Information Section -->
+          <div>
+            <h4
+              class="text-lg font-medium text-gray-900 mb-4 flex items-center"
+            >
+              <i class="pi pi-user mr-2 text-blue-600"></i>
+              Personal Information
+            </h4>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <!-- First Name -->
+              <div class="flex flex-col gap-2">
+                <label for="firstName" class="font-medium text-gray-700">
+                  First Name <span class="text-red-500">*</span>
+                </label>
+                <input
+                  pInputText
+                  id="firstName"
+                  formControlName="firstName"
+                  placeholder="Enter your first name"
+                  [class.ng-invalid]="isFieldInvalid('firstName')"
+                  [class.ng-dirty]="isFieldInvalid('firstName')"
+                />
+                <small *ngIf="isFieldInvalid('firstName')" class="text-red-600">
+                  {{ getFieldError("firstName") }}
+                </small>
+              </div>
+
+              <!-- Last Name -->
+              <div class="flex flex-col gap-2">
+                <label for="lastName" class="font-medium text-gray-700">
+                  Last Name <span class="text-red-500">*</span>
+                </label>
+                <input
+                  pInputText
+                  id="lastName"
+                  formControlName="lastName"
+                  placeholder="Enter your last name"
+                  [class.ng-invalid]="isFieldInvalid('lastName')"
+                  [class.ng-dirty]="isFieldInvalid('lastName')"
+                />
+                <small *ngIf="isFieldInvalid('lastName')" class="text-red-600">
+                  {{ getFieldError("lastName") }}
+                </small>
+              </div>
+
+              <!-- Email -->
+              <div class="flex flex-col gap-2 md:col-span-2">
+                <label for="email" class="font-medium text-gray-700">
+                  Email Address <span class="text-red-500">*</span>
+                </label>
+                <input
+                  pInputText
+                  id="email"
+                  type="email"
+                  formControlName="email"
+                  placeholder="Enter your email address"
+                  [class.ng-invalid]="isFieldInvalid('email')"
+                  [class.ng-dirty]="isFieldInvalid('email')"
+                />
+                <small *ngIf="isFieldInvalid('email')" class="text-red-600">
+                  {{ getFieldError("email") }}
+                </small>
+              </div>
+            </div>
+          </div>
+
+          <p-divider></p-divider>
+
+          <!-- Address Section -->
+          <div>
+            <h4
+              class="text-lg font-medium text-gray-900 mb-4 flex items-center"
+            >
+              <i class="pi pi-map-marker mr-2 text-blue-600"></i>
+              Address Information
+            </h4>
+            <div class="grid grid-cols-1 gap-4">
+              <!-- Address 1 -->
+              <div class="flex flex-col gap-2">
+                <label for="address1" class="font-medium text-gray-700"
+                  >Address Line 1</label
+                >
+                <input
+                  pInputText
+                  id="address1"
+                  formControlName="address1"
+                  placeholder="Street address, P.O. box, company name"
+                />
+              </div>
+
+              <!-- Address 2 -->
+              <div class="flex flex-col gap-2">
+                <label for="address2" class="font-medium text-gray-700"
+                  >Address Line 2</label
+                >
+                <input
+                  pInputText
+                  id="address2"
+                  formControlName="address2"
+                  placeholder="Apartment, suite, unit, building, floor, etc."
+                />
+              </div>
+
+              <!-- Address 3 -->
+              <div class="flex flex-col gap-2">
+                <label for="address3" class="font-medium text-gray-700"
+                  >Address Line 3</label
+                >
+                <input
+                  pInputText
+                  id="address3"
+                  formControlName="address3"
+                  placeholder="City, state, postal code, country"
+                />
+              </div>
+            </div>
+          </div>
+
+          <p-divider></p-divider>
+
+          <!-- Read-only Information Section -->
+          <div>
+            <h4
+              class="text-lg font-medium text-gray-900 mb-4 flex items-center"
+            >
+              <i class="pi pi-lock mr-2 text-gray-600"></i>
+              System Information
+              <span class="text-sm font-normal text-gray-500 ml-2"
+                >(Read-only)</span
+              >
+            </h4>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <!-- Employee ID -->
+              <div class="flex flex-col gap-2">
+                <label class="font-medium text-gray-700">Employee ID</label>
+                <input
+                  pInputText
+                  [value]="userProfile.employeeId"
+                  disabled
+                  class="bg-gray-50"
+                />
+              </div>
+
+              <!-- Role -->
+              <div class="flex flex-col gap-2">
+                <label class="font-medium text-gray-700">Role</label>
+                <input
+                  pInputText
+                  [value]="userProfile.role"
+                  disabled
+                  class="bg-gray-50"
+                />
+              </div>
+
+              <!-- Department -->
+              <div class="flex flex-col gap-2 md:col-span-2">
+                <label class="font-medium text-gray-700">Department</label>
+                <input
+                  pInputText
+                  [value]="userProfile.department"
+                  disabled
+                  class="bg-gray-50"
+                />
+              </div>
+            </div>
+            <p-message
+              severity="info"
+              text="Role and Department can only be changed by administrators"
+              styleClass="mt-4 w-full"
+            >
+            </p-message>
+          </div>
+
+          <!-- Action Buttons -->
+          <div *ngIf="editMode" class="flex justify-end gap-3 pt-4">
+            <p-button
+              label="Cancel"
+              icon="pi pi-times"
+              (onClick)="toggleEditMode()"
+              styleClass="p-button-outlined p-button-secondary"
+              [disabled]="saving"
+            >
+            </p-button>
+            <p-button
+              label="Save Changes"
+              icon="pi pi-check"
+              (onClick)="onSave()"
+              [loading]="saving"
+              [disabled]="profileForm.invalid"
+            >
+            </p-button>
+          </div>
+        </form>
+      </p-card>
+    </div>
+  </div>
+</div>
+
+<style>
+  :host ::ng-deep {
+    .p-card {
+      box-shadow:
+        0 1px 3px 0 rgba(0, 0, 0, 0.1),
+        0 1px 2px 0 rgba(0, 0, 0, 0.06);
+    }
+
+    .p-card .p-card-body {
+      padding: 1.5rem;
+    }
+
+    .p-inputtext {
+      width: 100%;
+    }
+
+    .p-inputtext:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    .custom-file-upload .p-button {
+      background: transparent !important;
+      border: none !important;
+      color: white !important;
+      padding: 0.5rem 1rem !important;
+    }
+
+    .custom-file-upload .p-button:hover {
+      background: rgba(255, 255, 255, 0.1) !important;
+    }
+
+    .p-fileupload-choose {
+      display: inline-flex;
+    }
+  }
+</style>

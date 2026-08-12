@@ -1,0 +1,638 @@
+/* Create Rack modal
+   Retuned onto the shared dialog design system (src/styles/dialogs.css).
+   Every selector below is unchanged - only colours, radii and spacing now come
+   from the --dlg-* tokens, so this dialog matches the rest of the app. The
+   accents used to be a blue and a purple, neither of which appears anywhere
+   else in the product. */
+
+/* Dialog customization */
+:host ::ng-deep .p-dialog {
+  border-radius: var(--dlg-radius);
+  box-shadow: var(--dlg-shadow);
+  overflow: hidden;
+}
+
+:host ::ng-deep .p-dialog .p-dialog-header {
+  background: var(--dlg-surface);
+  border-bottom: 1px solid var(--dlg-border);
+  padding: var(--dlg-pad-y) var(--dlg-pad-x);
+  border-radius: 0;
+}
+
+:host ::ng-deep .p-dialog .p-dialog-title {
+  font-size: 1.0625rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: var(--dlg-text);
+}
+
+:host ::ng-deep .p-dialog .p-dialog-content {
+  padding: 0;
+  background: var(--dlg-surface);
+  overflow-y: auto;
+  max-height: calc(88vh - 140px);
+}
+
+:host ::ng-deep .p-dialog .p-dialog-footer {
+  background: var(--dlg-surface-muted);
+  border-top: 1px solid var(--dlg-border);
+  padding: 16px var(--dlg-pad-x);
+  border-radius: 0;
+  position: sticky;
+  bottom: 0;
+  z-index: 1;
+}
+
+/* Tab styles */
+.tab-button {
+  position: relative;
+  padding: 0.75rem 1.125rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--dlg-text-muted);
+  border: none;
+  background: transparent;
+  border-bottom: 2px solid transparent;
+  cursor: pointer;
+  transition: color 0.15s ease, border-color 0.15s ease,
+    background-color 0.15s ease;
+}
+
+.tab-button:hover {
+  color: var(--dlg-text);
+  background: var(--dlg-surface-muted);
+}
+
+.tab-button.active {
+  color: var(--dlg-primary);
+  border-bottom-color: var(--dlg-primary);
+}
+
+.tab-button:focus-visible {
+  outline: 2px solid var(--dlg-accent);
+  outline-offset: -2px;
+}
+
+.tab-button i {
+  margin-right: 0.5rem;
+  font-size: 0.875rem;
+}
+
+/* Section headers */
+.section-header {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--dlg-text-muted);
+  margin-bottom: 0.875rem;
+}
+
+.section-description {
+  font-size: 0.8125rem;
+  color: var(--dlg-text-muted);
+  margin-bottom: 1.25rem;
+}
+
+/* Form field labels */
+.field-label {
+  display: block;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--dlg-text-label);
+  margin-bottom: 0.375rem;
+}
+
+.field-label .required {
+  color: var(--dlg-danger);
+  margin-left: 0.125rem;
+}
+
+/* Input field styles.
+   NOTE: the old rule targeted `.p-inputtextarea`, a class PrimeNG 19 no longer
+   emits - a textarea now carries `.p-textarea`. Both are listed so the rule
+   applies either way. */
+:host ::ng-deep .p-inputtext,
+:host ::ng-deep .p-dropdown,
+:host ::ng-deep .p-select,
+:host ::ng-deep .p-textarea,
+:host ::ng-deep .p-inputtextarea {
+  border: 1px solid var(--dlg-border-strong);
+  border-radius: var(--dlg-radius-control);
+  padding: 0.625rem 0.875rem;
+  font-size: 0.9375rem;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+:host ::ng-deep .p-inputtext:enabled:hover,
+:host ::ng-deep .p-dropdown:not(.p-disabled):hover,
+:host ::ng-deep .p-select:not(.p-disabled):hover,
+:host ::ng-deep .p-textarea:enabled:hover,
+:host ::ng-deep .p-inputtextarea:enabled:hover {
+  border-color: #94a3b8;
+}
+
+:host ::ng-deep .p-inputtext:enabled:focus,
+:host ::ng-deep .p-dropdown:not(.p-disabled).p-focus,
+:host ::ng-deep .p-select:not(.p-disabled).p-focus,
+:host ::ng-deep .p-textarea:enabled:focus,
+:host ::ng-deep .p-inputtextarea:enabled:focus {
+  border-color: var(--dlg-accent);
+  box-shadow: 0 0 0 3px var(--dlg-primary-ring);
+}
+
+:host ::ng-deep .p-inputtext:read-only,
+:host ::ng-deep .p-dropdown.p-disabled,
+:host ::ng-deep .p-select.p-disabled,
+:host ::ng-deep .p-textarea:read-only,
+:host ::ng-deep .p-inputtextarea:read-only {
+  background-color: var(--dlg-surface-muted);
+  cursor: not-allowed;
+}
+
+/* Error messages */
+.p-error {
+  color: var(--dlg-danger);
+  font-size: 0.75rem;
+  font-weight: 500;
+  margin-top: 0.375rem;
+  display: block;
+}
+
+/* Info card styles */
+.info-card {
+  background: var(--dlg-surface-muted);
+  border: 1px solid var(--dlg-border);
+  border-radius: 12px;
+  padding: 1.125rem;
+}
+
+.info-card-header {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--dlg-text-muted);
+  margin-bottom: 0.875rem;
+}
+
+/* Combo mode selection */
+:host ::ng-deep .p-selectbutton .p-button {
+  border-radius: var(--dlg-radius-control);
+  padding: 0.625rem 1rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  transition: background-color 0.15s ease, border-color 0.15s ease,
+    color 0.15s ease;
+}
+
+:host ::ng-deep .p-selectbutton .p-button:not(.p-highlight) {
+  background: var(--dlg-surface);
+  border: 1px solid var(--dlg-border-strong);
+  color: var(--dlg-text-muted);
+}
+
+:host ::ng-deep .p-selectbutton .p-button:not(.p-highlight):hover {
+  background: var(--dlg-surface-muted);
+  border-color: #94a3b8;
+  color: var(--dlg-text);
+}
+
+:host ::ng-deep .p-selectbutton .p-button.p-highlight {
+  background: var(--dlg-primary);
+  border-color: var(--dlg-primary);
+  color: #ffffff;
+}
+
+/* Multiselect customization */
+:host ::ng-deep .p-multiselect {
+  border: 1px solid var(--dlg-border-strong);
+  border-radius: var(--dlg-radius-control);
+}
+
+:host ::ng-deep .p-multiselect:not(.p-disabled):hover {
+  border-color: #94a3b8;
+}
+
+:host ::ng-deep .p-multiselect:not(.p-disabled).p-focus {
+  border-color: var(--dlg-accent);
+  box-shadow: 0 0 0 3px var(--dlg-primary-ring);
+}
+
+:host ::ng-deep .p-multiselect-panel .p-multiselect-items-wrapper {
+  max-height: 300px !important;
+}
+
+:host ::ng-deep .p-multiselect-item {
+  min-height: 65px;
+  border-bottom: 1px solid var(--dlg-border);
+  padding: 0.75rem 1rem;
+}
+
+:host ::ng-deep .p-multiselect-item:last-child {
+  border-bottom: none;
+}
+
+:host ::ng-deep .p-multiselect-item:hover {
+  background: var(--dlg-surface-muted);
+}
+
+/* Combo item template styles */
+.combo-item-template {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  width: 100%;
+}
+
+.combo-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.device-name {
+  font-weight: 600;
+  font-size: 0.875rem;
+  color: var(--dlg-text);
+}
+
+.device-mac {
+  font-size: 0.75rem;
+  color: var(--dlg-text-muted);
+}
+
+.default-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.125rem 0.5rem;
+  background: var(--dlg-accent-soft);
+  color: #065f46;
+  border-radius: 9999px;
+  font-size: 0.6875rem;
+  font-weight: 700;
+}
+
+.normal-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.125rem 0.5rem;
+  background: #e2e8f0;
+  color: #475569;
+  border-radius: 9999px;
+  font-size: 0.6875rem;
+  font-weight: 700;
+}
+
+.combo-details {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.template-info,
+.specs-info {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  font-size: 0.8125rem;
+  color: var(--dlg-text-muted);
+}
+
+.template-info i,
+.specs-info i {
+  font-size: 0.75rem;
+  color: #94a3b8;
+}
+
+.specs-info {
+  display: flex;
+  gap: 0.75rem;
+}
+
+/* Assignment card styles */
+.assignment-card {
+  background: var(--dlg-surface);
+  border: 1px solid var(--dlg-border);
+  border-radius: 12px;
+  padding: 1.125rem;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.assignment-card:hover {
+  border-color: var(--dlg-border-strong);
+  box-shadow: 0 4px 10px -4px rgba(15, 23, 42, 0.1);
+}
+
+.assignment-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 0.75rem;
+  margin-bottom: 1rem;
+  border-bottom: 1px solid var(--dlg-border);
+}
+
+.assignment-title {
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: var(--dlg-text);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.assignment-title i {
+  color: var(--dlg-text-muted);
+}
+
+/* Preview section */
+.preview-section {
+  background: #ecfdf5;
+  border: 1px solid #a7f3d0;
+  border-radius: var(--dlg-radius-control);
+  padding: 0.875rem;
+  margin-top: 1rem;
+}
+
+.preview-title {
+  font-size: 0.6875rem;
+  font-weight: 700;
+  color: #047857;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: 0.75rem;
+}
+
+.preview-content {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 0.875rem;
+}
+
+.preview-item-label {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  color: #059669;
+  margin-bottom: 0.375rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.preview-item-value {
+  font-size: 0.875rem;
+  color: var(--dlg-text);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* Empty state */
+.empty-state {
+  text-align: center;
+  padding: 2.25rem 1.5rem;
+  border: 1px dashed var(--dlg-border-strong);
+  border-radius: 12px;
+  background: var(--dlg-surface-muted);
+}
+
+.empty-state i {
+  font-size: 2rem;
+  color: #cbd5e1;
+  margin-bottom: 0.75rem;
+}
+
+.empty-state-title {
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: var(--dlg-text-label);
+  margin-bottom: 0.25rem;
+}
+
+.empty-state-description {
+  font-size: 0.8125rem;
+  color: var(--dlg-text-muted);
+  margin-bottom: 1.25rem;
+}
+
+/* Button styles.
+   The old rule lifted every button on hover (translateY), which no other
+   surface in the app does; colour change alone is steadier. */
+:host ::ng-deep .p-button {
+  border-radius: var(--dlg-radius-control);
+  padding: 0 1.125rem;
+  min-height: var(--dlg-control-h);
+  font-size: 0.875rem;
+  font-weight: 600;
+  transition: background-color 0.15s ease, border-color 0.15s ease,
+    color 0.15s ease;
+}
+
+:host ::ng-deep .p-button-outlined {
+  border: 1px solid var(--dlg-border-strong);
+  background: transparent;
+  color: var(--dlg-text-label);
+}
+
+:host ::ng-deep .p-button-outlined:enabled:hover {
+  background: var(--dlg-surface-muted);
+  border-color: #94a3b8;
+}
+
+:host ::ng-deep .p-button-text {
+  background: transparent;
+  border: none;
+  color: var(--dlg-text-label);
+}
+
+:host ::ng-deep .p-button-text:enabled:hover {
+  background: #f1f5f9;
+}
+
+/* The submit action is the one thing that should read as primary. */
+:host ::ng-deep .p-button-primary {
+  background: var(--dlg-primary);
+  border-color: var(--dlg-primary);
+  color: #ffffff;
+}
+
+:host ::ng-deep .p-button-primary:enabled:hover {
+  background: var(--dlg-primary-hover);
+  border-color: var(--dlg-primary-hover);
+}
+
+:host ::ng-deep .p-button-danger.p-button-text {
+  color: var(--dlg-danger);
+}
+
+:host ::ng-deep .p-button-danger.p-button-text:enabled:hover {
+  background: var(--dlg-danger-soft);
+}
+
+:host ::ng-deep .p-button:focus-visible {
+  outline: 2px solid var(--dlg-accent);
+  outline-offset: 2px;
+}
+
+/* Tag badge styles */
+:host ::ng-deep .p-tag {
+  border-radius: 0.375rem;
+  padding: 0.25rem 0.625rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+/* Checkbox styles */
+:host ::ng-deep .p-checkbox {
+  width: 1.125rem;
+  height: 1.125rem;
+}
+
+:host ::ng-deep .p-checkbox .p-checkbox-box {
+  border: 1px solid var(--dlg-border-strong);
+  border-radius: 0.375rem;
+  width: 1.125rem;
+  height: 1.125rem;
+}
+
+:host ::ng-deep .p-checkbox:not(.p-checkbox-disabled) .p-checkbox-box:hover {
+  border-color: var(--dlg-accent);
+}
+
+:host ::ng-deep .p-checkbox .p-checkbox-box.p-highlight {
+  background: var(--dlg-primary);
+  border-color: var(--dlg-primary);
+}
+
+/* Input number styles */
+:host ::ng-deep .p-inputnumber-input {
+  text-align: center;
+}
+
+/* Scrollbar styles */
+:host ::ng-deep .p-dialog .p-dialog-content::-webkit-scrollbar {
+  width: 10px;
+}
+
+:host ::ng-deep .p-dialog .p-dialog-content::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+:host ::ng-deep .p-dialog .p-dialog-content::-webkit-scrollbar-thumb {
+  background: var(--dlg-border-strong);
+  border-radius: 999px;
+  border: 3px solid var(--dlg-surface);
+}
+
+:host ::ng-deep .p-dialog .p-dialog-content::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  :host ::ng-deep .p-dialog .p-dialog-content {
+    max-height: calc(88vh - 120px);
+  }
+
+  .tab-button {
+    padding: 0.75rem 0.875rem;
+    font-size: 0.8125rem;
+  }
+
+  .assignment-card {
+    padding: 1rem;
+  }
+}
+
+/* Loading state */
+:host ::ng-deep .p-dropdown.p-disabled,
+:host ::ng-deep .p-select.p-disabled,
+:host ::ng-deep .p-multiselect.p-disabled {
+  opacity: 0.6;
+}
+
+/* Helper text */
+.helper-text {
+  font-size: 0.75rem;
+  color: var(--dlg-text-muted);
+  margin-top: 0.375rem;
+}
+
+/* Status indicator */
+.status-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.25rem 0.625rem;
+  border-radius: 9999px;
+  font-size: 0.6875rem;
+  font-weight: 700;
+}
+
+.status-indicator.active {
+  background: var(--dlg-accent-soft);
+  color: #065f46;
+}
+
+.status-indicator.inactive {
+  background: var(--dlg-danger-soft);
+  color: #991b1b;
+}
+
+/* Counter badge */
+.counter-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.375rem;
+  height: 1.375rem;
+  padding: 0 0.375rem;
+  background: var(--dlg-primary);
+  color: #ffffff;
+  border-radius: 9999px;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  margin-left: 0.5rem;
+}
+
+/* Shelf accordion header */
+.shelf-header-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  width: 100%;
+  min-width: 0;
+}
+
+.shelf-header-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+  min-width: 0;
+}
+
+.shelf-header-title {
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: var(--dlg-text);
+}
+
+.shelf-header-meta {
+  font-size: 0.75rem;
+  color: var(--dlg-text-muted);
+}
+
+.shelf-header-badges {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-shrink: 0;
+}
+
+/* Textarea in the rack description keeps a comfortable minimum height. */
+.description-field {
+  min-height: 92px;
+  resize: vertical;
+}

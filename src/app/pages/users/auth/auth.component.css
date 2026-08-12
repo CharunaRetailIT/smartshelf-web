@@ -1,0 +1,360 @@
+/* auth.component.css */
+/* Custom styles for the authentication component */
+/* Updated to match SmartShelf dashboard teal/green color scheme */
+
+/* Custom animations for enhanced UX */
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Component-specific styles */
+.auth-container {
+  animation: fadeIn 0.8s ease-out;
+}
+
+/* Form animations */
+form {
+  animation: slideIn 0.6s ease-out;
+}
+
+/* Enhanced button interactions */
+button {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+button:hover {
+  box-shadow: 0 10px 25px rgba(20, 184, 166, 0.2);
+}
+
+button:active {
+  transform: scale(0.98);
+}
+
+/* Enhanced input focus states with teal accent */
+input,
+select {
+  transition: all 0.2s ease-in-out;
+}
+
+input:focus,
+select:focus {
+  box-shadow: 0 0 0 3px rgba(20, 184, 166, 0.1);
+  transform: translateY(-1px);
+}
+
+/* Custom checkbox styling for better visual hierarchy */
+input[type="checkbox"]:checked {
+  background-color: #14b8a6;
+  background-image: url("data:image/svg+xml,%3csvg viewBox='0 0 16 16' fill='white' xmlns='http://www.w3.org/2000/svg'%3e%3cpath d='M12.207 4.793a1 1 0 010 1.414l-5 5a1 1 0 01-1.414 0l-2-2a1 1 0 011.414-1.414L6.5 9.086l4.293-4.293a1 1 0 011.414 0z'/%3e%3c/svg%3e");
+}
+
+input[type="checkbox"]:hover {
+  border-color: #14b8a6;
+}
+
+/* Loading spinner enhancement */
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-spin {
+  animation: spin 1s linear infinite;
+}
+
+/* Error message animation */
+.text-red-500 {
+  animation: slideIn 0.3s ease-out;
+}
+
+/* Form field error state */
+.border-red-300 {
+  border-color: #fca5a5 !important;
+  box-shadow: 0 0 0 3px rgba(248, 113, 113, 0.1);
+}
+
+/* Success state (for future use) */
+.border-green-300 {
+  border-color: #6ee7b7 !important;
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+}
+
+/* Custom scrollbar for select dropdown - teal themed */
+select {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(20, 184, 166, 0.3) rgba(243, 244, 246, 1);
+}
+
+select::-webkit-scrollbar {
+  width: 6px;
+}
+
+select::-webkit-scrollbar-track {
+  background: rgba(243, 244, 246, 1);
+}
+
+select::-webkit-scrollbar-thumb {
+  background: rgba(20, 184, 166, 0.3);
+  border-radius: 3px;
+}
+
+select::-webkit-scrollbar-thumb:hover {
+  background: rgba(20, 184, 166, 0.5);
+}
+
+/* Gradient background overlay - clean white background */
+/* .bg-white {
+  background-color: #ffffff;
+}
+
+.min-h-screen {
+  background-color: #ffffff;
+} */
+
+/* Header gradient matching SmartShelf sidebar */
+.bg-gradient-to-r {
+  background-image: linear-gradient(to right, #14b8a6, #10b981);
+}
+
+/* Active status badge style (matching dashboard) */
+.badge-active {
+  background-color: #d1fae5;
+  color: #065f46;
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+/* Link hover effects matching teal theme */
+a {
+  transition: color 0.2s ease-in-out;
+}
+
+a:hover {
+  color: #0f766e;
+}
+
+/* Responsive enhancements */
+@media (max-width: 640px) {
+  .grid-cols-2,
+  .grid-cols-3 {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .max-w-md {
+    max-width: 100%;
+    margin: 1rem;
+  }
+
+  .p-8 {
+    padding: 1.5rem;
+  }
+}
+
+/* Tablet view */
+@media (max-width: 768px) {
+  .grid-cols-3 {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Dark mode support (if needed in the future) */
+@media (prefers-color-scheme: dark) {
+  /* Add dark mode styles here if required */
+  .bg-white\/80 {
+    background-color: rgba(31, 41, 55, 0.8);
+  }
+}
+
+/* Print styles (hide component when printing) */
+@media print {
+  .auth-container {
+    display: none;
+  }
+}
+
+/* Accessibility enhancements */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Focus-visible for better keyboard navigation - teal themed */
+input:focus-visible,
+button:focus-visible,
+select:focus-visible {
+  outline: 2px solid #14b8a6;
+  outline-offset: 2px;
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  input,
+  select,
+  button {
+    border-width: 2px;
+  }
+
+  .text-gray-400 {
+    color: #374151 !important;
+  }
+
+  button {
+    font-weight: 600;
+  }
+}
+
+/* Container queries for better responsive design (if supported) */
+@container (max-width: 400px) {
+  .p-8 {
+    padding: 1.5rem;
+  }
+
+  .text-3xl {
+    font-size: 1.875rem;
+    line-height: 2.25rem;
+  }
+}
+
+/* Custom utility classes */
+.teal-focus:focus {
+  border-color: #14b8a6;
+  box-shadow: 0 0 0 3px rgba(20, 184, 166, 0.1);
+}
+
+.emerald-hover:hover {
+  background-color: #10b981;
+}
+
+/* SmartShelf branding colors */
+:root {
+  --smartshelf-primary: #14b8a6;
+  --smartshelf-secondary: #10b981;
+  --smartshelf-accent: #0d9488;
+  --smartshelf-light: #ccfbf1;
+  --smartshelf-dark: #134e4a;
+}
+
+/* Button gradient animation on hover */
+.bg-gradient-to-r:hover {
+  background-image: linear-gradient(to right, #0f766e, #059669);
+}
+
+/* Form card shadow enhancement */
+.shadow-2xl {
+  box-shadow: 0 25px 50px -12px rgba(20, 184, 166, 0.15);
+}
+
+/* Toggle button active state */
+button.bg-white {
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+/* Input placeholder styling */
+input::placeholder,
+select::placeholder {
+  color: #9ca3af;
+  opacity: 1;
+}
+
+input:focus::placeholder,
+select:focus::placeholder {
+  opacity: 0.5;
+}
+
+/* Smooth transitions for dynamic content */
+.transition-all {
+  transition-property: all;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 300ms;
+}
+
+/* Error state for required fields */
+input:invalid:not(:placeholder-shown) {
+  border-color: #fca5a5;
+}
+
+input:valid:not(:placeholder-shown) {
+  border-color: #6ee7b7;
+}
+
+/* Disabled state styling */
+button:disabled {
+  background-image: linear-gradient(to right, #9ca3af, #9ca3af);
+  cursor: not-allowed;
+}
+
+/* Loading state (for future implementation) */
+.loading {
+  position: relative;
+  pointer-events: none;
+}
+
+.loading::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 20px;
+  height: 20px;
+  margin: -10px 0 0 -10px;
+  border: 2px solid #ffffff;
+  border-top-color: transparent;
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+}
+
+.company-link {
+  text-align: center;
+  margin-top: 20px;
+  color: #666;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.company-link a {
+  color: #328e6e;
+  text-decoration: none;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.company-link a:hover {
+  color: #67ae6e;
+  text-decoration: underline;
+}

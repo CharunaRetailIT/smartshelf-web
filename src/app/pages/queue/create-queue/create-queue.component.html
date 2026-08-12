@@ -1,0 +1,527 @@
+<!-- queue-create.component.html -->
+<!-- The component owns its own dialog — no wrapper needed in the parent -->
+
+<p-dialog
+  header="Create Scheduled Queue"
+  [(visible)]="visible"
+  [modal]="true"
+  [draggable]="false"
+  [resizable]="false"
+  [style]="{ width: '860px', 'max-width': '95vw' }"
+  [contentStyle]="{ padding: '0' }"
+  appendTo="body"
+  styleClass="queue-create-dialog"
+  (onHide)="cancel()"
+>
+  <!-- ─── Subtitle in subheader ─────────────────────────────────── -->
+  <ng-template pTemplate="header">
+    <div class="dialog-header-content">
+      <div class="dialog-header-icon">
+        <i class="pi pi-calendar-plus"></i>
+      </div>
+      <div>
+        <span class="dialog-title">Create Scheduled Queue</span>
+        <p class="dialog-subtitle">
+          Schedule content to display on your ESL devices
+        </p>
+      </div>
+    </div>
+  </ng-template>
+
+  <!-- ─── Scrollable Body ───────────────────────────────────────── -->
+  <form [formGroup]="queueForm" class="modal-body">
+    <!-- Queue Source -->
+    <div class="section">
+      <h2 class="section-title">Queue Source</h2>
+      <p-selectButton
+        [options]="sourceOptions"
+        formControlName="sourceType"
+        optionLabel="label"
+        optionValue="value"
+        class="source-toggle"
+      >
+        <ng-template let-item>
+          <span class="flex align-items-center gap-2">
+            <i [class]="item.icon"></i>
+            <span>{{ item.label }}</span>
+          </span>
+        </ng-template>
+      </p-selectButton>
+    </div>
+
+    <!-- From Assignment -->
+    <div
+      *ngIf="queueForm.get('sourceType')?.value === 'assignment'"
+      class="section fade-in"
+    >
+      <h2 class="section-title">Select Assignment</h2>
+      <div class="field-group">
+        <label class="field-label"
+          >Assignment <span class="required">*</span></label
+        >
+        <p-dropdown
+          formControlName="assignmentId"
+          [options]="assignments"
+          optionLabel="displayName"
+          [showClear]="true"
+          [filter]="true"
+          filterBy="displayName"
+          placeholder="Search and select assignment"
+          appendTo="body"
+          styleClass="w-full"
+          (onChange)="onAssignmentSelect($event.value)"
+        ></p-dropdown>
+        <small
+          *ngIf="
+            queueForm.get('assignmentId')?.invalid &&
+            queueForm.get('assignmentId')?.touched
+          "
+          class="field-error"
+          ><i class="pi pi-exclamation-circle"></i> Assignment is
+          required</small
+        >
+      </div>
+    </div>
+
+    <!-- Direct Creation -->
+    <div
+      *ngIf="queueForm.get('sourceType')?.value === 'direct'"
+      class="section fade-in"
+    >
+      <h2 class="section-title">Device &amp; Content</h2>
+
+      <!-- New pairing vs. reusing a saved device+template / device+message
+           combo - same two modes as the product ESL assignment form. -->
+      <div class="combo-mode-toggle">
+        <button
+          pButton
+          type="button"
+          label="New Pairing"
+          class="p-button-sm"
+          [class.p-button-outlined]="comboSourceMode !== 'new'"
+          (click)="toggleComboSourceMode('new')"
+        ></button>
+        <button
+          pButton
+          type="button"
+          label="Use Existing Combo"
+          class="p-button-sm"
+          [class.p-button-outlined]="comboSourceMode !== 'existing'"
+          (click)="toggleComboSourceMode('existing')"
+        ></button>
+      </div>
+
+      <div class="grid-two">
+        <div class="field-group">
+          <label class="field-label"
+            >ESL Brand <span class="required">*</span></label
+          >
+          <p-dropdown
+            formControlName="brandId"
+            [options]="eslBrandOptions"
+            optionLabel="name"
+            optionValue="id"
+            [showClear]="true"
+            placeholder="Select brand"
+            appendTo="body"
+            styleClass="w-full"
+            (onChange)="onBrandChange()"
+          ></p-dropdown>
+          <small
+            *ngIf="
+              queueForm.get('brandId')?.invalid &&
+              queueForm.get('brandId')?.touched
+            "
+            class="field-error"
+            ><i class="pi pi-exclamation-circle"></i> Brand is required</small
+          >
+        </div>
+
+        <ng-container *ngIf="comboSourceMode === 'new'; else existingComboBlock">
+          <div class="field-group">
+            <label class="field-label"
+              >Device <span class="required">*</span></label
+            >
+            <p-dropdown
+              formControlName="deviceId"
+              [options]="devices"
+              optionLabel="deviceName"
+              optionValue="id"
+              [filter]="true"
+              filterBy="deviceName,mac"
+              [showClear]="true"
+              [placeholder]="
+                queueForm.get('brandId')?.value
+                  ? 'Select device'
+                  : 'Select a brand first'
+              "
+              appendTo="body"
+              styleClass="w-full"
+              (onChange)="onDeviceChange($event.value)"
+              (onFilter)="loadDevices($event)"
+            >
+              <ng-template pTemplate="item" let-device>
+                <div class="flex flex-col">
+                  <span class="font-semibold">{{
+                    device.deviceName || device.name
+                  }}</span>
+                  <small class="text-slate-500">{{
+                    device.mac || "No MAC"
+                  }}</small>
+                </div>
+              </ng-template>
+            </p-dropdown>
+            <small
+              *ngIf="
+                queueForm.get('deviceId')?.invalid &&
+                queueForm.get('deviceId')?.touched
+              "
+              class="field-error"
+              ><i class="pi pi-exclamation-circle"></i> Device is
+              required</small
+            >
+          </div>
+
+          <!-- Template (Minew only - Standard devices have no template concept) -->
+          <div class="field-group" *ngIf="brandSupportsTemplate()">
+            <label class="field-label"
+              >Template <span class="required" *ngIf="isMinewBrand()">*</span></label
+            >
+            <p-dropdown
+              formControlName="templateId"
+              [options]="templates"
+              optionLabel="name"
+              optionValue="id"
+              [filter]="true"
+              [showClear]="true"
+              placeholder="Select template"
+              appendTo="body"
+              styleClass="w-full"
+              (onFilter)="loadTemplates($event.filter)"
+            ></p-dropdown>
+            <small
+              *ngIf="
+                queueForm.get('templateId')?.invalid &&
+                queueForm.get('templateId')?.touched
+              "
+              class="field-error"
+              ><i class="pi pi-exclamation-circle"></i> Template is required for
+              Minew devices</small
+            >
+          </div>
+
+          <!-- Message - required for Standard, optional alongside a Minew template -->
+          <div class="field-group">
+            <label class="field-label">
+              Message
+              <span class="required" *ngIf="isStandardBrand()">*</span>
+              <span class="optional-badge" *ngIf="brandSupportsTemplate()"
+                >Optional</span
+              >
+            </label>
+            <p-dropdown
+              formControlName="messageId"
+              [options]="messages"
+              optionLabel="title"
+              optionValue="id"
+              [filter]="true"
+              [showClear]="true"
+              [placeholder]="
+                isStandardBrand()
+                  ? 'Select message'
+                  : 'Optionally pair a message'
+              "
+              appendTo="body"
+              styleClass="w-full"
+              (onFilter)="loadMessages($event.filter)"
+            ></p-dropdown>
+            <small
+              *ngIf="
+                queueForm.get('messageId')?.invalid &&
+                queueForm.get('messageId')?.touched
+              "
+              class="field-error"
+              ><i class="pi pi-exclamation-circle"></i> Message is required for
+              Standard devices</small
+            >
+          </div>
+        </ng-container>
+
+        <ng-template #existingComboBlock>
+          <!-- Minew: pick from the DeviceTemplateCombos table. -->
+          <div class="field-group" *ngIf="brandSupportsTemplate()">
+            <label class="field-label"
+              >Existing Device+Template Combo
+              <span class="required">*</span></label
+            >
+            <p-dropdown
+              formControlName="deviceTemplateComboId"
+              [options]="existingCombos"
+              optionLabel="templateName"
+              optionValue="id"
+              [filter]="true"
+              [showClear]="true"
+              placeholder="Select an existing template combo"
+              appendTo="body"
+              styleClass="w-full"
+              (onFilter)="loadExistingTemplateCombos($event.filter)"
+              (onChange)="onExistingComboSelected()"
+            >
+              <ng-template pTemplate="item" let-combo>
+                <div class="flex flex-col">
+                  <span class="font-semibold">{{ combo.templateName }}</span>
+                  <small class="text-slate-500">{{ combo.deviceName }}</small>
+                </div>
+              </ng-template>
+            </p-dropdown>
+          </div>
+
+          <!-- Standard: pick from the DeviceMessageCombos table. -->
+          <div class="field-group" *ngIf="!brandSupportsTemplate()">
+            <label class="field-label"
+              >Existing Device+Message Combo
+              <span class="required">*</span></label
+            >
+            <p-dropdown
+              formControlName="deviceMessageComboId"
+              [options]="existingMessageCombos"
+              optionLabel="messageTitle"
+              optionValue="id"
+              [filter]="true"
+              [showClear]="true"
+              placeholder="Select an existing message combo"
+              appendTo="body"
+              styleClass="w-full"
+              (onFilter)="loadExistingMessageCombos($event.filter)"
+              (onChange)="onExistingMessageComboSelected()"
+            >
+              <ng-template pTemplate="item" let-combo>
+                <div class="flex flex-col">
+                  <span class="font-semibold">{{ combo.messageTitle }}</span>
+                  <small class="text-slate-500">{{ combo.deviceName }}</small>
+                </div>
+              </ng-template>
+            </p-dropdown>
+          </div>
+
+          <div class="field-group combo-preview" *ngIf="existingComboPreview">
+            <span
+              ><i class="pi pi-check-circle"></i>
+              {{ existingComboPreview.device }} →
+              {{ existingComboPreview.binding }}</span
+            >
+          </div>
+        </ng-template>
+      </div>
+
+      <div class="section-divider"></div>
+
+      <h2 class="section-title section-title--sub">Location</h2>
+      <div class="grid-two">
+        <div class="field-group">
+          <label class="field-label">Location Type</label>
+          <p-selectButton
+            [options]="locationTypes"
+            formControlName="locationType"
+            optionLabel="label"
+            optionValue="value"
+            styleClass="location-toggle"
+          ></p-selectButton>
+        </div>
+
+        <div class="field-group">
+          <label class="field-label">
+            {{ queueForm.get("locationType")?.value | titlecase }}
+            <span class="required">*</span>
+          </label>
+
+          <p-dropdown
+            *ngIf="queueForm.get('locationType')?.value === 'PRODUCT'"
+            formControlName="locationId"
+            [options]="products"
+            optionLabel="productName"
+            optionValue="id"
+            [filter]="true"
+            [showClear]="true"
+            placeholder="Select product"
+            appendTo="body"
+            styleClass="w-full"
+            (onFilter)="loadProducts($event.filter)"
+          ></p-dropdown>
+
+          <p-dropdown
+            *ngIf="queueForm.get('locationType')?.value === 'SHELF'"
+            formControlName="locationId"
+            [options]="shelves"
+            optionLabel="name"
+            optionValue="id"
+            [filter]="true"
+            [showClear]="true"
+            placeholder="Select shelf"
+            appendTo="body"
+            styleClass="w-full"
+            (onFilter)="loadShelves($event.filter)"
+          ></p-dropdown>
+
+          <small
+            *ngIf="
+              queueForm.get('locationId')?.invalid &&
+              queueForm.get('locationId')?.touched
+            "
+            class="field-error"
+            ><i class="pi pi-exclamation-circle"></i> Location is
+            required</small
+          >
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Schedule -->
+    <div class="section">
+      <h2 class="section-title">Schedule</h2>
+
+      <div class="grid-two">
+        <div class="field-group">
+          <label class="field-label"
+            >Start Date &amp; Time <span class="required">*</span></label
+          >
+          <p-calendar
+            formControlName="startDate"
+            [showTime]="true"
+            [hourFormat]="'24'"
+            [showIcon]="true"
+            [showButtonBar]="true"
+            [minDate]="minStartDate"
+            placeholder="Select start date and time"
+            appendTo="body"
+            styleClass="w-full"
+          ></p-calendar>
+          <small
+            *ngIf="
+              queueForm.get('startDate')?.invalid &&
+              queueForm.get('startDate')?.touched
+            "
+            class="field-error"
+            ><i class="pi pi-exclamation-circle"></i> Start date is
+            required</small
+          >
+        </div>
+
+        <div class="field-group">
+          <label class="field-label">
+            End Date &amp; Time
+            <span class="optional-badge">Optional</span>
+          </label>
+          <p-calendar
+            formControlName="endDate"
+            [showTime]="true"
+            [hourFormat]="'24'"
+            [showIcon]="true"
+            [showButtonBar]="true"
+            [minDate]="queueForm.get('startDate')?.value"
+            placeholder="Select end date and time"
+            appendTo="body"
+            styleClass="w-full"
+          ></p-calendar>
+        </div>
+      </div>
+
+      <!-- Recurrence -->
+      <div class="recurrence-row">
+        <div class="recurrence-toggle">
+          <p-checkbox
+            formControlName="isRecurring"
+            [binary]="true"
+            inputId="isRecurring"
+          ></p-checkbox>
+          <label for="isRecurring" class="recurrence-label">
+            <i class="pi pi-refresh"></i>
+            Recurring Schedule
+          </label>
+        </div>
+
+        <div
+          class="field-group recurrence-pattern"
+          *ngIf="queueForm.get('isRecurring')?.value"
+        >
+          <p-dropdown
+            formControlName="recurrencePattern"
+            [options]="recurrenceOptions"
+            placeholder="Select pattern"
+            appendTo="body"
+            styleClass="w-full"
+          ></p-dropdown>
+        </div>
+      </div>
+    </div>
+
+    <!-- Priority & Display -->
+    <div class="section">
+      <h2 class="section-title">Priority &amp; Display</h2>
+
+      <div class="grid-two">
+        <div class="field-group">
+          <label class="field-label">Priority</label>
+          <p-dropdown
+            formControlName="priorityId"
+            [options]="priorityOptions"
+            optionLabel="priorityName"
+            optionValue="id"
+            placeholder="Select priority"
+            appendTo="body"
+            styleClass="w-full"
+          >
+            <ng-template let-option pTemplate="item">
+              <div class="flex align-items-center gap-2">
+                <span
+                  [style.background-color]="option.colorCode"
+                  class="priority-dot"
+                ></span>
+                <span>{{ option.priorityName }}</span>
+              </div>
+            </ng-template>
+          </p-dropdown>
+        </div>
+
+        <div class="field-group">
+          <label class="field-label">Display Order</label>
+          <p-inputNumber
+            formControlName="displayOrder"
+            [min]="1"
+            [max]="999"
+            styleClass="w-full"
+          ></p-inputNumber>
+        </div>
+      </div>
+    </div>
+  </form>
+
+  <!-- ─── Footer via pTemplate ──────────────────────────────────── -->
+  <ng-template pTemplate="footer">
+    <div class="modal-footer-inner">
+      <span class="footer-hint">
+        <i class="pi pi-info-circle"></i>
+        Active queues will be pushed to devices immediately
+      </span>
+      <div class="footer-actions">
+        <button
+          pButton
+          label="Cancel"
+          icon="pi pi-times"
+          class="p-button-outlined cancel-btn"
+          (click)="cancel()"
+        ></button>
+        <button
+          pButton
+          label="Create Queue"
+          icon="pi pi-calendar-plus"
+          class="p-button-primary"
+          [disabled]="!queueForm.valid || loading"
+          [loading]="loading"
+          (click)="createQueue()"
+        ></button>
+      </div>
+    </div>
+  </ng-template>
+</p-dialog>

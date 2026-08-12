@@ -1,0 +1,53 @@
+/* Add to create-message.component.css */
+canvas {
+  border: 1px solid #e5e7eb;
+  border-radius: 0.5rem;
+  background-image:
+    linear-gradient(45deg, #f3f4f6 25%, transparent 25%),
+    linear-gradient(-45deg, #f3f4f6 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, #f3f4f6 75%),
+    linear-gradient(-45deg, transparent 75%, #f3f4f6 75%);
+  background-size: 20px 20px;
+  background-position:
+    0 0,
+    0 10px,
+    10px -10px,
+    -10px 0px;
+}
+
+/* In your component's CSS file or global styles */
+:host ::ng-deep .p-dropdown {
+  width: 100%;
+}
+
+:host ::ng-deep .p-dropdown-panel {
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+:host ::ng-deep .p-dropdown-item {
+  padding: 0.5rem 1rem;
+}
+
+:host ::ng-deep .p-dropdown-header {
+  padding: 0.75rem;
+}
+
+:host ::ng-deep .p-dropdown-footer {
+  padding: 0.75rem;
+}
+
+/* Add this to your global styles or component CSS */
+input:focus,
+textarea:focus,
+select:focus {
+  outline: none;
+}
+
+/* Alternative: Use outline with your custom color */
+input:focus,
+textarea:focus,
+select:focus {
+  outline: 2px solid transparent;
+  outline-offset: 2px;
+}

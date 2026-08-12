@@ -1,0 +1,619 @@
+/* queue-create.component.css */
+
+/* ─── Root Variables ────────────────────────────────────────────── */
+:host {
+  --brand-teal: #1a7a6e;
+  --brand-teal-dark: #145e55;
+  --brand-teal-light: #e8f5f3;
+  --brand-teal-mid: #2da394;
+  --text-primary: #1c2b2a;
+  --text-secondary: #5a7370;
+  --text-muted: #8fa8a5;
+  --border: #e2e8e7;
+  --border-light: #f0f4f3;
+  --surface: #ffffff;
+  --surface-raised: #f7fbfa;
+  --error: #d64545;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --shadow-sm:
+    0 1px 3px rgba(26, 122, 110, 0.08), 0 1px 2px rgba(0, 0, 0, 0.04);
+  --shadow-md:
+    0 4px 16px rgba(26, 122, 110, 0.1), 0 2px 6px rgba(0, 0, 0, 0.04);
+  --shadow-focus: 0 0 0 3px rgba(26, 122, 110, 0.18);
+  --transition: 200ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ─── Dialog Shell ───────────────────────────────────────────────
+   Style the p-dialog itself to look like the shelf modal.
+   Use ::ng-deep from :host so it pierces the dialog's shadow DOM.
+   The dialog is appended to body so we target it via styleClass.
+─────────────────────────────────────────────────────────────────── */
+:host ::ng-deep .queue-create-dialog.p-dialog {
+  border-radius: var(--radius-lg) !important;
+  overflow: hidden;
+  font-family: "Segoe UI", system-ui, sans-serif;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.18) !important;
+}
+
+/* Header */
+:host ::ng-deep .queue-create-dialog .p-dialog-header {
+  background: var(--surface) !important;
+  border-bottom: 1px solid var(--border) !important;
+  padding: 1.25rem 1.5rem !important;
+  border-radius: var(--radius-lg) var(--radius-lg) 0 0 !important;
+}
+
+:host ::ng-deep .queue-create-dialog .p-dialog-header-icons {
+  align-self: flex-start;
+  margin-top: 2px;
+}
+
+:host ::ng-deep .queue-create-dialog .p-dialog-header-icon {
+  color: var(--text-muted) !important;
+  width: 32px !important;
+  height: 32px !important;
+  border-radius: var(--radius-sm) !important;
+  transition: all var(--transition);
+}
+
+:host ::ng-deep .queue-create-dialog .p-dialog-header-icon:hover {
+  background: var(--border-light) !important;
+  color: var(--text-primary) !important;
+}
+
+/* Content area — no extra padding, let .modal-body handle it */
+:host ::ng-deep .queue-create-dialog .p-dialog-content {
+  padding: 0 !important;
+  background: var(--surface-raised) !important;
+  /* Fixed scrollable height like shelf modal */
+  max-height: 68vh !important;
+  overflow-y: auto !important;
+  scrollbar-width: thin;
+  scrollbar-color: var(--border) transparent;
+}
+
+:host ::ng-deep .queue-create-dialog .p-dialog-content::-webkit-scrollbar {
+  width: 5px;
+}
+:host
+  ::ng-deep
+  .queue-create-dialog
+  .p-dialog-content::-webkit-scrollbar-track {
+  background: transparent;
+}
+:host
+  ::ng-deep
+  .queue-create-dialog
+  .p-dialog-content::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 99px;
+}
+:host
+  ::ng-deep
+  .queue-create-dialog
+  .p-dialog-content::-webkit-scrollbar-thumb:hover {
+  background: var(--text-muted);
+}
+
+/* Footer */
+:host ::ng-deep .queue-create-dialog .p-dialog-footer {
+  background: var(--surface) !important;
+  border-top: 1px solid var(--border) !important;
+  padding: 0 !important;
+  border-radius: 0 0 var(--radius-lg) var(--radius-lg) !important;
+}
+
+/* ─── Custom Dialog Header Content ──────────────────────────────── */
+.dialog-header-content {
+  display: flex;
+  align-items: center;
+  gap: 0.875rem;
+}
+
+.dialog-header-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  border-radius: var(--radius-sm);
+  background: var(--brand-teal-light);
+  color: var(--brand-teal);
+  font-size: 1rem;
+  flex-shrink: 0;
+}
+
+.dialog-title {
+  display: block;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  letter-spacing: -0.01em;
+  line-height: 1.25;
+}
+
+.dialog-subtitle {
+  margin: 0.15rem 0 0;
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+}
+
+/* ─── Scrollable Body ───────────────────────────────────────────── */
+.modal-body {
+  padding: 1.25rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  background: var(--surface-raised);
+}
+
+/* ─── Footer Inner ───────────────────────────────────────────────── */
+.modal-footer-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.875rem 1.5rem;
+  width: 100%;
+}
+
+.footer-hint {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.footer-hint i {
+  font-size: 0.85rem;
+}
+
+.footer-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+}
+
+/* ─── Sections ──────────────────────────────────────────────────── */
+.section {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 1.25rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.125rem;
+}
+
+.section-title {
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid var(--border-light);
+}
+
+.section-title--sub {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  padding-bottom: 0.25rem;
+  border-bottom: none;
+  margin-bottom: -0.25rem;
+}
+
+.section-divider {
+  height: 1px;
+  background: var(--border-light);
+}
+
+/* ─── Combo Source Toggle ───────────────────────────────────────── */
+.combo-mode-toggle {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.25rem;
+}
+
+/* Spans the full grid so the resolved device → binding line sits under the
+   combo picker rather than beside it. */
+.combo-preview {
+  grid-column: 1 / -1;
+  flex-direction: row;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+}
+
+.combo-preview i {
+  color: var(--brand-teal, var(--text-secondary));
+}
+
+/* ─── Grid ──────────────────────────────────────────────────────── */
+.grid-two {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem 1.5rem;
+}
+
+/* ─── Field Group ───────────────────────────────────────────────── */
+.field-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.field-label {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.required {
+  color: var(--error);
+}
+
+.optional-badge {
+  display: inline-flex;
+  align-items: center;
+  background: var(--brand-teal-light);
+  color: var(--brand-teal);
+  font-size: 0.62rem;
+  font-weight: 600;
+  padding: 0.1rem 0.4rem;
+  border-radius: 99px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.field-error {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  color: var(--error);
+  font-size: 0.78rem;
+}
+
+/* ─── Source Toggle ─────────────────────────────────────────────── */
+.source-toggle .p-selectbutton .p-button {
+  border-radius: var(--radius-sm) !important;
+  font-size: 0.875rem;
+  font-weight: 500;
+  padding: 0.575rem 1.25rem;
+  color: var(--text-secondary);
+  border: 1.5px solid var(--border) !important;
+  transition: all var(--transition);
+}
+
+.source-toggle .p-selectbutton .p-button.p-highlight {
+  background: var(--brand-teal) !important;
+  border-color: var(--brand-teal) !important;
+  color: #fff !important;
+}
+
+/* ─── Location Toggle ───────────────────────────────────────────── */
+.location-toggle .p-button {
+  font-size: 0.8rem !important;
+  padding: 0.45rem 0.85rem !important;
+}
+
+/* ─── Dropdown ──────────────────────────────────────────────────── */
+:host ::ng-deep .p-dropdown {
+  border-radius: var(--radius-sm) !important;
+  border: 1.5px solid var(--border) !important;
+  background: var(--surface) !important;
+  transition:
+    border-color var(--transition),
+    box-shadow var(--transition);
+}
+
+:host ::ng-deep .p-dropdown:not(.p-disabled).p-focus,
+:host ::ng-deep .p-dropdown:hover {
+  border-color: var(--brand-teal) !important;
+  box-shadow: var(--shadow-focus) !important;
+}
+
+:host ::ng-deep .p-dropdown-label {
+  font-size: 0.875rem;
+  color: var(--text-primary);
+  padding: 0.55rem 0.75rem;
+}
+
+:host ::ng-deep .p-dropdown-trigger {
+  color: var(--text-muted) !important;
+}
+
+/* ─── Calendar ──────────────────────────────────────────────────── */
+:host ::ng-deep .p-calendar .p-inputtext {
+  border-radius: var(--radius-sm) !important;
+  border: 1.5px solid var(--border) !important;
+  font-size: 0.875rem;
+  transition:
+    border-color var(--transition),
+    box-shadow var(--transition);
+}
+
+:host ::ng-deep .p-calendar .p-inputtext:focus {
+  border-color: var(--brand-teal) !important;
+  box-shadow: var(--shadow-focus) !important;
+  outline: none;
+}
+
+:host ::ng-deep .p-calendar .p-datepicker-trigger {
+  color: var(--text-muted) !important;
+  border: 1.5px solid var(--border) !important;
+  border-left: none !important;
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0 !important;
+}
+
+/* ─── InputNumber ───────────────────────────────────────────────── */
+:host ::ng-deep .p-inputnumber-input {
+  border-radius: var(--radius-sm) !important;
+  border: 1.5px solid var(--border) !important;
+  font-size: 0.875rem;
+  width: 100%;
+  transition:
+    border-color var(--transition),
+    box-shadow var(--transition);
+}
+
+:host ::ng-deep .p-inputnumber-input:focus {
+  border-color: var(--brand-teal) !important;
+  box-shadow: var(--shadow-focus) !important;
+  outline: none;
+}
+
+:host ::ng-deep .p-inputnumber-button {
+  background: var(--brand-teal) !important;
+  border-color: var(--brand-teal) !important;
+}
+
+/* ─── Checkbox ──────────────────────────────────────────────────── */
+:host ::ng-deep .p-checkbox .p-checkbox-box.p-highlight {
+  background: var(--brand-teal) !important;
+  border-color: var(--brand-teal) !important;
+}
+
+:host ::ng-deep .p-checkbox .p-checkbox-box:focus {
+  box-shadow: var(--shadow-focus) !important;
+}
+
+/* ─── Recurrence Row ─────────────────────────────────────────────── */
+.recurrence-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+  padding: 0.875rem 1rem;
+  background: var(--surface-raised);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-light);
+}
+
+.recurrence-toggle {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  flex-shrink: 0;
+  padding-top: 0.1rem;
+}
+
+.recurrence-label {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  cursor: pointer;
+  user-select: none;
+}
+
+.recurrence-label i {
+  color: var(--brand-teal);
+}
+
+.recurrence-pattern {
+  flex: 1;
+  min-width: 200px;
+}
+
+/* ─── Priority Dot ──────────────────────────────────────────────── */
+.priority-dot {
+  display: inline-block;
+  width: 0.75rem;
+  height: 0.75rem;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+/* ─── Buttons ────────────────────────────────────────────────────── */
+.cancel-btn.p-button {
+  border-color: var(--border) !important;
+  color: var(--text-secondary) !important;
+  background: var(--surface) !important;
+  font-weight: 500;
+  font-size: 0.875rem;
+  padding: 0.55rem 1.125rem !important;
+  border-radius: var(--radius-sm) !important;
+  transition: all var(--transition);
+}
+
+.cancel-btn.p-button:hover {
+  background: var(--surface-raised) !important;
+  border-color: var(--text-muted) !important;
+  color: var(--text-primary) !important;
+}
+
+.create-btn.p-button {
+  background: var(--brand-teal) !important;
+  border-color: var(--brand-teal) !important;
+  color: #fff !important;
+  font-weight: 600;
+  font-size: 0.875rem;
+  padding: 0.575rem 1.25rem !important;
+  border-radius: var(--radius-sm) !important;
+  box-shadow: var(--shadow-sm);
+  transition: all var(--transition);
+}
+
+.create-btn.p-button:not(:disabled):hover {
+  background: var(--brand-teal-dark) !important;
+  border-color: var(--brand-teal-dark) !important;
+  box-shadow: var(--shadow-md);
+  transform: translateY(-1px);
+}
+
+.create-btn.p-button:not(:disabled):active {
+  transform: translateY(0);
+}
+
+.create-btn.p-button:disabled {
+  opacity: 0.55;
+}
+
+/* ─── Fade In ───────────────────────────────────────────────────── */
+.fade-in {
+  animation: fadeSlideIn 0.2s ease both;
+}
+
+@keyframes fadeSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ─── Responsive: Tablet ─────────────────────────────────────────── */
+@media (max-width: 768px) {
+  :host ::ng-deep .queue-create-dialog .p-dialog-content {
+    max-height: 75vh !important;
+  }
+
+  .modal-body {
+    padding: 1rem 1.25rem;
+  }
+
+  .section {
+    padding: 1.125rem;
+  }
+
+  .grid-two {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .recurrence-row {
+    flex-direction: column;
+    gap: 0.875rem;
+  }
+
+  .modal-footer-inner {
+    flex-direction: column;
+    align-items: stretch;
+    padding: 0.875rem 1.25rem;
+    gap: 0.625rem;
+  }
+
+  .footer-hint {
+    justify-content: center;
+  }
+  .footer-actions {
+    justify-content: flex-end;
+  }
+}
+
+/* ─── Responsive: Mobile ─────────────────────────────────────────── */
+@media (max-width: 480px) {
+  .modal-body {
+    padding: 0.875rem;
+  }
+  .section {
+    padding: 1rem;
+  }
+
+  .footer-actions {
+    flex-direction: column-reverse;
+    gap: 0.5rem;
+  }
+
+  .footer-actions .p-button {
+    width: 100% !important;
+    justify-content: center;
+  }
+}
+
+/* styles.css  — add these, they must be global because appendTo="body" */
+
+.queue-create-dialog.p-dialog {
+  border-radius: 16px !important;
+  overflow: hidden;
+  font-family: "Segoe UI", system-ui, sans-serif;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.18) !important;
+}
+
+.queue-create-dialog .p-dialog-header {
+  background: #ffffff !important;
+  border-bottom: 1px solid #e2e8e7 !important;
+  padding: 1.25rem 1.5rem !important;
+  border-radius: 16px 16px 0 0 !important;
+}
+
+.queue-create-dialog .p-dialog-header-icons {
+  align-self: flex-start;
+  margin-top: 2px;
+}
+
+.queue-create-dialog .p-dialog-header-icon {
+  color: #8fa8a5 !important;
+  width: 32px !important;
+  height: 32px !important;
+  border-radius: 8px !important;
+}
+
+.queue-create-dialog .p-dialog-header-icon:hover {
+  background: #f0f4f3 !important;
+  color: #1c2b2a !important;
+}
+
+.queue-create-dialog .p-dialog-content {
+  padding: 0 !important;
+  background: #f7fbfa !important;
+  max-height: 68vh !important;
+  overflow-y: auto !important;
+  scrollbar-width: thin;
+  scrollbar-color: #e2e8e7 transparent;
+}
+
+.queue-create-dialog .p-dialog-content::-webkit-scrollbar {
+  width: 5px;
+}
+.queue-create-dialog .p-dialog-content::-webkit-scrollbar-track {
+  background: transparent;
+}
+.queue-create-dialog .p-dialog-content::-webkit-scrollbar-thumb {
+  background: #e2e8e7;
+  border-radius: 99px;
+}
+.queue-create-dialog .p-dialog-content::-webkit-scrollbar-thumb:hover {
+  background: #8fa8a5;
+}
+
+.queue-create-dialog .p-dialog-footer {
+  background: #ffffff !important;
+  border-top: 1px solid #e2e8e7 !important;
+  padding: 0 !important;
+  border-radius: 0 0 16px 16px !important;
+}

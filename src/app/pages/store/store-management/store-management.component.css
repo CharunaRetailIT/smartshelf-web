@@ -1,0 +1,111 @@
+@reference "tailwindcss";
+/* Custom styles for store management */
+.store-management {
+  /* // Ensure table has proper zebra striping */
+  .mat-row:nth-child(even) {
+    background-color: #f9fafb;
+  }
+  
+  .mat-row:hover {
+    background-color: #f0f9ff;
+  }
+
+  /* // Badge styles */
+  .badge-local {
+    @apply border-blue-200 text-blue-800 bg-blue-50;
+  }
+  
+  .badge-minew {
+    @apply border-purple-200 text-purple-800 bg-purple-50;
+  }
+  
+  .badge-active {
+    @apply border-green-200 text-green-800 bg-green-50;
+  }
+  
+  .badge-inactive {
+    @apply border-red-200 text-red-800 bg-red-50;
+  }
+  
+  .badge-synced {
+    @apply border-green-200 text-green-800 bg-green-50;
+  }
+  
+  .badge-pending {
+    @apply border-yellow-200 text-yellow-800 bg-yellow-50;
+  }
+  
+  .badge-failed {
+    @apply border-red-200 text-red-800 bg-red-50;
+  }
+  
+  /* // Avatar styles */
+  .avatar-local {
+    @apply bg-blue-500;
+  }
+  
+  .avatar-minew {
+    @apply bg-purple-500;
+  }
+  
+  /* // Modal scroll handling */
+  .ant-modal-body {
+    max-height: 70vh;
+    overflow-y: auto;
+  }
+  
+  /* // Statistics card hover effects */
+  .stat-card {
+    transition: all 0.2s ease-in-out;
+    
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+  }
+  
+  /* // Action buttons spacing */
+  .action-buttons {
+    button {
+      transition: all 0.2s ease;
+      
+      &:hover {
+        transform: scale(1.1);
+      }
+    }
+  }
+  
+  /* // Responsive table adjustments */
+  @media (max-width: 768px) {
+    .mat-table {
+      font-size: 12px;
+    }
+    
+    .mat-cell, .mat-header-cell {
+      padding: 8px 4px;
+    }
+    
+    .displayed-columns {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+  
+  /* // Loading overlay */
+  .loading-overlay {
+    position: relative;
+    
+    &:after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(255, 255, 255, 0.8);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 10;
+    }
+  }
+}

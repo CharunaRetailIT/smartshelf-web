@@ -1,0 +1,3938 @@
+<div class="min-h-screen bg-gray-50 p-4">
+  <div class="bg-white rounded-lg shadow-sm border border-gray-200 mb-6 p-6">
+    <div class="flex items-center justify-between">
+      <!-- Left content -->
+      <div class="flex items-center space-x-3">
+        <i class="pi pi-tablet text-blue-600 text-2xl"></i>
+        <div>
+          <h1 class="text-2xl font-bold text-secondary-dark">
+            Device Management
+          </h1>
+          <p class="text-secondary-light">
+            Manage ESL devices, templates, combos, and assignments
+          </p>
+        </div>
+      </div>
+
+      <!-- Right button with consistent styling -->
+      <div class="flex space-x-4">
+        <ng-container *ngIf="activeTabIndex === 0">
+          <button
+            pButton
+            icon="pi pi-sync"
+            label="Sync"
+            class="p-button-info"
+            (click)="openSyncDialog()"
+          ></button>
+          <p-splitButton
+            label="Add Device"
+            icon="pi pi-plus"
+            [model]="addDeviceOptions"
+            (onClick)="openDeviceDialog()"
+            class="p-button-primary"
+            [style]="{ marginRight: '0.5rem' }"
+          >
+          </p-splitButton>
+          <!-- <button 
+                  pButton 
+                  icon="pi pi-plus" 
+                  label="Add Device" 
+                  class="p-button-primary"
+                  (click)="openDeviceDialog()">
+                </button>
+                <button pButton 
+                  type="button" 
+                  icon="pi pi-cloud-upload" 
+                  label="Batch Add Minew Devices" 
+                  class="p-button-success"
+                  (click)="openMinewBatchDialog()">
+                </button> -->
+        </ng-container>
+        <ng-container *ngIf="activeTabIndex === 1">
+          <button
+            pButton
+            icon="pi pi-sync"
+            label="Sync Templates"
+            class="p-button-info"
+            (click)="syncTemplates()"
+          ></button>
+        </ng-container>
+        <ng-container *ngIf="activeTabIndex === 2">
+          <button
+            pButton
+            icon="pi pi-plus"
+            label="Create Combo"
+            class="p-button-primary"
+            (click)="openComboDialog()"
+          ></button>
+        </ng-container>
+        <ng-container *ngIf="activeTabIndex === 4">
+          <button
+            pButton
+            icon="pi pi-plus"
+            label="Create Assignment"
+            class="p-button-primary"
+            (click)="openAssignmentDialog()"
+          ></button>
+        </ng-container>
+        <ng-container *ngIf="activeTabIndex === 5">
+          <button
+            pButton
+            icon="pi pi-sync"
+            label="Sync"
+            class="p-button-info"
+            (click)="syncGateways()"
+            [disabled]="gatewaysLoading"
+          ></button>
+          <button
+            pButton
+            icon="pi pi-plus"
+            label="Add Gateway"
+            class="p-button-primary"
+            (click)="openGatewayDialog()"
+          ></button>
+        </ng-container>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <div class="bg-white rounded-lg shadow-sm border border-gray-200">
+    <!-- Tab Navigation -->
+    <p-tabView
+      [(activeIndex)]="activeTabIndex"
+      (onChange)="onTabChange($event)"
+    >
+      <!-- Tab 1: Devices -->
+      <p-tabPanel header="Devices">
+        <ng-template pTemplate="header">
+          <div class="flex items-center gap-2">
+            <i class="pi pi-tablet"></i>
+            <span>Devices</span>
+            <p-badge
+              [value]="devicesTotalRecords.toString()"
+              severity="info"
+            ></p-badge>
+          </div>
+        </ng-template>
+
+        <!-- Toolbar -->
+        <div class="mb-4">
+          <p-toolbar styleClass="p-3 bg-gray-50 border border-gray-200 rounded">
+            <div class="p-toolbar-group-start flex items-center space-x-4">
+              <!-- Search -->
+              <input
+                type="text"
+                pInputText
+                [(ngModel)]="deviceSearchTerm"
+                (input)="onDeviceSearch()"
+                placeholder="Search devices..."
+                class="w-64"
+              />
+
+              <!-- Status Filter -->
+              <!-- <p-dropdown 
+                [(ngModel)]="deviceStatusFilter"
+                [options]="statusOptions"
+                placeholder="Status"
+                (onChange)="onDeviceSearch()"
+                styleClass="w-32">
+              </p-dropdown> -->
+              <p-dropdown
+                [(ngModel)]="deviceStatusFilter"
+                [options]="statusOptions"
+                placeholder="Status"
+                (onChange)="onDeviceStatusFilterChange()"
+                styleClass="w-32"
+              >
+              </p-dropdown>
+
+              <!-- Layout Toggle -->
+              <p-selectButton
+                [options]="layoutOptions"
+                [(ngModel)]="selectedDevicesLayout"
+                optionLabel="label"
+                optionValue="value"
+              >
+                <ng-template let-item>
+                  <i [class]="item.icon"></i>
+                </ng-template>
+              </p-selectButton>
+            </div>
+
+            <div class="p-toolbar-group-end">
+              <div class="flex space-x-2">
+                <button
+                  pButton
+                  icon="pi pi-refresh"
+                  class="p-button-rounded p-button-text"
+                  (click)="devicesTable?.reset()"
+                  [disabled]="devicesLoading"
+                  pTooltip="Refresh"
+                  tooltipPosition="bottom"
+                ></button>
+                <button
+                  pButton
+                  icon="pi pi-filter-slash"
+                  label="Clear Filters"
+                  class="p-button-secondary"
+                  (click)="clearDeviceFilters()"
+                  pTooltip="Clear all filters"
+                  tooltipPosition="bottom"
+                ></button>
+              </div>
+            </div>
+          </p-toolbar>
+        </div>
+
+        <!-- Devices Table-->
+        <div *ngIf="selectedDevicesLayout === 'list'">
+          <div class="table-wrapper">
+            <!-- Scrollable Table Container -->
+            <div class="table-scroll-container">
+              <p-table
+                #devicesTable
+                [value]="devices"
+                [lazy]="true"
+                (onLazyLoad)="loadDevicesLazy($event)"
+                [paginator]="false"
+                [loading]="devicesLoading"
+                [filterDelay]="0"
+                dataKey="id"
+                [scrollable]="true"
+                scrollHeight="flex"
+                styleClass="p-datatable-striped p-datatable-gridlines"
+              >
+                <!-- Column Definitions -->
+                <ng-template pTemplate="header">
+                  <tr>
+                    <th pSortableColumn="deviceName" style="width: 15%">
+                      Device Name <p-sortIcon field="deviceName"></p-sortIcon>
+                    </th>
+                    <th pSortableColumn="mac" style="width: 12%">
+                      MAC Address <p-sortIcon field="mac"></p-sortIcon>
+                    </th>
+                    <th pSortableColumn="storeId" style="width: 10%">
+                      Store <p-sortIcon field="storeId"></p-sortIcon>
+                    </th>
+                    <th style="width: 10%">Screen Size</th>
+                    <th pSortableColumn="status" style="width: 10%">
+                      Status <p-sortIcon field="status"></p-sortIcon>
+                    </th>
+                    <th pSortableColumn="battery" style="width: 12%">
+                      Battery <p-sortIcon field="battery"></p-sortIcon>
+                    </th>
+                    <th pSortableColumn="deviceType" style="width: 10%">
+                      Type <p-sortIcon field="deviceType"></p-sortIcon>
+                    </th>
+                    <th pSortableColumn="isOnline" style="width: 8%">
+                      Online <p-sortIcon field="isOnline"></p-sortIcon>
+                    </th>
+                    <th pSortableColumn="createdDate" style="width: 8%">
+                      Created <p-sortIcon field="createdDate"></p-sortIcon>
+                    </th>
+                    <th style="width: 5%">Actions</th>
+                  </tr>
+                </ng-template>
+
+                <ng-template pTemplate="body" let-device>
+                  <tr>
+                    <td>{{ device.deviceName }}</td>
+                    <td>
+                      <span
+                        class="font-mono text-sm bg-gray-100 px-2 py-1 rounded"
+                      >
+                        {{ device.mac }}
+                      </span>
+                    </td>
+                    <td>{{ device.storeName || device.storeId }}</td>
+                    <td>{{ getScreenSize(device) }}</td>
+                    <td>
+                      <p-tag
+                        [value]="device.status"
+                        [severity]="getStatusBadge(device.status)"
+                        [rounded]="true"
+                      >
+                      </p-tag>
+                    </td>
+                    <td>
+                      <div class="flex items-center">
+                        <div class="w-16 bg-gray-200 rounded-full h-2 mr-2">
+                          <div
+                            class="h-full rounded-full transition-all"
+                            [ngClass]="getBatteryClass(device.battery)"
+                            [style.width.%]="device.battery"
+                          ></div>
+                        </div>
+                        <span>{{ device.battery }}%</span>
+                      </div>
+                    </td>
+                    <td>{{ device.deviceType }}</td>
+                    <td>
+                      <i
+                        [class]="
+                          device.isOnline
+                            ? 'pi pi-check-circle text-green-500'
+                            : 'pi pi-times-circle text-red-500'
+                        "
+                        [pTooltip]="device.isOnline ? 'Online' : 'Offline'"
+                      >
+                      </i>
+                    </td>
+                    <td>
+                      <span class="text-sm text-gray-500">
+                        {{ device.createdDate | date: "MMM d, y" }}
+                      </span>
+                    </td>
+                    <td>
+                      <div class="flex space-x-1">
+                        <button
+                          pButton
+                          icon="fas fa-edit"
+                          class="p-button-rounded p-button-text p-button-sm edit-icon"
+                          pTooltip="Edit"
+                          tooltipPosition="top"
+                          (click)="openDeviceDialog(device)"
+                        ></button>
+                        <button
+                          *ngIf="isDeviceRowMinew(device)"
+                          pButton
+                          icon="pi pi-bolt"
+                          class="p-button-rounded p-button-text p-button-sm p-button-warning"
+                          pTooltip="Blink ESL"
+                          tooltipPosition="top"
+                          (click)="blinkDevice(device)"
+                        ></button>
+                        <button
+                          *ngIf="auth.hasAnyRole(['Admin', 'Manager'])"
+                          pButton
+                          icon="pi pi-trash"
+                          class="p-button-rounded p-button-text p-button-danger p-button-sm"
+                          pTooltip="Delete"
+                          (click)="deleteDevice(device)"
+                        ></button>
+                      </div>
+                    </td>
+                  </tr>
+                </ng-template>
+
+                <ng-template pTemplate="emptymessage">
+                  <tr>
+                    <td colspan="10" class="text-center p-6">
+                      <div class="flex flex-col items-center">
+                        <i class="pi pi-inbox text-4xl text-gray-300 mb-3"></i>
+                        <h4 class="text-lg font-semibold text-gray-600 mb-2">
+                          No Devices Found
+                        </h4>
+                        <p class="text-gray-500 mb-4">
+                          Add a device to get started
+                        </p>
+                        <button
+                          pButton
+                          icon="pi pi-plus"
+                          label="Add Device"
+                          class="p-button-primary"
+                          (click)="openDeviceDialog()"
+                        ></button>
+                      </div>
+                    </td>
+                  </tr>
+                </ng-template>
+              </p-table>
+            </div>
+
+            <!-- Fixed Pagination Outside Scroll Area -->
+            <div class="pagination-container">
+              <p-paginator
+                [rows]="devicesRows"
+                [totalRecords]="devicesTotalRecords"
+                [rowsPerPageOptions]="[5, 10, 20, 50]"
+                [showCurrentPageReport]="true"
+                currentPageReportTemplate="Showing {first} to {last} of {totalRecords} devices"
+                (onPageChange)="onDevicesPageChange($event)"
+              >
+              </p-paginator>
+            </div>
+          </div>
+        </div>
+
+        <!-- Devices Grid View -->
+        <div
+          *ngIf="selectedDevicesLayout === 'grid'"
+          class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4"
+        >
+          <div
+            *ngFor="let device of devices"
+            class="bg-white border border-gray-200 rounded-lg overflow-hidden hover:shadow-lg transition-all duration-200"
+          >
+            <!-- Grid view card content -->
+            <div
+              class="bg-blue-50 h-40 flex flex-col items-center justify-center p-4"
+            >
+              <i class="pi pi-tablet text-blue-600 text-5xl mb-3"></i>
+              <h3
+                class="font-semibold text-gray-900 text-center truncate w-full"
+              >
+                {{ device.deviceName }}
+              </h3>
+              <p class="text-xs text-gray-500 mt-1">{{ device.deviceType }}</p>
+            </div>
+
+            <div class="p-4">
+              <div class="space-y-3">
+                <div class="flex justify-between items-center">
+                  <span class="text-sm text-gray-600">MAC:</span>
+                  <span
+                    class="font-mono text-xs bg-gray-100 px-2 py-1 rounded"
+                    >{{ device.mac }}</span
+                  >
+                </div>
+
+                <div class="flex justify-between items-center">
+                  <span class="text-sm text-gray-600">Store:</span>
+                  <span class="text-sm font-medium">{{
+                    device.storeName || device.storeId
+                  }}</span>
+                </div>
+
+                <div class="flex justify-between items-center">
+                  <span class="text-sm text-gray-600">Screen:</span>
+                  <span class="text-sm font-medium">{{
+                    getScreenSize(device)
+                  }}</span>
+                </div>
+
+                <div class="flex justify-between items-center">
+                  <span class="text-sm text-gray-600">Status:</span>
+                  <p-tag
+                    [value]="device.status"
+                    [severity]="getStatusBadge(device.status)"
+                    [rounded]="true"
+                    styleClass="text-xs"
+                  >
+                  </p-tag>
+                </div>
+
+                <!-- Battery -->
+                <div class="mt-3">
+                  <div class="flex justify-between text-sm mb-1">
+                    <span class="text-gray-600">Battery:</span>
+                    <span class="font-medium">{{ device.battery }}%</span>
+                  </div>
+                  <div class="w-full bg-gray-200 rounded-full h-2">
+                    <div
+                      class="h-full rounded-full transition-all"
+                      [ngClass]="getBatteryClass(device.battery)"
+                      [style.width.%]="device.battery"
+                    ></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Card Footer -->
+            <div class="border-t border-gray-100 p-3 bg-gray-50">
+              <div class="flex justify-between items-center">
+                <span class="text-xs text-gray-500">
+                  <i
+                    [class]="
+                      device.isOnline
+                        ? 'pi pi-check-circle text-green-500'
+                        : 'pi pi-times-circle text-red-500'
+                    "
+                  ></i>
+                  {{ device.isOnline ? "Online" : "Offline" }}
+                </span>
+                <div class="flex space-x-1">
+                  <button
+                    pButton
+                    icon="pi pi-pencil"
+                    class="p-button-rounded p-button-text p-button-sm"
+                    pTooltip="Edit"
+                    tooltipPosition="top"
+                    (click)="openDeviceDialog(device)"
+                  ></button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Empty State for Grid -->
+          <div
+            *ngIf="devices.length === 0 && !devicesLoading"
+            class="col-span-full py-12 text-center"
+          >
+            <i class="pi pi-inbox text-4xl text-gray-300 mb-3"></i>
+            <h4 class="text-lg font-semibold text-gray-600 mb-2">
+              No Devices Found
+            </h4>
+            <p class="text-gray-500 mb-4">Add a device to get started</p>
+            <button
+              pButton
+              icon="pi pi-plus"
+              label="Add Device"
+              class="p-button-primary"
+              (click)="openDeviceDialog()"
+            ></button>
+          </div>
+
+          <!-- Loading State for Grid -->
+          <div *ngIf="devicesLoading" class="col-span-full py-12 text-center">
+            <p-progressSpinner></p-progressSpinner>
+            <p class="text-gray-600 mt-3">Loading devices...</p>
+          </div>
+        </div>
+      </p-tabPanel>
+
+      <!-- Tab 2: Templates -->
+      <p-tabPanel header="Templates">
+        <ng-template pTemplate="header">
+          <div class="flex items-center gap-2">
+            <i class="pi pi-file"></i>
+            <span>Templates</span>
+            <p-badge
+              [value]="templatesTotalRecords.toString()"
+              severity="info"
+            ></p-badge>
+          </div>
+        </ng-template>
+
+        <!-- Template Toolbar -->
+        <div class="mb-4">
+          <p-toolbar styleClass="p-3 bg-gray-50 border border-gray-200 rounded">
+            <div class="p-toolbar-group-start flex items-center space-x-4">
+              <!-- Search -->
+              <input
+                type="text"
+                pInputText
+                [(ngModel)]="templateSearchTerm"
+                (input)="onTemplateSearch()"
+                placeholder="Search templates..."
+                class="w-64"
+              />
+
+              <!-- Layout Toggle -->
+              <p-selectButton
+                [options]="layoutOptions"
+                [(ngModel)]="selectedTemplatesLayout"
+                optionLabel="label"
+                optionValue="value"
+              >
+                <ng-template let-item>
+                  <i [class]="item.icon"></i>
+                </ng-template>
+              </p-selectButton>
+            </div>
+
+            <div class="p-toolbar-group-end">
+              <div class="flex space-x-2">
+                <button
+                  pButton
+                  icon="pi pi-refresh"
+                  class="p-button-rounded p-button-text"
+                  (click)="templatesTable!.reset()"
+                  [disabled]="templatesLoading"
+                  pTooltip="Refresh"
+                ></button>
+                <button
+                  pButton
+                  icon="pi pi-filter-slash"
+                  label="Clear Filters"
+                  class="p-button-secondary"
+                  (click)="clearTemplateFilters()"
+                  pTooltip="Clear all filters"
+                ></button>
+              </div>
+            </div>
+          </p-toolbar>
+        </div>
+
+        <!-- Templates Table (List View) -->
+        <div *ngIf="selectedTemplatesLayout === 'list'">
+          <div class="table-wrapper">
+            <!-- Scrollable Table Container -->
+            <div class="table-scroll-container">
+              <p-table
+                #templatesTable
+                [value]="templates"
+                [lazy]="true"
+                (onLazyLoad)="loadLocalTemplatesLazy($event)"
+                [paginator]="false"
+                [loading]="templatesLoading"
+                [filterDelay]="0"
+                dataKey="id"
+                [scrollable]="true"
+                scrollHeight="flex"
+                styleClass="p-datatable-striped p-datatable-gridlines"
+              >
+                <!-- Column Definitions -->
+                <ng-template pTemplate="header">
+                  <tr>
+                    <th pSortableColumn="name" style="width: 20%">
+                      Name <p-sortIcon field="name"></p-sortIcon>
+                    </th>
+                    <th style="width: 25%">Description</th>
+                    <th pSortableColumn="screenWidth" style="width: 15%">
+                      Screen Size <p-sortIcon field="screenWidth"></p-sortIcon>
+                    </th>
+                    <th pSortableColumn="color" style="width: 10%">
+                      Color <p-sortIcon field="color"></p-sortIcon>
+                    </th>
+                    <th pSortableColumn="orientation" style="width: 10%">
+                      Orientation <p-sortIcon field="orientation"></p-sortIcon>
+                    </th>
+                    <th pSortableColumn="isActive" style="width: 10%">
+                      Active <p-sortIcon field="isActive"></p-sortIcon>
+                    </th>
+                    <th style="width: 10%">Actions</th>
+                  </tr>
+                </ng-template>
+
+                <ng-template pTemplate="body" let-template>
+                  <tr>
+                    <td class="font-medium text-gray-900">
+                      {{ template.name }}
+                    </td>
+                    <td>{{ template.description || "-" }}</td>
+                    <td>
+                      {{ template.screenWidth }}x{{ template.screenHeight }}
+                    </td>
+                    <td>
+                      <span
+                        *ngIf="template.color"
+                        class="inline-flex items-center"
+                      >
+                        <span
+                          class="w-3 h-3 rounded-full mr-2"
+                          [style.background-color]="template.color"
+                        ></span>
+                        {{ template.color }}
+                      </span>
+                      <span *ngIf="!template.color">-</span>
+                    </td>
+                    <td>
+                      {{
+                        template.orientation === 0 ? "Portrait" : "Landscape"
+                      }}
+                    </td>
+                    <td>
+                      <i
+                        [class]="
+                          template.isActive
+                            ? 'pi pi-check-circle text-green-500'
+                            : 'pi pi-times-circle text-red-500'
+                        "
+                        [pTooltip]="template.isActive ? 'Active' : 'Inactive'"
+                      >
+                      </i>
+                    </td>
+                    <td>
+                      <div class="flex space-x-1">
+                        <button
+                          pButton
+                          icon="pi pi-eye"
+                          class="p-button-rounded p-button-text p-button-info p-button-sm"
+                          pTooltip="View Preview"
+                          (click)="loadTemplatePreview(template)"
+                        ></button>
+                        <button
+                          *ngIf="auth.hasAnyRole(['Admin', 'Manager'])"
+                          pButton
+                          icon="pi pi-trash"
+                          class="p-button-rounded p-button-text p-button-danger p-button-sm"
+                          pTooltip="Delete"
+                          (click)="deleteTemplate(template)"
+                        ></button>
+                      </div>
+                    </td>
+                  </tr>
+                </ng-template>
+
+                <ng-template pTemplate="emptymessage">
+                  <tr>
+                    <td colspan="7" class="text-center p-6">
+                      <div class="flex flex-col items-center">
+                        <i class="pi pi-file text-4xl text-gray-300 mb-3"></i>
+                        <h4 class="text-lg font-semibold text-gray-600 mb-2">
+                          No Templates Found
+                        </h4>
+                        <p class="text-gray-500 mb-4">
+                          Sync templates to get started
+                        </p>
+                        <button
+                          pButton
+                          icon="pi pi-sync"
+                          label="Sync Templates"
+                          class="p-button-primary"
+                          (click)="syncTemplates()"
+                        ></button>
+                      </div>
+                    </td>
+                  </tr>
+                </ng-template>
+              </p-table>
+            </div>
+
+            <!-- Fixed Pagination Outside Scroll Area -->
+            <div class="pagination-container">
+              <p-paginator
+                [rows]="templatesRows"
+                [totalRecords]="templatesTotalRecords"
+                [rowsPerPageOptions]="[5, 10, 20, 50]"
+                [showCurrentPageReport]="true"
+                currentPageReportTemplate="Showing {first} to {last} of {totalRecords} templates"
+                (onPageChange)="onTemplatesPageChange($event)"
+              >
+              </p-paginator>
+            </div>
+          </div>
+        </div>
+
+        <!-- Templates Grid View -->
+        <div
+          *ngIf="selectedTemplatesLayout === 'grid'"
+          class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4"
+        >
+          <!-- Grid view for templates -->
+          <div
+            *ngFor="let template of templates"
+            class="bg-white border border-gray-200 rounded-lg overflow-hidden hover:shadow-lg transition-all duration-200"
+          >
+            <div
+              class="bg-gradient-to-r from-purple-50 to-blue-50 h-40 flex items-center justify-center"
+            >
+              <div class="text-center">
+                <i class="pi pi-file text-purple-600 text-5xl mb-3"></i>
+                <h3 class="font-semibold text-gray-900">{{ template.name }}</h3>
+              </div>
+            </div>
+
+            <div class="p-4">
+              <div class="space-y-3">
+                <div class="flex justify-between items-center">
+                  <span class="text-sm text-gray-600">Screen:</span>
+                  <span class="font-medium"
+                    >{{ template.screenWidth }}x{{
+                      template.screenHeight
+                    }}</span
+                  >
+                </div>
+
+                <div class="flex justify-between items-center">
+                  <span class="text-sm text-gray-600">Orientation:</span>
+                  <span class="text-sm">{{
+                    template.orientation === 0 ? "Portrait" : "Landscape"
+                  }}</span>
+                </div>
+
+                <div class="flex justify-between items-center">
+                  <span class="text-sm text-gray-600">Status:</span>
+                  <span
+                    [ngClass]="
+                      template.isActive ? 'text-green-600' : 'text-red-600'
+                    "
+                  >
+                    {{ template.isActive ? "Active" : "Inactive" }}
+                  </span>
+                </div>
+              </div>
+
+              <div class="mt-4 pt-4 border-t border-gray-100">
+                <p class="text-xs text-gray-500 line-clamp-2">
+                  {{ template.description || "No description" }}
+                </p>
+              </div>
+            </div>
+
+            <div class="border-t border-gray-100 p-3 bg-gray-50">
+              <div class="flex justify-end">
+                <button
+                  pButton
+                  icon="pi pi-eye"
+                  class="p-button-rounded p-button-text p-button-info p-button-sm"
+                  pTooltip="View Preview"
+                  (click)="loadTemplatePreview(template)"
+                ></button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Empty State for Grid -->
+          <div
+            *ngIf="templates.length === 0 && !templatesLoading"
+            class="col-span-full py-12 text-center"
+          >
+            <i class="pi pi-file text-4xl text-gray-300 mb-3"></i>
+            <h4 class="text-lg font-semibold text-gray-600 mb-2">
+              No Templates Found
+            </h4>
+            <p class="text-gray-500 mb-4">Sync templates to get started</p>
+            <button
+              pButton
+              icon="pi pi-sync"
+              label="Sync Templates"
+              class="p-button-primary"
+              (click)="syncTemplates()"
+            ></button>
+          </div>
+
+          <!-- Loading State for Grid -->
+          <div *ngIf="templatesLoading" class="col-span-full py-12 text-center">
+            <p-progressSpinner></p-progressSpinner>
+            <p class="text-gray-600 mt-3">Loading templates...</p>
+          </div>
+        </div>
+      </p-tabPanel>
+
+      <!-- Tab 3: Combos -->
+      <p-tabPanel header="Combos">
+        <ng-template pTemplate="header">
+          <div class="flex items-center gap-2">
+            <i class="pi pi-link"></i>
+            <span>Combos</span>
+            <p-badge
+              [value]="combosTotalRecords.toString()"
+              severity="info"
+            ></p-badge>
+          </div>
+        </ng-template>
+
+        <!-- Combo Toolbar -->
+        <div class="mb-4">
+          <p-toolbar styleClass="p-3 bg-gray-50 border border-gray-200 rounded">
+            <div class="p-toolbar-group-start flex items-center space-x-4">
+              <!-- Search -->
+              <input
+                type="text"
+                pInputText
+                [(ngModel)]="comboSearchTerm"
+                (input)="onComboSearch()"
+                placeholder="Search combos..."
+                class="w-64"
+              />
+
+              <!-- Device Filter -->
+              <p-dropdown
+                [(ngModel)]="comboDeviceFilter"
+                [options]="deviceOptions"
+                placeholder="Filter by Device"
+                (onChange)="onComboSearch()"
+                styleClass="w-48"
+              >
+              </p-dropdown>
+
+              <!-- Template Filter -->
+              <p-dropdown
+                [(ngModel)]="comboTemplateFilter"
+                [options]="templateOptions"
+                placeholder="Filter by Template"
+                (onChange)="onComboSearch()"
+                styleClass="w-48"
+              >
+              </p-dropdown>
+
+              <!-- Layout Toggle -->
+              <p-selectButton
+                [options]="layoutOptions"
+                [(ngModel)]="selectedCombosLayout"
+                optionLabel="label"
+                optionValue="value"
+              >
+                <ng-template let-item>
+                  <i [class]="item.icon"></i>
+                </ng-template>
+              </p-selectButton>
+            </div>
+
+            <div class="p-toolbar-group-end">
+              <div class="flex space-x-2">
+                <button
+                  pButton
+                  icon="pi pi-refresh"
+                  class="p-button-rounded p-button-text"
+                  (click)="combosTable?.reset()"
+                  [disabled]="combosLoading"
+                  pTooltip="Refresh"
+                ></button>
+                <button
+                  pButton
+                  icon="pi pi-filter-slash"
+                  label="Clear Filters"
+                  class="p-button-secondary"
+                  (click)="clearComboFilters()"
+                  pTooltip="Clear all filters"
+                ></button>
+              </div>
+            </div>
+          </p-toolbar>
+        </div>
+
+        <!-- Combos Table (List View) -->
+        <div *ngIf="selectedCombosLayout === 'list'">
+          <div class="table-wrapper">
+            <!-- Scrollable Table Container -->
+            <div class="table-scroll-container">
+              <p-table
+                #combosTable
+                [value]="combos"
+                [lazy]="true"
+                (onLazyLoad)="loadCombosLazy($event)"
+                [paginator]="false"
+                [loading]="combosLoading"
+                [filterDelay]="0"
+                dataKey="id"
+                [scrollable]="true"
+                scrollHeight="flex"
+                styleClass="p-datatable-striped p-datatable-gridlines"
+              >
+                <!-- Column Definitions -->
+                <ng-template pTemplate="header">
+                  <tr>
+                    <th pSortableColumn="deviceName" style="width: 20%">
+                      Device <p-sortIcon field="deviceName"></p-sortIcon>
+                    </th>
+                    <th pSortableColumn="templateName" style="width: 20%">
+                      Template <p-sortIcon field="templateName"></p-sortIcon>
+                    </th>
+                    <th pSortableColumn="screenSize" style="width: 15%">
+                      Screen Size <p-sortIcon field="screenSize"></p-sortIcon>
+                    </th>
+                    <th pSortableColumn="isDefault" style="width: 15%">
+                      Default <p-sortIcon field="isDefault"></p-sortIcon>
+                    </th>
+                    <th pSortableColumn="createdAt" style="width: 15%">
+                      Created <p-sortIcon field="createdAt"></p-sortIcon>
+                    </th>
+                    <th style="width: 15%">Actions</th>
+                  </tr>
+                </ng-template>
+
+                <ng-template pTemplate="body" let-combo>
+                  <tr>
+                    <td class="font-medium text-gray-900">
+                      {{ combo.deviceName }}
+                    </td>
+                    <td>{{ combo.templateName }}</td>
+                    <td>
+                      {{
+                        combo.screenWidth && combo.screenHeight
+                          ? combo.screenWidth + " × " + combo.screenHeight
+                          : "-"
+                      }}
+                    </td>
+                    <td>
+                      <i
+                        [class]="
+                          combo.isDefault
+                            ? 'pi pi-check-circle text-green-500'
+                            : 'pi pi-times-circle text-gray-300'
+                        "
+                        [pTooltip]="
+                          combo.isDefault ? 'Default Combo' : 'Not Default'
+                        "
+                      >
+                      </i>
+                    </td>
+                    <td>
+                      <span class="text-sm text-gray-500">
+                        {{ combo.createdDate | date: "MMM d, y" }}
+                      </span>
+                    </td>
+                    <td>
+                      <div class="flex space-x-1">
+                        <button
+                          pButton
+                          icon="pi pi-eye"
+                          class="p-button-rounded p-button-text p-button-info p-button-sm"
+                          pTooltip="View Template Preview"
+                          (click)="loadTemplatePreviewFromCombo(combo)"
+                        ></button>
+                        <button
+                          *ngIf="auth.hasAnyRole(['Admin', 'Manager'])"
+                          pButton
+                          icon="pi pi-trash"
+                          class="p-button-rounded p-button-text p-button-danger p-button-sm"
+                          pTooltip="Delete"
+                          (click)="deleteCombo(combo)"
+                        ></button>
+                      </div>
+                    </td>
+                  </tr>
+                </ng-template>
+
+                <ng-template pTemplate="emptymessage">
+                  <tr>
+                    <td colspan="6" class="text-center p-6">
+                      <div class="flex flex-col items-center">
+                        <i
+                          class="pi pi-link-slash text-4xl text-gray-300 mb-3"
+                        ></i>
+                        <h4 class="text-lg font-semibold text-gray-600 mb-2">
+                          No Combos Found
+                        </h4>
+                        <p class="text-gray-500 mb-4">
+                          Create a combo by linking a device with a template
+                        </p>
+                        <button
+                          pButton
+                          icon="pi pi-plus"
+                          label="Create Combo"
+                          class="p-button-primary"
+                          (click)="openComboDialog()"
+                        ></button>
+                      </div>
+                    </td>
+                  </tr>
+                </ng-template>
+              </p-table>
+            </div>
+
+            <!-- Fixed Pagination Outside Scroll Area -->
+            <div class="pagination-container">
+              <p-paginator
+                [rows]="combosRows"
+                [totalRecords]="combosTotalRecords"
+                [rowsPerPageOptions]="[5, 10, 20, 50]"
+                [showCurrentPageReport]="true"
+                currentPageReportTemplate="Showing {first} to {last} of {totalRecords} combos"
+                (onPageChange)="onCombosPageChange($event)"
+              >
+              </p-paginator>
+            </div>
+          </div>
+        </div>
+
+        <!-- Combos Grid View -->
+        <div
+          *ngIf="selectedCombosLayout === 'grid'"
+          class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4"
+        >
+          <div
+            *ngFor="let combo of combos"
+            class="bg-white border border-gray-200 rounded-lg overflow-hidden hover:shadow-lg transition-all duration-200"
+          >
+            <div
+              class="bg-gradient-to-r from-green-50 to-blue-50 h-40 flex flex-col items-center justify-center p-4"
+            >
+              <div class="flex items-center space-x-2 mb-3">
+                <i class="pi pi-tablet text-blue-600 text-3xl"></i>
+                <i class="pi pi-arrow-right text-gray-400"></i>
+                <i class="pi pi-file text-purple-600 text-3xl"></i>
+              </div>
+              <h3 class="font-semibold text-gray-900 text-center">
+                Device & Template
+              </h3>
+              <p class="text-xs text-gray-500 mt-1">Combo</p>
+            </div>
+
+            <div class="p-4">
+              <div class="space-y-3">
+                <div>
+                  <p class="text-sm text-gray-600 mb-1">Device:</p>
+                  <p class="font-medium text-sm">{{ combo.deviceName }}</p>
+                </div>
+
+                <div>
+                  <p class="text-sm text-gray-600 mb-1">Template:</p>
+                  <p class="font-medium text-sm">{{ combo.templateName }}</p>
+                </div>
+
+                <div>
+                  <p class="text-sm text-gray-600 mb-1">Screen Size:</p>
+                  <p class="font-medium text-sm">
+                    {{
+                      combo.deviceWidth && combo.deviceHeight
+                        ? combo.deviceWidth + " × " + combo.deviceHeight
+                        : "-"
+                    }}
+                  </p>
+                </div>
+
+                <div class="flex justify-between items-center">
+                  <span class="text-sm text-gray-600">Default:</span>
+                  <i
+                    [class]="
+                      combo.isDefault
+                        ? 'pi pi-check-circle text-green-500'
+                        : 'pi pi-times-circle text-gray-300'
+                    "
+                    [pTooltip]="
+                      combo.isDefault ? 'Default Combo' : 'Not Default'
+                    "
+                  >
+                  </i>
+                </div>
+              </div>
+            </div>
+
+            <div class="border-t border-gray-100 p-3 bg-gray-50">
+              <div class="flex justify-between">
+                <button
+                  pButton
+                  icon="pi pi-eye"
+                  class="p-button-rounded p-button-text p-button-info p-button-sm"
+                  pTooltip="View Template Preview"
+                  (click)="loadTemplatePreviewFromCombo(combo)"
+                ></button>
+                <button
+                  pButton
+                  icon="pi pi-link"
+                  class="p-button-rounded p-button-text p-button-info p-button-sm"
+                  pTooltip="Assign"
+                  (click)="openAssignmentDialog()"
+                ></button>
+                <button
+                  *ngIf="auth.hasAnyRole(['Admin', 'Manager'])"
+                  pButton
+                  icon="pi pi-trash"
+                  class="p-button-rounded p-button-text p-button-danger p-button-sm"
+                  pTooltip="Delete"
+                  (click)="deleteCombo(combo)"
+                ></button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Empty State for Grid -->
+          <div
+            *ngIf="combos.length === 0 && !combosLoading"
+            class="col-span-full py-12 text-center"
+          >
+            <i class="pi pi-link-slash text-4xl text-gray-300 mb-3"></i>
+            <h4 class="text-lg font-semibold text-gray-600 mb-2">
+              No Combos Found
+            </h4>
+            <p class="text-gray-500 mb-4">
+              Create a combo by linking a device with a template
+            </p>
+            <button
+              pButton
+              icon="pi pi-plus"
+              label="Create Combo"
+              class="p-button-primary"
+              (click)="openComboDialog()"
+            ></button>
+          </div>
+
+          <!-- Loading State for Grid -->
+          <div *ngIf="combosLoading" class="col-span-full py-12 text-center">
+            <p-progressSpinner></p-progressSpinner>
+            <p class="text-gray-600 mt-3">Loading combos...</p>
+          </div>
+        </div>
+      </p-tabPanel>
+
+      <!-- Tab 4: Message Combos -->
+      <p-tabPanel header="Message Combos">
+        <ng-template pTemplate="header">
+          <div class="flex items-center gap-2">
+            <i class="pi pi-comment"></i>
+            <span>Message Combos</span>
+            <p-badge
+              [value]="messageCombosTotalRecords.toString()"
+              severity="info"
+            ></p-badge>
+          </div>
+        </ng-template>
+
+        <!-- Message Combo Toolbar -->
+        <div class="mb-4">
+          <p-toolbar styleClass="p-3 bg-gray-50 border border-gray-200 rounded">
+            <div class="p-toolbar-group-start flex items-center space-x-4">
+              <!-- Search -->
+              <input
+                type="text"
+                pInputText
+                [(ngModel)]="messageComboSearchTerm"
+                (input)="onMessageComboSearch()"
+                placeholder="Search message combos..."
+                class="w-64"
+              />
+
+              <!-- Device Filter -->
+              <p-dropdown
+                [(ngModel)]="messageComboDeviceFilter"
+                [options]="deviceOptions"
+                placeholder="Filter by Device"
+                (onChange)="onMessageComboSearch()"
+                styleClass="w-48"
+              >
+              </p-dropdown>
+
+              <!-- Message Filter -->
+              <p-dropdown
+                [(ngModel)]="messageComboMessageFilter"
+                [options]="messageOptions"
+                placeholder="Filter by Message"
+                (onChange)="onMessageComboSearch()"
+                styleClass="w-48"
+              >
+              </p-dropdown>
+
+              <!-- Layout Toggle -->
+              <p-selectButton
+                [options]="layoutOptions"
+                [(ngModel)]="selectedMessageCombosLayout"
+                optionLabel="label"
+                optionValue="value"
+              >
+                <ng-template let-item>
+                  <i [class]="item.icon"></i>
+                </ng-template>
+              </p-selectButton>
+            </div>
+
+            <div class="p-toolbar-group-end">
+              <div class="flex space-x-2">
+                <button
+                  pButton
+                  icon="pi pi-refresh"
+                  class="p-button-rounded p-button-text"
+                  (click)="messageCombosTable?.reset()"
+                  [disabled]="messageCombosLoading"
+                  pTooltip="Refresh"
+                ></button>
+                <button
+                  pButton
+                  icon="pi pi-filter-slash"
+                  label="Clear Filters"
+                  class="p-button-secondary"
+                  (click)="clearMessageComboFilters()"
+                  pTooltip="Clear all filters"
+                ></button>
+              </div>
+            </div>
+          </p-toolbar>
+        </div>
+
+        <!-- Message Combos Table (List View) -->
+        <div *ngIf="selectedMessageCombosLayout === 'list'">
+          <div class="table-wrapper">
+            <!-- Scrollable Table Container -->
+            <div class="table-scroll-container">
+              <p-table
+                #messageCombosTable
+                [value]="messageCombos"
+                [lazy]="true"
+                (onLazyLoad)="loadMessageCombosLazy($event)"
+                [paginator]="false"
+                [loading]="messageCombosLoading"
+                [filterDelay]="0"
+                dataKey="id"
+                [scrollable]="true"
+                scrollHeight="flex"
+                styleClass="p-datatable-striped p-datatable-gridlines"
+              >
+                <!-- Column Definitions -->
+                <ng-template pTemplate="header">
+                  <tr>
+                    <th pSortableColumn="deviceName" style="width: 20%">
+                      Device <p-sortIcon field="deviceName"></p-sortIcon>
+                    </th>
+                    <th pSortableColumn="messageTitle" style="width: 25%">
+                      Message <p-sortIcon field="messageTitle"></p-sortIcon>
+                    </th>
+                    <th style="width: 15%">Content Type</th>
+                    <th pSortableColumn="displayOrder" style="width: 10%">
+                      Order <p-sortIcon field="displayOrder"></p-sortIcon>
+                    </th>
+                    <th pSortableColumn="isActive" style="width: 10%">
+                      Active <p-sortIcon field="isActive"></p-sortIcon>
+                    </th>
+                    <th pSortableColumn="createdDate" style="width: 15%">
+                      Created <p-sortIcon field="createdDate"></p-sortIcon>
+                    </th>
+                    <th style="width: 5%">Actions</th>
+                  </tr>
+                </ng-template>
+
+                <ng-template pTemplate="body" let-messageCombo>
+                  <tr>
+                    <td class="font-medium text-gray-900">
+                      {{ messageCombo.deviceName }}
+                    </td>
+                    <td>
+                      <div>
+                        <div class="font-medium">
+                          {{ messageCombo.messageTitle || "No title" }}
+                        </div>
+                        <div
+                          *ngIf="messageCombo.messageContent"
+                          class="text-xs text-gray-500 truncate"
+                        >
+                          {{ messageCombo.messageContent | slice: 0 : 50
+                          }}{{
+                            messageCombo.messageContent?.length > 50
+                              ? "..."
+                              : ""
+                          }}
+                        </div>
+                      </div>
+                    </td>
+                    <td>
+                      <p-tag
+                        [value]="getContentTypeName(messageCombo)"
+                        [severity]="getContentTypeSeverity(messageCombo)"
+                        styleClass="text-xs"
+                      >
+                      </p-tag>
+                    </td>
+                    <td>{{ messageCombo.displayOrder || 0 }}</td>
+                    <td>
+                      <i
+                        [class]="
+                          messageCombo.isActive
+                            ? 'pi pi-check-circle text-green-500'
+                            : 'pi pi-times-circle text-red-500'
+                        "
+                        [pTooltip]="
+                          messageCombo.isActive ? 'Active' : 'Inactive'
+                        "
+                      >
+                      </i>
+                    </td>
+                    <td>
+                      <span class="text-sm text-gray-500">
+                        {{ messageCombo.createdDate | date: "MMM d, y" }}
+                      </span>
+                    </td>
+                    <td>
+                      <div class="flex space-x-1">
+                        <!-- <button
+                          pButton
+                          icon="pi pi-eye"
+                          class="p-button-rounded p-button-text p-button-info p-button-sm"
+                          pTooltip="View Message"
+                          (click)="viewMessageDetails(messageCombo)"
+                        ></button> -->
+                        <button
+                          *ngIf="auth.hasAnyRole(['Admin', 'Manager'])"
+                          pButton
+                          icon="pi pi-trash"
+                          class="p-button-rounded p-button-text p-button-danger p-button-sm"
+                          pTooltip="Delete"
+                          (click)="deleteMessageCombo(messageCombo)"
+                        ></button>
+                      </div>
+                    </td>
+                  </tr>
+                </ng-template>
+
+                <ng-template pTemplate="emptymessage">
+                  <tr>
+                    <td colspan="7" class="text-center p-6">
+                      <div class="flex flex-col items-center">
+                        <i
+                          class="pi pi-comment text-4xl text-gray-300 mb-3"
+                        ></i>
+                        <h4 class="text-lg font-semibold text-gray-600 mb-2">
+                          No Message Combos Found
+                        </h4>
+                        <p class="text-gray-500 mb-4">
+                          Create a message combo by linking a device with a
+                          message
+                        </p>
+                        <button
+                          pButton
+                          icon="pi pi-plus"
+                          label="Create Message Combo"
+                          class="p-button-primary"
+                          (click)="openMessageComboDialog()"
+                        ></button>
+                      </div>
+                    </td>
+                  </tr>
+                </ng-template>
+              </p-table>
+            </div>
+
+            <!-- Fixed Pagination Outside Scroll Area -->
+            <div class="pagination-container">
+              <p-paginator
+                [rows]="messageCombosRows"
+                [totalRecords]="messageCombosTotalRecords"
+                [rowsPerPageOptions]="[5, 10, 20, 50]"
+                [showCurrentPageReport]="true"
+                currentPageReportTemplate="Showing {first} to {last} of {totalRecords} message combos"
+                (onPageChange)="onMessageCombosPageChange($event)"
+              >
+              </p-paginator>
+            </div>
+          </div>
+        </div>
+
+        <!-- Message Combos Grid View -->
+        <div
+          *ngIf="selectedMessageCombosLayout === 'grid'"
+          class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4"
+        >
+          <div
+            *ngFor="let messageCombo of messageCombos"
+            class="bg-white border border-gray-200 rounded-lg overflow-hidden hover:shadow-lg transition-all duration-200"
+          >
+            <div
+              class="bg-gradient-to-r from-orange-50 to-pink-50 h-40 flex flex-col items-center justify-center p-4"
+            >
+              <div class="flex items-center space-x-2 mb-3">
+                <i class="pi pi-tablet text-blue-600 text-3xl"></i>
+                <i class="pi pi-arrow-right text-gray-400"></i>
+                <i class="pi pi-comment text-pink-600 text-3xl"></i>
+              </div>
+              <h3 class="font-semibold text-gray-900 text-center">
+                Device & Message
+              </h3>
+              <p class="text-xs text-gray-500 mt-1">Message Combo</p>
+            </div>
+
+            <div class="p-4">
+              <div class="space-y-3">
+                <div>
+                  <p class="text-sm text-gray-600 mb-1">Device:</p>
+                  <p class="font-medium text-sm">
+                    {{ messageCombo.deviceName }}
+                  </p>
+                </div>
+
+                <div>
+                  <p class="text-sm text-gray-600 mb-1">Message:</p>
+                  <p class="font-medium text-sm">
+                    {{ messageCombo.messageTitle || "No title" }}
+                  </p>
+                  <!-- <p *ngIf="messageCombo.contentTypeName" class="text-xs text-gray-500 truncate mt-1">
+                    {{ messageCombo.contentTypeName | slice:0:50 }}{{ messageCombo.contentTypeName?.length > 50 ? '...' : '' }}
+                  </p> -->
+                </div>
+
+                <div class="flex justify-between items-center">
+                  <span class="text-sm text-gray-600">Type:</span>
+                  <p-tag
+                    [value]="getContentTypeName(messageCombo)"
+                    [severity]="getContentTypeSeverity(messageCombo)"
+                    styleClass="text-xs"
+                  >
+                  </p-tag>
+                </div>
+
+                <div class="flex justify-between items-center">
+                  <span class="text-sm text-gray-600">Order:</span>
+                  <span class="font-medium">{{
+                    messageCombo.displayOrder || 0
+                  }}</span>
+                </div>
+
+                <div class="flex justify-between items-center">
+                  <span class="text-sm text-gray-600">Status:</span>
+                  <span
+                    [ngClass]="
+                      messageCombo.isActive ? 'text-green-600' : 'text-red-600'
+                    "
+                  >
+                    {{ messageCombo.isActive ? "Active" : "Inactive" }}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <div class="border-t border-gray-100 p-3 bg-gray-50">
+              <div class="flex justify-between">
+                <button
+                  pButton
+                  icon="pi pi-eye"
+                  class="p-button-rounded p-button-text p-button-info p-button-sm"
+                  pTooltip="View Message"
+                  (click)="viewMessageDetails(messageCombo)"
+                ></button>
+                <button
+                  pButton
+                  icon="pi pi-link"
+                  class="p-button-rounded p-button-text p-button-info p-button-sm"
+                  pTooltip="Assign"
+                  (click)="openAssignmentDialog('MESSAGE', messageCombo)"
+                ></button>
+                <button
+                  *ngIf="auth.hasAnyRole(['Admin', 'Manager'])"
+                  pButton
+                  icon="pi pi-trash"
+                  class="p-button-rounded p-button-text p-button-danger p-button-sm"
+                  pTooltip="Delete"
+                  (click)="deleteMessageCombo(messageCombo)"
+                ></button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Empty State for Grid -->
+          <div
+            *ngIf="messageCombos.length === 0 && !messageCombosLoading"
+            class="col-span-full py-12 text-center"
+          >
+            <i class="pi pi-comment text-4xl text-gray-300 mb-3"></i>
+            <h4 class="text-lg font-semibold text-gray-600 mb-2">
+              No Message Combos Found
+            </h4>
+            <p class="text-gray-500 mb-4">
+              Create a message combo by linking a device with a message
+            </p>
+            <button
+              pButton
+              icon="pi pi-plus"
+              label="Create Message Combo"
+              class="p-button-primary"
+              (click)="openMessageComboDialog()"
+            ></button>
+          </div>
+
+          <!-- Loading State for Grid -->
+          <div
+            *ngIf="messageCombosLoading"
+            class="col-span-full py-12 text-center"
+          >
+            <p-progressSpinner></p-progressSpinner>
+            <p class="text-gray-600 mt-3">Loading message combos...</p>
+          </div>
+        </div>
+      </p-tabPanel>
+
+      <!-- Tab 5: Assignments -->
+      <p-tabPanel header="Assignments">
+        <ng-template pTemplate="header">
+          <div class="flex items-center gap-2">
+            <i class="pi pi-map-marker"></i>
+            <span>Assignments</span>
+            <p-badge
+              [value]="assignmentsTotalRecords.toString()"
+              severity="info"
+            ></p-badge>
+          </div>
+        </ng-template>
+
+        <!-- Assignment Toolbar -->
+        <div class="mb-4">
+          <p-toolbar styleClass="p-3 bg-gray-50 border border-gray-200 rounded">
+            <div class="p-toolbar-group-start flex items-center space-x-4">
+              <!-- Search -->
+              <input
+                type="text"
+                pInputText
+                [(ngModel)]="assignmentSearchTerm"
+                (input)="onAssignmentSearch()"
+                placeholder="Search assignments..."
+                class="w-64"
+              />
+
+              <!-- Location Type Filter -->
+              <p-dropdown
+                [(ngModel)]="assignmentLocationTypeFilter"
+                [options]="locationTypeOptions"
+                placeholder="Location Type"
+                (onChange)="onAssignmentSearch()"
+                styleClass="w-32"
+              >
+              </p-dropdown>
+
+              <!-- Combo Filter -->
+              <p-dropdown
+                [(ngModel)]="assignmentComboFilter"
+                [options]="comboOptions"
+                placeholder="Filter by Combo"
+                (onChange)="onAssignmentSearch()"
+                styleClass="w-48"
+              >
+              </p-dropdown>
+
+              <!-- Message Combo Filter -->
+              <!-- <p-dropdown 
+                [(ngModel)]="assignmentMessageComboFilter"
+                [options]="messageComboOptions"
+                placeholder="Message Combo"
+                (onChange)="onAssignmentSearch()"
+                styleClass="w-48">
+              </p-dropdown> -->
+
+              <!-- Assignment Type -->
+              <p-dropdown
+                [(ngModel)]="assignmentTypeFilter"
+                [options]="comboTypeOptions"
+                placeholder="Assignment Type"
+                (onChange)="onAssignmentSearch()"
+                styleClass="w-40"
+              >
+              </p-dropdown>
+
+              <!-- Layout Toggle -->
+              <p-selectButton
+                [options]="layoutOptions"
+                [(ngModel)]="selectedAssignmentsLayout"
+                optionLabel="label"
+                optionValue="value"
+              >
+                <ng-template let-item>
+                  <i [class]="item.icon"></i>
+                </ng-template>
+              </p-selectButton>
+            </div>
+
+            <div class="p-toolbar-group-end">
+              <div class="flex space-x-2">
+                <button
+                  pButton
+                  icon="pi pi-refresh"
+                  class="p-button-rounded p-button-text"
+                  (click)="assignmentsTable!.reset()"
+                  [disabled]="assignmentsLoading"
+                  pTooltip="Refresh"
+                ></button>
+                <button
+                  pButton
+                  icon="pi pi-filter-slash"
+                  label="Clear Filters"
+                  class="p-button-secondary"
+                  (click)="clearAssignmentFilters()"
+                  pTooltip="Clear all filters"
+                ></button>
+              </div>
+            </div>
+          </p-toolbar>
+        </div>
+
+        <!-- Assignments Table (List View) -->
+        <div *ngIf="selectedAssignmentsLayout === 'list'">
+          <div class="table-wrapper">
+            <!-- Scrollable Table Container -->
+            <div class="table-scroll-container">
+              <p-table
+                #assignmentsTable
+                [value]="assignments"
+                [lazy]="true"
+                (onLazyLoad)="loadAssignmentsLazy($event)"
+                [paginator]="false"
+                [loading]="assignmentsLoading"
+                [filterDelay]="0"
+                dataKey="id"
+                [scrollable]="true"
+                scrollHeight="flex"
+                styleClass="p-datatable-striped p-datatable-gridlines"
+              >
+                <!-- Assignments table header -->
+                <ng-template pTemplate="header">
+                  <tr>
+                    <th pSortableColumn="deviceName" style="width: 12%">
+                      Device <p-sortIcon field="deviceName"></p-sortIcon>
+                    </th>
+                    <th style="width: 12%">Assignment Type</th>
+                    <th style="width: 15%">Content</th>
+                    <th pSortableColumn="locationType" style="width: 12%">
+                      Location Type
+                      <p-sortIcon field="locationType"></p-sortIcon>
+                    </th>
+                    <th pSortableColumn="locationName" style="width: 15%">
+                      Location <p-sortIcon field="locationName"></p-sortIcon>
+                    </th>
+                    <th pSortableColumn="displayOrder" style="width: 8%">
+                      Order <p-sortIcon field="displayOrder"></p-sortIcon>
+                    </th>
+                    <th pSortableColumn="isActive" style="width: 8%">
+                      Active <p-sortIcon field="isActive"></p-sortIcon>
+                    </th>
+                    <th pSortableColumn="createdDate" style="width: 10%">
+                      Created <p-sortIcon field="createdDate"></p-sortIcon>
+                    </th>
+                    <th style="width: 8%">Actions</th>
+                  </tr>
+                </ng-template>
+
+                <!-- Update the assignments table body -->
+                <ng-template pTemplate="body" let-assignment>
+                  <tr>
+                    <td class="font-medium text-gray-900">
+                      {{ getDeviceName(assignment) }}
+                    </td>
+                    <td>
+                      <p-tag
+                        [value]="getComboDisplay(assignment)"
+                        [severity]="
+                          assignment.assignmentType === 'TEMPLATE'
+                            ? 'info'
+                            : assignment.assignmentType === 'MESSAGE'
+                              ? 'success'
+                              : 'warning'
+                        "
+                        styleClass="text-xs"
+                      >
+                      </p-tag>
+                    </td>
+                    <td>
+                      <div *ngIf="assignment.isTemplateAssignment">
+                        <span class="font-medium">{{
+                          assignment.templateName
+                        }}</span>
+                      </div>
+                      <div *ngIf="assignment.isMessageAssignment">
+                        <span class="font-medium">{{
+                          assignment.messageTitle
+                        }}</span>
+                        <p class="text-xs text-gray-500 truncate">
+                          {{ assignment.messageContent | slice: 0 : 50 }}...
+                        </p>
+                      </div>
+                    </td>
+                    <td>
+                      <p-tag
+                        [value]="assignment.locationType"
+                        [severity]="
+                          getLocationTypeBadge(assignment.locationType)
+                        "
+                        styleClass="text-xs"
+                      >
+                      </p-tag>
+                    </td>
+                    <td>
+                      {{
+                        assignment.locationName || getLocationName(assignment)
+                      }}
+                    </td>
+                    <td>{{ assignment.displayOrder }}</td>
+                    <td>
+                      <i
+                        [class]="
+                          assignment.isActive
+                            ? 'pi pi-check-circle text-green-500'
+                            : 'pi pi-times-circle text-red-500'
+                        "
+                        [pTooltip]="assignment.isActive ? 'Active' : 'Inactive'"
+                      >
+                      </i>
+                    </td>
+                    <td>
+                      <span class="text-sm text-gray-500">
+                        {{ assignment.createdDate | date: "MMM d, y" }}
+                      </span>
+                    </td>
+                    <td>
+                      <div
+                        class="flex space-x-1"
+                        *ngIf="auth.hasAnyRole(['Admin', 'Manager'])"
+                      >
+                        <button
+                          *ngIf="auth.hasAnyRole(['Admin', 'Manager'])"
+                          pButton
+                          icon="pi pi-trash"
+                          class="p-button-rounded p-button-text p-button-danger p-button-sm"
+                          pTooltip="Delete"
+                          (click)="deleteAssignment(assignment)"
+                        ></button>
+                      </div>
+                    </td>
+                  </tr>
+                </ng-template>
+
+                <ng-template pTemplate="emptymessage">
+                  <tr>
+                    <td colspan="9" class="text-center p-6">
+                      <div class="flex flex-col items-center">
+                        <i
+                          class="pi pi-map-marker text-4xl text-gray-300 mb-3"
+                        ></i>
+                        <h4 class="text-lg font-semibold text-gray-600 mb-2">
+                          No Assignments Found
+                        </h4>
+                        <p class="text-gray-500 mb-4">
+                          Assign a combo to a location to get started
+                        </p>
+                        <button
+                          pButton
+                          icon="pi pi-plus"
+                          label="Create Assignment"
+                          class="p-button-primary"
+                          (click)="openAssignmentDialog()"
+                        ></button>
+                      </div>
+                    </td>
+                  </tr>
+                </ng-template>
+              </p-table>
+            </div>
+
+            <!-- Fixed Pagination Outside Scroll Area -->
+            <div class="pagination-container">
+              <p-paginator
+                [rows]="assignmentsRows"
+                [totalRecords]="assignmentsTotalRecords"
+                [rowsPerPageOptions]="[5, 10, 20, 50]"
+                [showCurrentPageReport]="true"
+                currentPageReportTemplate="Showing {first} to {last} of {totalRecords} assignments"
+                (onPageChange)="onAssignmentsPageChange($event)"
+              >
+              </p-paginator>
+            </div>
+          </div>
+        </div>
+
+        <!-- Assignments Grid View -->
+        <div
+          *ngIf="selectedAssignmentsLayout === 'grid'"
+          class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4"
+        >
+          <div
+            *ngFor="let assignment of assignments"
+            class="bg-white border border-gray-200 rounded-lg overflow-hidden hover:shadow-lg transition-all duration-200"
+          >
+            <div
+              [ngClass]="{
+                'bg-blue-50': assignment.locationType === 'shelf',
+                'bg-yellow-50': assignment.locationType === 'aisle',
+                'bg-green-50': assignment.locationType === 'product',
+              }"
+              class="h-40 flex flex-col items-center justify-center p-4"
+            >
+              <i
+                [class]="{
+                  'pi pi-tablet text-blue-600':
+                    assignment.locationType === 'shelf',
+                  'pi pi-building text-yellow-600':
+                    assignment.locationType === 'aisle',
+                  'pi pi-shopping-cart text-green-600':
+                    assignment.locationType === 'product',
+                }"
+                class="text-5xl mb-3"
+              ></i>
+              <h3 class="font-semibold text-gray-900 text-center">
+                {{ assignment.locationType | titlecase }}
+              </h3>
+              <p class="text-xs text-gray-500 mt-1">Assignment</p>
+            </div>
+
+            <div class="p-4">
+              <div class="space-y-3">
+                <div>
+                  <p class="text-sm text-gray-600 mb-1">Device:</p>
+                  <p class="font-medium text-sm">
+                    {{ getDeviceName(assignment) }}
+                  </p>
+                </div>
+
+                <div>
+                  <p class="text-sm text-gray-600 mb-1">Template:</p>
+                  <p class="font-medium text-sm">
+                    {{ getTemplateName(assignment) }}
+                  </p>
+                </div>
+
+                <div>
+                  <p class="text-sm text-gray-600 mb-1">Location:</p>
+                  <p class="font-medium text-sm">
+                    {{ getLocationName(assignment) }}
+                  </p>
+                </div>
+
+                <div class="flex justify-between items-center">
+                  <span class="text-sm text-gray-600">Order:</span>
+                  <span class="font-medium">{{ assignment.displayOrder }}</span>
+                </div>
+
+                <div class="flex justify-between items-center">
+                  <span class="text-sm text-gray-600">Status:</span>
+                  <span
+                    [ngClass]="
+                      assignment.isActive ? 'text-green-600' : 'text-red-600'
+                    "
+                  >
+                    {{ assignment.isActive ? "Active" : "Inactive" }}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <div class="border-t border-gray-100 p-3 bg-gray-50">
+              <div
+                class="flex justify-end"
+                *ngIf="auth.hasAnyRole(['Admin', 'Manager'])"
+              >
+                <button
+                  pButton
+                  icon="pi pi-trash"
+                  class="p-button-rounded p-button-text p-button-danger p-button-sm"
+                  pTooltip="Delete"
+                  (click)="deleteAssignment(assignment)"
+                ></button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Empty State for Grid -->
+          <div
+            *ngIf="assignments.length === 0 && !assignmentsLoading"
+            class="col-span-full py-12 text-center"
+          >
+            <i class="pi pi-map-marker text-4xl text-gray-300 mb-3"></i>
+            <h4 class="text-lg font-semibold text-gray-600 mb-2">
+              No Assignments Found
+            </h4>
+            <p class="text-gray-500 mb-4">
+              Assign a combo to a location to get started
+            </p>
+            <button
+              pButton
+              icon="pi pi-plus"
+              label="Create Assignment"
+              class="p-button-primary"
+              (click)="openAssignmentDialog()"
+            ></button>
+          </div>
+
+          <!-- Loading State for Grid -->
+          <div
+            *ngIf="assignmentsLoading"
+            class="col-span-full py-12 text-center"
+          >
+            <p-progressSpinner></p-progressSpinner>
+            <p class="text-gray-600 mt-3">Loading assignments...</p>
+          </div>
+        </div>
+      </p-tabPanel>
+
+      <!-- Tab 5 Gateway Tab -->
+      <p-tabPanel header="Gateways">
+        <ng-template pTemplate="header">
+          <div class="flex items-center gap-2">
+            <i class="pi pi-wifi"></i>
+            <span>Gateways</span>
+            <p-badge
+              [value]="gatewaysTotalRecords.toString()"
+              severity="info"
+            ></p-badge>
+          </div>
+        </ng-template>
+
+        <!-- Toolbar -->
+        <div class="mb-4">
+          <p-toolbar styleClass="p-3 bg-gray-50 border border-gray-200 rounded">
+            <div class="p-toolbar-group-start flex items-center space-x-4">
+              <!-- Search -->
+              <input
+                type="text"
+                pInputText
+                [(ngModel)]="gatewaySearchTerm"
+                (input)="onGatewaySearch()"
+                placeholder="Search gateways..."
+                class="w-64"
+              />
+
+              <!-- Layout Toggle -->
+              <p-selectButton
+                [options]="layoutOptions"
+                [(ngModel)]="selectedGatewaysLayout"
+                optionLabel="label"
+                optionValue="value"
+              >
+                <ng-template let-item>
+                  <i [class]="item.icon"></i>
+                </ng-template>
+              </p-selectButton>
+            </div>
+
+            <div class="p-toolbar-group-end">
+              <div class="flex space-x-2">
+                <button
+                  pButton
+                  icon="pi pi-refresh"
+                  class="p-button-rounded p-button-text"
+                  (click)="gatewaysTable!.reset()"
+                  [disabled]="gatewaysLoading"
+                  pTooltip="Refresh"
+                ></button>
+                <button
+                  pButton
+                  icon="pi pi-filter-slash"
+                  label="Clear Filters"
+                  class="p-button-secondary"
+                  (click)="clearGatewayFilters()"
+                  pTooltip="Clear all filters"
+                  tooltipPosition="bottom"
+                ></button>
+              </div>
+            </div>
+          </p-toolbar>
+        </div>
+
+        <!-- Gateways Table -->
+        <div *ngIf="selectedGatewaysLayout === 'list'" class="table-container">
+          <p-table
+            #gatewaysTable
+            [value]="gateways"
+            [lazy]="true"
+            (onLazyLoad)="loadGatewaysLazy($event)"
+            [paginator]="true"
+            [rows]="gatewaysRows"
+            [totalRecords]="gatewaysTotalRecords"
+            [loading]="false"
+            [rowsPerPageOptions]="[5, 10, 20, 50]"
+            [showCurrentPageReport]="true"
+            currentPageReportTemplate="Showing {first} to {last} of {totalRecords} gateways"
+            dataKey="id"
+            styleClass="p-datatable-striped p-datatable-gridlines"
+          >
+            <!-- Column Definitions -->
+            <ng-template pTemplate="header">
+              <tr>
+                <th pSortableColumn="name" style="width: 15%">
+                  Name <p-sortIcon field="name"></p-sortIcon>
+                </th>
+                <th pSortableColumn="macAddress" style="width: 15%">
+                  MAC Address <p-sortIcon field="macAddress"></p-sortIcon>
+                </th>
+                <th pSortableColumn="storeName" style="width: 15%">
+                  Store <p-sortIcon field="storeName"></p-sortIcon>
+                </th>
+                <th style="width: 10%">Type</th>
+                <th pSortableColumn="isOnline" style="width: 10%">
+                  Status <p-sortIcon field="isOnline"></p-sortIcon>
+                </th>
+                <th pSortableColumn="lastSeen" style="width: 15%">
+                  Last Seen <p-sortIcon field="lastSeen"></p-sortIcon>
+                </th>
+                <th style="width: 10%">Hardware/Firmware</th>
+                <th style="width: 10%">Actions</th>
+              </tr>
+            </ng-template>
+
+            <ng-template pTemplate="body" let-gateway>
+              <tr>
+                <td class="font-medium text-gray-900">{{ gateway.name }}</td>
+                <td>
+                  <span class="font-mono text-sm bg-gray-100 px-2 py-1 rounded">
+                    {{ gateway.macAddress }}
+                  </span>
+                </td>
+                <td>{{ gateway.storeName || gateway.storeId }}</td>
+                <td>{{ gateway.gatewayType }}</td>
+                <td>
+                  <p-tag
+                    [value]="gateway.isOnline ? 'Online' : 'Offline'"
+                    [severity]="gateway.isOnline ? 'success' : 'danger'"
+                    [rounded]="true"
+                  >
+                  </p-tag>
+                </td>
+                <td>
+                  <span class="text-sm text-gray-500">
+                    {{ gateway.lastSeen | date: "MMM d, y HH:mm" }}
+                  </span>
+                </td>
+                <td>
+                  <div class="text-xs">
+                    <div>HW: {{ gateway.hardwareVersion || "-" }}</div>
+                    <div>FW: {{ gateway.firmwareVersion || "-" }}</div>
+                  </div>
+                </td>
+                <td>
+                  <div class="flex space-x-1">
+                    <button
+                      pButton
+                      icon="fas fa-edit"
+                      class="p-button-rounded p-button-text p-button-sm edit-icon"
+                      pTooltip="Edit"
+                      tooltipPosition="top"
+                      (click)="openGatewayDialog(gateway)"
+                    ></button>
+                    <button
+                      *ngIf="auth.hasAnyRole(['Admin', 'Manager'])"
+                      pButton
+                      icon="pi pi-trash"
+                      class="p-button-rounded p-button-text p-button-danger p-button-sm"
+                      pTooltip="Delete"
+                      (click)="deleteGateway(gateway)"
+                    ></button>
+                  </div>
+                </td>
+              </tr>
+            </ng-template>
+
+            <ng-template pTemplate="emptymessage">
+              <tr>
+                <td colspan="8" class="text-center p-6">
+                  <div
+                    style="
+                      display: flex;
+                      flex-direction: column;
+                      align-items: center;
+                    "
+                  >
+                    <i class="pi pi-wifi text-4xl text-gray-300 mb-3"></i>
+                    <h4 class="text-lg font-semibold text-gray-600 mb-2">
+                      No Gateways Found
+                    </h4>
+                    <p class="text-gray-500 mb-4">
+                      Add a gateway or sync from cloud to get started
+                    </p>
+                    <button
+                      pButton
+                      icon="pi pi-plus"
+                      label="Add Gateway"
+                      class="p-button-primary"
+                      (click)="openGatewayDialog()"
+                    ></button>
+                  </div>
+                </td>
+              </tr>
+            </ng-template>
+          </p-table>
+        </div>
+
+        <!-- Gateways Grid View -->
+        <div
+          *ngIf="selectedGatewaysLayout === 'grid'"
+          class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4"
+        >
+          <!-- Gateway Cards -->
+          <div
+            *ngFor="let gateway of gateways"
+            class="bg-white border border-gray-200 rounded-lg overflow-hidden hover:shadow-lg transition-all duration-200 transform hover:-translate-y-1"
+          >
+            <!-- Card Header -->
+            <div
+              class="bg-gradient-to-r from-blue-50 to-indigo-50 p-4 border-b border-gray-100"
+            >
+              <div class="flex items-center justify-between mb-3">
+                <div class="flex items-center">
+                  <div class="p-2 bg-white rounded-lg shadow-sm mr-3">
+                    <i class="pi pi-wifi text-blue-600 text-xl"></i>
+                  </div>
+                  <div>
+                    <h3
+                      class="font-semibold text-gray-900 text-lg truncate max-w-[180px]"
+                    >
+                      {{ gateway.name }}
+                    </h3>
+                    <p class="text-xs text-gray-500 mt-1">
+                      {{ gateway.gatewayType || "Minew Gateway" }}
+                    </p>
+                  </div>
+                </div>
+                <p-tag
+                  [value]="getGatewayStatusText(gateway)"
+                  [severity]="getGatewayStatusBadge(gateway)"
+                  styleClass="text-xs"
+                  [rounded]="true"
+                >
+                </p-tag>
+              </div>
+
+              <!-- MAC Address -->
+              <div class="bg-white rounded-lg p-2">
+                <div class="flex items-center">
+                  <i class="pi pi-id-card text-gray-400 text-sm mr-2"></i>
+                  <span class="font-mono text-xs text-gray-600 truncate">{{
+                    gateway.macAddress
+                  }}</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Card Body -->
+            <div class="p-4">
+              <div class="space-y-3">
+                <!-- Store Info -->
+                <div class="flex items-center justify-between">
+                  <div class="flex items-center">
+                    <i class="pi pi-store text-gray-400 text-sm mr-2"></i>
+                    <span class="text-sm text-gray-600">Store:</span>
+                  </div>
+                  <span
+                    class="text-sm font-medium text-gray-900 truncate ml-2 max-w-[120px]"
+                  >
+                    {{ gateway.storeName || "Store #" + gateway.storeId }}
+                  </span>
+                </div>
+
+                <!-- Last Seen -->
+                <div class="flex items-center justify-between">
+                  <div class="flex items-center">
+                    <i class="pi pi-clock text-gray-400 text-sm mr-2"></i>
+                    <span class="text-sm text-gray-600">Last Seen:</span>
+                  </div>
+                  <span class="text-sm font-medium text-gray-900">
+                    {{ getLastSeenDisplay(gateway) }}
+                  </span>
+                </div>
+
+                <!-- Hardware/Firmware -->
+                <div class="space-y-2 pt-2 border-t border-gray-100">
+                  <div class="flex items-center justify-between">
+                    <div class="flex items-center">
+                      <i class="pi pi-microchip text-gray-400 text-sm mr-2"></i>
+                      <span class="text-xs text-gray-600">Hardware:</span>
+                    </div>
+                    <span class="text-xs font-medium text-gray-900">
+                      {{ gateway.hardwareVersion || "N/A" }}
+                    </span>
+                  </div>
+
+                  <div class="flex items-center justify-between">
+                    <div class="flex items-center">
+                      <i class="pi pi-code text-gray-400 text-sm mr-2"></i>
+                      <span class="text-xs text-gray-600">Firmware:</span>
+                    </div>
+                    <span class="text-xs font-medium text-gray-900">
+                      {{ gateway.firmwareVersion || "N/A" }}
+                    </span>
+                  </div>
+                </div>
+
+                <!-- Battery (if available) -->
+                <div
+                  *ngIf="
+                    gateway.battery !== undefined && gateway.battery !== null
+                  "
+                  class="pt-2 border-t border-gray-100"
+                >
+                  <div class="flex justify-between text-sm mb-1">
+                    <span class="text-gray-600">Battery:</span>
+                    <span class="font-medium">{{ gateway.battery }}%</span>
+                  </div>
+                  <div class="w-full bg-gray-200 rounded-full h-2">
+                    <div
+                      class="h-full rounded-full transition-all"
+                      [ngClass]="getGatewayBatteryClass(gateway.battery)"
+                      [style.width.%]="gateway.battery"
+                    ></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Card Footer -->
+            <div class="border-t border-gray-100 p-3 bg-gray-50">
+              <div class="flex justify-between items-center">
+                <span class="text-xs text-gray-500">
+                  <i
+                    [class]="
+                      gateway.isOnline
+                        ? 'pi pi-check-circle text-green-500'
+                        : 'pi pi-times-circle text-red-500'
+                    "
+                  ></i>
+                  {{ gateway.isOnline ? "Connected" : "Disconnected" }}
+                </span>
+                <div class="flex space-x-1">
+                  <button
+                    pButton
+                    icon="pi pi-pencil"
+                    class="p-button-rounded p-button-text p-button-sm edit-icon"
+                    pTooltip="Edit"
+                    tooltipPosition="top"
+                    (click)="openGatewayDialog(gateway)"
+                  ></button>
+                  <button
+                    pButton
+                    icon="pi pi-eye"
+                    class="p-button-rounded p-button-text p-button-info p-button-sm"
+                    pTooltip="View Details"
+                    tooltipPosition="top"
+                    (click)="viewGatewayDetails(gateway)"
+                  ></button>
+                  <button
+                    *ngIf="auth.hasAnyRole(['Admin', 'Manager'])"
+                    pButton
+                    icon="pi pi-trash"
+                    class="p-button-rounded p-button-text p-button-danger p-button-sm"
+                    pTooltip="Delete"
+                    tooltipPosition="top"
+                    (click)="deleteGateway(gateway)"
+                  ></button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Empty State for Grid -->
+          <div
+            *ngIf="gateways.length === 0 && !gatewaysLoading"
+            class="col-span-full py-12 text-center bg-white border border-gray-200 rounded-lg"
+          >
+            <div class="flex flex-col items-center justify-center p-8">
+              <div
+                class="w-20 h-20 bg-blue-50 rounded-full flex items-center justify-center mb-4"
+              >
+                <i class="pi pi-wifi text-blue-500 text-3xl"></i>
+              </div>
+              <h4 class="text-xl font-semibold text-gray-800 mb-2">
+                No Gateways Found
+              </h4>
+              <p class="text-gray-600 mb-6 max-w-md text-center">
+                Gateways are essential for connecting your ESL devices to the
+                network. Add a gateway manually or sync from the cloud to get
+                started.
+              </p>
+              <div class="flex flex-col sm:flex-row gap-3">
+                <button
+                  pButton
+                  icon="pi pi-plus"
+                  label="Add Gateway"
+                  class="p-button-primary"
+                  (click)="openGatewayDialog()"
+                ></button>
+                <button
+                  pButton
+                  icon="pi pi-sync"
+                  label="Sync from Cloud"
+                  class="p-button-info"
+                  (click)="syncGateways()"
+                ></button>
+                <button
+                  pButton
+                  icon="pi pi-question-circle"
+                  label="Learn More"
+                  class="p-button-help"
+                  (click)="showGatewayHelp()"
+                ></button>
+              </div>
+              <div class="mt-6 text-xs text-gray-500">
+                <p>
+                  Gateways help bridge communication between devices and the
+                  cloud
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Loading State for Grid -->
+          <div *ngIf="gatewaysLoading" class="col-span-full py-12 text-center">
+            <div class="flex flex-col items-center justify-center">
+              <p-progressSpinner
+                styleClass="w-12 h-12"
+                strokeWidth="4"
+                animationDuration=".5s"
+              >
+              </p-progressSpinner>
+              <p class="text-gray-600 mt-4">Loading gateways...</p>
+              <p class="text-sm text-gray-400 mt-2">
+                Fetching gateway information from server
+              </p>
+            </div>
+          </div>
+
+          <!-- Add New Gateway Card (Static) -->
+          <div
+            *ngIf="gateways.length > 0 && !gatewaysLoading"
+            class="border-2 border-dashed border-gray-300 rounded-lg hover:border-blue-400 transition-colors duration-200"
+          >
+            <div
+              class="h-full flex flex-col items-center justify-center p-8 cursor-pointer"
+              (click)="openGatewayDialog()"
+            >
+              <div
+                class="w-16 h-16 bg-blue-50 rounded-full flex items-center justify-center mb-4"
+              >
+                <i class="pi pi-plus text-blue-500 text-2xl"></i>
+              </div>
+              <h4 class="text-lg font-medium text-gray-700 mb-2">
+                Add New Gateway
+              </h4>
+              <p class="text-sm text-gray-500 text-center mb-4">
+                Click to add a new gateway to your network
+              </p>
+              <button
+                pButton
+                icon="pi pi-plus"
+                label="Add Gateway"
+                class="p-button-outlined p-button-sm"
+              ></button>
+            </div>
+          </div>
+        </div>
+      </p-tabPanel>
+    </p-tabView>
+  </div>
+
+  <!-- Dialogs -->
+
+  <!-- Device Dialog -->
+  <app-minew-batch-add
+    #minewBatchAdd
+    (devicesAdded)="onMinewDevicesAdded($event)"
+  >
+  </app-minew-batch-add>
+
+  <p-dialog
+    [(visible)]="displayDeviceDialog"
+    [modal]="true"
+    [style]="{ width: '750px' }"
+    [draggable]="false"
+    [resizable]="false"
+    [header]="isEditMode ? 'Edit Device' : 'Add New Device'"
+    appendTo="body"
+    styleClass="device-modal-dialog"
+  >
+    <!-- Main Form Container -->
+    <form
+      [formGroup]="deviceForm"
+      (ngSubmit)="saveDevice()"
+      class="device-modal-form"
+    >
+      <!-- Scrollable Content Area -->
+      <div class="modal-scrollable-content">
+        <!-- Device Type Selection -->
+        <div class="form-section mb-6">
+          <label for="deviceType" class="form-label"
+            >Device Type <span class="required">*</span></label
+          >
+          <div class="device-type-selector">
+            <p-selectButton
+              id="deviceType"
+              formControlName="deviceType"
+              [options]="deviceTypeOptions"
+              optionLabel="label"
+              optionValue="value"
+              class="w-full device-type-buttons"
+            >
+            </p-selectButton>
+          </div>
+        </div>
+
+        <!-- Basic Information Section -->
+        <div class="form-section mb-6">
+          <h4 class="form-section-title">Basic Information</h4>
+          <div class="grid grid-cols-2 gap-4">
+            <!-- Device Name -->
+            <div class="field">
+              <label for="deviceName" class="form-label"
+                >Device Name <span class="required">*</span></label
+              >
+              <input
+                id="deviceName"
+                pInputText
+                formControlName="deviceName"
+                placeholder="e.g., ESL-001"
+                class="form-input"
+                [ngClass]="{
+                  'input-error':
+                    deviceForm.get('deviceName')?.invalid &&
+                    deviceForm.get('deviceName')?.touched,
+                }"
+              />
+              <small
+                *ngIf="
+                  deviceForm.get('deviceName')?.invalid &&
+                  deviceForm.get('deviceName')?.touched
+                "
+                class="error-message"
+              >
+                Device name is required
+              </small>
+            </div>
+
+            <!-- MAC Address -->
+            <div class="field">
+              <label for="macAddress" class="form-label"
+                >MAC Address <span class="required">*</span></label
+              >
+              <input
+                id="macAddress"
+                pInputText
+                formControlName="macAddress"
+                placeholder="e.g., 00:1A:2B:3C:4D:5E"
+                class="form-input"
+                [ngClass]="{
+                  'input-error':
+                    deviceForm.get('macAddress')?.invalid &&
+                    deviceForm.get('macAddress')?.touched,
+                }"
+              />
+              <small
+                *ngIf="
+                  deviceForm.get('macAddress')?.invalid &&
+                  deviceForm.get('macAddress')?.touched
+                "
+                class="error-message"
+              >
+                Valid MAC address is required
+              </small>
+            </div>
+          </div>
+        </div>
+
+        <!-- Store and Screen Section -->
+        <div class="form-section mb-6">
+          <h4 class="form-section-title">Store & Screen</h4>
+
+          <!-- Store Selection -->
+          <div class="field mb-4">
+            <label for="storeId" class="font-medium block mb-2">
+              Store <span class="text-red-500">*</span>
+              <span *ngIf="storeLoading" class="ml-2 text-xs text-emerald-600">
+                <i class="pi pi-spin pi-spinner mr-1"></i> Loading...
+              </span>
+            </label>
+            <p-dropdown
+              id="storeId"
+              formControlName="storeId"
+              [options]="storeOptions"
+              optionLabel="label"
+              optionValue="value"
+              [showClear]="true"
+              [lazy]="true"
+              (onLazyLoad)="loadStoresLazy($event)"
+              [filter]="true"
+              filterBy="label"
+              placeholder="Select Store"
+              class="w-full"
+              [ngClass]="{
+                'p-invalid':
+                  deviceForm.get('storeId')?.invalid &&
+                  deviceForm.get('storeId')?.touched,
+              }"
+            >
+              <ng-template pTemplate="header">
+                <div class="p-2 border-b">
+                  <div class="font-medium text-gray-700">Select Store</div>
+                  <small class="text-gray-500"
+                    >Scroll to load more stores</small
+                  >
+                </div>
+              </ng-template>
+
+              <ng-template let-store pTemplate="item">
+                <div class="flex flex-col p-2">
+                  <div class="font-medium">{{ store.storeName }}</div>
+                  <div class="text-sm text-gray-500">
+                    {{ store.storeCode || "No Code" }}
+                    <span *ngIf="store.address" class="ml-2"
+                      >• {{ store.address }}</span
+                    >
+                  </div>
+                </div>
+              </ng-template>
+
+              <ng-template pTemplate="empty">
+                <div class="p-3 text-center text-gray-500">
+                  <i class="pi pi-building text-2xl mb-2 block"></i>
+                  <p>No stores found</p>
+                </div>
+              </ng-template>
+
+              <ng-template pTemplate="selectedItem">
+                <div
+                  *ngIf="deviceForm.get('storeId')?.value"
+                  class="flex items-center"
+                >
+                  <i class="pi pi-building mr-2 text-emerald-600"></i>
+                  <span>{{ getSelectedStoreName() }}</span>
+                </div>
+              </ng-template>
+            </p-dropdown>
+
+            <small
+              *ngIf="
+                deviceForm.get('storeId')?.invalid &&
+                deviceForm.get('storeId')?.touched
+              "
+              class="p-error block mt-1"
+            >
+              Store is required
+            </small>
+
+            <!-- Show current default store as hint -->
+            <small *ngIf="storeName" class="text-gray-500 block mt-1">
+              Current default store:
+              <span class="font-medium">{{ storeName }}</span>
+            </small>
+          </div>
+
+          <!-- Screen Properties -->
+          <div class="field">
+            <label for="screenId" class="form-label">Screen Properties</label>
+            <p-dropdown
+              id="screenId"
+              formControlName="screenId"
+              [options]="screenOptions"
+              optionLabel="name"
+              optionValue="id"
+              [filter]="true"
+              filterBy="name,aspectRatio"
+              [showClear]="true"
+              placeholder="Select Screen"
+              class="form-dropdown"
+            >
+              <ng-template pTemplate="selectedItem">
+                <div *ngIf="deviceForm.get('screenId')?.value">
+                  <span>{{
+                    getScreenDisplay(deviceForm.get("screenId")?.value)
+                  }}</span>
+                </div>
+              </ng-template>
+              <ng-template let-screen pTemplate="item">
+                <div class="flex items-center">
+                  <div class="mr-3">
+                    <i class="pi pi-desktop text-emerald-600"></i>
+                  </div>
+                  <div>
+                    <div class="font-medium">{{ screen.name }}</div>
+                    <div class="text-sm text-gray-500">
+                      {{ screen.width }}x{{ screen.height }} |
+                      {{ screen.inch }}" | {{ screen.aspectRatio }}
+                    </div>
+                  </div>
+                </div>
+              </ng-template>
+            </p-dropdown>
+            <small class="form-hint"
+              >Select from predefined screen dimensions</small
+            >
+          </div>
+        </div>
+
+        <!-- Network Settings (Standard Devices Only) -->
+        <div *ngIf="!isMinewDevice()" class="form-section mb-6">
+          <h4 class="form-section-title">Network Settings</h4>
+
+          <!-- IP Address -->
+          <div class="field mb-4">
+            <label for="ipAddress" class="form-label">IP Address</label>
+            <input
+              id="ipAddress"
+              pInputText
+              formControlName="ipAddress"
+              placeholder="e.g., 192.168.1.100"
+              class="form-input"
+              [ngClass]="{
+                'input-error':
+                  deviceForm.get('ipAddress')?.invalid &&
+                  deviceForm.get('ipAddress')?.touched,
+              }"
+            />
+            <small
+              *ngIf="
+                deviceForm.get('ipAddress')?.invalid &&
+                deviceForm.get('ipAddress')?.touched
+              "
+              class="error-message"
+            >
+              Valid IP address required for Standard devices
+            </small>
+          </div>
+
+          <!-- Network Name -->
+          <div class="field">
+            <label for="networkName" class="form-label">Network Name</label>
+            <input
+              id="networkName"
+              pInputText
+              formControlName="networkName"
+              placeholder="e.g., Store-Network"
+              class="form-input"
+            />
+          </div>
+        </div>
+
+        <!-- Device Status Section -->
+        <div class="form-section mb-6">
+          <h4 class="form-section-title">Device Status</h4>
+          <div class="grid grid-cols-2 gap-4">
+            <!-- Status -->
+            <div class="field">
+              <label for="statusId" class="form-label">Status</label>
+              <p-dropdown
+                id="statusId"
+                formControlName="statusId"
+                [options]="[
+                  { label: 'Active', value: 1 },
+                  { label: 'Inactive', value: 2 },
+                  { label: 'Maintenance', value: 3 },
+                ]"
+                optionLabel="label"
+                optionValue="value"
+                placeholder="Select Status"
+                class="form-dropdown"
+              >
+              </p-dropdown>
+            </div>
+          </div>
+
+          <!-- Active Checkbox -->
+          <div class="field-checkbox mt-4">
+            <div class="flex items-center">
+              <p-checkbox
+                formControlName="isActive"
+                [binary]="true"
+                inputId="isActive"
+                class="mr-2"
+              >
+              </p-checkbox>
+              <label for="isActive" class="form-label mb-0"
+                >Device is Active</label
+              >
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- End of scrollable content -->
+    </form>
+
+    <!-- Fixed Footer with Action Buttons -->
+    <!-- <ng-template pTemplate="footer"> -->
+    <div class="dialog-footer">
+      <button
+        type="button"
+        class="dialog-btn dialog-btn-secondary"
+        (click)="displayDeviceDialog = false"
+      >
+        <span>Cancel</span>
+      </button>
+      <button
+        type="button"
+        class="dialog-btn dialog-btn-primary"
+        [disabled]="deviceForm.invalid || loading"
+        (click)="saveDevice()"
+      >
+        <i class="pi" [ngClass]="isEditMode ? 'pi-check' : 'pi-plus'"></i>
+        <span>{{ isEditMode ? "Update Device" : "Create Device" }}</span>
+        <i *ngIf="loading" class="pi pi-spin pi-spinner ml-2"></i>
+      </button>
+    </div>
+    <!-- </ng-template> -->
+  </p-dialog>
+
+  <!-- Screen Dimension Dialog -->
+  <p-dialog
+    [(visible)]="displayScreenDimensionDialog"
+    [modal]="true"
+    [style]="{ width: '600px' }"
+    [draggable]="false"
+    [resizable]="false"
+    header="Device Screen Dimensions"
+  >
+    <div *ngIf="selectedDevice" class="mb-4">
+      <p-card>
+        <div class="flex items-center space-x-3">
+          <i class="pi pi-tablet text-2xl text-emerald-600"></i>
+          <div>
+            <h4 class="font-semibold">{{ selectedDevice.deviceName }}</h4>
+            <p class="text-sm text-gray-500">{{ selectedDevice.mac }}</p>
+          </div>
+        </div>
+      </p-card>
+    </div>
+
+    <!-- Existing Dimensions -->
+    <div *ngIf="screenDimensions.length > 0" class="mb-6">
+      <h5 class="font-medium text-gray-700 mb-3">Existing Screen Dimensions</h5>
+      <div class="space-y-2">
+        <div
+          *ngFor="let dimension of screenDimensions"
+          class="p-3 border border-gray-200 rounded-lg hover:bg-gray-50"
+        >
+          <div class="flex justify-between items-center">
+            <div>
+              <span class="font-medium">{{ dimension.screenSize }}</span>
+              <span class="text-sm text-gray-500 ml-2"
+                >({{ dimension.aspectRatio }})</span
+              >
+            </div>
+            <div class="flex space-x-2">
+              <p-tag
+                [value]="dimension.orientation"
+                severity="info"
+                styleClass="text-xs"
+              >
+              </p-tag>
+              <button
+                pButton
+                icon="pi pi-trash"
+                class="p-button-rounded p-button-text p-button-danger p-button-sm"
+                (click)="deleteScreenDimension(dimension)"
+              ></button>
+            </div>
+          </div>
+          <div class="grid grid-cols-3 gap-2 mt-2 text-xs text-gray-600">
+            <div>Refresh: {{ dimension.refreshRate }}Hz</div>
+            <div>Color: {{ dimension.colorDepth }}-bit</div>
+            <div>DPI: {{ dimension.pixelDensity }}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Add New Dimension Form -->
+    <h5 class="font-medium text-gray-700 mb-3">Add New Screen Dimension</h5>
+    <form
+      [formGroup]="screenDimensionForm"
+      (ngSubmit)="saveScreenDimension()"
+      class="p-fluid"
+    >
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div class="field">
+          <label for="screenWidth" class="font-medium">Screen Width *</label>
+          <p-inputNumber
+            id="screenWidth"
+            formControlName="screenWidth"
+            mode="decimal"
+            [min]="1"
+            class="w-full"
+          >
+          </p-inputNumber>
+        </div>
+
+        <div class="field">
+          <label for="screenHeight" class="font-medium">Screen Height *</label>
+          <p-inputNumber
+            id="screenHeight"
+            formControlName="screenHeight"
+            mode="decimal"
+            [min]="1"
+            class="w-full"
+          >
+          </p-inputNumber>
+        </div>
+
+        <div class="field">
+          <label for="orientation" class="font-medium">Orientation *</label>
+          <p-dropdown
+            id="orientation"
+            formControlName="orientation"
+            [options]="orientationOptions"
+            placeholder="Select Orientation"
+            class="w-full"
+          >
+          </p-dropdown>
+        </div>
+
+        <div class="field">
+          <label for="refreshRate" class="font-medium">Refresh Rate (Hz)</label>
+          <p-inputNumber
+            id="refreshRate"
+            formControlName="refreshRate"
+            mode="decimal"
+            [min]="1"
+            [max]="240"
+            class="w-full"
+          >
+          </p-inputNumber>
+        </div>
+
+        <div class="field">
+          <label for="colorDepth" class="font-medium">Color Depth (bits)</label>
+          <p-inputNumber
+            id="colorDepth"
+            formControlName="colorDepth"
+            mode="decimal"
+            [min]="1"
+            [max]="32"
+            class="w-full"
+          >
+          </p-inputNumber>
+        </div>
+
+        <div class="field">
+          <label for="pixelDensity" class="font-medium"
+            >Pixel Density (DPI)</label
+          >
+          <p-inputNumber
+            id="pixelDensity"
+            formControlName="pixelDensity"
+            mode="decimal"
+            [min]="1"
+            class="w-full"
+          >
+          </p-inputNumber>
+        </div>
+      </div>
+
+      <!-- Form Actions -->
+      <div class="flex justify-end gap-2 mt-6">
+        <button
+          pButton
+          type="button"
+          label="Cancel"
+          class="p-button-text"
+          (click)="displayScreenDimensionDialog = false"
+        ></button>
+        <button
+          pButton
+          type="submit"
+          label="Add Dimension"
+          class="p-button-primary"
+          [disabled]="screenDimensionForm.invalid"
+        ></button>
+      </div>
+    </form>
+  </p-dialog>
+
+  <!-- Sync Dialog -->
+  <p-dialog
+    [(visible)]="displayDeviceSyncDialog"
+    [modal]="true"
+    [style]="{ width: '500px' }"
+    [draggable]="false"
+    [resizable]="false"
+    appendTo="body"
+    header="Sync Devices"
+  >
+    <!-- Remove the form tag and use a regular div -->
+    <div class="space-y-4">
+      <!-- Sync Type -->
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">
+          Sync Type *
+        </label>
+        <p-dropdown
+          [(ngModel)]="selectedSyncType"
+          [options]="syncOptions"
+          placeholder="Select Sync Type"
+          class="w-full"
+        >
+        </p-dropdown>
+        <small
+          *ngIf="selectedSyncType === 'localToCloud'"
+          class="text-gray-500 block mt-1"
+        >
+          Create devices locally first, then synchronize to Minew cloud
+        </small>
+        <small
+          *ngIf="selectedSyncType === 'cloudToLocal'"
+          class="text-gray-500 block mt-1"
+        >
+          Import devices from Minew cloud to local database
+        </small>
+      </div>
+
+      <!-- Store Selection -->
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">
+          Store *
+        </label>
+        <div class="bg-emerald-50 border border-emerald-200 rounded-lg p-4 mb-4">
+          <div class="flex items-start">
+            <i class="pi pi-info-circle text-emerald-600 mt-1 mr-2"></i>
+            <div>
+              <h5 class="font-medium text-emerald-800">Current Store</h5>
+              <p class="text-emerald-700">{{ getStoreName() }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <ng-template pTemplate="footer">
+      <button
+        pButton
+        type="button"
+        label="Cancel"
+        class="p-button-text"
+        (click)="displayDeviceSyncDialog = false"
+      ></button>
+      <button
+        pButton
+        type="button"
+        class="p-button-primary"
+        (click)="confirmDeviceSync()"
+        [disabled]="loading || !selectedSyncType"
+      >
+        <i *ngIf="loading" class="pi pi-spin pi-spinner mr-2"></i>
+        {{ loading ? "Syncing..." : "Start Sync" }}
+      </button>
+    </ng-template>
+  </p-dialog>
+
+  <!-- Template Sync Dialog -->
+  <p-dialog
+    [(visible)]="displayTemplateSyncDialog"
+    [modal]="true"
+    [style]="{ width: '500px' }"
+    [draggable]="false"
+    [resizable]="false"
+    appendTo="body"
+    header="Sync Templates"
+  >
+    <div class="p-4">
+      <p class="text-gray-600 mb-4">
+        This will sync templates from the cloud for the current store. Existing
+        templates will be updated and new templates will be added.
+      </p>
+
+      <div class="bg-emerald-50 border border-emerald-200 rounded-lg p-4 mb-4">
+        <div class="flex items-start">
+          <i class="pi pi-info-circle text-emerald-600 mt-1 mr-2"></i>
+          <div>
+            <h5 class="font-medium text-emerald-800">Current Store</h5>
+            <p class="text-emerald-700">{{ getStoreName() }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <ng-template pTemplate="footer">
+      <button
+        pButton
+        type="button"
+        label="Cancel"
+        class="p-button-text"
+        (click)="displayTemplateSyncDialog = false"
+      ></button>
+      <button
+        pButton
+        type="button"
+        class="p-button-primary"
+        (click)="confirmTemplateSync()"
+        [disabled]="syncingTemplates"
+      >
+        <i *ngIf="syncingTemplates" class="pi pi-spin pi-spinner mr-2"></i>
+        {{ syncingTemplates ? "Syncing..." : "Sync Templates" }}
+      </button>
+    </ng-template>
+  </p-dialog>
+
+  <!-- Template Dialog -->
+  <p-dialog
+    [(visible)]="displayTemplateDialog"
+    [modal]="true"
+    [style]="{ width: '600px' }"
+    [draggable]="false"
+    [resizable]="false"
+    [header]="isEditMode ? 'Edit Template' : 'Add New Template'"
+  >
+    <form
+      [formGroup]="templateForm"
+      (ngSubmit)="saveTemplate()"
+      class="p-fluid"
+    >
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div class="space-y-4">
+          <div class="field">
+            <label for="name" class="font-medium">Template Name *</label>
+            <input
+              id="name"
+              pInputText
+              formControlName="name"
+              placeholder="e.g., Price Template"
+              class="w-full"
+              [ngClass]="{
+                'p-invalid':
+                  templateForm.get('name')?.invalid &&
+                  templateForm.get('name')?.touched,
+              }"
+            />
+            <small
+              *ngIf="
+                templateForm.get('name')?.invalid &&
+                templateForm.get('name')?.touched
+              "
+              class="p-error"
+            >
+              Template name is required
+            </small>
+          </div>
+
+          <div class="field">
+            <label for="description" class="font-medium">Description</label>
+            <textarea
+              id="description"
+              pInputTextarea
+              formControlName="description"
+              rows="3"
+              placeholder="Template description..."
+              class="w-full"
+            >
+            </textarea>
+          </div>
+
+          <div class="field">
+            <label for="storeId" class="font-medium">Store ID</label>
+            <input
+              id="storeId"
+              pInputText
+              formControlName="storeId"
+              placeholder="e.g., 1"
+              class="w-full"
+            />
+          </div>
+        </div>
+
+        <div class="space-y-4">
+          <div class="grid grid-cols-2 gap-3">
+            <div class="field">
+              <label for="screenWidth" class="font-medium">Screen Width</label>
+              <p-inputNumber
+                id="screenWidth"
+                formControlName="screenWidth"
+                mode="decimal"
+                [min]="0"
+                class="w-full"
+              >
+              </p-inputNumber>
+            </div>
+
+            <div class="field">
+              <label for="screenHeight" class="font-medium"
+                >Screen Height</label
+              >
+              <p-inputNumber
+                id="screenHeight"
+                formControlName="screenHeight"
+                mode="decimal"
+                [min]="0"
+                class="w-full"
+              >
+              </p-inputNumber>
+            </div>
+          </div>
+
+          <div class="field">
+            <label for="color" class="font-medium">Color</label>
+            <input
+              id="color"
+              pInputText
+              formControlName="color"
+              placeholder="e.g., red, bwry"
+              class="w-full"
+            />
+          </div>
+
+          <div class="field">
+            <label for="orientation" class="font-medium">Orientation</label>
+            <p-inputNumber
+              id="orientation"
+              formControlName="orientation"
+              mode="decimal"
+              [min]="0"
+              [max]="1"
+              class="w-full"
+            >
+              <ng-template pTemplate="suffix"
+                >(0=Portrait, 1=Landscape)</ng-template
+              >
+            </p-inputNumber>
+          </div>
+
+          <div class="field">
+            <div class="flex items-center">
+              <p-checkbox
+                formControlName="isActive"
+                [binary]="true"
+                inputId="templateIsActive"
+              >
+              </p-checkbox>
+              <label for="templateIsActive" class="ml-2 font-medium"
+                >Template is Active</label
+              >
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Form Actions -->
+      <div class="flex justify-end gap-2 mt-6">
+        <button
+          pButton
+          type="button"
+          label="Cancel"
+          class="p-button-text"
+          (click)="displayTemplateDialog = false"
+        ></button>
+        <button
+          pButton
+          type="submit"
+          [label]="isEditMode ? 'Update Template' : 'Create Template'"
+          class="p-button-primary"
+          [disabled]="templateForm.invalid"
+        ></button>
+      </div>
+    </form>
+  </p-dialog>
+
+  <!-- Combo Dialog -->
+  <p-dialog
+    [(visible)]="displayComboDialog"
+    [modal]="true"
+    [style]="{ width: '500px' }"
+    [draggable]="false"
+    [resizable]="false"
+    appendTo="body"
+    header="Create Device-Template Combo"
+  >
+    <form [formGroup]="comboForm" (ngSubmit)="saveCombo()" class="p-fluid">
+      <div class="space-y-4">
+        <div class="field">
+          <label for="deviceId" class="font-medium">Device *</label>
+          <p-dropdown
+            id="deviceId"
+            formControlName="deviceId"
+            [options]="deviceOptions"
+            placeholder="Select Device"
+            class="w-full"
+            [ngClass]="{
+              'p-invalid':
+                comboForm.get('deviceId')?.invalid &&
+                comboForm.get('deviceId')?.touched,
+            }"
+          >
+          </p-dropdown>
+          <small
+            *ngIf="
+              comboForm.get('deviceId')?.invalid &&
+              comboForm.get('deviceId')?.touched
+            "
+            class="p-error"
+          >
+            Device is required
+          </small>
+        </div>
+
+        <div class="field">
+          <label for="templateId" class="font-medium">Template *</label>
+          <p-dropdown
+            id="templateId"
+            formControlName="templateId"
+            [options]="templateOptions"
+            placeholder="Select Template"
+            class="w-full"
+            [ngClass]="{
+              'p-invalid':
+                comboForm.get('templateId')?.invalid &&
+                comboForm.get('templateId')?.touched,
+            }"
+          >
+          </p-dropdown>
+          <small
+            *ngIf="
+              comboForm.get('templateId')?.invalid &&
+              comboForm.get('templateId')?.touched
+            "
+            class="p-error"
+          >
+            Template is required
+          </small>
+        </div>
+
+        <div class="field">
+          <div class="flex items-center">
+            <p-checkbox
+              formControlName="isDefault"
+              [binary]="true"
+              inputId="isDefault"
+            >
+            </p-checkbox>
+            <label for="isDefault" class="ml-2 font-medium"
+              >Set as default combo</label
+            >
+          </div>
+          <small class="text-gray-500"
+            >Default combos are used when no specific combo is assigned</small
+          >
+        </div>
+      </div>
+
+      <!-- Form Actions -->
+      <div class="flex justify-end gap-2 mt-6">
+        <button
+          pButton
+          type="button"
+          label="Cancel"
+          class="p-button-text"
+          (click)="displayComboDialog = false"
+        ></button>
+        <button
+          pButton
+          type="submit"
+          label="Create Combo"
+          class="p-button-primary"
+          [disabled]="comboForm.invalid"
+        ></button>
+      </div>
+    </form>
+  </p-dialog>
+
+  <!-- Assignment Dialog -->
+  <p-dialog
+    [(visible)]="displayAssignmentDialog"
+    [modal]="true"
+    [style]="{ width: '500px' }"
+    [draggable]="false"
+    [resizable]="false"
+    appendTo="body"
+    header="Create Assignment"
+  >
+    <form
+      [formGroup]="assignmentForm"
+      (ngSubmit)="saveAssignment()"
+      class="p-fluid"
+    >
+      <div class="space-y-4">
+        <div class="field">
+          <label for="comboId" class="font-medium">Combo *</label>
+          <p-dropdown
+            id="comboId"
+            formControlName="comboId"
+            [options]="comboOptions"
+            placeholder="Select Combo"
+            class="w-full"
+            [ngClass]="{
+              'p-invalid':
+                assignmentForm.get('comboId')?.invalid &&
+                assignmentForm.get('comboId')?.touched,
+            }"
+          >
+          </p-dropdown>
+          <small
+            *ngIf="
+              assignmentForm.get('comboId')?.invalid &&
+              assignmentForm.get('comboId')?.touched
+            "
+            class="p-error"
+          >
+            Combo is required
+          </small>
+        </div>
+
+        <!-- Location Type -->
+        <div>
+          <label for="locationType" class="font-medium">Location Type *</label>
+          <p-dropdown
+            id="locationType"
+            formControlName="locationType"
+            [options]="locationTypeOptions"
+            placeholder="Select Location Type"
+            class="w-full"
+            (onChange)="onLocationTypeChange()"
+            [ngClass]="{
+              'p-invalid':
+                assignmentForm.get('locationType')?.invalid &&
+                assignmentForm.get('locationType')?.touched,
+            }"
+          >
+          </p-dropdown>
+          <small
+            *ngIf="
+              assignmentForm.get('locationType')?.invalid &&
+              assignmentForm.get('locationType')?.touched
+            "
+            class="p-error"
+          >
+            Location type is required
+          </small>
+        </div>
+
+        <!-- Location Selection (Product or Shelf) -->
+        <div
+          *ngIf="
+            assignmentForm.get('locationType')?.value &&
+            assignmentForm.get('locationType')?.value !== 'Store'
+          "
+        >
+          <label class="block text-sm font-medium text-gray-700 mb-2">
+            <i
+              class="pi pi-box mr-2"
+              *ngIf="assignmentForm.get('locationType')?.value === 'Product'"
+            ></i>
+            <i
+              class="pi pi-shelf mr-2"
+              *ngIf="assignmentForm.get('locationType')?.value === 'Shelf'"
+            ></i>
+            {{ getLocationLabel() }} *
+          </label>
+          <!-- Product Dropdown -->
+          <div *ngIf="assignmentForm.get('locationType')?.value === 'Product'">
+            <p-dropdown
+              formControlName="locationId"
+              [options]="products"
+              optionLabel="productName"
+              optionValue="id"
+              placeholder="Select a product"
+              [showClear]="true"
+              [loading]="loadingProducts"
+              [virtualScroll]="true"
+              [virtualScrollItemSize]="38"
+              filterBy="productName,productCode"
+              (onFilter)="onProductSearch($event)"
+              (onShow)="loadProducts()"
+              styleClass="w-full"
+              [ngClass]="{
+                'p-invalid':
+                  assignmentForm.get('locationId')?.invalid &&
+                  assignmentForm.get('locationId')?.touched,
+              }"
+            >
+              <ng-template pTemplate="header">
+                <div class="p-3 border-b">
+                  <div class="flex justify-between items-center">
+                    <div class="text-sm font-semibold text-gray-700">
+                      Products
+                      <span class="text-gray-500 text-xs ml-2">
+                        ({{ products.length }} loaded)
+                      </span>
+                    </div>
+                    <div class="flex gap-2">
+                      <p-button
+                        icon="pi pi-arrow-left"
+                        size="small"
+                        [text]="true"
+                        [disabled]="productCurrentPage === 1"
+                        (onClick)="loadPreviousProducts()"
+                        pTooltip="Previous"
+                      ></p-button>
+                      <p-button
+                        icon="pi pi-arrow-right"
+                        size="small"
+                        [text]="true"
+                        [disabled]="!hasMoreProducts"
+                        (onClick)="loadMoreProducts()"
+                        pTooltip="Next"
+                      ></p-button>
+                    </div>
+                  </div>
+                </div>
+              </ng-template>
+
+              <ng-template pTemplate="item" let-product>
+                <div class="flex items-center p-2 hover:bg-gray-50">
+                  <div
+                    class="w-8 h-8 bg-emerald-100 rounded flex items-center justify-center mr-3"
+                  >
+                    <i class="pi pi-box text-emerald-700"></i>
+                  </div>
+                  <div class="flex-1 min-w-0">
+                    <div class="font-medium truncate">
+                      {{ product.productName }}
+                    </div>
+                    <div class="text-xs text-gray-500 truncate">
+                      {{ product.productCode }} • {{ product.categoryName }}
+                    </div>
+                  </div>
+                </div>
+              </ng-template>
+
+              <!-- <ng-template pTemplate="emptymessage">
+                <div class="text-center py-4">
+                  <i class="pi pi-search text-gray-300 text-2xl mb-2"></i>
+                  <p class="text-gray-500">No products found</p>
+                  <p class="text-xs text-gray-400 mt-1">
+                    Try changing your search
+                  </p>
+                </div>
+              </ng-template> -->
+
+              <ng-template pTemplate="footer">
+                <div class="p-3 border-t">
+                  <div class="flex justify-between items-center">
+                    <span class="text-xs text-gray-500">
+                      Page {{ productCurrentPage }} •
+                      {{ products.length }} products
+                    </span>
+                    <div class="flex gap-2">
+                      <p-button
+                        *ngIf="productCurrentPage > 1"
+                        label="Previous"
+                        icon="pi pi-arrow-left"
+                        size="small"
+                        [text]="true"
+                        (onClick)="loadPreviousProducts()"
+                      ></p-button>
+                      <p-button
+                        *ngIf="hasMoreProducts"
+                        label="Load More"
+                        icon="pi pi-arrow-down"
+                        size="small"
+                        [text]="true"
+                        [loading]="loadingMoreProducts"
+                        (onClick)="loadMoreProducts()"
+                      ></p-button>
+                    </div>
+                  </div>
+                </div>
+              </ng-template>
+            </p-dropdown>
+          </div>
+
+          <!-- Shelf Dropdown -->
+          <div *ngIf="assignmentForm.get('locationType')?.value === 'Shelf'">
+            <p-dropdown
+              formControlName="locationId"
+              [options]="shelves"
+              optionLabel="name"
+              optionValue="id"
+              placeholder="Select a shelf"
+              [showClear]="true"
+              [loading]="loadingShelves"
+              [virtualScroll]="true"
+              [virtualScrollItemSize]="38"
+              filterBy="name,location"
+              (onFilter)="onShelfSearch($event)"
+              (onShow)="loadShelves()"
+              styleClass="w-full"
+              [ngClass]="{
+                'p-invalid':
+                  assignmentForm.get('locationId')?.invalid &&
+                  assignmentForm.get('locationId')?.touched,
+              }"
+            >
+              <ng-template pTemplate="header">
+                <div class="p-3 border-b">
+                  <div class="flex justify-between items-center">
+                    <div class="text-sm font-semibold text-gray-700">
+                      Shelves
+                      <span class="text-gray-500 text-xs ml-2">
+                        ({{ shelves.length }} loaded)
+                      </span>
+                    </div>
+                    <div class="flex gap-2">
+                      <p-button
+                        icon="pi pi-arrow-left"
+                        size="small"
+                        [text]="true"
+                        [disabled]="shelfCurrentPage === 1"
+                        (onClick)="loadPreviousShelves()"
+                        pTooltip="Previous"
+                      ></p-button>
+                      <p-button
+                        icon="pi pi-arrow-right"
+                        size="small"
+                        [text]="true"
+                        [disabled]="!hasMoreShelves"
+                        (onClick)="loadMoreShelves()"
+                        pTooltip="Next"
+                      ></p-button>
+                    </div>
+                  </div>
+                </div>
+              </ng-template>
+
+              <ng-template pTemplate="item" let-shelf>
+                <div class="flex items-center p-2 hover:bg-gray-50">
+                  <div
+                    class="w-8 h-8 bg-green-100 rounded flex items-center justify-center mr-3"
+                  >
+                    <i class="pi pi-shelf text-green-600"></i>
+                  </div>
+                  <div class="flex-1 min-w-0">
+                    <div class="font-medium truncate">{{ shelf.name }}</div>
+                    <div class="text-xs text-gray-500 truncate">
+                      {{ shelf.location }} • Aisle:
+                      {{ shelf.aisleName || "N/A" }}
+                    </div>
+                  </div>
+                </div>
+              </ng-template>
+
+              <!-- <ng-template pTemplate="emptymessage">
+                <div class="text-center py-4">
+                  <i class="pi pi-search text-gray-300 text-2xl mb-2"></i>
+                  <p class="text-gray-500">No shelves found</p>
+                  <p class="text-xs text-gray-400 mt-1">
+                    Try changing your search
+                  </p>
+                </div>
+              </ng-template> -->
+
+              <ng-template pTemplate="footer">
+                <div class="p-3 border-t">
+                  <div class="flex justify-between items-center">
+                    <span class="text-xs text-gray-500">
+                      Page {{ shelfCurrentPage }} • {{ shelves.length }} shelves
+                    </span>
+                    <div class="flex gap-2">
+                      <p-button
+                        *ngIf="shelfCurrentPage > 1"
+                        label="Previous"
+                        icon="pi pi-arrow-left"
+                        size="small"
+                        [text]="true"
+                        (onClick)="loadPreviousShelves()"
+                      ></p-button>
+                      <p-button
+                        *ngIf="hasMoreShelves"
+                        label="Load More"
+                        icon="pi pi-arrow-down"
+                        size="small"
+                        [text]="true"
+                        [loading]="loadingMoreShelves"
+                        (onClick)="loadMoreShelves()"
+                      ></p-button>
+                    </div>
+                  </div>
+                </div>
+              </ng-template>
+            </p-dropdown>
+          </div>
+        </div>
+
+        <!-- <div class="field">
+          <label for="locationId" class="font-medium">Location ID *</label>
+          <p-inputNumber
+            id="locationId"
+            formControlName="locationId"
+            mode="decimal"
+            [min]="1"
+            class="w-full"
+            [ngClass]="{
+              'p-invalid':
+                assignmentForm.get('locationId')?.invalid &&
+                assignmentForm.get('locationId')?.touched,
+            }"
+          >
+          </p-inputNumber>
+          <small
+            *ngIf="
+              assignmentForm.get('locationId')?.invalid &&
+              assignmentForm.get('locationId')?.touched
+            "
+            class="p-error"
+          >
+            Location ID is required
+          </small>
+          <small class="text-gray-500"
+            >ID of the shelf, aisle, product, etc.</small
+          >
+        </div> -->
+
+        <div class="field">
+          <label for="displayOrder" class="font-medium">Display Order</label>
+          <p-inputNumber
+            id="displayOrder"
+            formControlName="displayOrder"
+            mode="decimal"
+            [min]="0"
+            class="w-full"
+          >
+          </p-inputNumber>
+          <small class="text-gray-500"
+            >Order in which assignments are displayed (0 = first)</small
+          >
+        </div>
+
+        <div class="field">
+          <div class="flex items-center">
+            <p-checkbox
+              formControlName="isActive"
+              [binary]="true"
+              inputId="assignmentIsActive"
+            >
+            </p-checkbox>
+            <label for="assignmentIsActive" class="ml-2 font-medium"
+              >Assignment is Active</label
+            >
+          </div>
+        </div>
+      </div>
+
+      <!-- Form Actions -->
+      <div class="flex justify-end gap-2 mt-6">
+        <button
+          pButton
+          type="button"
+          label="Cancel"
+          class="p-button-text"
+          (click)="displayAssignmentDialog = false"
+        ></button>
+        <button
+          pButton
+          type="submit"
+          label="Create Assignment"
+          class="p-button-primary"
+          [disabled]="assignmentForm.invalid"
+        ></button>
+      </div>
+    </form>
+  </p-dialog>
+
+  <!-- Template Preview Dialog -->
+  <p-dialog
+    [(visible)]="displayTemplatePreviewDialog"
+    [modal]="true"
+    [style]="{ width: '700px' }"
+    [draggable]="false"
+    [resizable]="false"
+    header="Template Preview"
+    appendTo="body"
+    (onHide)="closeTemplatePreview()"
+  >
+    <div *ngIf="selectedTemplateForPreview" class="space-y-4">
+      <!-- Template Information -->
+      <div class="bg-emerald-50 border border-emerald-200 rounded-lg p-4">
+        <div class="flex justify-between items-start">
+          <div>
+            <h4 class="font-semibold text-lg text-gray-900">
+              {{ selectedTemplateForPreview.name }}
+            </h4>
+            <p class="text-sm text-gray-600 mt-1">
+              {{ selectedTemplateForPreview.description || "No description" }}
+            </p>
+          </div>
+          <p-tag
+            [value]="
+              selectedTemplateForPreview.isActive ? 'Active' : 'Inactive'
+            "
+            [severity]="
+              selectedTemplateForPreview.isActive ? 'success' : 'danger'
+            "
+            [rounded]="true"
+          >
+          </p-tag>
+        </div>
+
+        <div class="grid grid-cols-2 gap-2 mt-3 text-sm">
+          <div class="flex items-center">
+            <i class="pi pi-desktop mr-2 text-emerald-600"></i>
+            <span class="text-gray-700"
+              >Screen: {{ getTemplateInfo(selectedTemplateForPreview) }}</span
+            >
+          </div>
+          <div class="flex items-center">
+            <i class="pi pi-store mr-2 text-emerald-600"></i>
+            <span class="text-gray-700">Store: {{ getStoreName() }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Preview Area -->
+      <div class="border border-gray-300 rounded-lg p-6 bg-gray-50">
+        <div class="text-center">
+          <!-- Loading State -->
+          <div *ngIf="isLoadingPreview" class="py-12">
+            <p-progressSpinner
+              styleClass="w-8 h-8"
+              strokeWidth="4"
+              animationDuration=".5s"
+            >
+            </p-progressSpinner>
+            <p class="text-gray-600 mt-3">Loading preview...</p>
+          </div>
+
+          <!-- Preview Image -->
+          <div
+            *ngIf="!isLoadingPreview && templatePreviewImage"
+            class="space-y-4"
+          >
+            <div
+              class="inline-block p-4 bg-white rounded-lg shadow-sm border border-gray-200"
+            >
+              <img
+                [src]="'data:image/png;base64,' + templatePreviewImage"
+                [alt]="selectedTemplateForPreview.name + ' preview'"
+                class="max-w-full h-auto rounded border border-gray-300"
+                style="max-height: 400px"
+              />
+            </div>
+            <p class="text-sm text-gray-500">
+              Template preview generated from design
+            </p>
+          </div>
+
+          <!-- No Preview Available -->
+          <div *ngIf="!isLoadingPreview && !templatePreviewImage" class="py-12">
+            <i class="pi pi-image text-5xl text-gray-300 mb-3"></i>
+            <h5 class="text-lg font-medium text-gray-600 mb-2">
+              No Preview Available
+            </h5>
+            <p class="text-gray-500">
+              This template doesn't have a preview image yet.
+            </p>
+            <p class="text-sm text-gray-400 mt-2">
+              Try syncing templates from cloud or contact administrator.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Action Buttons -->
+      <div
+        class="flex justify-between items-center pt-4 border-t border-gray-200"
+      >
+        <div class="text-sm text-gray-500">
+          <i class="pi pi-info-circle mr-1"></i>
+          Preview shows how this template will appear on ESL devices
+        </div>
+        <div class="flex space-x-2">
+          <button
+            pButton
+            icon="pi pi-times"
+            label="Close"
+            class="p-button-text"
+            (click)="closeTemplatePreview()"
+          ></button>
+        </div>
+      </div>
+    </div>
+  </p-dialog>
+
+  <!-- Gateway Dialog -->
+  <p-dialog
+    [(visible)]="displayGatewayDialog"
+    [modal]="true"
+    [style]="{ width: '600px' }"
+    [draggable]="false"
+    [resizable]="false"
+    appendTo="body"
+    [header]="isEditMode ? 'Edit Gateway' : 'Add New Gateway'"
+  >
+    <form [formGroup]="gatewayForm" (ngSubmit)="saveGateway()" class="p-fluid">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div class="space-y-4">
+          <div class="field">
+            <label for="name" class="font-medium">Gateway Name *</label>
+            <input
+              id="name"
+              pInputText
+              formControlName="name"
+              placeholder="e.g., Store Gateway"
+              class="w-full"
+              [ngClass]="{
+                'p-invalid':
+                  gatewayForm.get('name')?.invalid &&
+                  gatewayForm.get('name')?.touched,
+              }"
+            />
+            <small
+              *ngIf="
+                gatewayForm.get('name')?.invalid &&
+                gatewayForm.get('name')?.touched
+              "
+              class="p-error"
+            >
+              Gateway name is required
+            </small>
+          </div>
+
+          <div class="field">
+            <label for="macAddress" class="font-medium">MAC Address *</label>
+            <input
+              id="macAddress"
+              pInputText
+              formControlName="macAddress"
+              placeholder="e.g., 00:1A:2B:3C:4D:5E"
+              class="w-full"
+              [ngClass]="{
+                'p-invalid':
+                  gatewayForm.get('macAddress')?.invalid &&
+                  gatewayForm.get('macAddress')?.touched,
+              }"
+            />
+            <small
+              *ngIf="
+                gatewayForm.get('macAddress')?.invalid &&
+                gatewayForm.get('macAddress')?.touched
+              "
+              class="p-error"
+            >
+              Valid MAC address is required
+            </small>
+          </div>
+
+          <div class="field">
+            <label for="storeId" class="font-medium">Store *</label>
+            <p-dropdown
+              id="storeId"
+              formControlName="storeId"
+              [options]="storeOptions"
+              optionLabel="label"
+              optionValue="value"
+              placeholder="Select Store"
+              class="w-full"
+              [ngClass]="{
+                'p-invalid':
+                  gatewayForm.get('storeId')?.invalid &&
+                  gatewayForm.get('storeId')?.touched,
+              }"
+            >
+            </p-dropdown>
+            <small
+              *ngIf="
+                gatewayForm.get('storeId')?.invalid &&
+                gatewayForm.get('storeId')?.touched
+              "
+              class="p-error"
+            >
+              Store is required
+            </small>
+          </div>
+
+          <div class="field">
+            <label for="gatewayType" class="font-medium">Gateway Type</label>
+            <p-dropdown
+              id="gatewayType"
+              formControlName="gatewayType"
+              [options]="gatewayTypeOptions"
+              placeholder="Select Type"
+              class="w-full"
+            >
+            </p-dropdown>
+          </div>
+        </div>
+
+        <div class="space-y-4">
+          <div class="field">
+            <label for="description" class="font-medium">Description</label>
+            <textarea
+              id="description"
+              pInputTextarea
+              formControlName="description"
+              rows="3"
+              placeholder="Gateway description..."
+              class="w-full"
+            >
+            </textarea>
+          </div>
+
+          <div class="grid grid-cols-2 gap-3">
+            <div class="field">
+              <label for="hardwareVersion" class="font-medium"
+                >Hardware Version</label
+              >
+              <input
+                id="hardwareVersion"
+                pInputText
+                formControlName="hardwareVersion"
+                placeholder="e.g., v1.0"
+                class="w-full"
+              />
+            </div>
+
+            <div class="field">
+              <label for="firmwareVersion" class="font-medium"
+                >Firmware Version</label
+              >
+              <input
+                id="firmwareVersion"
+                pInputText
+                formControlName="firmwareVersion"
+                placeholder="e.g., v2.1"
+                class="w-full"
+              />
+            </div>
+          </div>
+
+          <div class="field">
+            <div class="flex items-center">
+              <p-checkbox
+                formControlName="isActive"
+                [binary]="true"
+                inputId="gatewayIsActive"
+              >
+              </p-checkbox>
+              <label for="gatewayIsActive" class="ml-2 font-medium"
+                >Gateway is Active</label
+              >
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Form Actions -->
+      <div class="flex justify-end gap-2 mt-6">
+        <button
+          pButton
+          type="button"
+          label="Cancel"
+          class="p-button-text"
+          (click)="displayGatewayDialog = false"
+        ></button>
+        <button
+          pButton
+          type="submit"
+          [label]="isEditMode ? 'Update Gateway' : 'Create Gateway'"
+          class="p-button-primary"
+          [disabled]="gatewayForm.invalid"
+        ></button>
+      </div>
+    </form>
+  </p-dialog>
+</div>

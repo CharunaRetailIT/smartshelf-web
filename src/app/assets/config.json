@@ -1,0 +1,4 @@
+{
+  "apiUrl": "https://localhost:44321/api",
+  "authUrl": "https://localhost:44341/api"
+}

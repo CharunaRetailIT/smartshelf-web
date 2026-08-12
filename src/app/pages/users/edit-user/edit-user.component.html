@@ -1,0 +1,197 @@
+<div class="bg-white rounded-lg shadow-xl w-full max-w-2xl mx-auto flex flex-col" style="height: 85vh;">
+  <!-- Dialog Header -->
+  <div class="flex items-center justify-between p-6 border-b border-gray-200 flex-shrink-0">
+    <div>
+      <h2 class="text-xl font-semibold text-gray-900">
+        Edit User - {{data.user.employeeId}}
+      </h2>
+      <p class="text-sm text-gray-500 mt-1">
+        Update user information and role assignment
+      </p>
+    </div>
+    <button 
+      (click)="onCancel()" 
+      class="text-gray-400 hover:text-gray-600 focus:outline-none focus:ring-2 focus:ring-emerald-600 focus:ring-offset-2 rounded-full p-2"
+      aria-label="Close dialog">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+      </svg>
+    </button>
+  </div>
+
+  <!-- Dialog Content -->
+  <form [formGroup]="userForm" (ngSubmit)="onSubmit()" class="flex flex-col flex-1 min-h-0">
+    <div class="flex-1 overflow-y-auto p-6 space-y-6">
+      
+      <!-- Basic Information Section -->
+      <div class="space-y-4">
+        <h3 class="text-lg font-medium text-gray-900 border-b border-gray-200 pb-2">
+          Basic Information
+        </h3>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <!-- Employee ID Field -->
+          <div class="space-y-2">
+            <label for="employeeId" class="block text-sm font-medium text-gray-700">
+              Employee ID <span class="text-red-500">*</span>
+            </label>
+            <input
+              id="employeeId"
+              type="text"
+              formControlName="employeeId"
+              placeholder="e.g., EMP-001"
+              [class.border-red-500]="isFieldInvalid('employeeId')"
+              class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-emerald-600 focus:border-emerald-600 placeholder-gray-400">
+            <div *ngIf="isFieldInvalid('employeeId')" class="text-red-500 text-sm">
+              {{ getFieldError('employeeId') }}
+            </div>
+          </div>
+
+          <!-- Email Field -->
+          <div class="space-y-2">
+            <label for="email" class="block text-sm font-medium text-gray-700">
+              Email <span class="text-red-500">*</span>
+            </label>
+            <input
+              id="email"
+              type="email"
+              formControlName="email"
+              placeholder="e.g., user@example.com"
+              [class.border-red-500]="isFieldInvalid('email')"
+              class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-emerald-600 focus:border-emerald-600 placeholder-gray-400">
+            <div *ngIf="isFieldInvalid('email')" class="text-red-500 text-sm">
+              {{ getFieldError('email') }}
+            </div>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <!-- First Name Field -->
+          <div class="space-y-2">
+            <label for="firstName" class="block text-sm font-medium text-gray-700">
+              First Name <span class="text-red-500">*</span>
+            </label>
+            <input
+              id="firstName"
+              type="text"
+              formControlName="firstName"
+              placeholder="e.g., John"
+              [class.border-red-500]="isFieldInvalid('firstName')"
+              class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-emerald-600 focus:border-emerald-600 placeholder-gray-400">
+            <div *ngIf="isFieldInvalid('firstName')" class="text-red-500 text-sm">
+              {{ getFieldError('firstName') }}
+            </div>
+          </div>
+
+          <!-- Last Name Field -->
+          <div class="space-y-2">
+            <label for="lastName" class="block text-sm font-medium text-gray-700">
+              Last Name <span class="text-red-500">*</span>
+            </label>
+            <input
+              id="lastName"
+              type="text"
+              formControlName="lastName"
+              placeholder="e.g., Doe"
+              [class.border-red-500]="isFieldInvalid('lastName')"
+              class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-emerald-600 focus:border-emerald-600 placeholder-gray-400">
+            <div *ngIf="isFieldInvalid('lastName')" class="text-red-500 text-sm">
+              {{ getFieldError('lastName') }}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Department Section -->
+      <div class="space-y-4">
+        <h3 class="text-lg font-medium text-gray-900 border-b border-gray-200 pb-2">
+          Department Assignment
+        </h3>
+        
+        <div class="space-y-2">
+          <label for="department" class="block text-sm font-medium text-gray-700">
+            Department <span class="text-red-500">*</span>
+          </label>
+          <select
+            id="department"
+            formControlName="department"
+            [class.border-red-500]="isFieldInvalid('department')"
+            class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-emerald-600 focus:border-emerald-600">
+            <option value="">Select Department</option>
+            <option *ngFor="let dept of departments" [value]="dept.id">
+              {{ dept.name }}
+            </option>
+          </select>
+          <div *ngIf="isFieldInvalid('department')" class="text-red-500 text-sm">
+            {{ getFieldError('department') }}
+          </div>
+          <div *ngIf="userForm.get('department')?.value && departments.length > 0" class="text-sm text-gray-500">
+            Current selection: {{ getDepartmentName(userForm.get('department')?.value) }}
+          </div>
+        </div>
+      </div>
+
+      <!-- Role Assignment Section (Admin Only) -->
+      <div class="space-y-4" *ngIf="canAssignRole">
+        <h3 class="text-lg font-medium text-gray-900 border-b border-gray-200 pb-2">
+          Role Assignment
+        </h3>
+        
+        <div class="space-y-2">
+          <label for="role" class="block text-sm font-medium text-gray-700">
+            Role <span class="text-red-500">*</span>
+          </label>
+          <select
+            id="role"
+            formControlName="role"
+            [class.border-red-500]="isFieldInvalid('role')"
+            class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-emerald-600 focus:border-emerald-600">
+            <option value="">Select Role</option>
+            <option *ngFor="let role of roles" [value]="role.id">
+              {{ role.name }}
+            </option>
+          </select>
+          <div *ngIf="isFieldInvalid('role')" class="text-red-500 text-sm">
+            {{ getFieldError('role') }}
+          </div>
+          <div *ngIf="userForm.get('role')?.value && roles.length > 0" class="text-sm text-gray-500">
+            Current selection: {{ getRoleName(userForm.get('role')?.value) }}
+          </div>
+        </div>
+
+        <div class="bg-emerald-50 border border-emerald-200 rounded-md p-3">
+          <div class="flex">
+            <svg class="w-5 h-5 text-emerald-500 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+            <div class="ml-3">
+              <p class="text-sm text-emerald-700">
+                <strong>Admin Notice:</strong> Role changes will take effect immediately and may affect user permissions.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Dialog Actions -->
+    <div class="flex items-center justify-end gap-3 p-6 border-t border-gray-200 bg-gray-50 flex-shrink-0">
+      <button
+        type="button"
+        (click)="onCancel()"
+        class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-600 transition-colors">
+        Cancel
+      </button>
+      <button
+        type="submit"
+        [disabled]="userForm.invalid || isSubmitting"
+        class="px-4 py-2 text-sm font-medium text-white bg-primary border border-transparent rounded-md shadow-sm hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center gap-2">
+        <svg *ngIf="isSubmitting" class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+        </svg>
+        {{ isSubmitting ? 'Updating...' : 'Update User' }}
+      </button>
+    </div>
+  </form>
+</div>

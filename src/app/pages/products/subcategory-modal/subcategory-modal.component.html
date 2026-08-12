@@ -1,0 +1,240 @@
+<div class="dlg-shell">
+  <!-- Dialog Header -->
+  <div class="dlg-header">
+    <div>
+      <h2 class="dlg-title">
+        {{ getSUbCategoryHeaderText() }}
+      </h2>
+      <p class="dlg-subtitle">
+        {{ getSubCategoryDescriptionText() }}
+      </p>
+    </div>
+    <button
+      type="button"
+      (click)="onCancel()"
+      class="dlg-close"
+      aria-label="Close dialog"
+    >
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M6 18L18 6M6 6l12 12"
+        ></path>
+      </svg>
+    </button>
+  </div>
+
+  <!-- Dialog Content -->
+  <form
+    [formGroup]="subCategoryForm"
+    (ngSubmit)="onSubmit()"
+    class="flex flex-col flex-1 min-h-0"
+  >
+    <div class="dlg-body">
+      <!-- Basic Information Section -->
+      <div class="dlg-section">
+        <h3 class="dlg-section-title">Basic Information</h3>
+
+        <div class="dlg-grid">
+          <!-- Parent Category Field -->
+          <div class="dlg-field">
+            <label for="categoryId" class="dlg-label">
+              Parent Category <span class="dlg-req">*</span>
+            </label>
+            <select
+              id="categoryId"
+              formControlName="categoryId"
+              required
+              class="dlg-input"
+              [class.is-invalid]="
+                formControls['categoryId'].invalid &&
+                formControls['categoryId'].touched
+              "
+            >
+              <option value="" disabled>Select a category</option>
+              <option *ngFor="let cat of categories" [value]="cat.id">
+                {{ cat.categoryName }}
+              </option>
+            </select>
+            <div
+              *ngIf="
+                formControls['categoryId'].invalid &&
+                formControls['categoryId'].touched
+              "
+              class="dlg-error"
+            >
+              {{ getFieldError('categoryId') || 'Parent category is required' }}
+            </div>
+            <div *ngIf="formControls['categoryId'].value" class="dlg-hint">
+              Selected: {{ getCategoryName(formControls['categoryId'].value) }}
+            </div>
+          </div>
+
+          <!-- Subcategory Code Field -->
+          <div class="dlg-field">
+            <label for="subCategoryCode" class="dlg-label">
+              Subcategory Code <span class="dlg-req">*</span>
+            </label>
+            <input
+              id="subCategoryCode"
+              type="text"
+              formControlName="subCategoryCode"
+              required
+              placeholder="e.g., ELEC-PHONE"
+              class="dlg-input"
+              [class.is-invalid]="
+                formControls['subCategoryCode'].invalid &&
+                formControls['subCategoryCode'].touched
+              "
+            />
+            <div
+              *ngIf="
+                formControls['subCategoryCode'].invalid &&
+                formControls['subCategoryCode'].touched
+              "
+              class="dlg-error"
+            >
+              {{
+                getFieldError('subCategoryCode') ||
+                  'Subcategory code is required'
+              }}
+            </div>
+          </div>
+        </div>
+
+        <!-- Subcategory Name Field -->
+        <div class="dlg-field">
+          <label for="subCategoryName" class="dlg-label">
+            Subcategory Name <span class="dlg-req">*</span>
+          </label>
+          <input
+            id="subCategoryName"
+            type="text"
+            formControlName="subCategoryName"
+            required
+            placeholder="e.g., Smartphones"
+            class="dlg-input"
+            [class.is-invalid]="
+              formControls['subCategoryName'].invalid &&
+              formControls['subCategoryName'].touched
+            "
+          />
+          <div
+            *ngIf="
+              formControls['subCategoryName'].invalid &&
+              formControls['subCategoryName'].touched
+            "
+            class="dlg-error"
+          >
+            {{
+              getFieldError('subCategoryName') || 'Subcategory name is required'
+            }}
+          </div>
+        </div>
+      </div>
+
+      <!-- Description Section -->
+      <div class="dlg-section">
+        <h3 class="dlg-section-title">Additional Information</h3>
+
+        <div class="dlg-field">
+          <label for="subCategoryDescription" class="dlg-label">
+            Description
+          </label>
+          <textarea
+            id="subCategoryDescription"
+            formControlName="subCategoryDescription"
+            rows="3"
+            placeholder="Enter a brief description of the subcategory..."
+            class="dlg-textarea"
+          ></textarea>
+          <div class="dlg-hint">
+            Optional: Provide a description to help identify this subcategory
+          </div>
+        </div>
+      </div>
+
+      <!-- Status Section -->
+      <div class="dlg-section">
+        <h3 class="dlg-section-title">Status &amp; Configuration</h3>
+
+        <div class="dlg-check-row">
+          <input
+            formControlName="isActive"
+            type="checkbox"
+            id="subCategoryActive"
+          />
+          <label for="subCategoryActive" class="dlg-check-label">
+            Active Status
+          </label>
+        </div>
+
+        <div class="dlg-note">
+          <svg
+            class="dlg-note-icon"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+            ></path>
+          </svg>
+          <p class="m-0">
+            <strong>Note:</strong>
+            {{
+              isEditMode
+                ? 'Updating this subcategory will affect all associated products.'
+                : 'Active subcategories will be available for product assignment immediately.'
+            }}
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Dialog Actions -->
+    <div class="dlg-footer">
+      <button
+        type="button"
+        (click)="onCancel()"
+        class="dlg-btn dlg-btn-secondary"
+      >
+        Cancel
+      </button>
+      <button
+        *ngIf="auth.hasAnyRole(['Admin','Manager','Operator'])"
+        type="submit"
+        [disabled]="subCategoryForm.invalid || isSubmitting"
+        class="dlg-btn dlg-btn-primary"
+      >
+        <svg
+          *ngIf="isSubmitting"
+          class="animate-spin h-4 w-4 text-white"
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+        >
+          <circle
+            class="opacity-25"
+            cx="12"
+            cy="12"
+            r="10"
+            stroke="currentColor"
+            stroke-width="4"
+          ></circle>
+          <path
+            class="opacity-75"
+            fill="currentColor"
+            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+          ></path>
+        </svg>
+        {{ isEditMode ? 'Update Subcategory' : 'Create Subcategory' }}
+      </button>
+    </div>
+  </form>
+</div>

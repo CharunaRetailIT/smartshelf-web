@@ -1,0 +1,887 @@
+/* Enhanced Shelf Modal Styles */
+
+/* Dialog customization */
+:host ::ng-deep .p-dialog {
+  border-radius: var(--dlg-radius);
+  box-shadow: var(--dlg-shadow);
+}
+
+:host ::ng-deep .p-dialog .p-dialog-header {
+  background: var(--dlg-surface);
+  border-bottom: 1px solid var(--dlg-border);
+  padding: var(--dlg-pad-y) var(--dlg-pad-x);
+  border-radius: var(--dlg-radius) var(--dlg-radius) 0 0;
+}
+
+:host ::ng-deep .p-dialog .p-dialog-title {
+  font-size: 1.0625rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: var(--dlg-text);
+}
+
+:host ::ng-deep .p-dialog .p-dialog-content {
+  padding: 0;
+  background: var(--dlg-surface);
+  overflow-y: auto;
+  max-height: calc(88vh - 140px);
+}
+
+:host ::ng-deep .p-dialog .p-dialog-footer {
+  background: var(--dlg-surface-muted);
+  border-top: 1px solid var(--dlg-border);
+  padding: 16px var(--dlg-pad-x);
+  border-radius: 0 0 var(--dlg-radius) var(--dlg-radius);
+  position: sticky;
+  bottom: 0;
+  z-index: 1;
+}
+
+.close-button {
+  background: none;
+  border: none;
+  color: #9ca3af;
+  cursor: pointer;
+  padding: 0.5rem;
+  border-radius: 9999px;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.close-button:hover {
+  color: #4b5563;
+  background-color: #f3f4f6;
+}
+
+.close-button:focus {
+  outline: 2px solid var(--dlg-accent);
+  outline-offset: 2px;
+}
+
+/* Tab styles */
+.tab-button {
+  position: relative;
+  padding: 0.875rem 1.25rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #6b7280;
+  border: none;
+  background: transparent;
+  border-bottom: 2px solid transparent;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.tab-button:hover {
+  color: #374151;
+  background: #f9fafb;
+}
+
+.tab-button.active {
+  color: var(--dlg-primary);
+  border-bottom-color: var(--dlg-primary);
+}
+
+.tab-button i {
+  margin-right: 0.5rem;
+  font-size: 0.875rem;
+}
+
+/* Section headers */
+.section-header {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #111827;
+  margin-bottom: 1rem;
+}
+
+.section-description {
+  font-size: 0.875rem;
+  color: #6b7280;
+  margin-bottom: 1.5rem;
+}
+
+/* Form field labels */
+.field-label {
+  display: block;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #374151;
+  margin-bottom: 0.5rem;
+}
+
+.field-label .required {
+  color: #ef4444;
+  margin-left: 0.25rem;
+}
+
+/* Input field styles */
+:host ::ng-deep .p-inputtext,
+:host ::ng-deep .p-dropdown,
+:host ::ng-deep .p-textarea {
+  border: 1px solid #d1d5db;
+  border-radius: 0.5rem;
+  padding: 0.625rem 0.875rem;
+  font-size: 0.875rem;
+  transition: all 0.2s ease;
+}
+
+:host ::ng-deep .p-inputtext:enabled:hover,
+:host ::ng-deep .p-dropdown:not(.p-disabled):hover,
+:host ::ng-deep .p-textarea:enabled:hover {
+  border-color: #9ca3af;
+}
+
+:host ::ng-deep .p-inputtext:enabled:focus,
+:host ::ng-deep .p-dropdown:not(.p-disabled).p-focus,
+:host ::ng-deep .p-textarea:enabled:focus {
+  border-color: var(--dlg-accent);
+  box-shadow: 0 0 0 3px var(--dlg-primary-ring);
+}
+
+:host ::ng-deep .p-inputtext:read-only,
+:host ::ng-deep .p-dropdown.p-disabled,
+:host ::ng-deep .p-textarea:read-only {
+  background-color: #f3f4f6;
+  cursor: not-allowed;
+}
+
+/* Error messages */
+.p-error {
+  color: #ef4444;
+  font-size: 0.75rem;
+  margin-top: 0.375rem;
+  display: block;
+}
+
+/* Info card styles */
+.info-card {
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.75rem;
+  padding: 1.25rem;
+}
+
+.info-card-header {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #111827;
+  margin-bottom: 1rem;
+}
+
+/* Combo mode selection */
+:host ::ng-deep .p-selectbutton .p-button {
+  border-radius: 0.5rem;
+  padding: 0.625rem 1rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+:host ::ng-deep .p-selectbutton .p-button:not(.p-highlight) {
+  background: #ffffff;
+  border: 1px solid #d1d5db;
+  color: #6b7280;
+}
+
+:host ::ng-deep .p-selectbutton .p-button:not(.p-highlight):hover {
+  background: #f9fafb;
+  border-color: #9ca3af;
+  color: #374151;
+}
+
+:host ::ng-deep .p-selectbutton .p-button.p-highlight {
+  background: var(--dlg-primary);
+  border-color: var(--dlg-primary);
+  color: #ffffff;
+}
+
+/* Multiselect customization */
+:host ::ng-deep .p-multiselect {
+  border: 1px solid #d1d5db;
+  border-radius: 0.5rem;
+}
+
+:host ::ng-deep .p-multiselect:not(.p-disabled):hover {
+  border-color: #9ca3af;
+}
+
+:host ::ng-deep .p-multiselect:not(.p-disabled).p-focus {
+  border-color: var(--dlg-accent);
+  box-shadow: 0 0 0 3px var(--dlg-primary-ring);
+}
+
+/* Ensure dropdown is tall enough */
+::ng-deep .p-multiselect-panel .p-multiselect-items {
+  max-height: 250px;
+  overflow-y: auto;
+}
+
+
+:host ::ng-deep .p-multiselect-panel .p-multiselect-items-wrapper {
+  max-height: 300px !important;
+}
+
+:host ::ng-deep .p-multiselect-item {
+  min-height: 65px;
+  border-bottom: 1px solid #f3f4f6;
+  padding: 0.75rem 1rem;
+}
+
+:host ::ng-deep .p-multiselect-item:last-child {
+  border-bottom: none;
+}
+
+:host ::ng-deep .p-multiselect-item:hover {
+  background: #f9fafb;
+}
+
+/* Combo item template styles */
+.combo-item-template {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  width: 100%;
+}
+
+.combo-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.device-name {
+  font-weight: 600;
+  font-size: 0.875rem;
+  color: #111827;
+}
+
+.device-mac {
+  font-size: 0.75rem;
+  color: #6b7280;
+}
+
+.default-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.125rem 0.5rem;
+  background: var(--dlg-accent-soft);
+  color: #065f46;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.normal-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.125rem 0.5rem;
+  background: #f3f4f6;
+  color: #6b7280;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.combo-details {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.template-info,
+.specs-info {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  font-size: 0.8125rem;
+  color: #6b7280;
+}
+
+.template-info i,
+.specs-info i {
+  font-size: 0.75rem;
+  color: #9ca3af;
+}
+
+.specs-info {
+  display: flex;
+  gap: 0.75rem;
+}
+
+/* Assignment card styles */
+.assignment-card {
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.75rem;
+  padding: 1.25rem;
+  transition: all 0.2s ease;
+}
+
+.assignment-card:hover {
+  border-color: #d1d5db;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+}
+
+.assignment-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 0.75rem;
+  margin-bottom: 1rem;
+  border-bottom: 1px solid #f3f4f6;
+}
+
+.assignment-title {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #111827;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.assignment-title i {
+  color: #6b7280;
+}
+
+/* Preview section */
+.preview-section {
+  background: #f9fafb;
+  border-radius: 0.5rem;
+  padding: 0.875rem;
+  margin-top: 1rem;
+}
+
+.preview-title {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #6b7280;
+  text-transform: uppercase;
+  letter-spacing: 0.025em;
+  margin-bottom: 0.75rem;
+}
+
+.preview-content {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 0.875rem;
+}
+
+.preview-item-label {
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: #6b7280;
+  margin-bottom: 0.375rem;
+  text-transform: uppercase;
+  letter-spacing: 0.025em;
+}
+
+.preview-item-value {
+  font-size: 0.875rem;
+  color: #111827;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* Empty state */
+.empty-state {
+  text-align: center;
+  padding: 3rem 1.5rem;
+  border: 2px dashed #d1d5db;
+  border-radius: 0.75rem;
+  background: #f9fafb;
+}
+
+.empty-state i {
+  font-size: 3rem;
+  color: #d1d5db;
+  margin-bottom: 1rem;
+}
+
+.empty-state-title {
+  font-size: 1rem;
+  font-weight: 500;
+  color: #374151;
+  margin-bottom: 0.25rem;
+}
+
+.empty-state-description {
+  font-size: 0.875rem;
+  color: #6b7280;
+  margin-bottom: 1.5rem;
+}
+
+/* Button styles */
+:host ::ng-deep .p-button {
+  border-radius: 0.5rem;
+  padding: 0.625rem 1.25rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+:host ::ng-deep .p-button:enabled:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+:host ::ng-deep .p-button:enabled:active {
+  transform: translateY(0);
+}
+
+:host ::ng-deep .p-button-outlined {
+  border: 1px solid #d1d5db;
+  background: transparent;
+  color: #374151;
+}
+
+:host ::ng-deep .p-button-outlined:enabled:hover {
+  background: #f9fafb;
+  border-color: #9ca3af;
+}
+
+:host ::ng-deep .p-button-text {
+  background: transparent;
+  border: none;
+}
+
+:host ::ng-deep .p-button-text:enabled:hover {
+  background: #f3f4f6;
+}
+
+/* Tag badge styles */
+:host ::ng-deep .p-tag {
+  border-radius: 0.375rem;
+  padding: 0.25rem 0.625rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+/* Checkbox styles */
+:host ::ng-deep .p-checkbox {
+  width: 1.125rem;
+  height: 1.125rem;
+}
+
+:host ::ng-deep .p-checkbox .p-checkbox-box {
+  border: 1px solid #d1d5db;
+  border-radius: 0.375rem;
+  width: 1.125rem;
+  height: 1.125rem;
+}
+
+:host ::ng-deep .p-checkbox:not(.p-checkbox-disabled) .p-checkbox-box:hover {
+  border-color: var(--dlg-accent);
+}
+
+:host ::ng-deep .p-checkbox .p-checkbox-box.p-highlight {
+  background: var(--dlg-primary);
+  border-color: var(--dlg-primary);
+}
+
+/* Input number styles */
+:host ::ng-deep .p-inputnumber-input {
+  text-align: center;
+}
+
+/* Scrollbar styles */
+:host ::ng-deep .p-dialog .p-dialog-content::-webkit-scrollbar {
+  width: 8px;
+}
+
+:host ::ng-deep .p-dialog .p-dialog-content::-webkit-scrollbar-track {
+  background: #f3f4f6;
+  border-radius: 4px;
+}
+
+:host ::ng-deep .p-dialog .p-dialog-content::-webkit-scrollbar-thumb {
+  background: #d1d5db;
+  border-radius: 4px;
+}
+
+:host ::ng-deep .p-dialog .p-dialog-content::-webkit-scrollbar-thumb:hover {
+  background: #9ca3af;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  :host ::ng-deep .p-dialog .p-dialog-content {
+    max-height: calc(85vh - 120px);
+  }
+  
+  .tab-button {
+    padding: 0.75rem 1rem;
+    font-size: 0.8125rem;
+  }
+  
+  .assignment-card {
+    padding: 1rem;
+  }
+}
+
+/* Loading state */
+:host ::ng-deep .p-dropdown.p-disabled,
+:host ::ng-deep .p-multiselect.p-disabled {
+  opacity: 0.6;
+}
+
+/* Helper text */
+.helper-text {
+  font-size: 0.75rem;
+  color: #6b7280;
+  margin-top: 0.375rem;
+}
+
+/* Status indicator */
+.status-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.25rem 0.625rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.status-indicator.active {
+  background: #d1fae5;
+  color: #065f46;
+}
+
+.status-indicator.inactive {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+/* Counter badge */
+.counter-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.5rem;
+  height: 1.5rem;
+  padding: 0 0.375rem;
+  background: var(--dlg-primary);
+  color: #ffffff;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  margin-left: 0.5rem;
+}
+
+
+/* Pagination button styles */
+.p-button.p-button-text.p-button-sm {
+  font-size: 0.875rem;
+  padding: 0.5rem 0.75rem;
+}
+
+/* Loading spinner for pagination buttons */
+.p-button-loading .p-button-icon {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Combo item template */
+.combo-item-template {
+  padding: 0.5rem 0;
+  border-bottom: 1px solid #f3f4f6;
+}
+
+.combo-item-template:last-child {
+  border-bottom: none;
+}
+
+.combo-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.25rem;
+}
+
+.device-name {
+  font-weight: 600;
+  font-size: 0.875rem;
+}
+
+.device-mac {
+  font-size: 0.75rem;
+  color: #6b7280;
+}
+
+.default-badge, .normal-badge {
+  font-size: 0.7rem;
+  padding: 0.125rem 0.375rem;
+  border-radius: 0.25rem;
+}
+
+.default-badge {
+  background-color: var(--dlg-accent-soft);
+  color: var(--dlg-primary-hover);
+}
+
+.normal-badge {
+  background-color: #f3f4f6;
+  color: #4b5563;
+}
+
+.combo-details {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.template-info, .specs-info {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.75rem;
+  color: #6b7280;
+}
+
+.template-info i, .specs-info i {
+  font-size: 0.75rem;
+}
+
+.specs-info {
+  display: flex;
+  gap: 1rem;
+}
+
+
+/* Custom multiselect styles */
+.custom-multiselect-wrapper {
+  position: relative;
+}
+
+* Custom styling for the footer */
+.multiselect-footer {
+  border-top: 1px solid #e5e7eb;
+  padding: 0.75rem;
+  background: #f9fafb;
+}
+
+/* Pagination button styling */
+.multiselect-footer .p-button {
+  font-size: 0.75rem !important;
+  padding: 0.375rem 0.75rem !important;
+}
+
+/* Pagination info styling */
+.pagination-info {
+  text-align: center;
+  padding: 0.25rem 0;
+  font-size: 0.75rem;
+}
+
+/* Combo item template with better spacing */
+.combo-item-template {
+  padding: 0.5rem;
+  border-bottom: 1px solid #f3f4f6;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.combo-item-template:hover {
+  background-color: #f9fafb;
+}
+
+.combo-item-template:last-child {
+  border-bottom: none;
+}
+
+/* Ensure dropdown panel has enough height */
+::ng-deep .p-multiselect-panel {
+  min-width: 400px !important;
+  max-height: 450px !important;
+  display: flex !important;
+  flex-direction: column !important;
+}
+
+::ng-deep .p-multiselect-items-wrapper {
+  flex: 1;
+  overflow-y: auto;
+}
+
+
+/* Loading spinner for buttons */
+.pi-spinner.pi-spin {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+
+/* Make sure load buttons don't close dropdown */
+::ng-deep .multiselect-footer button {
+  pointer-events: all !important;
+}
+
+/* Search input styling */
+.p-inputgroup-addon {
+  background-color: #f3f4f6;
+  border-color: #d1d5db;
+}
+
+/* Search highlight in dropdown items */
+.search-highlight {
+  background-color: #ffd700;
+  padding: 0 2px;
+  border-radius: 2px;
+  font-weight: 600;
+}
+
+/* Search results info */
+.bg-blue-50 {
+  background-color: #ecfdf5;
+}
+
+.text-blue-700 {
+  color: var(--dlg-primary-hover);
+}
+
+
+::ng-deep .p-multiselect-panel .p-multiselect-header {
+  padding: 0.5rem 0.75rem !important;
+  border-bottom: 1px solid #e5e7eb !important;
+  position: relative;
+}
+
+::ng-deep .p-multiselect-panel .p-multiselect-header .p-multiselect-filter-container {
+  width: 100%;
+}
+
+::ng-deep .p-multiselect-panel .p-multiselect-header input {
+  width: 100% !important;
+  padding-right: 2rem !important;
+}
+
+/* Loading indicator in search box */
+::ng-deep .p-multiselect-header .p-multiselect-filter-icon {
+  position: absolute;
+  right: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+::ng-deep .p-multiselect-header .pi-spinner {
+  position: absolute;
+  right: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  animation: spin 1s linear infinite;
+}
+
+/* Search info banner */
+.bg-blue-50 {
+  background-color: #ecfdf5 !important;
+  border: 1px solid #a7f3d0 !important;
+}
+
+.text-blue-700 {
+  color: var(--dlg-primary-hover) !important;
+}
+
+/* Pagination info styling */
+.pagination-info {
+  text-align: center;
+  padding: 0.5rem;
+  background: #f8fafc;
+  border-top: 1px solid #e2e8f0;
+}
+
+/* Combo item template for search results */
+.combo-item-template {
+  padding: 0.75rem;
+  border-bottom: 1px solid #f1f5f9;
+  transition: background-color 0.15s;
+}
+
+.combo-item-template:hover {
+  background-color: #f8fafc;
+}
+
+.combo-item-template:last-child {
+  border-bottom: none;
+}
+
+/* Loading buttons in footer */
+.multiselect-footer .p-button.p-button-loading .p-button-label {
+  visibility: visible !important;
+}
+
+/* Ensure dropdown stays open when clicking footer buttons */
+::ng-deep .multiselect-footer button {
+  pointer-events: all !important;
+  z-index: 1000 !important;
+  position: relative !important;
+}
+
+
+
+
+
+
+
+
+
+
+/* Message combo specific styles */
+.message-badge {
+  font-size: 0.7rem;
+  padding: 0.125rem 0.375rem;
+  border-radius: 0.25rem;
+  background-color: #f0f9ff;
+  color: #0369a1;
+  font-weight: 500;
+}
+
+.message-info {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.75rem;
+  color: #475569;
+}
+
+.message-specs {
+  display: flex;
+  gap: 1rem;
+  font-size: 0.7rem;
+  color: #64748b;
+}
+
+.message-info i, .message-specs i {
+  font-size: 0.75rem;
+  opacity: 0.7;
+}
+
+/* Add these to existing CSS */
+.combo-item-template {
+  padding: 0.75rem;
+  border-bottom: 1px solid #f1f5f9;
+  transition: background-color 0.15s;
+}
+
+.combo-item-template:hover {
+  background-color: #f8fafc;
+}
+
+.combo-details {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  margin-top: 0.25rem;
+}

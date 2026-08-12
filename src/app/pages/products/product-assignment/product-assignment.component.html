@@ -1,0 +1,1809 @@
+<!-- product-assignment.component.html - REFACTORED FOR PRIMENG 19 -->
+<!-- <style>
+  /* Diagnostic CSS for DataView */
+  p-dataview {
+    display: block !important;
+    border: 3px solid red !important;
+    min-height: 200px !important;
+    background: white !important;
+  }
+  
+  .p-dataview-content {
+    border: 2px solid blue !important;
+    padding: 20px !important;
+    min-height: 150px !important;
+  }
+</style> -->
+<div class="min-h-screen bg-gray-50 py-6">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <!-- Header Toolbar -->
+    <p-toolbar styleClass="mb-6 shadow-sm border border-gray-200 rounded-lg">
+      <div class="p-toolbar-group-start flex items-center space-x-4">
+        <p-button
+          icon="pi pi-arrow-left"
+          [rounded]="true"
+          [text]="true"
+          severity="secondary"
+          (onClick)="goBack()"
+          pTooltip="Back to Aisles"
+          tooltipPosition="bottom"
+        >
+        </p-button>
+        <p-divider layout="vertical"></p-divider>
+        <div class="flex items-center space-x-3">
+          <div class="bg-blue-100 p-3 rounded-lg">
+            <i class="pi pi-box text-blue-600 text-2xl"></i>
+          </div>
+          <div>
+            <h1 class="text-2xl font-bold text-gray-900">Product Assignment</h1>
+            <p class="text-sm text-gray-600">
+              {{ shelf.name }} - {{ shelf.location }}
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div class="p-toolbar-group-end flex items-center space-x-4">
+        <p-badge
+          [value]="assignedProducts.length.toString()"
+          severity="info"
+          styleClass="mr-2"
+        >
+        </p-badge>
+        <span class="text-sm font-medium text-gray-700">Products</span>
+
+        <p-divider layout="vertical"></p-divider>
+
+        <p-badge
+          [value]="(shelfDevices.length + productDevices.size).toString()"
+          severity="success"
+        >
+        </p-badge>
+        <span class="text-sm font-medium text-gray-700">Devices</span>
+
+        <p-tag
+          *ngIf="viewMode === 'view'"
+          icon="pi pi-eye"
+          value="View Only"
+          severity="info"
+          [rounded]="true"
+        >
+        </p-tag>
+      </div>
+    </p-toolbar>
+
+    <!-- Loading State -->
+    <div *ngIf="loading" class="flex items-center justify-center min-h-[60vh]">
+      <div class="text-center">
+        <p-progressSpinner styleClass="w-16 h-16"></p-progressSpinner>
+        <p class="text-gray-600 text-lg mt-4">Loading data...</p>
+      </div>
+    </div>
+
+    <!-- Main Content -->
+    <div *ngIf="!loading">
+      <!-- Tab Navigation -->
+      <p-tabView [(activeIndex)]="activeTab" styleClass="shadow-sm">
+        <!-- Tab 1: Shelf Products View -->
+        <p-tabPanel header="Shelf Products" leftIcon="pi pi-box">
+          <ng-template pTemplate="header">
+            <div class="flex items-center gap-2">
+              <i class="pi pi-box"></i>
+              <span>Shelf Products</span>
+              <p-badge
+                [value]="assignedProducts.length.toString()"
+                severity="info"
+              ></p-badge>
+            </div>
+          </ng-template>
+
+          <div class="bg-white rounded-lg p-4">
+            <!-- Search and View Toggle -->
+            <div class="flex justify-between items-center mb-4">
+              <div class="flex-1 max-w-md">
+                <!-- <span class="p-input-icon-left w-full">
+                  <i class="pi pi-search"></i> -->
+                <input
+                  type="text"
+                  pInputText
+                  [(ngModel)]="assignedSearchTerm"
+                  (input)="onAssignedSearch()"
+                  placeholder="Search assigned products..."
+                  class="w-full"
+                />
+                <!-- </span> -->
+              </div>
+
+              <!-- Layout Toggle-->
+              <p-selectButton
+                [options]="layoutOptions"
+                [(ngModel)]="selectedAssignedProductsLayout"
+                optionLabel="label"
+                optionValue="value"
+                (onChange)="onAssignedProductsLayoutChange()"
+              >
+                <ng-template let-item>
+                  <i [class]="item.icon"></i>
+                </ng-template>
+              </p-selectButton>
+            </div>
+
+            <!-- Products Count Summary -->
+            <div class="mb-4 text-sm text-gray-600">
+              Showing {{ getPaginatedProducts().length }} of
+              {{ filteredAssignedProducts.length }} products
+            </div>
+
+            <!-- Grid View Layout -->
+            <div
+              *ngIf="
+                selectedAssignedProductsLayout === 'grid' &&
+                filteredAssignedProducts.length > 0
+              "
+              class="mb-6"
+            >
+              <!-- Grid Cards -->
+              <div
+                class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4"
+              >
+                <div
+                  *ngFor="let product of getPaginatedProducts()"
+                  class="bg-white border border-gray-200 rounded-lg overflow-hidden hover:shadow-lg transition-all duration-200"
+                >
+                  <!-- Card Header Image -->
+                  <div
+                    class="bg-gray-100 h-40 flex items-center justify-center"
+                  >
+                    <i class="pi pi-image text-5xl text-gray-400"></i>
+                  </div>
+
+                  <!-- Card Content -->
+                  <div class="p-4">
+                    <h4 class="font-semibold text-gray-900 mb-2 truncate">
+                      {{ product.productName }}
+                    </h4>
+                    <p class="text-xs text-gray-500 mb-3">
+                      {{ product.productCode }}
+                    </p>
+
+                    <!-- Price Section -->
+                    <div class="flex items-center gap-2 mb-3">
+                      <span class="font-bold text-gray-900 text-lg"
+                        >LKR {{ product.sellingPrice }}</span
+                      >
+                      <p-badge
+                        *ngIf="product.discountPrice > 0"
+                        [value]="calculateDiscountPercent(product) + '%'"
+                        severity="success"
+                        styleClass="text-xs"
+                      >
+                      </p-badge>
+                    </div>
+
+                    <!-- Additional Info -->
+                    <div class="space-y-2">
+                      <div class="flex items-center justify-between text-xs">
+                        <span class="text-gray-600">Category:</span>
+                        <span class="font-medium">{{
+                          product.categoryName || "N/A"
+                        }}</span>
+                      </div>
+
+                      <div class="flex items-center justify-between text-xs">
+                        <span class="text-gray-600">Barcode:</span>
+                        <span class="font-mono">{{
+                          product.barCode || "N/A"
+                        }}</span>
+                      </div>
+                    </div>
+
+                    <!-- Device Count Badge -->
+                    <p-tag
+                      *ngIf="getProductDeviceCount(product.id) > 0"
+                      icon="pi pi-tablet"
+                      [value]="getProductDeviceCount(product.id) + ' device(s)'"
+                      severity="info"
+                      styleClass="text-xs mt-3 w-full justify-center"
+                    >
+                    </p-tag>
+                  </div>
+
+                  <!-- Card Footer -->
+                  <div class="border-t border-gray-100 p-3 bg-gray-50">
+                    <div class="flex justify-between items-center">
+                      <span class="text-xs text-gray-500">
+                        Status:
+                        <span
+                          [ngClass]="
+                            product.isActive
+                              ? 'text-green-600 font-medium'
+                              : 'text-red-600 font-medium'
+                          "
+                        >
+                          {{ product.isActive ? "Active" : "Inactive" }}
+                        </span>
+                      </span>
+                      <p-button
+                        icon="pi pi-info-circle"
+                        [text]="true"
+                        severity="secondary"
+                        size="small"
+                        pTooltip="View Details"
+                        tooltipPosition="top"
+                      >
+                      </p-button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Grid View Pagination -->
+              <div class="mt-6 flex justify-center">
+                <p-paginator
+                  [rows]="itemsPerPage"
+                  [totalRecords]="filteredAssignedProducts.length"
+                  [rowsPerPageOptions]="[12, 24, 48]"
+                  (onPageChange)="onPageChange($event)"
+                  [first]="currentPage * itemsPerPage"
+                >
+                </p-paginator>
+              </div>
+            </div>
+
+            <!-- List View Layout -->
+            <div
+              *ngIf="
+                selectedAssignedProductsLayout === 'list' &&
+                filteredAssignedProducts.length > 0
+              "
+              class="mb-6"
+            >
+              <!-- List Table -->
+              <div class="overflow-x-auto border border-gray-200 rounded-lg">
+                <table class="min-w-full divide-y divide-gray-200">
+                  <thead class="bg-gray-50">
+                    <tr>
+                      <th
+                        scope="col"
+                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                      >
+                        Product
+                      </th>
+                      <th
+                        scope="col"
+                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                      >
+                        Code
+                      </th>
+                      <th
+                        scope="col"
+                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                      >
+                        Price
+                      </th>
+                      <th
+                        scope="col"
+                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                      >
+                        Category
+                      </th>
+                      <th
+                        scope="col"
+                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                      >
+                        Devices
+                      </th>
+                      <th
+                        scope="col"
+                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                      >
+                        Status
+                      </th>
+                      <th
+                        scope="col"
+                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                      >
+                        Actions
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody class="bg-white divide-y divide-gray-200">
+                    <tr
+                      *ngFor="let product of getPaginatedProducts()"
+                      class="hover:bg-gray-50 transition-colors"
+                    >
+                      <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="flex items-center">
+                          <div
+                            class="flex-shrink-0 h-10 w-10 bg-gray-100 rounded-lg flex items-center justify-center"
+                          >
+                            <i class="pi pi-box text-gray-600"></i>
+                          </div>
+                          <div class="ml-4">
+                            <div class="text-sm font-medium text-gray-900">
+                              {{ product.productName }}
+                            </div>
+                            <div
+                              class="text-xs text-gray-500 truncate max-w-xs"
+                            >
+                              {{ product.description || "No description" }}
+                            </div>
+                          </div>
+                        </div>
+                      </td>
+                      <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="text-sm text-gray-900">
+                          {{ product.productCode }}
+                        </div>
+                        <div class="text-xs text-gray-500">
+                          {{ product.barCode }}
+                        </div>
+                      </td>
+                      <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="text-sm font-bold text-gray-900">
+                          LKR {{ product.sellingPrice }}
+                        </div>
+                        <div
+                          *ngIf="product.discountPrice > 0"
+                          class="text-xs text-green-600"
+                        >
+                          LKR {{ product.discountPrice }} ({{
+                            calculateDiscountPercent(product)
+                          }}% off)
+                        </div>
+                      </td>
+                      <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="text-sm text-gray-900">
+                          {{ product.categoryName }}
+                        </div>
+                        <div class="text-xs text-gray-500">
+                          {{ product.subCategoryName }}
+                        </div>
+                      </td>
+                      <td class="px-6 py-4 whitespace-nowrap">
+                        <div
+                          *ngIf="getProductDeviceCount(product.id) > 0"
+                          class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800"
+                        >
+                          <i class="pi pi-tablet mr-1"></i>
+                          {{ getProductDeviceCount(product.id) }}
+                        </div>
+                        <span
+                          *ngIf="getProductDeviceCount(product.id) === 0"
+                          class="text-xs text-gray-500"
+                          >None</span
+                        >
+                      </td>
+                      <td class="px-6 py-4 whitespace-nowrap">
+                        <span
+                          [ngClass]="
+                            product.isActive
+                              ? 'px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800'
+                              : 'px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800'
+                          "
+                        >
+                          {{ product.isActive ? "Active" : "Inactive" }}
+                        </span>
+                      </td>
+                      <td
+                        class="px-6 py-4 whitespace-nowrap text-sm font-medium"
+                      >
+                        <div class="flex space-x-2">
+                          <p-button
+                            icon="pi pi-eye"
+                            [text]="true"
+                            severity="info"
+                            size="small"
+                            pTooltip="View Details"
+                            tooltipPosition="top"
+                          >
+                          </p-button>
+                          <p-button
+                            *ngIf="viewMode === 'assign'"
+                            icon="pi pi-trash"
+                            [text]="true"
+                            severity="danger"
+                            size="small"
+                            pTooltip="Remove"
+                            tooltipPosition="top"
+                            (onClick)="removeProduct(product)"
+                          >
+                          </p-button>
+                        </div>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+
+              <!-- List View Pagination -->
+              <div class="mt-4 flex justify-between items-center">
+                <div class="text-sm text-gray-600">
+                  Showing {{ currentPage * itemsPerPage + 1 }} to
+                  {{
+                    (currentPage + 1) * itemsPerPage >
+                    filteredAssignedProducts.length
+                      ? filteredAssignedProducts.length
+                      : (currentPage + 1) * itemsPerPage
+                  }}
+                  of {{ filteredAssignedProducts.length }} products
+                </div>
+                <p-paginator
+                  [rows]="itemsPerPage"
+                  [totalRecords]="filteredAssignedProducts.length"
+                  [rowsPerPageOptions]="[12, 24, 48]"
+                  (onPageChange)="onPageChange($event)"
+                  [first]="currentPage * itemsPerPage"
+                >
+                </p-paginator>
+              </div>
+            </div>
+
+            <!-- Empty State -->
+            <div
+              *ngIf="filteredAssignedProducts.length === 0"
+              class="text-center py-16"
+            >
+              <div class="max-w-md mx-auto">
+                <div
+                  class="bg-gray-100 h-48 rounded-lg flex items-center justify-center mb-6"
+                >
+                  <i class="pi pi-inbox text-6xl text-gray-400"></i>
+                </div>
+                <h3 class="text-lg font-semibold text-gray-900 mb-2">
+                  No products assigned
+                </h3>
+                <p class="text-gray-600 mb-6">
+                  {{
+                    assignedSearchTerm
+                      ? "No products match your search."
+                      : "Products will appear here once assigned to this shelf."
+                  }}
+                </p>
+                <div *ngIf="assignedSearchTerm">
+                  <p-button
+                    label="Clear Search"
+                    icon="pi pi-times"
+                    severity="secondary"
+                    (onClick)="assignedSearchTerm = ''; onAssignedSearch()"
+                  >
+                  </p-button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </p-tabPanel>
+
+        <!-- Tab 2: Product Assignment (Assign Mode Only) -->
+        <p-tabPanel
+          *ngIf="viewMode === 'assign'"
+          header="Assign Products"
+          leftIcon="pi pi-plus-circle"
+        >
+          <ng-template pTemplate="header">
+            <div class="flex items-center gap-2">
+              <i class="pi pi-plus-circle"></i>
+              <span>Assign Products</span>
+            </div>
+          </ng-template>
+
+          <!-- Sub-tabs for assignment methods -->
+          <p-tabView>
+            <!-- By Product -->
+            <p-tabPanel header="By Product" leftIcon="pi pi-box">
+              <div class="bg-white rounded-lg p-6">
+                <!-- PickList for Product Assignment -->
+                <div class="mb-4">
+                  <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-4">
+                    <!-- Available Products Filter -->
+                    <div>
+                      <label
+                        class="block text-sm font-medium text-gray-700 mb-2"
+                        >Filter Available Products</label
+                      >
+                      <div class="flex gap-2">
+                        <!-- <span class="p-input-icon-left flex-1">
+                          <i class="pi pi-search"></i> -->
+                        <input
+                          type="text"
+                          pInputText
+                          [(ngModel)]="availableSearchTerm"
+                          (input)="onAvailableSearch()"
+                          placeholder="Search products..."
+                          class="w-full"
+                        />
+                        <!-- </span> -->
+                      </div>
+                      <div class="grid grid-cols-2 gap-2 mt-2">
+                        <p-dropdown
+                          [(ngModel)]="selectedCategoryId"
+                          [options]="filteredCategories"
+                          optionLabel="categoryName"
+                          optionValue="id"
+                          placeholder="All Categories"
+                          [showClear]="true"
+                          (onChange)="onCategoryChange()"
+                          styleClass="w-full"
+                        >
+                        </p-dropdown>
+                        <p-dropdown
+                          *ngIf="subCategories.length > 0"
+                          [(ngModel)]="selectedSubCategoryId"
+                          [options]="filteredSubCategories"
+                          optionLabel="subCategoryName"
+                          optionValue="id"
+                          placeholder="All SubCategories"
+                          [showClear]="true"
+                          (onChange)="onSubCategoryChange()"
+                          styleClass="w-full"
+                        >
+                        </p-dropdown>
+                      </div>
+                    </div>
+
+                    <!-- Assigned Products Search -->
+                    <div>
+                      <label
+                        class="block text-sm font-medium text-gray-700 mb-2"
+                        >Search Assigned Products</label
+                      >
+                      <!-- <span class="p-input-icon-left w-full">
+                        <i class="pi pi-search"></i> -->
+                      <input
+                        type="text"
+                        pInputText
+                        [(ngModel)]="assignedSearchTerm"
+                        (input)="onAssignedSearch()"
+                        placeholder="Search assigned..."
+                        class="w-full"
+                      />
+                      <!-- </span> -->
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Dual List Panels -->
+                <div
+                  class="grid grid-cols-1 lg:grid-cols-12 gap-4"
+                  style="min-height: 500px"
+                >
+                  <!-- Available Products Panel -->
+                  <div class="lg:col-span-5">
+                    <p-card>
+                      <ng-template pTemplate="header">
+                        <div
+                          class="flex justify-between items-center p-3 bg-gray-50"
+                        >
+                          <div class="flex items-center gap-2">
+                            <i class="pi pi-box text-gray-600"></i>
+                            <span class="font-semibold"
+                              >Available Products</span
+                            >
+                          </div>
+                          <p-badge
+                            [value]="
+                              filteredAvailableProducts.length.toString()
+                            "
+                          ></p-badge>
+                        </div>
+                      </ng-template>
+
+                      <div class="flex justify-between items-center mb-3">
+                        <span class="text-sm text-gray-600">
+                          <i class="pi pi-check-square mr-1"></i>
+                          {{ selectedAvailable.size }} selected
+                        </span>
+                        <div class="flex gap-2">
+                          <p-button
+                            label="Select All"
+                            [text]="true"
+                            size="small"
+                            (onClick)="selectAllAvailable()"
+                          >
+                          </p-button>
+                          <p-button
+                            label="Clear"
+                            [text]="true"
+                            size="small"
+                            (onClick)="deselectAllAvailable()"
+                          >
+                          </p-button>
+                        </div>
+                      </div>
+
+                      <p-scrollPanel
+                        [style]="{ height: '400px' }"
+                        (onScroll)="onAvailableScroll($event)"
+                      >
+                        <div
+                          *ngIf="filteredAvailableProducts.length === 0"
+                          class="text-center py-8 text-gray-500"
+                        >
+                          <i
+                            class="pi pi-inbox text-4xl mb-3 block text-gray-300"
+                          ></i>
+                          <p class="font-medium">No products available</p>
+                          <p class="text-xs mt-1">Try changing your filters</p>
+                        </div>
+
+                        <div
+                          *ngFor="let product of displayedAvailableProducts"
+                          (click)="toggleAvailableSelection(product.id)"
+                          [class]="
+                            selectedAvailable.has(product.id)
+                              ? 'bg-blue-50 border-l-4 border-l-blue-500'
+                              : 'border-l-4 border-l-transparent hover:bg-gray-50'
+                          "
+                          class="p-3 border-b cursor-pointer transition-all"
+                        >
+                          <div class="flex items-start gap-3">
+                            <p-checkbox
+                              [binary]="true"
+                              [ngModel]="selectedAvailable.has(product.id)"
+                              (click)="$event.stopPropagation()"
+                            >
+                            </p-checkbox>
+                            <div class="flex-1">
+                              <p class="font-medium text-gray-900 truncate">
+                                {{ product.productName }}
+                              </p>
+                              <p class="text-xs text-gray-500">
+                                {{ product.productCode }} -
+                                {{ product.categoryName }} -
+                                {{ product.subCategoryName }}
+                              </p>
+                              <div class="flex items-center gap-2 mt-2">
+                                <span
+                                  class="font-semibold text-gray-700 text-sm"
+                                  >LKR {{ product.sellingPrice }}</span
+                                >
+                                <p-tag
+                                  *ngIf="product.discountPrice > 0"
+                                  [value]="
+                                    (
+                                      ((product.sellingPrice -
+                                        product.discountPrice) /
+                                        product.sellingPrice) *
+                                      100
+                                    ).toFixed(0) + '% off'
+                                  "
+                                  severity="success"
+                                  styleClass="text-xs"
+                                >
+                                </p-tag>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                        <!-- Added for load more -->
+                        <!-- Replace the loading indicators section with: -->
+                        <div
+                          *ngIf="isLoadingMoreAvailable"
+                          class="text-center py-4"
+                        >
+                          <p-progressSpinner
+                            [style]="{ width: '30px', height: '30px' }"
+                            strokeWidth="4"
+                          >
+                          </p-progressSpinner>
+                          <p class="text-sm text-gray-600 mt-2">
+                            Loading more products...
+                          </p>
+                          <p class="text-xs text-gray-500">
+                            Page {{ currentAvailablePage }}
+                          </p>
+                        </div>
+
+                        <div
+                          *ngIf="
+                            hasMoreAvailable &&
+                            !isLoadingMoreAvailable &&
+                            displayedAvailableProducts.length > 0
+                          "
+                          class="text-center py-4 border-t"
+                        >
+                          <p-button
+                            label="Load More Products ({{
+                              displayedAvailableProducts.length
+                            }} shown)"
+                            icon="pi pi-arrow-down"
+                            [text]="true"
+                            severity="info"
+                            size="small"
+                            (onClick)="loadMoreAvailableProducts()"
+                          >
+                          </p-button>
+                          <p class="text-xs text-gray-500 mt-1">
+                            Showing {{ displayedAvailableProducts.length }} of
+                            {{ filteredAvailableProducts.length }} filtered
+                            products
+                            <span
+                              *ngIf="
+                                availableProducts.length >
+                                filteredAvailableProducts.length
+                              "
+                            >
+                              ({{
+                                availableProducts.length -
+                                  filteredAvailableProducts.length
+                              }}
+                              already assigned)
+                            </span>
+                          </p>
+                          <p
+                            class="text-xs text-gray-500"
+                            *ngIf="hasMoreAvailable"
+                          >
+                            More products available - scroll to bottom or click
+                            above
+                          </p>
+                        </div>
+
+                        <div
+                          *ngIf="
+                            !hasMoreAvailable &&
+                            displayedAvailableProducts.length > 0
+                          "
+                          class="text-center py-3 border-t"
+                        >
+                          <p class="text-xs text-gray-500">
+                            <i
+                              class="pi pi-check-circle text-green-500 mr-1"
+                            ></i>
+                            All
+                            {{ displayedAvailableProducts.length }} available
+                            products loaded
+                            <span
+                              *ngIf="
+                                availableProducts.length >
+                                filteredAvailableProducts.length
+                              "
+                            >
+                              ({{
+                                availableProducts.length -
+                                  filteredAvailableProducts.length
+                              }}
+                              already assigned)
+                            </span>
+                          </p>
+                        </div>
+                      </p-scrollPanel>
+                    </p-card>
+                  </div>
+
+                  <!-- Action Buttons -->
+                  <div
+                    class="lg:col-span-2 flex flex-col items-center justify-center gap-4"
+                  >
+                    <p-button
+                      icon="pi pi-angle-right"
+                      [rounded]="true"
+                      [disabled]="selectedAvailable.size === 0 || savingChanges"
+                      (onClick)="assignSelected()"
+                      severity="info"
+                      size="large"
+                      pTooltip="Assign Selected"
+                      tooltipPosition="top"
+                    >
+                    </p-button>
+
+                    <p-divider></p-divider>
+
+                    <p-button
+                      icon="pi pi-angle-left"
+                      [rounded]="true"
+                      [disabled]="selectedAssigned.size === 0 || savingChanges"
+                      (onClick)="unassignSelected()"
+                      severity="secondary"
+                      size="large"
+                      pTooltip="Unassign Selected"
+                      tooltipPosition="top"
+                    >
+                    </p-button>
+
+                    <div *ngIf="savingChanges" class="text-center mt-4">
+                      <p-progressSpinner
+                        [style]="{ width: '40px', height: '40px' }"
+                        strokeWidth="4"
+                      >
+                      </p-progressSpinner>
+                      <p class="text-xs text-gray-600 mt-2">Saving...</p>
+                    </div>
+                  </div>
+
+                  <!-- Assigned Products Panel -->
+                  <div class="lg:col-span-5">
+                    <p-card>
+                      <ng-template pTemplate="header">
+                        <div
+                          class="flex justify-between items-center p-3 bg-green-50"
+                        >
+                          <div class="flex items-center gap-2">
+                            <i class="pi pi-check-circle text-green-600"></i>
+                            <span class="font-semibold">Assigned Products</span>
+                          </div>
+                          <p-badge
+                            [value]="filteredAssignedProducts.length.toString()"
+                            severity="success"
+                          ></p-badge>
+                        </div>
+                      </ng-template>
+
+                      <div class="flex justify-between items-center mb-3">
+                        <span class="text-sm text-gray-600">
+                          <i class="pi pi-check-square mr-1"></i>
+                          {{ selectedAssigned.size }} selected
+                        </span>
+                        <div class="flex gap-2">
+                          <p-button
+                            label="Select All"
+                            [text]="true"
+                            size="small"
+                            (onClick)="selectAllAssigned()"
+                          >
+                          </p-button>
+                          <p-button
+                            label="Clear"
+                            [text]="true"
+                            size="small"
+                            (onClick)="deselectAllAssigned()"
+                          >
+                          </p-button>
+                        </div>
+                      </div>
+
+                      <p-scrollPanel [style]="{ height: '400px' }">
+                        <div
+                          *ngIf="filteredAssignedProducts.length === 0"
+                          class="text-center py-8 text-gray-500"
+                        >
+                          <i
+                            class="pi pi-box-open text-4xl mb-3 block text-gray-300"
+                          ></i>
+                          <p class="font-medium">No products assigned</p>
+                          <p class="text-xs mt-1">
+                            Assign products from the left panel
+                          </p>
+                        </div>
+
+                        <div
+                          *ngFor="let product of filteredAssignedProducts"
+                          (click)="toggleAssignedSelection(product.id)"
+                          [class]="
+                            selectedAssigned.has(product.id)
+                              ? 'bg-blue-50 border-l-4 border-l-blue-500'
+                              : 'border-l-4 border-l-transparent hover:bg-gray-50'
+                          "
+                          class="p-3 border-b cursor-pointer transition-all"
+                        >
+                          <div class="flex items-start gap-3">
+                            <p-checkbox
+                              [binary]="true"
+                              [ngModel]="selectedAssigned.has(product.id)"
+                              (click)="$event.stopPropagation()"
+                            >
+                            </p-checkbox>
+                            <div class="flex-1">
+                              <p class="font-medium text-gray-900 truncate">
+                                {{ product.productName }}
+                              </p>
+                              <p class="text-xs text-gray-500">
+                                {{ product.productCode }} -
+                                {{ product.categoryName }} -
+                                {{ product.subCategoryName }}
+                              </p>
+                              <div class="flex items-center gap-2 mt-2">
+                                <span
+                                  class="font-semibold text-gray-700 text-sm"
+                                  >LKR {{ product.sellingPrice }}</span
+                                >
+                                <p-tag
+                                  *ngIf="getProductDeviceCount(product.id) > 0"
+                                  icon="pi pi-tablet"
+                                  [value]="
+                                    getProductDeviceCount(product.id).toString()
+                                  "
+                                  severity="info"
+                                  styleClass="text-xs"
+                                >
+                                </p-tag>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </p-scrollPanel>
+                    </p-card>
+                  </div>
+                </div>
+              </div>
+            </p-tabPanel>
+
+            <!-- By Category -->
+            <p-tabPanel header="By Category" leftIcon="pi pi-list">
+              <div class="max-w-2xl mx-auto py-6">
+                <p-card>
+                  <ng-template pTemplate="header">
+                    <div
+                      class="flex items-center gap-3 p-4 bg-gradient-to-r from-blue-50 to-white"
+                    >
+                      <div class="bg-blue-100 p-3 rounded-lg">
+                        <i class="pi pi-list text-blue-600 text-xl"></i>
+                      </div>
+                      <div>
+                        <h3 class="text-lg font-semibold text-gray-900">
+                          Assign All Products from Category
+                        </h3>
+                        <p class="text-sm text-gray-600">
+                          Bulk assign all products in a category to this shelf
+                        </p>
+                      </div>
+                    </div>
+                  </ng-template>
+
+                  <div class="space-y-4">
+                    <div>
+                      <label
+                        class="block text-sm font-medium text-gray-700 mb-2"
+                      >
+                        <i class="pi pi-filter mr-1"></i>
+                        Select Category
+                      </label>
+                      <p-dropdown
+                        [(ngModel)]="selectedCategoryId"
+                        [options]="filteredCategories"
+                        optionLabel="categoryName"
+                        optionValue="id"
+                        placeholder="Choose a category..."
+                        [showClear]="true"
+                        styleClass="w-full"
+                      >
+                      </p-dropdown>
+                    </div>
+
+                    <p-message
+                      *ngIf="selectedCategoryId"
+                      severity="info"
+                      styleClass="w-full"
+                    >
+                      <div class="flex flex-col">
+                        <span class="font-medium"
+                          >This will assign all products from the selected
+                          category to this shelf.</span
+                        >
+                        <span class="text-sm mt-1"
+                          >Products already assigned will be skipped.</span
+                        >
+                      </div>
+                    </p-message>
+                  </div>
+
+                  <ng-template pTemplate="footer">
+                    <div class="flex justify-end">
+                      <p-button
+                        label="Assign Category Products"
+                        icon="pi pi-check"
+                        [disabled]="!selectedCategoryId || savingChanges"
+                        [loading]="savingChanges"
+                        (onClick)="assignByCategory()"
+                        styleClass="w-full"
+                      >
+                      </p-button>
+                    </div>
+                  </ng-template>
+                </p-card>
+              </div>
+            </p-tabPanel>
+
+            <!-- By SubCategory -->
+            <p-tabPanel header="By SubCategory" leftIcon="pi pi-tags">
+              <div class="max-w-2xl mx-auto py-6">
+                <p-card>
+                  <ng-template pTemplate="header">
+                    <div
+                      class="flex items-center gap-3 p-4 bg-gradient-to-r from-purple-50 to-white"
+                    >
+                      <div class="bg-purple-100 p-3 rounded-lg">
+                        <i class="pi pi-tags text-purple-600 text-xl"></i>
+                      </div>
+                      <div>
+                        <h3 class="text-lg font-semibold text-gray-900">
+                          Assign All Products from SubCategory
+                        </h3>
+                        <p class="text-sm text-gray-600">
+                          Bulk assign all products in a subcategory to this
+                          shelf
+                        </p>
+                      </div>
+                    </div>
+                  </ng-template>
+
+                  <div class="space-y-4">
+                    <div>
+                      <label
+                        class="block text-sm font-medium text-gray-700 mb-2"
+                      >
+                        <i class="pi pi-list mr-1"></i>
+                        Select Category First
+                      </label>
+                      <p-dropdown
+                        [(ngModel)]="selectedCategoryId"
+                        [options]="filteredCategories"
+                        optionLabel="categoryName"
+                        optionValue="id"
+                        placeholder="Choose a category..."
+                        [showClear]="true"
+                        (onChange)="onCategoryChange()"
+                        styleClass="w-full"
+                      >
+                      </p-dropdown>
+                    </div>
+
+                    <div *ngIf="selectedCategoryId">
+                      <label
+                        class="block text-sm font-medium text-gray-700 mb-2"
+                      >
+                        <i class="pi pi-tags mr-1"></i>
+                        Select SubCategory
+                      </label>
+                      <p-dropdown
+                        [(ngModel)]="selectedSubCategoryId"
+                        [options]="filteredSubCategories"
+                        optionLabel="subCategoryName"
+                        optionValue="id"
+                        placeholder="Choose a subcategory..."
+                        [showClear]="true"
+                        styleClass="w-full"
+                      >
+                      </p-dropdown>
+                    </div>
+
+                    <p-message
+                      *ngIf="selectedSubCategoryId"
+                      severity="info"
+                      styleClass="w-full"
+                    >
+                      <div class="flex flex-col">
+                        <span class="font-medium"
+                          >This will assign all products from the selected
+                          subcategory to this shelf.</span
+                        >
+                        <span class="text-sm mt-1"
+                          >Products already assigned will be skipped.</span
+                        >
+                      </div>
+                    </p-message>
+                  </div>
+
+                  <ng-template pTemplate="footer">
+                    <div class="flex justify-end">
+                      <p-button
+                        label="Assign SubCategory Products"
+                        icon="pi pi-check"
+                        [disabled]="!selectedSubCategoryId || savingChanges"
+                        [loading]="savingChanges"
+                        (onClick)="assignBySubCategory()"
+                        severity="help"
+                        styleClass="w-full"
+                      >
+                      </p-button>
+                    </div>
+                  </ng-template>
+                </p-card>
+              </div>
+            </p-tabPanel>
+          </p-tabView>
+        </p-tabPanel>
+
+        <!-- Tab 3: Devices -->
+        <p-tabPanel header="Devices" leftIcon="pi pi-tablet">
+          <ng-template pTemplate="header">
+            <div class="flex items-center gap-2">
+              <i class="pi pi-tablet"></i>
+              <span>Devices</span>
+              <p-badge
+                [value]="(shelfDevices.length + productDevices.size).toString()"
+                severity="success"
+              ></p-badge>
+            </div>
+          </ng-template>
+
+          <div class="bg-white rounded-lg p-4">
+            <!-- View Toggle and Actions -->
+            <div class="flex justify-between items-center mb-4">
+              <h3 class="text-lg font-semibold text-gray-900">
+                Device Assignments
+              </h3>
+
+              <!-- Layout Toggle -->
+              <p-selectButton
+                [options]="layoutOptions"
+                [(ngModel)]="selectedDevicesLayout"
+                optionLabel="label"
+                optionValue="value"
+              >
+                <ng-template let-item>
+                  <i [class]="item.icon"></i>
+                </ng-template>
+              </p-selectButton>
+            </div>
+
+            <!-- Grid View for Devices -->
+            <div *ngIf="selectedDevicesLayout === 'grid'">
+              <!-- Empty State -->
+              <div *ngIf="shelfDevices.length === 0" class="text-center py-16">
+                <i class="pi pi-info-circle text-6xl text-gray-300 mb-4"></i>
+                <p class="text-gray-600 font-medium text-lg">
+                  No devices assigned
+                </p>
+                <p class="text-sm text-gray-500 mt-2">
+                  Devices will appear here once assigned
+                </p>
+              </div>
+
+              <!-- Grid Cards -->
+              <div
+                *ngIf="shelfDevices.length > 0"
+                class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4"
+              >
+                <div
+                  *ngFor="let device of shelfDevices"
+                  class="bg-white border border-gray-200 rounded-lg overflow-hidden hover:shadow-lg transition-all duration-200"
+                >
+                  <!-- Card Header with Icon -->
+                  <div
+                    class="bg-purple-50 h-40 flex items-center justify-center"
+                  >
+                    <i class="pi pi-tablet text-purple-600 text-6xl"></i>
+                  </div>
+
+                  <!-- Card Content -->
+                  <div class="p-4">
+                    <h4 class="font-semibold text-gray-900 mb-2 truncate">
+                      {{ device.deviceMac }}
+                    </h4>
+                    <p
+                      *ngIf="device.assignmentType === 'TEMPLATE'"
+                      class="text-xs text-gray-500 mb-3"
+                    >
+                      {{ device.templateName }}
+                    </p>
+
+                    <!-- Device Details -->
+                    <div
+                      *ngIf="device.assignmentType === 'TEMPLATE'"
+                      class="space-y-2 mb-4"
+                    >
+                      <div class="flex items-center justify-between text-xs">
+                        <span class="text-gray-600">Screen:</span>
+                        <span class="font-medium"
+                          >{{ device.deviceWidth }}x{{
+                            device.deviceHeight
+                          }}px</span
+                        >
+                      </div>
+
+                      <div class="flex items-center justify-between text-xs">
+                        <span class="text-gray-600">Location:</span>
+                        <span class="font-medium">{{
+                          device.locationType
+                        }}</span>
+                      </div>
+
+                      <div class="flex items-center justify-between text-xs">
+                        <span class="text-gray-600">Status:</span>
+                        <p-tag
+                          value="Active"
+                          severity="success"
+                          styleClass="text-xs"
+                        >
+                        </p-tag>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Card Footer with Actions -->
+                  <div class="border-t border-gray-100 p-3 bg-gray-50">
+                    <div class="flex gap-2 justify-center">
+                      <p-button
+                        *ngIf="auth.hasAnyRole(['Admin', 'Manager'])"
+                        label="Quick Bind"
+                        icon="pi pi-bolt"
+                        size="small"
+                        severity="success"
+                        (onClick)="quickBindDevice(device)"
+                        styleClass="w-full"
+                      >
+                      </p-button>
+                      <p-button
+                        *ngIf="auth.hasAnyRole(['Admin', 'Manager'])"
+                        label="Bind Message"
+                        icon="pi pi-link"
+                        size="small"
+                        (onClick)="openBindDialog(device)"
+                        styleClass="w-full"
+                      >
+                      </p-button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- List View for Devices -->
+            <div *ngIf="selectedDevicesLayout === 'list'">
+              <!-- Empty State -->
+              <div *ngIf="shelfDevices.length === 0" class="text-center py-16">
+                <i class="pi pi-info-circle text-6xl text-gray-300 mb-4"></i>
+                <p class="text-gray-600 font-medium text-lg">
+                  No devices assigned
+                </p>
+                <p class="text-sm text-gray-500 mt-2">
+                  Devices will appear here once assigned
+                </p>
+              </div>
+
+              <!-- List Table -->
+              <div
+                *ngIf="shelfDevices.length > 0"
+                class="overflow-x-auto border border-gray-200 rounded-lg"
+              >
+                <table class="min-w-full divide-y divide-gray-200">
+                  <thead class="bg-gray-50">
+                    <tr>
+                      <th
+                        scope="col"
+                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                      >
+                        Device
+                      </th>
+                      <th
+                        scope="col"
+                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                      >
+                        Screen
+                      </th>
+                      <th
+                        scope="col"
+                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                      >
+                        Template
+                      </th>
+                      <th
+                        scope="col"
+                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                      >
+                        Location
+                      </th>
+                      <th
+                        scope="col"
+                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                      >
+                        Status
+                      </th>
+                      <th
+                        scope="col"
+                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                      >
+                        Actions
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody class="bg-white divide-y divide-gray-200">
+                    <tr
+                      *ngFor="let device of shelfDevices"
+                      class="hover:bg-gray-50 transition-colors"
+                    >
+                      <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="flex items-center">
+                          <div
+                            class="flex-shrink-0 h-10 w-10 bg-purple-100 rounded-lg flex items-center justify-center"
+                          >
+                            <i class="pi pi-tablet text-purple-600"></i>
+                          </div>
+                          <div class="ml-4">
+                            <div class="text-sm font-medium text-gray-900">
+                              {{ device.deviceMac }}
+                            </div>
+                            <div class="text-xs text-gray-500">
+                              {{ device.deviceName || "No name" }}
+                            </div>
+                          </div>
+                        </div>
+                      </td>
+                      <td class="px-6 py-4 whitespace-nowrap">
+                        <div
+                          *ngIf="device.assignmentType === 'TEMPLATE'"
+                          class="text-sm text-gray-900"
+                        >
+                          {{ device.deviceWidth }}x{{ device.deviceHeight }}px
+                        </div>
+                      </td>
+                      <td class="px-6 py-4 whitespace-nowrap">
+                        <div
+                          *ngIf="device.assignmentType === 'TEMPLATE'"
+                          class="text-sm text-gray-900"
+                        >
+                          {{ device.templateName }}
+                        </div>
+                      </td>
+                      <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="text-sm text-gray-900">
+                          {{ device.locationType }}
+                        </div>
+                        <div class="text-xs text-gray-500">
+                          ID: {{ device.locationId }}
+                        </div>
+                      </td>
+                      <td class="px-6 py-4 whitespace-nowrap">
+                        <span
+                          class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800"
+                        >
+                          Active
+                        </span>
+                      </td>
+                      <td
+                        class="px-6 py-4 whitespace-nowrap text-sm font-medium"
+                      >
+                        <div class="flex space-x-2">
+                          <p-button
+                            *ngIf="auth.hasAnyRole(['Admin', 'Manager'])"
+                            icon="pi pi-bolt"
+                            [text]="true"
+                            severity="success"
+                            size="small"
+                            pTooltip="Quick Bind"
+                            tooltipPosition="top"
+                            (onClick)="quickBindDevice(device)"
+                          >
+                          </p-button>
+                          <p-button
+                            *ngIf="auth.hasAnyRole(['Admin', 'Manager'])"
+                            icon="pi pi-link"
+                            [text]="true"
+                            severity="info"
+                            size="small"
+                            pTooltip="Bind with Message"
+                            tooltipPosition="top"
+                            (onClick)="openBindDialog(device)"
+                          >
+                          </p-button>
+                        </div>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- Product Devices Section -->
+            <div *ngIf="productDevices.size > 0" class="mt-8">
+              <p-divider align="left">
+                <div class="flex align-items-center gap-2">
+                  <i class="pi pi-box-open text-blue-600"></i>
+                  <span class="font-semibold text-gray-900"
+                    >Product Devices</span
+                  >
+                </div>
+              </p-divider>
+
+              <p-accordion [multiple]="true" styleClass="mt-4">
+                <p-accordionTab *ngFor="let entry of productDevices | keyvalue">
+                  <ng-template pTemplate="header">
+                    <div class="flex align-items-center gap-2">
+                      <i class="pi pi-box text-blue-500"></i>
+                      <span class="font-semibold">{{
+                        (assignedProducts | filter: "id" : entry.key)[0]
+                          ?.productName
+                      }}</span>
+                      <p-badge
+                        [value]="entry.value.length.toString()"
+                        severity="info"
+                      ></p-badge>
+                    </div>
+                  </ng-template>
+
+                  <!-- Product Devices Grid View -->
+                  <div
+                    *ngIf="selectedDevicesLayout === 'grid'"
+                    class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4"
+                  >
+                    <div
+                      *ngFor="let device of entry.value"
+                      class="bg-white border border-gray-200 rounded-lg overflow-hidden hover:shadow-lg transition-all duration-200"
+                    >
+                      <!-- Card Header -->
+                      <div
+                        class="bg-blue-50 h-32 flex items-center justify-center"
+                      >
+                        <i class="pi pi-tablet text-blue-600 text-5xl"></i>
+                      </div>
+
+                      <!-- Card Content -->
+                      <div class="p-4">
+                        <h4 class="font-semibold text-gray-900 mb-2 truncate">
+                          {{ device.deviceMac }}
+                        </h4>
+                        <p
+                          *ngIf="device.assignmentType === 'TEMPLATE'"
+                          class="text-xs text-gray-500 mb-3"
+                        >
+                          {{ device.templateName }}
+                        </p>
+
+                        <!-- Device Details -->
+                        <div
+                          *ngIf="device.assignmentType === 'TEMPLATE'"
+                          class="space-y-2"
+                        >
+                          <div
+                            class="flex items-center justify-between text-xs"
+                          >
+                            <span class="text-gray-600">Screen:</span>
+                            <span class="font-medium"
+                              >{{ device.deviceWidth }}x{{
+                                device.deviceHeight
+                              }}px</span
+                            >
+                          </div>
+                        </div>
+                      </div>
+
+                      <!-- Card Footer -->
+                      <div class="border-t border-gray-100 p-3 bg-gray-50">
+                        <div class="flex gap-2 justify-center">
+                          <p-button
+                            *ngIf="auth.hasAnyRole(['Admin', 'Manager'])"
+                            icon="pi pi-bolt"
+                            [rounded]="true"
+                            size="small"
+                            severity="success"
+                            pTooltip="Quick Bind"
+                            tooltipPosition="top"
+                            (onClick)="quickBindDevice(device)"
+                          >
+                          </p-button>
+                          <p-button
+                            *ngIf="auth.hasAnyRole(['Admin', 'Manager'])"
+                            icon="pi pi-link"
+                            [rounded]="true"
+                            size="small"
+                            pTooltip="Bind with Message"
+                            tooltipPosition="top"
+                            (onClick)="openBindDialog(device)"
+                          >
+                          </p-button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Product Devices List View -->
+                  <div
+                    *ngIf="selectedDevicesLayout === 'list'"
+                    class="overflow-x-auto border border-gray-200 rounded-lg"
+                  >
+                    <table class="min-w-full divide-y divide-gray-200">
+                      <thead class="bg-gray-50">
+                        <tr>
+                          <th
+                            scope="col"
+                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                          >
+                            Device
+                          </th>
+                          <th
+                            scope="col"
+                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                          >
+                            Screen
+                          </th>
+                          <th
+                            scope="col"
+                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                          >
+                            Template
+                          </th>
+                          <th
+                            scope="col"
+                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                          >
+                            Actions
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody class="bg-white divide-y divide-gray-200">
+                        <tr
+                          *ngFor="let device of entry.value"
+                          class="hover:bg-gray-50 transition-colors"
+                        >
+                          <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="flex items-center">
+                              <div
+                                class="flex-shrink-0 h-10 w-10 bg-blue-100 rounded-lg flex items-center justify-center"
+                              >
+                                <i class="pi pi-tablet text-blue-600"></i>
+                              </div>
+                              <div class="ml-4">
+                                <div class="text-sm font-medium text-gray-900">
+                                  {{ device.deviceMac }}
+                                </div>
+                              </div>
+                            </div>
+                          </td>
+                          <td class="px-6 py-4 whitespace-nowrap">
+                            <div
+                              *ngIf="device.assignmentType === 'TEMPLATE'"
+                              class="text-sm text-gray-900"
+                            >
+                              {{ device.deviceWidth }}x{{
+                                device.deviceHeight
+                              }}px
+                            </div>
+                          </td>
+                          <td class="px-6 py-4 whitespace-nowrap">
+                            <div
+                              *ngIf="device.assignmentType === 'TEMPLATE'"
+                              class="text-sm text-gray-900"
+                            >
+                              {{ device.templateName }}
+                            </div>
+                          </td>
+                          <td
+                            class="px-6 py-4 whitespace-nowrap text-sm font-medium"
+                          >
+                            <div class="flex space-x-2">
+                              <p-button
+                                *ngIf="auth.hasAnyRole(['Admin', 'Manager'])"
+                                icon="pi pi-bolt"
+                                [text]="true"
+                                severity="success"
+                                size="small"
+                                pTooltip="Quick Bind"
+                                tooltipPosition="top"
+                                (onClick)="quickBindDevice(device)"
+                              >
+                              </p-button>
+                              <p-button
+                                *ngIf="auth.hasAnyRole(['Admin', 'Manager'])"
+                                icon="pi pi-link"
+                                [text]="true"
+                                severity="info"
+                                size="small"
+                                pTooltip="Bind with Message"
+                                tooltipPosition="top"
+                                (onClick)="openBindDialog(device)"
+                              >
+                              </p-button>
+                            </div>
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </p-accordionTab>
+              </p-accordion>
+            </div>
+          </div>
+        </p-tabPanel>
+      </p-tabView>
+    </div>
+  </div>
+</div>
+
+<!-- Bind Message Dialog -->
+<p-dialog
+  [(visible)]="showBindDialog"
+  [modal]="true"
+  [closable]="true"
+  [draggable]="false"
+  [resizable]="false"
+  [style]="{ width: '90vw', maxWidth: '1000px' }"
+  (onHide)="closeBindDialog()"
+>
+  <ng-template pTemplate="header">
+    <div class="flex items-center gap-3">
+      <div class="bg-blue-100 p-2 rounded-lg">
+        <i class="pi pi-link text-blue-600"></i>
+      </div>
+      <div>
+        <h3 class="text-lg font-semibold text-gray-900">
+          Bind Message to Device
+        </h3>
+        <p class="text-sm text-gray-600">
+          Device: {{ getDeviceDisplayName(selectedAssignmentForBind!) }}
+        </p>
+      </div>
+    </div>
+  </ng-template>
+
+  <!-- Search and Filters -->
+  <div class="mb-4">
+    <div class="grid grid-cols-1 gap-3">
+      <!-- <span class="p-input-icon-left w-full">
+        <i class="pi pi-search"></i> -->
+      <input
+        type="text"
+        pButtonIcon="pi pi-search"
+        pInputText
+        [(ngModel)]="searchQuery"
+        (input)="filterMessages()"
+        placeholder="Search messages by title, description, or content type..."
+        class="w-full"
+      />
+      <!-- </span> -->
+
+      <div class="flex justify-between items-center">
+        <div class="flex gap-4">
+          <p-checkbox
+            [(ngModel)]="showActiveOnly"
+            (onChange)="filterMessages()"
+            [binary]="true"
+            label="Show active only"
+            inputId="activeOnly"
+          >
+          </p-checkbox>
+        </div>
+
+        <div class="flex items-center gap-3 text-sm text-gray-600">
+          <span
+            >Showing {{ filteredMessages.length }} of
+            {{ availableMessages.length }} messages</span
+          >
+          <p-button
+            icon="pi pi-refresh"
+            [text]="true"
+            [loading]="loadingMessages"
+            size="small"
+            (onClick)="refreshMessages()"
+          >
+          </p-button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Messages List -->
+  <div
+    class="border border-gray-200 rounded-lg"
+    style="max-height: 400px; overflow-y: auto"
+  >
+    <!-- Loading State -->
+    <div *ngIf="loadingMessages" class="flex justify-center items-center py-12">
+      <p-progressSpinner
+        [style]="{ width: '40px', height: '40px' }"
+      ></p-progressSpinner>
+      <span class="ml-3 text-gray-600">Loading messages...</span>
+    </div>
+
+    <!-- Empty State -->
+    <div
+      *ngIf="!loadingMessages && filteredMessages.length === 0"
+      class="text-center py-12"
+    >
+      <i class="pi pi-inbox text-gray-300 text-5xl mb-4"></i>
+      <p class="text-gray-600 font-medium text-lg">No messages found</p>
+      <p class="text-sm text-gray-500 mt-1" *ngIf="searchQuery">
+        No messages match "{{ searchQuery }}"
+      </p>
+      <p-button
+        *ngIf="searchQuery || showActiveOnly"
+        label="Clear filters"
+        icon="pi pi-times"
+        [text]="true"
+        size="small"
+        (onClick)="clearFilters()"
+        styleClass="mt-4"
+      >
+      </p-button>
+    </div>
+
+    <!-- Messages -->
+    <div
+      *ngIf="!loadingMessages && filteredMessages.length > 0"
+      class="divide-y"
+    >
+      <div
+        *ngFor="let message of filteredMessages"
+        (click)="selectedMessageId = message.id"
+        [class]="
+          selectedMessageId === message.id
+            ? 'bg-blue-50 border-l-4 border-l-blue-500'
+            : 'border-l-4 border-l-transparent hover:bg-gray-50'
+        "
+        class="p-4 cursor-pointer transition-all"
+      >
+        <div class="flex items-start gap-3">
+          <p-radioButton
+            [value]="message.id"
+            [(ngModel)]="selectedMessageId"
+            [inputId]="'msg-' + message.id"
+          >
+          </p-radioButton>
+
+          <div class="flex-1 min-w-0">
+            <div class="flex justify-between items-start">
+              <div class="flex-1">
+                <h4 class="font-semibold text-gray-900 truncate">
+                  {{ message.title }}
+                </h4>
+                <p class="text-sm text-gray-600 mt-1 line-clamp-2">
+                  {{ message.description || "No description" }}
+                </p>
+              </div>
+              <p-tag
+                [value]="message.is_active ? 'Active' : 'Inactive'"
+                [severity]="message.is_active ? 'success' : 'secondary'"
+                [rounded]="true"
+                styleClass="ml-3"
+              >
+              </p-tag>
+            </div>
+
+            <div class="flex flex-wrap gap-2 mt-3">
+              <p-tag
+                [icon]="getContentTypeIcon(message.content_type)"
+                [value]="getContentTypeDisplayName(message.content_type)"
+                severity="info"
+                styleClass="text-xs"
+              >
+              </p-tag>
+              <p-tag
+                icon="pi pi-clock"
+                [value]="(message.duration || '0') + 's'"
+                severity="secondary"
+                styleClass="text-xs"
+              >
+              </p-tag>
+              <span
+                *ngIf="message.created_at"
+                class="inline-flex items-center bg-gray-100 text-gray-700 px-2.5 py-1 rounded-full text-xs"
+              >
+                <i class="pi pi-calendar mr-1.5"></i>
+                {{ message.created_at | date: "shortDate" }}
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <ng-template pTemplate="footer">
+    <div class="flex justify-between items-center">
+      <div class="text-sm text-gray-600">
+        <span *ngIf="selectedMessageId">
+          <span class="font-medium">{{ getSelectedMessageTitle() }}</span>
+          <p-tag
+            [icon]="getContentTypeIcon(getSelectedMessage()?.content_type)"
+            [value]="
+              getContentTypeDisplayName(getSelectedMessage()?.content_type)
+            "
+            severity="info"
+            styleClass="text-xs ml-2"
+          >
+          </p-tag>
+        </span>
+        <span *ngIf="!selectedMessageId" class="text-gray-400">
+          <i class="pi pi-info-circle mr-1"></i>Select a message to bind
+        </span>
+      </div>
+      <div class="flex gap-2">
+        <p-button
+          label="Cancel"
+          severity="secondary"
+          [text]="true"
+          (onClick)="closeBindDialog()"
+        >
+        </p-button>
+        <p-button
+          label="Bind Message"
+          icon="pi pi-link"
+          [disabled]="!selectedMessageId || bindingInProgress"
+          [loading]="bindingInProgress"
+          (onClick)="bindMessageToDevice()"
+        >
+        </p-button>
+      </div>
+    </div>
+  </ng-template>
+</p-dialog>

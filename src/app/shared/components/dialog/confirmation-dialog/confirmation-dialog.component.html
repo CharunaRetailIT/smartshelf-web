@@ -1,0 +1,28 @@
+<div class="dlg-confirm">
+  <!-- Header -->
+  <div class="dlg-confirm-head">
+    <span
+      class="dlg-icon-badge"
+      [class.dlg-icon-badge--warn]="data.confirmColor === 'warn'"
+      aria-hidden="true"
+    >
+      <i class="fas fa-exclamation-triangle" *ngIf="data.confirmColor === 'warn'"></i>
+      <i class="fas fa-question-circle" *ngIf="data.confirmColor !== 'warn'"></i>
+    </span>
+    <h2 class="dlg-confirm-title">{{ data.title }}</h2>
+  </div>
+
+  <!-- Message -->
+  <p class="dlg-confirm-message">{{ data.message }}</p>
+
+  <!-- Actions -->
+  <div class="dlg-confirm-actions">
+    <button type="button" (click)="onCancel()" class="dlg-btn dlg-btn-secondary">
+      {{ data.cancelText || 'Cancel' }}
+    </button>
+
+    <button type="button" (click)="onConfirm()" [class]="getConfirmButtonClass()">
+      {{ data.confirmText || 'Confirm' }}
+    </button>
+  </div>
+</div>

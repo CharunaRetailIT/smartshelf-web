@@ -1,0 +1,18 @@
+<div class="min-h-screen bg-[var(--color-background)] p-4 sm:p-6">
+  <div class="max-w-4xl mx-auto">
+    <h1 class="text-2xl sm:text-3xl font-bold text-[var(--color-secondary)] mb-6">Minew Integration</h1>
+    
+    <ng-container *ngIf="isAuthenticated$ | async; else loginTemplate">
+      <ng-container *ngIf="selectedStore; else storeTemplate">
+        <app-minew-products [store]="selectedStore!" (logout)="onLogout()"></app-minew-products>
+      </ng-container>
+      <ng-template #storeTemplate>
+        <app-minew-stores (storeSelected)="onStoreSelected($event)" (logout)="onLogout()"></app-minew-stores>
+      </ng-template>
+    </ng-container>
+    
+    <ng-template #loginTemplate>
+      <app-minew-login></app-minew-login>
+    </ng-template>
+  </div>
+</div>

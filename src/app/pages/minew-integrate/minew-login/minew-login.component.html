@@ -1,0 +1,35 @@
+<div class="bg-white p-6 sm:p-8 rounded-lg shadow-md max-w-md mx-auto">
+  <h2 class="text-xl sm:text-2xl font-semibold text-[var(--color-secondary)] mb-4">Login to Minew</h2>
+  <form (ngSubmit)="onSubmit()" class="space-y-4">
+    <div>
+      <label for="username" class="block text-sm font-medium text-[var(--color-secondary-dark)]">Username</label>
+      <input
+        id="username"
+        type="text"
+        [(ngModel)]="loginRequest.username"
+        name="username"
+        class="w-full p-2 border border-[var(--color-primary-light)] rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]"
+        required
+      />
+    </div>
+    <div>
+      <label for="password" class="block text-sm font-medium text-[var(--color-secondary-dark)]">Password</label>
+      <input
+        id="password"
+        type="password"
+        [(ngModel)]="loginRequest.password"
+        name="password"
+        class="w-full p-2 border border-[var(--color-primary-light)] rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]"
+        required
+      />
+    </div>
+    <div *ngIf="errorMessage" class="text-red-500 text-sm">{{ errorMessage }}</div>
+    <button
+      type="submit"
+      [disabled]="isLoading"
+      class="w-full bg-[var(--color-primary)] text-white py-2 rounded-md hover:bg-[var(--color-primary-dark)] disabled:opacity-50"
+    >
+      {{ isLoading ? 'Logging in...' : 'Login' }}
+    </button>
+  </form>
+</div>

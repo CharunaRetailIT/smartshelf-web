@@ -1,0 +1,370 @@
+:host {
+  display: block;
+}
+
+.portal-card {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid #bbcabf;
+  border-radius: 18px;
+  background: #ffffff;
+  padding: 24px;
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04);
+}
+
+.section-accent {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 5px;
+  height: 100%;
+  background: #10b981;
+}
+
+.tabs-card {
+  padding: 0;
+}
+
+:host ::ng-deep .clean-tabs .p-tabview-nav {
+  border-bottom: 1px solid #bbcabf;
+  background: #f8fafc;
+  padding: 0 24px;
+  margin: 0;
+  border-top-left-radius: 18px;
+  border-top-right-radius: 18px;
+}
+
+:host ::ng-deep .clean-tabs .p-tabview-nav li .p-tabview-nav-link {
+  border: none;
+  border-bottom: 3px solid transparent;
+  background: transparent;
+  color: #64748b;
+  font-weight: 700;
+  padding: 16px 20px;
+}
+
+:host ::ng-deep .clean-tabs .p-tabview-nav li.p-highlight .p-tabview-nav-link {
+  border-bottom-color: #10b981;
+  color: #047857;
+  background: transparent;
+}
+
+:host ::ng-deep .clean-tabs .p-tabview-nav li .p-tabview-nav-link:hover {
+  color: #047857;
+  background: transparent;
+}
+
+:host ::ng-deep .clean-tabs .p-tabview-panels {
+  padding: 24px;
+}
+
+.section-header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding-bottom: 18px;
+  margin-bottom: 22px;
+  border-bottom: 1px solid #bbcabf;
+}
+
+.section-header h2 {
+  margin: 0;
+  color: #121c2a;
+  font-size: 20px;
+  font-weight: 800;
+}
+
+.section-header p {
+  margin: 2px 0 0;
+  color: #64748b;
+  font-size: 13px;
+}
+
+.section-icon {
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  display: grid;
+  place-items: center;
+  color: #047857;
+  background: #d1fae5;
+  font-size: 18px;
+}
+
+.field label {
+  display: block;
+  margin-bottom: 7px;
+  color: #3c4a42;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.field label span {
+  color: #dc2626;
+}
+
+.error-text {
+  display: block;
+  margin-top: 5px;
+  color: #dc2626;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.assignment-builder {
+  border: 1px dashed #bbcabf;
+  border-radius: 16px;
+  padding: 20px;
+  background: #f1f5ff;
+}
+
+.assignment-row {
+  border: 1px solid #bbcabf;
+  border-radius: 15px;
+  padding: 18px;
+  background: #ffffff;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    transform 0.2s ease;
+}
+
+.assignment-row:hover {
+  border-color: #10b981;
+  box-shadow: 0 8px 18px rgba(16, 185, 129, 0.09);
+  transform: translateY(-1px);
+}
+
+.assignment-row-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 18px;
+}
+
+.assignment-row-header h4 {
+  margin: 0;
+  color: #0f172a;
+  font-size: 16px;
+  font-weight: 800;
+}
+
+.assignment-row-header p {
+  margin: 2px 0 0;
+  color: #64748b;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.row-number {
+  width: 36px;
+  height: 36px;
+  border-radius: 12px;
+  display: grid;
+  place-items: center;
+  background: #10b981;
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: 900;
+}
+
+.empty-state {
+  display: grid;
+  place-items: center;
+  gap: 10px;
+  padding: 36px 16px;
+  text-align: center;
+  border: 1px dashed #94a3b8;
+  border-radius: 16px;
+  background: #ffffff;
+}
+
+.empty-state h4 {
+  margin: 0;
+  color: #0f172a;
+  font-size: 17px;
+  font-weight: 800;
+}
+
+.empty-state p {
+  margin: 0 0 8px;
+  color: #64748b;
+  font-size: 14px;
+}
+
+.combo-preview {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  border: 1px solid #a7f3d0;
+  border-radius: 10px;
+  background: #ecfdf5;
+  color: #065f46;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.combo-preview i {
+  color: #10b981;
+  font-size: 16px;
+}
+
+.summary-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px;
+  border: 1px solid #bbcabf;
+  border-radius: 14px;
+  background: #f8fafc;
+}
+
+.summary-icon {
+  width: 42px;
+  height: 42px;
+  flex: 0 0 auto;
+  border-radius: 10px;
+  display: grid;
+  place-items: center;
+  background: #d1fae5;
+  color: #047857;
+}
+
+.summary-row h4 {
+  overflow: hidden;
+  margin: 0;
+  color: #0f172a;
+  font-size: 14px;
+  font-weight: 850;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.summary-row p {
+  margin: 2px 0 0;
+  color: #475569;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.status-pill {
+  flex: 0 0 auto;
+  border-radius: 999px;
+  padding: 6px 12px;
+  background: #e2e8f0;
+  color: #475569;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.status-pill.active {
+  background: #d1fae5;
+  color: #047857;
+}
+
+.tip-card {
+  border: 1px solid #10b981;
+  border-radius: 18px;
+  background: #e6f5f2;
+  padding: 22px;
+}
+
+.tip-card h3 {
+  margin: 0;
+  color: #064e3b;
+  font-size: 18px;
+  font-weight: 900;
+}
+
+.tip-card p {
+  margin: 8px 0 0;
+  color: #334155;
+  font-size: 15px;
+  line-height: 1.45;
+}
+
+.fixed-save-bar {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 50;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 20px;
+  padding: 20px 32px;
+  border-top: 1px solid #bbcabf;
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(12px);
+  box-shadow: 0 -10px 30px rgba(15, 23, 42, 0.08);
+}
+
+.save-btn {
+  min-width: 190px;
+  height: 52px;
+  font-weight: 900;
+}
+
+/* PrimeNG polish */
+:host ::ng-deep .p-inputtext,
+:host ::ng-deep .p-dropdown,
+:host ::ng-deep .p-inputnumber,
+:host ::ng-deep .p-textarea {
+  width: 100%;
+}
+
+:host ::ng-deep .p-inputtext,
+:host ::ng-deep .p-dropdown,
+:host ::ng-deep .p-inputnumber-input,
+:host ::ng-deep .p-textarea {
+  border-color: #bbcabf;
+  border-radius: 11px;
+  background: #f9f9ff;
+  min-height: 46px;
+  color: #121c2a;
+  font-weight: 600;
+}
+
+:host ::ng-deep .p-inputtext:enabled:focus,
+:host ::ng-deep .p-dropdown:not(.p-disabled).p-focus,
+:host ::ng-deep .p-textarea:enabled:focus,
+:host ::ng-deep .p-inputnumber-input:enabled:focus {
+  border-color: #10b981;
+  box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.14);
+}
+
+:host ::ng-deep .p-button-success {
+  background: #047857;
+  border-color: #047857;
+}
+
+:host ::ng-deep .p-button-success:hover {
+  background: #065f46;
+  border-color: #065f46;
+}
+
+:host ::ng-deep .p-toggleswitch.p-toggleswitch-checked .p-toggleswitch-slider {
+  background: #10b981;
+}
+
+@media (max-width: 768px) {
+  .portal-card {
+    padding: 18px;
+  }
+
+  .assignment-builder {
+    padding: 14px;
+  }
+
+  .fixed-save-bar {
+    justify-content: stretch;
+    padding: 14px;
+  }
+
+  .fixed-save-bar button {
+    flex: 1;
+  }
+}

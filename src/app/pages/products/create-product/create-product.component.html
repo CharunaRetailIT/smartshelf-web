@@ -1,0 +1,564 @@
+<div
+  class="add-product-dialog p-4 max-h-[90vh] overflow-y-auto bg-white rounded-lg"
+>
+  <!-- Dialog Header -->
+  <div class="mb-6">
+    <h1 class="text-2xl font-bold text-gray-800">Add New Product</h1>
+    <p class="text-gray-600 mt-2">
+      Create a new product with complete details and pricing
+    </p>
+  </div>
+
+  <!-- Basic Information -->
+  <div class="mb-8">
+    <h2 class="text-lg font-semibold text-gray-700 mb-4">Basic Information</h2>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <!-- Product Name -->
+      <div class="form-group">
+        <label class="block text-sm font-medium text-gray-700 mb-2">
+          Product Name *
+        </label>
+        <input
+          type="text"
+          pInputText
+          [(ngModel)]="productName"
+          placeholder="e.g., iPhone 15 Pro"
+          class="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+        />
+      </div>
+
+      <!-- Barcode -->
+      <div class="form-group">
+        <label class="block text-sm font-medium text-gray-700 mb-2">
+          Barcode *
+        </label>
+        <input
+          type="text"
+          pInputText
+          [(ngModel)]="barcode"
+          placeholder="e.g., 123456789012"
+          class="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+        />
+      </div>
+
+      <!-- Category -->
+      <div class="form-group">
+        <label class="block text-sm font-medium text-gray-700 mb-2">
+          Category *
+        </label>
+        <p-dropdown
+          [options]="categories"
+          [(ngModel)]="selectedCategory"
+          optionLabel="categoryName"
+          placeholder="Select Category"
+          [filter]="true"
+          filterBy="categoryName"
+          [showClear]="true"
+          (onFilter)="onCategorySearch($event)"
+          [virtualScroll]="true"
+          [virtualScrollItemSize]="34"
+          (onScroll)="onCategoryScroll($event)"
+          [lazy]="true"
+          [loading]="loadingCategories"
+          class="w-full"
+        >
+          <ng-template pTemplate="item" let-category>
+            <div class="flex items-center">
+              <span>{{ category.categoryName }}</span>
+              <span class="ml-2 text-xs text-gray-500"
+                >({{ category.categoryCode }})</span
+              >
+            </div>
+          </ng-template>
+          <ng-template pTemplate="loadingItem">
+            <div class="flex items-center justify-center py-2">
+              <p-progressSpinner
+                [style]="{ width: '20px', height: '20px' }"
+                strokeWidth="4"
+              ></p-progressSpinner>
+            </div>
+          </ng-template>
+        </p-dropdown>
+      </div>
+
+      <!-- Subcategory -->
+      <div class="form-group">
+        <label class="block text-sm font-medium text-gray-700 mb-2">
+          Subcategory *
+        </label>
+        <p-dropdown
+          [options]="subcategories"
+          [(ngModel)]="selectedSubcategory"
+          optionLabel="subCategoryName"
+          placeholder="Select Subcategory"
+          [filter]="true"
+          filterBy="subCategoryName"
+          [showClear]="true"
+          [disabled]="!selectedCategory"
+          (onShow)="loadSubcategories()"
+          (onFilter)="onSubcategorySearch($event)"
+          [virtualScroll]="true"
+          [virtualScrollItemSize]="34"
+          (onScroll)="onSubcategoryScroll($event)"
+          [lazy]="true"
+          [loading]="loadingSubcategories"
+          class="w-full"
+        >
+          <ng-template pTemplate="item" let-subcategory>
+            <div class="flex items-center">
+              <span>{{ subcategory.subCategoryName }}</span>
+              <span class="ml-2 text-xs text-gray-500"
+                >({{ subcategory.subCategoryCode }})</span
+              >
+            </div>
+          </ng-template>
+          <ng-template pTemplate="loadingItem">
+            <div class="flex items-center justify-center py-2">
+              <p-progressSpinner
+                [style]="{ width: '20px', height: '20px' }"
+                strokeWidth="4"
+              ></p-progressSpinner>
+            </div>
+          </ng-template>
+        </p-dropdown>
+      </div>
+
+      <!-- Product Code -->
+      <div class="form-group">
+        <label class="block text-sm font-medium text-gray-700 mb-2">
+          Product Code *
+        </label>
+        <input
+          type="text"
+          pInputText
+          [(ngModel)]="productCode"
+          placeholder="e.g., IPHONE-15-PRO"
+          class="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+        />
+      </div>
+    </div>
+
+    <!-- Description -->
+    <div class="form-group mt-4">
+      <label class="block text-sm font-medium text-gray-700 mb-2">
+        Description
+      </label>
+      <textarea
+        pInputTextarea
+        [(ngModel)]="description"
+        rows="4"
+        maxlength="75"
+        (input)="enforceMaxLength($event, 75)"
+        (paste)="onPaste($event, 75)"
+        placeholder="Enter a detailed description of the product..."
+        class="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+      ></textarea>
+      <div class="text-xs text-gray-500 mt-1">
+        {{ description?.length || 0 }} / 75 characters
+      </div>
+    </div>
+  </div>
+
+  <!-- Device & Template Configuration -->
+  <div class="mb-8">
+    <h2 class="text-lg font-semibold text-gray-700 mb-4">
+      Device & Template Configuration
+    </h2>
+
+    <div class="space-y-4">
+      <!-- Use Existing Combos -->
+      <div class="flex items-center space-x-2">
+        <p-checkbox
+          [(ngModel)]="useExistingCombos"
+          [binary]="true"
+          inputId="useExistingCombos"
+        ></p-checkbox>
+        <label for="useExistingCombos" class="text-gray-700"
+          >Use Existing Device-Template Combos</label
+        >
+      </div>
+
+      <!-- Existing Combos Dropdown -->
+      <div *ngIf="useExistingCombos" class="mt-2">
+        <p-dropdown
+          [options]="existingCombos"
+          [(ngModel)]="selectedExistingCombo"
+          optionLabel="deviceName"
+          placeholder="Select Existing Combo"
+          [filter]="true"
+          filterBy="deviceName,templateName"
+          [showClear]="true"
+          [loading]="loadingCombos"
+          class="w-full"
+        >
+          <ng-template pTemplate="selectedItem" let-item>
+            <div *ngIf="item" class="flex items-center">
+              <span>{{ item.deviceName }} - {{ item.templateName }}</span>
+              <span class="ml-2 text-xs text-gray-500"
+                >({{ item.screenSize }})</span
+              >
+            </div>
+          </ng-template>
+          <ng-template pTemplate="item" let-combo>
+            <div class="flex flex-col py-2">
+              <div class="flex justify-between">
+                <span class="font-medium"
+                  >{{ combo.deviceName }} - {{ combo.templateName }}</span
+                >
+                <span class="text-xs text-gray-500">{{
+                  combo.screenSize
+                }}</span>
+              </div>
+              <div class="text-xs text-gray-600 mt-1">
+                Status: {{ combo.status }} | Default:
+                {{ combo.isDefault ? "Yes" : "No" }}
+              </div>
+            </div>
+          </ng-template>
+        </p-dropdown>
+      </div>
+    </div>
+
+    <!-- Device Assignments -->
+    <div class="mt-6">
+      <div class="flex justify-between items-center mb-4">
+        <h3 class="font-medium text-gray-700">
+          Device Assignments for Product
+        </h3>
+        <button
+          *ngIf="!useExistingCombos"
+          pButton
+          type="button"
+          icon="pi pi-plus"
+          label="Add Device Assignment"
+          class="p-button-outlined p-button-sm"
+          (click)="addDeviceAssignment()"
+        ></button>
+      </div>
+
+      <!-- No assignments message -->
+      <div
+        *ngIf="deviceAssignments.length === 0 && !useExistingCombos"
+        class="text-center py-8 border-2 border-dashed border-gray-300 rounded-lg"
+      >
+        <div class="text-gray-500 mb-4">No device assignments configured</div>
+        <p class="text-sm text-gray-600 mb-4">
+          Add device-template combinations that will display this product
+        </p>
+        <button
+          pButton
+          type="button"
+          icon="pi pi-plus"
+          label="Add your first assignment"
+          class="p-button-outlined"
+          (click)="addDeviceAssignment()"
+        ></button>
+      </div>
+
+      <!-- Device Assignment List -->
+      <div
+        *ngFor="let assignment of deviceAssignments; let i = index"
+        class="mb-6 p-4 border border-gray-200 rounded-lg"
+      >
+        <div class="flex justify-between items-center mb-4">
+          <h4 class="font-medium text-gray-700">
+            Device Assignment {{ i + 1 }}
+          </h4>
+          <button
+            pButton
+            type="button"
+            icon="pi pi-times"
+            class="p-button-text p-button-danger p-button-sm"
+            (click)="removeDeviceAssignment(i)"
+          ></button>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <!-- Device -->
+          <div class="form-group">
+            <label class="block text-sm font-medium text-gray-700 mb-2"
+              >Device *</label
+            >
+            <p-dropdown
+              [options]="devices"
+              [(ngModel)]="assignment.device"
+              optionLabel="deviceName"
+              placeholder="Select a device"
+              [filter]="true"
+              filterBy="deviceName,mac"
+              [showClear]="true"
+              (onShow)="loadDevices()"
+              (onFilter)="onDeviceSearch($event, assignment)"
+              [virtualScroll]="true"
+              [virtualScrollItemSize]="34"
+              (onScroll)="onDeviceScroll($event)"
+              [lazy]="true"
+              [loading]="loadingDevices"
+              class="w-full"
+            >
+              <ng-template pTemplate="item" let-device>
+                <div class="flex flex-col py-2">
+                  <div class="font-medium">{{ device.deviceName }}</div>
+                  <div class="text-xs text-gray-600">
+                    MAC: {{ device.mac }} | Screen: {{ device.screenSize }}
+                  </div>
+                  <div class="text-xs text-gray-500">
+                    Status:
+                    <span
+                      [ngClass]="{
+                        'text-green-600': device.status === 'ACTIVE',
+                        'text-red-600': device.status === 'INACTIVE',
+                        'text-yellow-600': device.status === 'MAINTENANCE',
+                      }"
+                    >
+                      {{ device.status }}
+                    </span>
+                  </div>
+                </div>
+              </ng-template>
+            </p-dropdown>
+          </div>
+
+          <!-- Display Order -->
+          <div class="form-group">
+            <label class="block text-sm font-medium text-gray-700 mb-2"
+              >Display Order</label
+            >
+            <input
+              type="number"
+              pInputText
+              [(ngModel)]="assignment.displayOrder"
+              class="w-full p-3 border border-gray-300 rounded-md"
+            />
+          </div>
+
+          <!-- Template -->
+          <div class="form-group">
+            <label class="block text-sm font-medium text-gray-700 mb-2"
+              >Template *</label
+            >
+            <p-dropdown
+              [options]="templates"
+              [(ngModel)]="assignment.template"
+              optionLabel="name"
+              placeholder="Select a template"
+              [filter]="true"
+              filterBy="name"
+              [showClear]="true"
+              (onShow)="loadTemplates()"
+              (onFilter)="onTemplateSearch($event, assignment)"
+              [virtualScroll]="true"
+              [virtualScrollItemSize]="34"
+              (onScroll)="onTemplateScroll($event)"
+              [lazy]="true"
+              [loading]="loadingTemplates"
+              class="w-full"
+            >
+              <ng-template pTemplate="item" let-template>
+                <div class="flex flex-col py-2">
+                  <div class="font-medium">{{ template.name }}</div>
+                  <div class="text-xs text-gray-600">
+                    {{ template.description }}
+                  </div>
+                  <div class="text-xs text-gray-500">
+                    Screen: {{ template.screenWidth }}x{{
+                      template.screenHeight
+                    }}
+                    | Status:
+                    <span
+                      [ngClass]="{
+                        'text-green-600': template.isActive,
+                        'text-red-600': !template.isActive,
+                      }"
+                    >
+                      {{ template.isActive ? "Active" : "Inactive" }}
+                    </span>
+                  </div>
+                </div>
+              </ng-template>
+            </p-dropdown>
+          </div>
+        </div>
+
+        <!-- Assignment Preview -->
+        <div class="mt-4 p-4 bg-gray-50 rounded-lg">
+          <h5 class="font-medium text-gray-700 mb-2">Assignment Preview</h5>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+            <div>
+              <div class="text-gray-600">Device:</div>
+              <div class="font-medium">
+                {{ assignment.device?.deviceName || "No device selected" }}
+              </div>
+            </div>
+            <div>
+              <div class="text-gray-600">Template:</div>
+              <div class="font-medium">
+                {{ assignment.template?.name || "No template selected" }}
+              </div>
+            </div>
+            <div>
+              <div class="text-gray-600">Location Information:</div>
+              <div>Location Type: Product</div>
+            </div>
+            <div>
+              <div class="text-gray-600">Product ID:</div>
+              <div>New Product</div>
+            </div>
+          </div>
+
+          <!-- Active Assignment Toggle -->
+          <div class="flex items-center space-x-2 mt-4">
+            <p-checkbox
+              [(ngModel)]="assignment.isActive"
+              [binary]="true"
+              inputId="activeAssignment{{ i }}"
+            ></p-checkbox>
+            <label for="activeAssignment{{ i }}" class="text-gray-700"
+              >Active Assignment</label
+            >
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Pricing Information -->
+  <div class="mb-8">
+    <h2 class="text-lg font-semibold text-gray-700 mb-4">
+      Pricing Information
+    </h2>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+      <!-- Selling Price -->
+      <div class="form-group">
+        <label class="block text-sm font-medium text-gray-700 mb-2">
+          Selling Price *
+        </label>
+        <div class="p-inputgroup">
+          <span class="p-inputgroup-addon bg-gray-100 border border-gray-300"
+            >LKR</span
+          >
+          <input
+            type="number"
+            pInputText
+            [(ngModel)]="sellingPrice"
+            class="w-full p-3 border border-gray-300 rounded-r-md"
+          />
+        </div>
+      </div>
+
+      <!-- Discount Price -->
+      <div class="form-group">
+        <label class="block text-sm font-medium text-gray-700 mb-2">
+          Discount Price
+        </label>
+        <div class="p-inputgroup">
+          <span class="p-inputgroup-addon bg-gray-100 border border-gray-300"
+            >LKR</span
+          >
+          <input
+            type="number"
+            pInputText
+            [(ngModel)]="discountPrice"
+            class="w-full p-3 border border-gray-300 rounded-r-md"
+          />
+        </div>
+      </div>
+
+      <!-- Wholesale Price -->
+      <div class="form-group">
+        <label class="block text-sm font-medium text-gray-700 mb-2">
+          Wholesale Price
+        </label>
+        <div class="p-inputgroup">
+          <span class="p-inputgroup-addon bg-gray-100 border border-gray-300"
+            >LKR</span
+          >
+          <input
+            type="number"
+            pInputText
+            [(ngModel)]="wholesalePrice"
+            class="w-full p-3 border border-gray-300 rounded-r-md"
+          />
+        </div>
+      </div>
+    </div>
+
+    <!-- Min/Max Prices -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div class="form-group">
+        <label class="block text-sm font-medium text-gray-700 mb-2">
+          Minimum Price
+        </label>
+        <div class="p-inputgroup">
+          <span class="p-inputgroup-addon bg-gray-100 border border-gray-300"
+            >LKR</span
+          >
+          <input
+            type="number"
+            pInputText
+            [(ngModel)]="minPrice"
+            class="w-full p-3 border border-gray-300 rounded-r-md"
+          />
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="block text-sm font-medium text-gray-700 mb-2">
+          Maximum Price
+        </label>
+        <div class="p-inputgroup">
+          <span class="p-inputgroup-addon bg-gray-100 border border-gray-300"
+            >LKR</span
+          >
+          <input
+            type="number"
+            pInputText
+            [(ngModel)]="maxPrice"
+            class="w-full p-3 border border-gray-300 rounded-r-md"
+          />
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Status & Configuration -->
+  <div class="mb-8">
+    <h2 class="text-lg font-semibold text-gray-700 mb-4">
+      Status & Configuration
+    </h2>
+
+    <div class="space-y-2">
+      <div class="flex items-center space-x-2">
+        <p-checkbox
+          [(ngModel)]="isActive"
+          [binary]="true"
+          inputId="activeStatus"
+        ></p-checkbox>
+        <label for="activeStatus" class="text-gray-700">Active Status</label>
+      </div>
+      <p class="text-sm text-gray-600 ml-6">
+        Note: Active products will be available for sale immediately.
+      </p>
+    </div>
+  </div>
+
+  <!-- Dialog Actions -->
+  <div class="flex justify-end space-x-4 pt-6 border-t border-gray-200">
+    <button
+      pButton
+      type="button"
+      label="Cancel"
+      class="p-button-outlined p-button-secondary"
+      (click)="onCancel()"
+    ></button>
+    <button
+      pButton
+      type="button"
+      label="Create Product"
+      class="p-button-primary"
+      (click)="onCreateProduct()"
+    ></button>
+  </div>
+</div>

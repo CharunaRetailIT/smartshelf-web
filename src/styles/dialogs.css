@@ -1,0 +1,1075 @@
+/* =============================================================================
+   Shared dialog design system
+   =============================================================================
+
+   The app renders dialogs through two frameworks - PrimeNG (p-dialog,
+   p-confirmDialog) and Angular Material (MatDialog) - and both mount their
+   markup in an overlay outside the owning component, so component-scoped CSS
+   cannot reach them. Everything here is therefore global, and is the single
+   place that decides how a dialog looks.
+
+   This file is presentation only. It adds no markup, removes no controls and
+   changes no behaviour; it just gives both frameworks the same surface,
+   spacing, typography and control styling.
+
+   Component stylesheets that already set their own dialog rules with
+   !important still win over this file. Those are being migrated dialog by
+   dialog; until then a dialog simply keeps its current look rather than
+   breaking.
+   ========================================================================== */
+
+:root {
+  /* Brand. --color-primary is declared in styles.css (#328e6e); the dialog
+     surface uses the deeper emerald the app's action buttons already use. */
+  --dlg-primary: #047857;
+  --dlg-primary-hover: #065f46;
+  --dlg-primary-ring: rgba(16, 185, 129, 0.16);
+  --dlg-accent: #10b981;
+  --dlg-accent-soft: #d1fae5;
+
+  --dlg-danger: #dc2626;
+  --dlg-danger-hover: #b91c1c;
+  --dlg-danger-soft: #fee2e2;
+  --dlg-warn: #b45309;
+  --dlg-warn-soft: #fef3c7;
+
+  /* Surfaces and text */
+  --dlg-surface: #ffffff;
+  --dlg-surface-muted: #f8fafc;
+  --dlg-border: #e2e8f0;
+  --dlg-border-strong: #cbd5e1;
+  --dlg-text: #0f172a;
+  --dlg-text-muted: #64748b;
+  --dlg-text-label: #334155;
+
+  /* Shape */
+  --dlg-radius: 16px;
+  --dlg-radius-control: 11px;
+  --dlg-shadow: 0 24px 48px -12px rgba(15, 23, 42, 0.22),
+    0 0 0 1px rgba(15, 23, 42, 0.04);
+
+  /* Rhythm - one scale so every dialog breathes the same way */
+  --dlg-pad-x: 24px;
+  --dlg-pad-y: 20px;
+  --dlg-gap: 16px;
+  --dlg-control-h: 44px;
+}
+
+/* -----------------------------------------------------------------------------
+   Backdrop - one treatment for both frameworks
+   -------------------------------------------------------------------------- */
+.p-dialog-mask,
+.cdk-overlay-dark-backdrop {
+  background-color: rgba(15, 23, 42, 0.45);
+  backdrop-filter: blur(2px);
+}
+
+/* -----------------------------------------------------------------------------
+   Dialog shell
+   -------------------------------------------------------------------------- */
+.p-dialog,
+.mat-mdc-dialog-container .mat-mdc-dialog-surface {
+  border-radius: var(--dlg-radius);
+  background: var(--dlg-surface);
+  box-shadow: var(--dlg-shadow);
+  border: none;
+  overflow: hidden;
+  color: var(--dlg-text);
+}
+
+/* Keep tall dialogs inside the viewport so the page behind never scrolls. */
+.p-dialog,
+.mat-mdc-dialog-panel {
+  max-width: min(96vw, 1200px);
+  max-height: 92vh;
+}
+
+/* -----------------------------------------------------------------------------
+   Header
+   -------------------------------------------------------------------------- */
+.p-dialog .p-dialog-header,
+.mat-mdc-dialog-container .mat-mdc-dialog-title {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: var(--dlg-pad-y) var(--dlg-pad-x);
+  margin: 0;
+  background: var(--dlg-surface);
+  border-bottom: 1px solid var(--dlg-border);
+  font-size: 1.0625rem;
+  font-weight: 700;
+  line-height: 1.4;
+  letter-spacing: -0.01em;
+  color: var(--dlg-text);
+}
+
+/* Material's title uses a ::before spacer to reserve room; we set our own
+   padding, so drop it to avoid a double gap. */
+.mat-mdc-dialog-container .mat-mdc-dialog-title::before {
+  display: none;
+}
+
+.p-dialog .p-dialog-title {
+  font-size: inherit;
+  font-weight: inherit;
+  color: inherit;
+}
+
+/* Header close/maximise controls.
+   PrimeNG 19 renders these as .p-dialog-close-button /
+   .p-dialog-maximize-button (inside a .p-dialog-header-actions wrapper);
+   .p-dialog-header-icon is kept for older PrimeNG usages elsewhere. */
+.p-dialog .p-dialog-header-actions {
+  flex-shrink: 0;
+  align-items: center;
+}
+
+.p-dialog .p-dialog-close-button,
+.p-dialog .p-dialog-maximize-button,
+.p-dialog .p-dialog-header-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  box-sizing: border-box;
+  width: 34px;
+  height: 34px;
+  /* PrimeNG's .p-button base rule sets padding-block on this button and its
+     icon-only rule only zeroes padding-inline, not padding-block - left
+     alone that vertical padding stacks on top of the fixed height above
+     (button isn't border-box by default) and stretches the circle into an
+     oval. Zero all padding here so width/height fully own the box. */
+  padding: 0;
+  margin: 0;
+  border-radius: 9px;
+  color: var(--dlg-text-muted);
+  background: transparent;
+  border: none;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.p-dialog .p-dialog-close-button:hover,
+.p-dialog .p-dialog-maximize-button:hover,
+.p-dialog .p-dialog-header-icon:hover {
+  background: var(--dlg-surface-muted);
+  color: var(--dlg-text);
+}
+
+/* -----------------------------------------------------------------------------
+   Body
+   -------------------------------------------------------------------------- */
+.p-dialog .p-dialog-content,
+.mat-mdc-dialog-container .mat-mdc-dialog-content {
+  padding: var(--dlg-pad-y) var(--dlg-pad-x);
+  background: var(--dlg-surface);
+  color: var(--dlg-text);
+  font-size: 0.9375rem;
+  line-height: 1.55;
+  max-height: unset;
+}
+
+/* A dialog with no footer shouldn't end flush against its last control. */
+.p-dialog .p-dialog-content:last-child,
+.mat-mdc-dialog-container .mat-mdc-dialog-content:last-child {
+  padding-bottom: calc(var(--dlg-pad-y) + 4px);
+}
+
+/* -----------------------------------------------------------------------------
+   Footer - primary action right-most, secondary actions quieter
+   -------------------------------------------------------------------------- */
+.p-dialog .p-dialog-footer,
+.mat-mdc-dialog-container .mat-mdc-dialog-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+  padding: 16px var(--dlg-pad-x);
+  margin: 0;
+  min-height: unset;
+  background: var(--dlg-surface-muted);
+  border-top: 1px solid var(--dlg-border);
+}
+
+/* -----------------------------------------------------------------------------
+   Form controls inside dialogs
+   -------------------------------------------------------------------------- */
+.p-dialog .p-inputtext,
+.p-dialog .p-textarea,
+.p-dialog .p-select,
+.p-dialog .p-dropdown,
+.p-dialog .p-multiselect,
+.p-dialog .p-inputnumber-input,
+.p-dialog .p-datepicker-input,
+.mat-mdc-dialog-container .p-inputtext,
+.mat-mdc-dialog-container .p-textarea,
+.mat-mdc-dialog-container .p-select,
+.mat-mdc-dialog-container .p-dropdown,
+.mat-mdc-dialog-container .p-multiselect,
+.mat-mdc-dialog-container .p-inputnumber-input,
+.mat-mdc-dialog-container .p-datepicker-input {
+  min-height: var(--dlg-control-h);
+  border-radius: var(--dlg-radius-control);
+  border: 1px solid var(--dlg-border-strong);
+  background: var(--dlg-surface);
+  color: var(--dlg-text);
+  font-size: 0.9375rem;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+/* A textarea grows, so only enforce a floor. */
+.p-dialog .p-textarea,
+.mat-mdc-dialog-container .p-textarea {
+  min-height: 88px;
+  padding-block: 10px;
+}
+
+.p-dialog .p-inputtext:enabled:hover,
+.p-dialog .p-textarea:enabled:hover,
+.mat-mdc-dialog-container .p-inputtext:enabled:hover,
+.mat-mdc-dialog-container .p-textarea:enabled:hover {
+  border-color: var(--dlg-border-strong);
+}
+
+/* Focus: visible ring on every control, including keyboard-only traversal. */
+.p-dialog .p-inputtext:enabled:focus,
+.p-dialog .p-textarea:enabled:focus,
+.p-dialog .p-inputnumber-input:enabled:focus,
+.p-dialog .p-select:not(.p-disabled).p-focus,
+.p-dialog .p-dropdown:not(.p-disabled).p-focus,
+.p-dialog .p-multiselect:not(.p-disabled).p-focus,
+.mat-mdc-dialog-container .p-inputtext:enabled:focus,
+.mat-mdc-dialog-container .p-textarea:enabled:focus,
+.mat-mdc-dialog-container .p-inputnumber-input:enabled:focus,
+.mat-mdc-dialog-container .p-select:not(.p-disabled).p-focus,
+.mat-mdc-dialog-container .p-dropdown:not(.p-disabled).p-focus,
+.mat-mdc-dialog-container .p-multiselect:not(.p-disabled).p-focus {
+  border-color: var(--dlg-accent);
+  box-shadow: 0 0 0 3px var(--dlg-primary-ring);
+  outline: none;
+}
+
+.p-dialog :focus-visible,
+.mat-mdc-dialog-container :focus-visible {
+  outline: 2px solid var(--dlg-accent);
+  outline-offset: 2px;
+}
+
+/* Invalid state stays legible rather than only turning red. */
+.p-dialog .ng-invalid.ng-touched:not(form):not([role='group']),
+.mat-mdc-dialog-container .ng-invalid.ng-touched:not(form):not([role='group']) {
+  border-color: var(--dlg-danger);
+}
+
+/* Disabled controls read as inert, not broken. */
+.p-dialog .p-disabled,
+.p-dialog .p-inputtext:disabled,
+.mat-mdc-dialog-container .p-disabled,
+.mat-mdc-dialog-container .p-inputtext:disabled {
+  background: var(--dlg-surface-muted);
+  color: var(--dlg-text-muted);
+  opacity: 1;
+  cursor: not-allowed;
+}
+
+/* -----------------------------------------------------------------------------
+   Buttons - one hierarchy everywhere
+   -------------------------------------------------------------------------- */
+.p-dialog .p-button,
+.mat-mdc-dialog-container .p-button {
+  min-height: var(--dlg-control-h);
+  padding: 0 18px;
+  border-radius: var(--dlg-radius-control);
+  font-size: 0.9375rem;
+  font-weight: 600;
+  transition: background-color 0.15s ease, border-color 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+/* Primary */
+.p-dialog .p-button:not(.p-button-text):not(.p-button-outlined):not(.p-button-secondary):not(.p-button-danger),
+.p-dialog .p-button-success,
+.mat-mdc-dialog-container .p-button-success {
+  background: var(--dlg-primary);
+  border-color: var(--dlg-primary);
+  color: #ffffff;
+}
+
+.p-dialog .p-button:not(.p-button-text):not(.p-button-outlined):not(.p-button-secondary):not(.p-button-danger):enabled:hover,
+.p-dialog .p-button-success:enabled:hover,
+.mat-mdc-dialog-container .p-button-success:enabled:hover {
+  background: var(--dlg-primary-hover);
+  border-color: var(--dlg-primary-hover);
+}
+
+/* Secondary / cancel - quieter than the primary action */
+.p-dialog .p-button.p-button-text,
+.p-dialog .p-button.p-button-outlined,
+.mat-mdc-dialog-container .p-button.p-button-text,
+.mat-mdc-dialog-container .p-button.p-button-outlined {
+  background: transparent;
+  color: var(--dlg-text-label);
+  border-color: var(--dlg-border-strong);
+}
+
+.p-dialog .p-button.p-button-text:enabled:hover,
+.p-dialog .p-button.p-button-outlined:enabled:hover,
+.mat-mdc-dialog-container .p-button.p-button-text:enabled:hover,
+.mat-mdc-dialog-container .p-button.p-button-outlined:enabled:hover {
+  background: var(--dlg-surface-muted);
+  color: var(--dlg-text);
+}
+
+/* Destructive */
+.p-dialog .p-button.p-button-danger,
+.mat-mdc-dialog-container .p-button.p-button-danger {
+  background: var(--dlg-danger);
+  border-color: var(--dlg-danger);
+  color: #ffffff;
+}
+
+.p-dialog .p-button.p-button-danger:enabled:hover,
+.mat-mdc-dialog-container .p-button.p-button-danger:enabled:hover {
+  background: var(--dlg-danger-hover);
+  border-color: var(--dlg-danger-hover);
+}
+
+/* Native buttons used by the Material dialogs get the same hierarchy. */
+.mat-mdc-dialog-container .mat-mdc-dialog-actions .mat-mdc-button,
+.mat-mdc-dialog-container .mat-mdc-dialog-actions .mat-mdc-raised-button,
+.mat-mdc-dialog-container .mat-mdc-dialog-actions .mat-mdc-unelevated-button {
+  min-height: var(--dlg-control-h);
+  border-radius: var(--dlg-radius-control);
+  font-weight: 600;
+  letter-spacing: normal;
+}
+
+/* Loading spinners keep the button from collapsing mid-request. */
+.p-dialog .p-button .p-button-loading-icon,
+.mat-mdc-dialog-container .p-button .p-button-loading-icon {
+  margin-inline-end: 8px;
+}
+
+/* -----------------------------------------------------------------------------
+   Labels, sections and helper text - the readability rules
+   -------------------------------------------------------------------------- */
+.p-dialog label,
+.mat-mdc-dialog-container label {
+  display: inline-block;
+  margin-bottom: 6px;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--dlg-text-label);
+  letter-spacing: 0.01em;
+}
+
+/* Required marker reads as meaning, not decoration. */
+.p-dialog label .required,
+.p-dialog label .text-red-500,
+.mat-mdc-dialog-container label .required,
+.mat-mdc-dialog-container label .text-red-500 {
+  color: var(--dlg-danger);
+  margin-inline-start: 2px;
+}
+
+.p-dialog .helper-text,
+.p-dialog small,
+.mat-mdc-dialog-container .helper-text,
+.mat-mdc-dialog-container small {
+  font-size: 0.75rem;
+  color: var(--dlg-text-muted);
+  line-height: 1.5;
+}
+
+/* Validation messages stay red even though `small` is muted above. */
+.p-dialog small.error-text,
+.p-dialog .error-text,
+.p-dialog .p-error,
+.mat-mdc-dialog-container small.error-text,
+.mat-mdc-dialog-container .error-text,
+.mat-mdc-dialog-container .p-error {
+  color: var(--dlg-danger);
+  font-weight: 500;
+}
+
+/* -----------------------------------------------------------------------------
+   Overlays launched from inside a dialog must sit above it
+   -------------------------------------------------------------------------- */
+.p-select-overlay,
+.p-multiselect-overlay,
+.p-datepicker-panel,
+.p-autocomplete-overlay {
+  border-radius: 12px;
+  border: 1px solid var(--dlg-border);
+  box-shadow: 0 16px 32px -8px rgba(15, 23, 42, 0.18);
+}
+
+/* -----------------------------------------------------------------------------
+   Responsive - desktop through tablet down to small screens
+   -------------------------------------------------------------------------- */
+@media (max-width: 1024px) {
+  :root {
+    --dlg-pad-x: 20px;
+    --dlg-pad-y: 18px;
+  }
+
+  .p-dialog,
+  .mat-mdc-dialog-panel {
+    max-width: 94vw;
+  }
+}
+
+@media (max-width: 640px) {
+  :root {
+    --dlg-pad-x: 16px;
+    --dlg-pad-y: 16px;
+    --dlg-control-h: 42px;
+  }
+
+  .p-dialog,
+  .mat-mdc-dialog-panel {
+    max-width: 96vw;
+    max-height: 94vh;
+  }
+
+  /* Stack footer actions so the primary action stays reachable by thumb. */
+  .p-dialog .p-dialog-footer,
+  .mat-mdc-dialog-container .mat-mdc-dialog-actions {
+    flex-direction: column-reverse;
+    align-items: stretch;
+  }
+
+  .p-dialog .p-dialog-footer > *,
+  .mat-mdc-dialog-container .mat-mdc-dialog-actions > * {
+    width: 100%;
+  }
+}
+
+/* =============================================================================
+   Reusable dialog building blocks
+   =============================================================================
+   Several dialogs are hand-built inside a MatDialog rather than using
+   mat-dialog-title/content/actions, so the framework selectors above cannot
+   reach them. These classes give those dialogs the same shell, rhythm and
+   control styling. Adopting them is a class swap - no markup semantics,
+   bindings or handlers change.
+   ========================================================================== */
+
+.dlg-shell {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  /* Grow with content instead of pinning to a fixed vh, which left short
+     dialogs with dead space and clipped tall ones. */
+  max-height: 88vh;
+  background: var(--dlg-surface);
+  border-radius: var(--dlg-radius);
+  overflow: hidden;
+}
+
+/* ---- Header ---- */
+.dlg-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  flex-shrink: 0;
+  padding: var(--dlg-pad-y) var(--dlg-pad-x);
+  border-bottom: 1px solid var(--dlg-border);
+}
+
+.dlg-title {
+  margin: 0;
+  font-size: 1.125rem;
+  font-weight: 700;
+  line-height: 1.35;
+  letter-spacing: -0.01em;
+  color: var(--dlg-text);
+}
+
+.dlg-subtitle {
+  margin: 4px 0 0;
+  font-size: 0.8125rem;
+  line-height: 1.5;
+  color: var(--dlg-text-muted);
+}
+
+.dlg-close {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+  border: none;
+  border-radius: 10px;
+  background: transparent;
+  color: var(--dlg-text-muted);
+  cursor: pointer;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.dlg-close:hover {
+  background: var(--dlg-surface-muted);
+  color: var(--dlg-text);
+}
+
+.dlg-close:focus-visible {
+  outline: 2px solid var(--dlg-accent);
+  outline-offset: 2px;
+}
+
+/* ---- Body ---- */
+.dlg-body {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  padding: var(--dlg-pad-y) var(--dlg-pad-x);
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+
+.dlg-body::-webkit-scrollbar {
+  width: 10px;
+}
+
+.dlg-body::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.dlg-body::-webkit-scrollbar-thumb {
+  background: var(--dlg-border-strong);
+  border-radius: 999px;
+  border: 3px solid var(--dlg-surface);
+}
+
+.dlg-body::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* ---- Sections: group related fields so a form can be scanned ---- */
+.dlg-section {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.dlg-section-title {
+  margin: 0;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--dlg-border);
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--dlg-text-muted);
+}
+
+/* ---- Field layout ---- */
+.dlg-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--dlg-gap);
+}
+
+.dlg-grid-1 {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+@media (max-width: 768px) {
+  .dlg-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.dlg-field {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.dlg-label {
+  margin-bottom: 6px;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--dlg-text-label);
+}
+
+.dlg-req {
+  color: var(--dlg-danger);
+  margin-inline-start: 2px;
+}
+
+.dlg-input,
+.dlg-textarea {
+  width: 100%;
+  min-height: var(--dlg-control-h);
+  padding: 10px 12px;
+  border: 1px solid var(--dlg-border-strong);
+  border-radius: var(--dlg-radius-control);
+  background: var(--dlg-surface);
+  color: var(--dlg-text);
+  font-size: 0.9375rem;
+  font-family: inherit;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.dlg-textarea {
+  min-height: 92px;
+  resize: vertical;
+}
+
+.dlg-input::placeholder,
+.dlg-textarea::placeholder {
+  color: #94a3b8;
+}
+
+.dlg-input:focus,
+.dlg-textarea:focus {
+  outline: none;
+  border-color: var(--dlg-accent);
+  box-shadow: 0 0 0 3px var(--dlg-primary-ring);
+}
+
+.dlg-input:disabled,
+.dlg-textarea:disabled {
+  background: var(--dlg-surface-muted);
+  color: var(--dlg-text-muted);
+  cursor: not-allowed;
+}
+
+/* Invalid styling is driven by the same condition the template already binds. */
+.dlg-input.is-invalid,
+.dlg-textarea.is-invalid {
+  border-color: var(--dlg-danger);
+}
+
+.dlg-input.is-invalid:focus,
+.dlg-textarea.is-invalid:focus {
+  box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.14);
+}
+
+.dlg-error {
+  margin-top: 6px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--dlg-danger);
+}
+
+.dlg-hint {
+  margin-top: 6px;
+  font-size: 0.75rem;
+  line-height: 1.5;
+  color: var(--dlg-text-muted);
+}
+
+/* ---- Toggle / checkbox row ---- */
+.dlg-check-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  border: 1px solid var(--dlg-border);
+  border-radius: 12px;
+  background: var(--dlg-surface-muted);
+}
+
+.dlg-check-row input[type='checkbox'] {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--dlg-primary);
+  cursor: pointer;
+}
+
+.dlg-check-label {
+  margin: 0;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--dlg-text-label);
+  cursor: pointer;
+}
+
+/* ---- Inline note / callout, in brand green rather than a competing blue ---- */
+.dlg-note {
+  display: flex;
+  gap: 10px;
+  padding: 12px 14px;
+  border: 1px solid #a7f3d0;
+  border-radius: 12px;
+  background: #ecfdf5;
+  font-size: 0.8125rem;
+  line-height: 1.55;
+  color: #065f46;
+}
+
+.dlg-note-icon {
+  flex-shrink: 0;
+  width: 18px;
+  height: 18px;
+  margin-top: 1px;
+  color: var(--dlg-primary);
+}
+
+.dlg-note--warn {
+  border-color: #fde68a;
+  background: var(--dlg-warn-soft);
+  color: #92400e;
+}
+
+.dlg-note--warn .dlg-note-icon {
+  color: var(--dlg-warn);
+}
+
+.dlg-note--danger {
+  border-color: #fecaca;
+  background: var(--dlg-danger-soft);
+  color: #991b1b;
+}
+
+.dlg-note--danger .dlg-note-icon {
+  color: var(--dlg-danger);
+}
+
+/* A form that fills the dialog body and keeps the same section rhythm.
+   (Preferred over display:contents, which can drop form semantics.) */
+.dlg-form {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+  min-width: 0;
+}
+
+/* ---- Section header with a trailing action (e.g. "Add Shelf") ---- */
+.dlg-section-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--dlg-border);
+}
+
+.dlg-section-head .dlg-section-title {
+  padding-bottom: 0;
+  border-bottom: none;
+}
+
+.dlg-section-head-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+/* ---- Count / status badge ---- */
+.dlg-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: var(--dlg-accent-soft);
+  color: #065f46;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+}
+
+.dlg-badge--neutral {
+  background: #e2e8f0;
+  color: #475569;
+}
+
+/* ---- Nested card, for repeated groups inside a form (shelves, combos) ---- */
+.dlg-subcard {
+  position: relative;
+  padding: 16px;
+  border: 1px solid var(--dlg-border);
+  border-radius: 12px;
+  background: var(--dlg-surface-muted);
+}
+
+.dlg-subcard-nested {
+  padding: 12px;
+  border: 1px solid var(--dlg-border);
+  border-radius: 10px;
+  background: var(--dlg-surface);
+}
+
+.dlg-subcard-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.dlg-subcard-title {
+  margin: 0;
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: var(--dlg-text);
+}
+
+/* ---- Small inline buttons ---- */
+.dlg-btn-sm {
+  min-height: 34px;
+  padding: 0 12px;
+  font-size: 0.8125rem;
+  border-radius: 9px;
+}
+
+/* Icon-only destructive action (remove a row). */
+.dlg-icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  width: auto;
+  min-height: 30px;
+  padding: 0 8px;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--dlg-text-muted);
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.dlg-icon-btn:hover:not(:disabled) {
+  background: #f1f5f9;
+  color: var(--dlg-text);
+}
+
+.dlg-icon-btn--danger:hover:not(:disabled) {
+  background: var(--dlg-danger-soft);
+  color: var(--dlg-danger);
+}
+
+.dlg-icon-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.dlg-icon-btn:focus-visible {
+  outline: 2px solid var(--dlg-accent);
+  outline-offset: 2px;
+}
+
+/* ---- Empty state ---- */
+.dlg-empty {
+  padding: 22px 16px;
+  border: 1px dashed var(--dlg-border-strong);
+  border-radius: 12px;
+  text-align: center;
+  color: var(--dlg-text-muted);
+  font-size: 0.8125rem;
+}
+
+.dlg-empty p {
+  margin: 0;
+}
+
+/* ---- Read-only preview strip (shows what a selection resolved to) ---- */
+.dlg-preview {
+  margin-top: 10px;
+  padding: 10px 12px;
+  border: 1px solid #a7f3d0;
+  border-radius: 10px;
+  background: #ecfdf5;
+  font-size: 0.75rem;
+  color: #065f46;
+}
+
+/* ---- Compact field variant for dense nested grids ---- */
+.dlg-input-sm {
+  min-height: 38px;
+  padding: 7px 10px;
+  font-size: 0.8125rem;
+}
+
+.dlg-label-sm {
+  font-size: 0.75rem;
+}
+
+/* ---- Compact confirmation dialogs ----
+   Small, message-only dialogs (confirm / delete / restore). The icon badge
+   carries the severity so the message itself can stay plain and readable. */
+.dlg-confirm {
+  padding: var(--dlg-pad-y) var(--dlg-pad-x);
+  background: var(--dlg-surface);
+}
+
+.dlg-confirm-head {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  margin-bottom: 14px;
+}
+
+.dlg-icon-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: var(--dlg-accent-soft);
+  color: var(--dlg-primary);
+  font-size: 1.125rem;
+}
+
+.dlg-icon-badge svg {
+  width: 22px;
+  height: 22px;
+}
+
+.dlg-icon-badge--danger {
+  background: var(--dlg-danger-soft);
+  color: var(--dlg-danger);
+}
+
+.dlg-icon-badge--warn {
+  background: var(--dlg-warn-soft);
+  color: var(--dlg-warn);
+}
+
+.dlg-confirm-title {
+  margin: 0;
+  padding-top: 2px;
+  font-size: 1.0625rem;
+  font-weight: 700;
+  line-height: 1.4;
+  letter-spacing: -0.01em;
+  color: var(--dlg-text);
+}
+
+.dlg-confirm-message {
+  margin: 0 0 20px;
+  /* Align under the title rather than the icon. */
+  padding-inline-start: 58px;
+  font-size: 0.875rem;
+  line-height: 1.6;
+  color: var(--dlg-text-muted);
+}
+
+.dlg-confirm-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+@media (max-width: 640px) {
+  .dlg-confirm-message {
+    padding-inline-start: 0;
+  }
+
+  .dlg-confirm-actions {
+    flex-direction: column-reverse;
+    align-items: stretch;
+  }
+
+  .dlg-confirm-actions .dlg-btn {
+    width: 100%;
+  }
+}
+
+/* ---- Footer ---- */
+.dlg-footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+  flex-shrink: 0;
+  padding: 16px var(--dlg-pad-x);
+  border-top: 1px solid var(--dlg-border);
+  background: var(--dlg-surface-muted);
+}
+
+/* ---- Buttons ---- */
+.dlg-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: var(--dlg-control-h);
+  padding: 0 18px;
+  border-radius: var(--dlg-radius-control);
+  border: 1px solid transparent;
+  font-size: 0.875rem;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background-color 0.15s ease, border-color 0.15s ease,
+    color 0.15s ease;
+}
+
+.dlg-btn:focus-visible {
+  outline: 2px solid var(--dlg-accent);
+  outline-offset: 2px;
+}
+
+.dlg-btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.dlg-btn-primary {
+  background: var(--dlg-primary);
+  border-color: var(--dlg-primary);
+  color: #ffffff;
+}
+
+.dlg-btn-primary:not(:disabled):hover {
+  background: var(--dlg-primary-hover);
+  border-color: var(--dlg-primary-hover);
+}
+
+.dlg-btn-secondary {
+  background: var(--dlg-surface);
+  border-color: var(--dlg-border-strong);
+  color: var(--dlg-text-label);
+}
+
+.dlg-btn-secondary:not(:disabled):hover {
+  background: var(--dlg-surface-muted);
+  color: var(--dlg-text);
+}
+
+.dlg-btn-danger {
+  background: var(--dlg-danger);
+  border-color: var(--dlg-danger);
+  color: #ffffff;
+}
+
+.dlg-btn-danger:not(:disabled):hover {
+  background: var(--dlg-danger-hover);
+  border-color: var(--dlg-danger-hover);
+}
+
+@media (max-width: 640px) {
+  .dlg-footer {
+    flex-direction: column-reverse;
+    align-items: stretch;
+  }
+
+  .dlg-footer .dlg-btn {
+    width: 100%;
+  }
+}
+
+/* Respect users who ask for reduced motion. */
+@media (prefers-reduced-motion: reduce) {
+  .p-dialog,
+  .p-dialog *,
+  .mat-mdc-dialog-container,
+  .mat-mdc-dialog-container * {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+  }
+}

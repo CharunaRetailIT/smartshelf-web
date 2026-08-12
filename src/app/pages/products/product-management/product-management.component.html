@@ -1,0 +1,1201 @@
+<div class="min-h-screen bg-gray-50 p-6">
+  <div class="max-w-7xl mx-auto">
+    <!-- Header -->
+    <div class="bg-white rounded-lg shadow-sm border border-gray-200 mb-6 p-6">
+      <div class="flex items-center justify-between">
+        <!-- Left content -->
+        <div class="flex items-center space-x-3">
+          <i class="pi pi-box text-blue-600 text-2xl"></i>
+          <div>
+            <h1 class="text-2xl font-bold text-secondary-dark">
+              Product Management
+            </h1>
+            <p class="text-secondary-light">
+              Manage products, categories and subcategories
+            </p>
+          </div>
+        </div>
+
+        <!-- Right button with consistent styling -->
+        <div
+          class="flex space-x-4"
+          *ngIf="auth.hasAnyRole(['Admin', 'Manager', 'Operator'])"
+        >
+          <!-- Sync to Cloud Button -->
+          <button
+            (click)="syncToCloud()"
+            [disabled]="syncing"
+            class="cursor-pointer bg-blue-500 hover:bg-blue-800 text-white px-4 py-2 rounded-lg flex items-center space-x-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            <i class="fas fa-cloud-upload-alt" [class.fa-spin]="syncing"></i>
+            <span>{{ syncing ? "Syncing..." : "Sync to Cloud" }}</span>
+          </button>
+          <button
+            *ngIf="activeTab === 'categories'"
+            (click)="openCategoryModal()"
+            id="addCategoryButton"
+            class="cursor-pointer bg-primary hover:bg-primary-light text-white px-4 py-2 rounded-lg flex items-center space-x-2 transition-colors"
+          >
+            <i class="fas fa-plus"></i>
+            <span>Add Category</span>
+          </button>
+
+          <button
+            *ngIf="activeTab === 'subcategories'"
+            (click)="openSubCategoryModal()"
+            id="addSubcategoryButton"
+            class="cursor-pointer bg-primary hover:bg-primary-light text-white px-4 py-2 rounded-lg flex items-center space-x-2 transition-colors"
+          >
+            <i class="fas fa-plus"></i>
+            <span>Add Subcategory</span>
+          </button>
+
+          <button
+            *ngIf="activeTab === 'products'"
+            (click)="downloadImportTemplate()"
+            class="cursor-pointer bg-white hover:bg-gray-100 text-gray-700 border border-gray-300 px-4 py-2 rounded-lg flex items-center space-x-2 transition-colors"
+            title="Download a sample Excel file showing the columns expected for import"
+          >
+            <i class="fas fa-file-download"></i>
+            <span>Sample Excel</span>
+          </button>
+
+          <button
+            *ngIf="activeTab === 'products'"
+            (click)="triggerImportFile()"
+            [disabled]="importing"
+            class="cursor-pointer bg-white hover:bg-gray-100 text-gray-700 border border-gray-300 px-4 py-2 rounded-lg flex items-center space-x-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            <i class="fas fa-file-import" [class.fa-spin]="importing"></i>
+            <span>{{ importing ? "Importing..." : "Import" }}</span>
+          </button>
+          <input
+            #importFileInput
+            type="file"
+            accept=".xlsx,.xls"
+            class="hidden"
+            (change)="onImportFileSelected($event)"
+          />
+
+          <button
+            *ngIf="activeTab === 'products'"
+            (click)="exportProducts()"
+            [disabled]="exporting"
+            class="cursor-pointer bg-white hover:bg-gray-100 text-gray-700 border border-gray-300 px-4 py-2 rounded-lg flex items-center space-x-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            <i class="fas fa-file-export" [class.fa-spin]="exporting"></i>
+            <span>{{ exporting ? "Exporting..." : "Export" }}</span>
+          </button>
+
+          <button
+            *ngIf="activeTab === 'products'"
+            (click)="createProduct()"
+            id="addProductButton"
+            class="cursor-pointer bg-primary hover:bg-primary-light text-white px-4 py-2 rounded-lg flex items-center space-x-2 transition-colors"
+          >
+            <i class="fas fa-plus"></i>
+            <span>Add Product</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tabs Navigation -->
+    <div
+      class="bg-white rounded-lg shadow-sm border border-gray-200 mb-6 overflow-x-auto"
+    >
+      <div class="flex border-b">
+        <button
+          (click)="onTabChange('categories')"
+          [class.border-b-2]="activeTab === 'categories'"
+          [class.border-blue-900]="activeTab === 'categories'"
+          [class.text-blue-900]="activeTab === 'categories'"
+          [class.text-gray-600]="activeTab !== 'categories'"
+          class="px-6 py-3 font-medium hover:text-blue-900 transition-colors whitespace-nowrap"
+        >
+          <i class="fas fa-folder mr-2"></i>
+          Categories
+        </button>
+        <button
+          (click)="onTabChange('subcategories')"
+          [class.border-b-2]="activeTab === 'subcategories'"
+          [class.border-blue-900]="activeTab === 'subcategories'"
+          [class.text-blue-900]="activeTab === 'subcategories'"
+          [class.text-gray-600]="activeTab !== 'subcategories'"
+          class="px-6 py-3 font-medium hover:text-blue-900 transition-colors whitespace-nowrap"
+        >
+          <i class="fas fa-folder-open mr-2"></i>
+          Subcategories
+        </button>
+        <button
+          (click)="onTabChange('products')"
+          [class.border-b-2]="activeTab === 'products'"
+          [class.border-blue-900]="activeTab === 'products'"
+          [class.text-blue-900]="activeTab === 'products'"
+          [class.text-gray-600]="activeTab !== 'products'"
+          class="px-6 py-3 font-medium hover:text-blue-900 transition-colors whitespace-nowrap"
+        >
+          <i class="fas fa-box mr-2"></i>
+          Products
+        </button>
+      </div>
+    </div>
+
+    <!-- Search Bar -->
+    <div class="bg-white rounded-lg shadow-sm border border-gray-200 mb-6 p-6">
+      <!-- Categories Search -->
+      <div
+        *ngIf="activeTab === 'categories'"
+        class="flex items-center space-x-4"
+      >
+        <div class="relative flex-1">
+          <div
+            class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"
+          >
+            <i class="fas fa-search text-gray-400"></i>
+          </div>
+          <input
+            [(ngModel)]="categorySearchTerm"
+            (input)="onCategorySearchChange($any($event.target).value || '')"
+            type="text"
+            placeholder="Search categories by name, code, description..."
+            class="block w-full pl-10 pr-10 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-blue-500 focus:border-blue-900 sm:text-sm"
+          />
+
+          <!-- Clear search button -->
+          <button
+            *ngIf="categorySearchTerm"
+            (click)="clearCategorySearch()"
+            class="absolute inset-y-0 right-0 pr-3 flex items-center cursor-pointer"
+          >
+            <i class="fas fa-times text-gray-400 hover:text-gray-600"></i>
+          </button>
+        </div>
+
+        <button
+          (click)="searchCategories()"
+          class="cursor-pointer bg-blue-500 hover:bg-blue-800 text-white px-4 py-2 rounded-md flex items-center space-x-2 transition-colors"
+        >
+          <i class="fas fa-search"></i>
+          <span>Search</span>
+        </button>
+      </div>
+
+      <!-- Subcategories Search -->
+      <div
+        *ngIf="activeTab === 'subcategories'"
+        class="flex items-center space-x-4"
+      >
+        <div class="relative flex-1">
+          <div
+            class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"
+          >
+            <i class="fas fa-search text-gray-400"></i>
+          </div>
+          <input
+            [(ngModel)]="subCategorySearchTerm"
+            (input)="onSubCategorySearchChange($any($event.target).value || '')"
+            type="text"
+            placeholder="Search subcategories by name, code, description..."
+            class="block w-full pl-10 pr-10 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-blue-500 focus:border-blue-900 sm:text-sm"
+          />
+
+          <!-- Clear search button -->
+          <button
+            *ngIf="subCategorySearchTerm"
+            (click)="clearSubCategorySearch()"
+            class="absolute inset-y-0 right-0 pr-3 flex items-center cursor-pointer"
+          >
+            <i class="fas fa-times text-gray-400 hover:text-gray-600"></i>
+          </button>
+        </div>
+
+        <button
+          (click)="searchSubCategories()"
+          class="cursor-pointer bg-blue-500 hover:bg-blue-800 text-white px-4 py-2 rounded-md flex items-center space-x-2 transition-colors"
+        >
+          <i class="fas fa-search"></i>
+          <span>Search</span>
+        </button>
+      </div>
+
+      <!-- Products Search -->
+      <div *ngIf="activeTab === 'products'" class="flex items-center space-x-4">
+        <div class="relative flex-1">
+          <div
+            class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"
+          >
+            <i class="fas fa-search text-gray-400"></i>
+          </div>
+          <input
+            [(ngModel)]="productSearchTerm"
+            (input)="onProductSearchChange($any($event.target).value || '')"
+            type="text"
+            placeholder="Search products by name, code, barcode, category..."
+            class="block w-full pl-10 pr-10 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-blue-500 focus:border-blue-900 sm:text-sm"
+          />
+
+          <!-- Clear search button -->
+          <button
+            *ngIf="productSearchTerm"
+            (click)="clearProductSearch()"
+            class="absolute inset-y-0 right-0 pr-3 flex items-center cursor-pointer"
+          >
+            <i class="fas fa-times text-gray-400 hover:text-gray-600"></i>
+          </button>
+        </div>
+
+        <button
+          (click)="searchProducts()"
+          class="cursor-pointer bg-blue-500 hover:bg-blue-800 text-white px-4 py-2 rounded-md flex items-center space-x-2 transition-colors"
+        >
+          <i class="fas fa-search"></i>
+          <span>Search</span>
+        </button>
+      </div>
+
+      <!-- Search Status Messages -->
+      <div
+        *ngIf="activeTab === 'categories' && categorySearchMessage"
+        [class]="
+          hasCategoryResults
+            ? 'mt-2 text-sm text-green-600'
+            : 'mt-2 text-sm text-amber-600'
+        "
+      >
+        <i
+          [class]="
+            hasCategoryResults
+              ? 'fas fa-info-circle'
+              : 'fas fa-exclamation-triangle'
+          "
+        ></i>
+        {{ categorySearchMessage }}
+      </div>
+
+      <div
+        *ngIf="activeTab === 'subcategories' && subCategorySearchMessage"
+        [class]="
+          hasSubCategoryResults
+            ? 'mt-2 text-sm text-green-600'
+            : 'mt-2 text-sm text-amber-600'
+        "
+      >
+        <i
+          [class]="
+            hasSubCategoryResults
+              ? 'fas fa-info-circle'
+              : 'fas fa-exclamation-triangle'
+          "
+        ></i>
+        {{ subCategorySearchMessage }}
+      </div>
+
+      <div
+        *ngIf="activeTab === 'products' && productSearchMessage"
+        [class]="
+          hasProductResults
+            ? 'mt-2 text-sm text-green-600'
+            : 'mt-2 text-sm text-amber-600'
+        "
+      >
+        <i
+          [class]="
+            hasProductResults
+              ? 'fas fa-info-circle'
+              : 'fas fa-exclamation-triangle'
+          "
+        ></i>
+        {{ productSearchMessage }}
+      </div>
+    </div>
+
+    <!-- Categories Tab Content -->
+    <div *ngIf="activeTab === 'categories'">
+      <!-- Loading Spinner -->
+      <div
+        *ngIf="loadingCategories"
+        class="flex justify-center items-center p-8 bg-white rounded-lg shadow-sm border border-gray-200"
+      >
+        <mat-spinner diameter="40"></mat-spinner>
+        <span class="ml-4 text-gray-600">Loading categories...</span>
+      </div>
+
+      <!-- No Results State -->
+      <div
+        *ngIf="!loadingCategories && !hasCategoryResults"
+        class="bg-white rounded-lg shadow-sm border border-gray-200 p-12 text-center"
+      >
+        <div class="max-w-md mx-auto">
+          <i class="fas fa-folder text-6xl text-gray-300 mb-4"></i>
+          <h3 class="text-lg font-medium text-gray-900 mb-2">
+            No Categories Found
+          </h3>
+          <p class="text-gray-600 mb-6">{{ categorySearchMessage }}</p>
+          <div class="space-y-3">
+            <p class="text-sm text-gray-500">Suggestions:</p>
+            <ul class="text-sm text-gray-500 text-left max-w-xs mx-auto">
+              <li class="flex items-center mb-2">
+                <i class="fas fa-check text-green-500 mr-2"></i>
+                Check your spelling
+              </li>
+              <li class="flex items-center mb-2">
+                <i class="fas fa-check text-green-500 mr-2"></i>
+                Try more general keywords
+              </li>
+              <li class="flex items-center">
+                <i class="fas fa-check text-green-500 mr-2"></i>
+                Clear search to see all categories
+              </li>
+            </ul>
+            <button
+              *ngIf="categorySearchTerm"
+              (click)="clearCategorySearch()"
+              class="cursor-pointer bg-blue-900 hover:bg-blue-800 text-white px-6 py-2 rounded-md inline-flex items-center space-x-2 transition-colors mt-4"
+            >
+              <i class="fas fa-times"></i>
+              <span>Clear Search</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Categories Table -->
+      <!-- <div *ngIf="!loadingCategories && hasCategoryResults" class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden"> -->
+      <!-- <div class="overflow-x-auto"> -->
+      <!-- <div class="bg-white rounded-lg shadow-sm border border-gray-200"> -->
+      <div
+        *ngIf="!loadingCategories && hasCategoryResults"
+        class="bg-white rounded-lg shadow-sm border border-gray-200"
+      >
+        <div class="overflow-y-auto max-h-[calc(100vh-250px)]">
+          <table
+            mat-table
+            [dataSource]="categoryDataSource"
+            class="mat-elevation-z0 w-full text-sm"
+          >
+            <!-- Name Column -->
+            <ng-container matColumnDef="name">
+              <th
+                mat-header-cell
+                *matHeaderCellDef
+                class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase bg-gray-100"
+                style="border-bottom: 1px solid #e5e7eb !important"
+              >
+                Category Name
+              </th>
+              <td
+                mat-cell
+                *matCellDef="let category"
+                class="px-6 py-4"
+                style="border-bottom: 1px solid #e5e7eb !important"
+              >
+                <div class="flex items-center space-x-3">
+                  <div
+                    class="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold bg-blue-500"
+                  >
+                    {{ category.categoryName.charAt(0) }}
+                  </div>
+                  <div class="font-medium text-gray-900">
+                    {{ category.categoryName }}
+                  </div>
+                </div>
+              </td>
+            </ng-container>
+
+            <!-- Code Column -->
+            <ng-container matColumnDef="code">
+              <th
+                mat-header-cell
+                *matHeaderCellDef
+                class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase bg-gray-100"
+                style="border-bottom: 1px solid #e5e7eb !important"
+              >
+                Code
+              </th>
+              <td
+                mat-cell
+                *matCellDef="let category"
+                class="px-6 py-4 text-gray-600"
+                style="border-bottom: 1px solid #e5e7eb !important"
+              >
+                {{ category.categoryCode }}
+              </td>
+            </ng-container>
+
+            <!-- Description Column -->
+            <ng-container matColumnDef="description">
+              <th
+                mat-header-cell
+                *matHeaderCellDef
+                class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase bg-gray-100"
+                style="border-bottom: 1px solid #e5e7eb !important"
+              >
+                Description
+              </th>
+              <td
+                mat-cell
+                *matCellDef="let category"
+                class="px-6 py-4 text-gray-600"
+                style="border-bottom: 1px solid #e5e7eb !important"
+              >
+                {{ category.categoryDescription || "N/A" }}
+              </td>
+            </ng-container>
+
+            <!-- Status Column -->
+            <ng-container matColumnDef="status">
+              <th
+                mat-header-cell
+                *matHeaderCellDef
+                class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase bg-gray-100"
+                style="border-bottom: 1px solid #e5e7eb !important"
+              >
+                Status
+              </th>
+              <td
+                mat-cell
+                *matCellDef="let category"
+                class="px-6 py-4"
+                style="border-bottom: 1px solid #e5e7eb !important"
+              >
+                <span
+                  class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border"
+                  [ngClass]="getStatusColor(category.isActive)"
+                >
+                  <i
+                    class="fas fa-circle mr-1.5"
+                    [ngClass]="
+                      category.isActive ? 'text-green-400' : 'text-red-400'
+                    "
+                    [style.font-size.px]="8"
+                  ></i>
+                  {{ category.isActive ? "Active" : "Inactive" }}
+                </span>
+              </td>
+            </ng-container>
+
+            <!-- Created Column -->
+            <ng-container matColumnDef="created">
+              <th
+                mat-header-cell
+                *matHeaderCellDef
+                class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase bg-gray-100"
+                style="border-bottom: 1px solid #e5e7eb !important"
+              >
+                Created
+              </th>
+              <td
+                mat-cell
+                *matCellDef="let category"
+                class="px-6 py-4 text-gray-600"
+                style="border-bottom: 1px solid #e5e7eb !important"
+              >
+                {{ category.createdDate | date: "MMM d, y" }}
+              </td>
+            </ng-container>
+
+            <!-- Actions Column -->
+            <ng-container matColumnDef="actions">
+              <th
+                mat-header-cell
+                *matHeaderCellDef
+                class="px-6 py-4 text-center text-xs font-medium text-gray-500 uppercase bg-gray-100"
+                style="border-bottom: 1px solid #e5e7eb !important"
+              >
+                Actions
+              </th>
+              <td
+                mat-cell
+                *matCellDef="let category"
+                class="px-6 py-4 text-center"
+                style="border-bottom: 1px solid #e5e7eb !important"
+              >
+                <div class="flex justify-center space-x-4">
+                  <button
+                    *ngIf="auth.hasAnyRole(['Admin', 'Manager', 'Operator'])"
+                    (click)="openCategoryModal(category)"
+                    title="Edit Category"
+                    class="text-blue-600 hover:text-blue-900 p-1 rounded hover:bg-blue-50 transition-colors duration-150 cursor-pointer"
+                  >
+                    <i class="fas fa-edit"></i>
+                  </button>
+                  <button
+                    *ngIf="auth.hasAnyRole(['Viewer'])"
+                    (click)="openCategoryModal(category)"
+                    title="View Category"
+                    class="text-blue-600 hover:text-blue-900 p-1 rounded hover:bg-blue-50 transition-colors duration-150 cursor-pointer"
+                  >
+                    <i class="fas fa-eye"></i>
+                  </button>
+                  <button
+                    *ngIf="auth.hasAnyRole(['Admin', 'Manager'])"
+                    (click)="deleteCategory(category)"
+                    title="Delete Category"
+                    class="text-red-600 hover:text-red-900 p-1 rounded hover:bg-red-50 transition-colors duration-150 cursor-pointer"
+                  >
+                    <i class="fas fa-trash"></i>
+                  </button>
+                </div>
+              </td>
+            </ng-container>
+
+            <tr
+              mat-header-row
+              *matHeaderRowDef="categoryDisplayedColumns"
+              class="bg-gray-100"
+            ></tr>
+            <tr
+              mat-row
+              *matRowDef="let row; columns: categoryDisplayedColumns"
+              class="hover:bg-gray-50"
+            ></tr>
+          </table>
+        </div>
+
+        <!-- Paginator -->
+        <mat-paginator
+          #categoryPaginator
+          [length]="categoryTotalCount"
+          [pageSize]="categoryPageSize"
+          [pageSizeOptions]="categoryPageSizeOptions"
+          [pageIndex]="categoryCurrentPage"
+          (page)="onCategoryPageChange($event)"
+          showFirstLastButtons
+          aria-label="Select page of categories"
+        >
+        </mat-paginator>
+      </div>
+    </div>
+
+    <!-- Subcategories Tab Content -->
+    <div *ngIf="activeTab === 'subcategories'">
+      <!-- Loading Spinner -->
+      <div
+        *ngIf="loadingSubCategories"
+        class="flex justify-center items-center p-8 bg-white rounded-lg shadow-sm border border-gray-200"
+      >
+        <mat-spinner diameter="40"></mat-spinner>
+        <span class="ml-4 text-gray-600">Loading subcategories...</span>
+      </div>
+
+      <!-- No Results State -->
+      <div
+        *ngIf="!loadingSubCategories && !hasSubCategoryResults"
+        class="bg-white rounded-lg shadow-sm border border-gray-200 p-12 text-center"
+      >
+        <div class="max-w-md mx-auto">
+          <i class="fas fa-folder-open text-6xl text-gray-300 mb-4"></i>
+          <h3 class="text-lg font-medium text-gray-900 mb-2">
+            No Subcategories Found
+          </h3>
+          <p class="text-gray-600 mb-6">{{ subCategorySearchMessage }}</p>
+          <div class="space-y-3">
+            <p class="text-sm text-gray-500">Suggestions:</p>
+            <ul class="text-sm text-gray-500 text-left max-w-xs mx-auto">
+              <li class="flex items-center mb-2">
+                <i class="fas fa-check text-green-500 mr-2"></i>
+                Check your spelling
+              </li>
+              <li class="flex items-center mb-2">
+                <i class="fas fa-check text-green-500 mr-2"></i>
+                Try more general keywords
+              </li>
+              <li class="flex items-center">
+                <i class="fas fa-check text-green-500 mr-2"></i>
+                Clear search to see all subcategories
+              </li>
+            </ul>
+            <button
+              *ngIf="subCategorySearchTerm"
+              (click)="clearSubCategorySearch()"
+              class="cursor-pointer bg-blue-900 hover:bg-blue-800 text-white px-6 py-2 rounded-md inline-flex items-center space-x-2 transition-colors mt-4"
+            >
+              <i class="fas fa-times"></i>
+              <span>Clear Search</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Subcategories Table -->
+      <!-- <div *ngIf="!loadingSubCategories && hasSubCategoryResults" class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+        <div class="overflow-x-auto"> -->
+      <div
+        *ngIf="!loadingSubCategories && hasSubCategoryResults"
+        class="bg-white rounded-lg shadow-sm border border-gray-200"
+      >
+        <div class="overflow-y-auto max-h-[calc(100vh-250px)]">
+          <table
+            mat-table
+            [dataSource]="subCategoryDataSource"
+            class="mat-elevation-z0 w-full text-sm"
+          >
+            <!-- Name Column -->
+            <ng-container matColumnDef="name">
+              <th
+                mat-header-cell
+                *matHeaderCellDef
+                class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase bg-gray-100"
+                style="border-bottom: 1px solid #e5e7eb !important"
+              >
+                Subcategory Name
+              </th>
+              <td
+                mat-cell
+                *matCellDef="let subCategory"
+                class="px-6 py-4"
+                style="border-bottom: 1px solid #e5e7eb !important"
+              >
+                <div class="flex items-center space-x-3">
+                  <div
+                    class="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold bg-indigo-500"
+                  >
+                    {{ subCategory.subCategoryName.charAt(0) }}
+                  </div>
+                  <div class="font-medium text-gray-900">
+                    {{ subCategory.subCategoryName }}
+                  </div>
+                </div>
+              </td>
+            </ng-container>
+
+            <!-- Category Column -->
+            <ng-container matColumnDef="category">
+              <th
+                mat-header-cell
+                *matHeaderCellDef
+                class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase bg-gray-100"
+                style="border-bottom: 1px solid #e5e7eb !important"
+              >
+                Category
+              </th>
+              <td
+                mat-cell
+                *matCellDef="let subCategory"
+                class="px-6 py-4 text-gray-600"
+                style="border-bottom: 1px solid #e5e7eb !important"
+              >
+                {{ getCategoryName(subCategory.categoryId) }}
+              </td>
+            </ng-container>
+
+            <!-- Code Column -->
+            <ng-container matColumnDef="code">
+              <th
+                mat-header-cell
+                *matHeaderCellDef
+                class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase bg-gray-100"
+                style="border-bottom: 1px solid #e5e7eb !important"
+              >
+                Code
+              </th>
+              <td
+                mat-cell
+                *matCellDef="let subCategory"
+                class="px-6 py-4 text-gray-600"
+                style="border-bottom: 1px solid #e5e7eb !important"
+              >
+                {{ subCategory.subCategoryCode }}
+              </td>
+            </ng-container>
+
+            <!-- Description Column -->
+            <ng-container matColumnDef="description">
+              <th
+                mat-header-cell
+                *matHeaderCellDef
+                class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase bg-gray-100"
+                style="border-bottom: 1px solid #e5e7eb !important"
+              >
+                Description
+              </th>
+              <td
+                mat-cell
+                *matCellDef="let subCategory"
+                class="px-6 py-4 text-gray-600"
+                style="border-bottom: 1px solid #e5e7eb !important"
+              >
+                {{ subCategory.subCategoryDescription || "N/A" }}
+              </td>
+            </ng-container>
+
+            <!-- Status Column -->
+            <ng-container matColumnDef="status">
+              <th
+                mat-header-cell
+                *matHeaderCellDef
+                class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase bg-gray-100"
+                style="border-bottom: 1px solid #e5e7eb !important"
+              >
+                Status
+              </th>
+              <td
+                mat-cell
+                *matCellDef="let subCategory"
+                class="px-6 py-4"
+                style="border-bottom: 1px solid #e5e7eb !important"
+              >
+                <span
+                  class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border"
+                  [ngClass]="getStatusColor(subCategory.isActive)"
+                >
+                  <i
+                    class="fas fa-circle mr-1.5"
+                    [ngClass]="
+                      subCategory.isActive ? 'text-green-400' : 'text-red-400'
+                    "
+                    [style.font-size.px]="8"
+                  ></i>
+                  {{ subCategory.isActive ? "Active" : "Inactive" }}
+                </span>
+              </td>
+            </ng-container>
+
+            <!-- Actions Column -->
+            <ng-container matColumnDef="actions">
+              <th
+                mat-header-cell
+                *matHeaderCellDef
+                class="px-6 py-4 text-center text-xs font-medium text-gray-500 uppercase bg-gray-100"
+                style="border-bottom: 1px solid #e5e7eb !important"
+              >
+                Actions
+              </th>
+              <td
+                mat-cell
+                *matCellDef="let subCategory"
+                class="px-6 py-4 text-center"
+                style="border-bottom: 1px solid #e5e7eb !important"
+              >
+                <div class="flex justify-center space-x-4">
+                  <button
+                    *ngIf="auth.hasAnyRole(['Admin', 'Manager', 'Operator'])"
+                    (click)="openSubCategoryModal(subCategory)"
+                    title="Edit SubCategory"
+                    class="text-blue-600 hover:text-blue-900 p-1 rounded hover:bg-blue-50 transition-colors duration-150 cursor-pointer"
+                  >
+                    <i class="fas fa-edit"></i>
+                  </button>
+                  <button
+                    *ngIf="auth.hasAnyRole(['Viewer'])"
+                    (click)="openSubCategoryModal(subCategory)"
+                    title="View SubCategory"
+                    class="text-blue-600 hover:text-blue-900 p-1 rounded hover:bg-blue-50 transition-colors duration-150 cursor-pointer"
+                  >
+                    <i class="fas fa-eye"></i>
+                  </button>
+                  <button
+                    *ngIf="auth.hasAnyRole(['Admin', 'Manager'])"
+                    (click)="deleteSubCategory(subCategory)"
+                    title="Delete SubCategory"
+                    class="text-red-600 hover:text-red-900 p-1 rounded hover:bg-red-50 transition-colors duration-150 cursor-pointer"
+                  >
+                    <i class="fas fa-trash"></i>
+                  </button>
+                </div>
+              </td>
+            </ng-container>
+
+            <tr
+              mat-header-row
+              *matHeaderRowDef="subCategoryDisplayedColumns"
+              class="bg-gray-100"
+            ></tr>
+            <tr
+              mat-row
+              *matRowDef="let row; columns: subCategoryDisplayedColumns"
+              class="hover:bg-gray-50"
+            ></tr>
+          </table>
+        </div>
+
+        <!-- Paginator -->
+        <mat-paginator
+          #subCategoryPaginator
+          [length]="subCategoryTotalCount"
+          [pageSize]="subCategoryPageSize"
+          [pageSizeOptions]="subCategoryPageSizeOptions"
+          [pageIndex]="subCategoryCurrentPage"
+          (page)="onSubCategoryPageChange($event)"
+          showFirstLastButtons
+          aria-label="Select page of subcategories"
+        >
+        </mat-paginator>
+      </div>
+    </div>
+
+    <!-- Products Tab Content -->
+    <div *ngIf="activeTab === 'products'">
+      <!-- Loading Spinner -->
+      <div
+        *ngIf="loadingProducts"
+        class="flex justify-center items-center p-8 bg-white rounded-lg shadow-sm border border-gray-200"
+      >
+        <mat-spinner diameter="40"></mat-spinner>
+        <span class="ml-4 text-gray-600">Loading products...</span>
+      </div>
+
+      <!-- No Results State -->
+      <div
+        *ngIf="!loadingProducts && !hasProductResults"
+        class="bg-white rounded-lg shadow-sm border border-gray-200 p-12 text-center"
+      >
+        <div class="max-w-md mx-auto">
+          <i class="fas fa-box text-6xl text-gray-300 mb-4"></i>
+          <h3 class="text-lg font-medium text-gray-900 mb-2">
+            No Products Found
+          </h3>
+          <p class="text-gray-600 mb-6">{{ productSearchMessage }}</p>
+          <div class="space-y-3">
+            <p class="text-sm text-gray-500">Suggestions:</p>
+            <ul class="text-sm text-gray-500 text-left max-w-xs mx-auto">
+              <li class="flex items-center mb-2">
+                <i class="fas fa-check text-green-500 mr-2"></i>
+                Check your spelling
+              </li>
+              <li class="flex items-center mb-2">
+                <i class="fas fa-check text-green-500 mr-2"></i>
+                Try more general keywords
+              </li>
+              <li class="flex items-center">
+                <i class="fas fa-check text-green-500 mr-2"></i>
+                Clear search to see all products
+              </li>
+            </ul>
+            <button
+              *ngIf="productSearchTerm"
+              (click)="clearProductSearch()"
+              class="cursor-pointer bg-blue-900 hover:bg-blue-800 text-white px-6 py-2 rounded-md inline-flex items-center space-x-2 transition-colors mt-4"
+            >
+              <i class="fas fa-times"></i>
+              <span>Clear Search</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Products Table -->
+      <!-- <div *ngIf="!loadingProducts && hasProductResults" class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+        <div class="overflow-x-auto"> -->
+      <div
+        *ngIf="!loadingProducts && hasProductResults"
+        class="bg-white rounded-lg shadow-sm border border-gray-200"
+      >
+        <div class="overflow-y-auto max-h-[calc(100vh-250px)]">
+          <table
+            mat-table
+            [dataSource]="productDataSource"
+            class="mat-elevation-z0 w-full text-sm"
+          >
+            <!-- Name Column -->
+            <ng-container matColumnDef="name">
+              <th
+                mat-header-cell
+                *matHeaderCellDef
+                class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase bg-gray-100"
+                style="border-bottom: 1px solid #e5e7eb !important"
+              >
+                Product Name
+              </th>
+              <td
+                mat-cell
+                *matCellDef="let product"
+                class="px-6 py-4"
+                style="border-bottom: 1px solid #e5e7eb !important"
+              >
+                <div class="flex items-center space-x-3">
+                  <div
+                    class="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold bg-purple-500"
+                  >
+                    {{ product.productName.charAt(0) }}
+                  </div>
+                  <div class="font-medium text-gray-900">
+                    {{ product.productName }}
+                  </div>
+                </div>
+              </td>
+            </ng-container>
+
+            <!-- Code Column -->
+            <ng-container matColumnDef="code">
+              <th
+                mat-header-cell
+                *matHeaderCellDef
+                class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase bg-gray-100"
+                style="border-bottom: 1px solid #e5e7eb !important"
+              >
+                Code
+              </th>
+              <td
+                mat-cell
+                *matCellDef="let product"
+                class="px-6 py-4 text-gray-600"
+                style="border-bottom: 1px solid #e5e7eb !important"
+              >
+                {{ product.productCode }}
+              </td>
+            </ng-container>
+
+            <!-- Barcode Column -->
+            <ng-container matColumnDef="barcode">
+              <th
+                mat-header-cell
+                *matHeaderCellDef
+                class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase bg-gray-100"
+                style="border-bottom: 1px solid #e5e7eb !important"
+              >
+                Barcode
+              </th>
+              <td
+                mat-cell
+                *matCellDef="let product"
+                class="px-6 py-4 text-gray-600"
+                style="border-bottom: 1px solid #e5e7eb !important"
+              >
+                {{ product.barCode || "N/A" }}
+              </td>
+            </ng-container>
+
+            <!-- Category Column -->
+            <ng-container matColumnDef="category">
+              <th
+                mat-header-cell
+                *matHeaderCellDef
+                class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase bg-gray-100"
+                style="border-bottom: 1px solid #e5e7eb !important"
+              >
+                Category
+              </th>
+              <td
+                mat-cell
+                *matCellDef="let product"
+                class="px-6 py-4 text-gray-600"
+                style="border-bottom: 1px solid #e5e7eb !important"
+              >
+                <div>{{ product.categoryName }}</div>
+                <div class="text-xs text-gray-400">
+                  {{ product.subCategoryName }}
+                </div>
+              </td>
+            </ng-container>
+
+            <!-- Price Column -->
+            <ng-container matColumnDef="price">
+              <th
+                mat-header-cell
+                *matHeaderCellDef
+                class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase bg-gray-100"
+                style="border-bottom: 1px solid #e5e7eb !important"
+              >
+                Price
+              </th>
+              <td
+                mat-cell
+                *matCellDef="let product"
+                class="px-6 py-4"
+                style="border-bottom: 1px solid #e5e7eb !important"
+              >
+                <div class="font-semibold text-gray-900">
+                  LKR {{ product.sellingPrice | number: "1.0-0" }}
+                </div>
+                <div
+                  class="text-xs text-red-600"
+                  *ngIf="
+                    product.discountedPrice > 0 &&
+                    product.discountedPrice < product.sellingPrice
+                  "
+                >
+                  Disc: LKR
+                  {{
+                    product.sellingPrice - product.discountedPrice
+                      | number: "1.0-0"
+                  }}
+                </div>
+              </td>
+            </ng-container>
+
+            <!-- Status Column -->
+            <ng-container matColumnDef="status">
+              <th
+                mat-header-cell
+                *matHeaderCellDef
+                class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase bg-gray-100"
+                style="border-bottom: 1px solid #e5e7eb !important"
+              >
+                Status
+              </th>
+              <td
+                mat-cell
+                *matCellDef="let product"
+                class="px-6 py-4"
+                style="border-bottom: 1px solid #e5e7eb !important"
+              >
+                <span
+                  class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border"
+                  [ngClass]="getStatusColor(product.isActive)"
+                >
+                  <i
+                    class="fas fa-circle mr-1.5"
+                    [ngClass]="
+                      product.isActive ? 'text-green-400' : 'text-red-400'
+                    "
+                    [style.font-size.px]="8"
+                  ></i>
+                  {{ product.isActive ? "Active" : "Inactive" }}
+                </span>
+              </td>
+            </ng-container>
+
+            <!-- Actions Column -->
+            <ng-container matColumnDef="actions">
+              <th
+                mat-header-cell
+                *matHeaderCellDef
+                class="px-6 py-4 text-center text-xs font-medium text-gray-500 uppercase bg-gray-100"
+                style="border-bottom: 1px solid #e5e7eb !important"
+              >
+                Actions
+              </th>
+              <td
+                mat-cell
+                *matCellDef="let product"
+                class="px-6 py-4 text-center"
+                style="border-bottom: 1px solid #e5e7eb !important"
+              >
+                <div class="flex justify-center space-x-4">
+                  <button
+                    *ngIf="auth.hasAnyRole(['Admin', 'Manager', 'Operator'])"
+                    title="Edit Product"
+                    (click)="openEditProductModal(product)"
+                    class="text-blue-600 hover:text-blue-900 p-1 rounded hover:bg-blue-50 transition-colors duration-150 cursor-pointer"
+                  >
+                    <i class="fas fa-edit"></i>
+                  </button>
+                  <button
+                    *ngIf="auth.hasAnyRole(['Viewer'])"
+                    title="View Product"
+                    (click)="openEditProductModal(product)"
+                    class="text-blue-600 hover:text-blue-900 p-1 rounded hover:bg-blue-50 transition-colors duration-150 cursor-pointer"
+                  >
+                    <i class="fas fa-eye"></i>
+                  </button>
+                  <button
+                    *ngIf="auth.hasAnyRole(['Admin', 'Manager'])"
+                    title="Delete Product"
+                    (click)="deleteProduct(product)"
+                    class="text-red-600 hover:text-red-900 p-1 rounded hover:bg-red-50 transition-colors duration-150 cursor-pointer"
+                  >
+                    <i class="fas fa-trash"></i>
+                  </button>
+                  <button
+                    *ngIf="auth.hasAnyRole(['Admin', 'Manager', 'Operator'])"
+                    title="Bind all ESLs to Minew"
+                    [disabled]="bindingProductId === product.id"
+                    (click)="bindProductEsl(product)"
+                    class="text-green-600 hover:text-green-900 p-1 rounded hover:bg-green-50 transition-colors duration-150 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    <i
+                      class="fas"
+                      [ngClass]="
+                        bindingProductId === product.id
+                          ? 'fa-spinner fa-spin'
+                          : 'fa-link'
+                      "
+                    ></i>
+                  </button>
+                  <button
+                    title="View assigned devices"
+                    (click)="openDeviceListDialog(product)"
+                    class="text-slate-600 hover:text-slate-900 p-1 rounded hover:bg-slate-100 transition-colors duration-150 cursor-pointer"
+                  >
+                    <i class="fas fa-microchip"></i>
+                  </button>
+                </div>
+              </td>
+            </ng-container>
+
+            <tr
+              mat-header-row
+              *matHeaderRowDef="productDisplayedColumns"
+              class="bg-gray-100"
+            ></tr>
+            <tr
+              mat-row
+              *matRowDef="let row; columns: productDisplayedColumns"
+              class="hover:bg-gray-50"
+            ></tr>
+          </table>
+        </div>
+
+        <!-- Paginator -->
+        <mat-paginator
+          #productPaginator
+          [length]="productTotalCount"
+          [pageSize]="productPageSize"
+          [pageSizeOptions]="productPageSizeOptions"
+          [pageIndex]="productCurrentPage"
+          (page)="onProductPageChange($event)"
+          showFirstLastButtons
+          aria-label="Select page of products"
+        >
+        </mat-paginator>
+      </div>
+    </div>
+  </div>
+
+  <!-- Assigned Devices Popup -->
+  <p-dialog
+    [(visible)]="deviceListDialogVisible"
+    [modal]="true"
+    [style]="{ width: '32rem' }"
+    [header]="
+      'Assigned Devices' +
+      (deviceListProduct ? ' - ' + deviceListProduct.productName : '')
+    "
+    (onHide)="closeDeviceListDialog()"
+  >
+    <div *ngIf="deviceListLoading" class="flex justify-center py-8">
+      <mat-spinner diameter="32"></mat-spinner>
+    </div>
+
+    <div
+      *ngIf="!deviceListLoading && deviceListItems.length === 0"
+      class="py-8 text-center text-gray-500"
+    >
+      No devices assigned to this product.
+    </div>
+
+    <div
+      *ngIf="!deviceListLoading && deviceListItems.length > 0"
+      class="space-y-3 max-h-96 overflow-y-auto"
+    >
+      <div
+        *ngFor="let item of deviceListItems"
+        class="border rounded-lg p-3 flex items-start justify-between gap-3"
+      >
+        <div>
+          <div class="font-semibold text-gray-900">
+            {{ item.deviceName || 'Unknown Device' }}
+          </div>
+          <div class="text-xs text-gray-500">MAC: {{ item.deviceMac }}</div>
+          <div class="text-xs text-gray-500">
+            {{ item.assignmentType === 'TEMPLATE' ? 'Template' : 'Message' }}:
+            {{ getAssignmentBindingLabel(item) }}
+          </div>
+        </div>
+        <div class="text-right shrink-0">
+          <span
+            class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium border"
+            [ngClass]="getStatusColor(item.isActive)"
+          >
+            {{ item.isActive ? 'Active' : 'Inactive' }}
+          </span>
+          <div *ngIf="item.battery != null" class="text-xs text-gray-500 mt-1">
+            Battery: {{ item.battery }}%
+          </div>
+        </div>
+      </div>
+    </div>
+  </p-dialog>
+</div>

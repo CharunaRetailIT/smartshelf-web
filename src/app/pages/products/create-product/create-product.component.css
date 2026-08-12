@@ -1,0 +1,43 @@
+/* Dialog overlay */
+.p-dialog-mask {
+  background-color: rgba(0, 0, 0, 0.4) !important;
+}
+
+/* Dialog container */
+.p-dialog {
+  border-radius: 0.5rem !important;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04) !important;
+}
+
+/* Responsive dialog */
+@media (max-width: 640px) {
+  .p-dialog {
+    width: 95% !important;
+    margin: 1rem auto !important;
+  }
+}
+
+:host ::ng-deep .p-dialog-mask {
+  background-color: rgba(0, 0, 0, 0.4) !important;
+  backdrop-filter: blur(2px);
+}
+
+:host ::ng-deep .p-dialog {
+  background-color: white !important;
+  border-radius: 8px !important;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2) !important;
+}
+
+:host ::ng-deep .p-dialog-content {
+  background-color: white !important;
+  border-radius: 8px !important;
+  padding: 0 !important;
+}
+
+:host ::ng-deep .p-dialog-header {
+  background-color: white !important;
+  border-top-left-radius: 8px !important;
+  border-top-right-radius: 8px !important;
+  border-bottom: 1px solid #e5e7eb !important;
+  padding: 1.5rem !important;
+}

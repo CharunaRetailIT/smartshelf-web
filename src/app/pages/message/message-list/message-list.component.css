@@ -1,0 +1,222 @@
+/* message-list.component.css */
+
+/* Base styles */
+.min-h-screen {
+  min-height: 100vh;
+}
+
+.bg-gray-50 {
+  background-color: #f9fafb;
+}
+
+/* Header section */
+/* Header button positioning */
+.max-w-7xl .bg-white.rounded-lg.shadow-sm .flex > div:last-child {
+  margin-left: auto;
+}
+/* Table improvements */
+.mat-table {
+  background: white;
+  width: 100%;
+}
+
+.mat-header-cell {
+  font-weight: 600 !important;
+  color: #6b7280 !important;
+  background-color: #f9fafb !important;
+  border-bottom: 1px solid #e5e7eb !important;
+  padding: 16px 24px !important;
+}
+
+.mat-cell {
+  border-bottom: 1px solid #e5e7eb !important;
+  padding: 16px 24px !important;
+}
+
+.mat-row:hover {
+  background-color: #f9fafb !important;
+  transition: background-color 0.15s ease-in-out;
+}
+
+/* Form field consistency */
+.mat-form-field {
+  width: 100%;
+}
+
+.mat-form-field-appearance-outline .mat-form-field-outline {
+  color: #d1d5db !important;
+}
+
+.mat-form-field-appearance-outline.mat-focused .mat-form-field-outline-thick {
+  color: #3b82f6 !important;
+}
+
+/* Button hover effects */
+button {
+  transition: all 0.15s ease-in-out;
+}
+
+button:hover {
+  transform: translateY(-1px);
+}
+
+button:active {
+  transform: translateY(0);
+}
+
+/* Status badge improvements */
+.inline-flex.items-center.px-2\.5.py-0\.5.rounded-full {
+  font-weight: 500;
+  letter-spacing: 0.025em;
+}
+
+/* Action button improvements */
+.text-blue-600:hover {
+  color: #1d4ed8 !important;
+  background-color: #eff6ff !important;
+}
+
+.text-red-600:hover {
+  color: #dc2626 !important;
+  background-color: #fef2f2 !important;
+}
+
+/* Search input improvements */
+input[type="text"] {
+  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+input[type="text"]:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+/* Select improvements */
+select {
+  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+select:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+/* Empty state improvements */
+.text-center.py-16 {
+  padding: 4rem 1rem;
+}
+
+.text-center.py-16 .w-20.h-20 {
+  width: 5rem;
+  height: 5rem;
+  background-color: #f3f4f6;
+}
+
+/* Pagination */
+.mat-paginator {
+  background-color: #f9fafb !important;
+  border-top: 1px solid #e5e7eb !important;
+}
+
+/* Font Awesome icons */
+.fas {
+  font-family: "Font Awesome 5 Free" !important;
+  font-weight: 900;
+}
+
+/* Form validation */
+.mat-error {
+  color: #dc2626 !important;
+  font-size: 0.75rem;
+}
+
+/* Mobile responsive styles */
+@media (max-width: 640px) {
+  /* Header adjustments */
+  .max-w-7xl .bg-white.rounded-lg.shadow-sm .flex {
+    flex-direction: column;
+    align-items: flex-start !important;
+    gap: 1rem;
+  }
+  
+  .max-w-7xl .bg-white.rounded-lg.shadow-sm .flex > div:last-child {
+    margin-left: 0 !important;
+    padding-left: 0 !important;
+    width: 100%;
+  }
+  
+  /* Filter sections */
+  .bg-white.rounded-lg.shadow-sm .flex.justify-between.items-center {
+    flex-direction: column;
+    align-items: flex-start !important;
+    gap: 1rem;
+  }
+  
+  .bg-white.rounded-lg.shadow-sm .flex.justify-between.items-center > div {
+    width: 100%;
+  }
+  
+  /* Table responsiveness */
+  .mat-table {
+    min-width: 800px;
+  }
+  
+  .px-6 {
+    padding-left: 1rem !important;
+    padding-right: 1rem !important;
+  }
+  
+  .p-6 {
+    padding: 1rem !important;
+  }
+  
+  .text-2xl {
+    font-size: 1.5rem !important;
+  }
+  
+  .space-x-4 > * + * {
+    margin-left: 0.75rem !important;
+  }
+}
+
+/* Tablet styles */
+@media (min-width: 641px) and (max-width: 768px) {
+  .max-w-7xl .bg-white.rounded-lg.shadow-sm .flex > div:last-child {
+    margin-left: 30% !important;
+  }
+  
+  .bg-white.rounded-lg.shadow-sm .flex.justify-between.items-center {
+    flex-wrap: wrap;
+  }
+  
+  .bg-white.rounded-lg.shadow-sm .flex.justify-between.items-center > div:first-child {
+    width: 100%;
+    margin-bottom: 1rem;
+  }
+}
+
+
+.edit-message-dialog {
+  padding: 0 !important;
+  overflow: hidden !important;
+}
+
+.edit-dialog-backdrop {
+  backdrop-filter: blur(4px);
+}
+
+.cdk-overlay-pane {
+  border-radius: 12px !important;
+}
+
+/* Responsive dialog sizing */
+@media (max-width: 768px) {
+  .edit-message-dialog {
+    width: 100vw !important;
+    height: 100vh !important;
+    max-width: 100vw !important;
+    max-height: 100vh !important;
+  }
+}

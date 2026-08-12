@@ -1,0 +1,1436 @@
+<!-- Complete message-creator.component.html - Single Unified File -->
+<div class="min-h-screen bg-gray-50 p-4">
+  <!-- Header Section -->
+  <div class="max-w-7xl mx-auto mb-6">
+    <div
+      class="flex items-center justify-between bg-white rounded-xl shadow-sm p-6 border border-gray-100"
+    >
+      <div class="flex items-center space-x-4">
+        <!-- <div class="w-12 h-12 bg-secondary rounded-xl flex items-center justify-center"> -->
+        <!-- <i class="fas fa-plus text-white text-lg"></i> -->
+        <i class="pi pi-comment text-blue-600 text-2xl"></i>
+        <!-- </div> -->
+        <div>
+          <h1 class="text-2xl font-bold text-secondary-dark">Create Message</h1>
+          <p class="text-secondary-light text-sm">
+            Create and manage digital signage content
+          </p>
+        </div>
+      </div>
+      <button
+        type="button"
+        (click)="resetForm()"
+        class="px-4 py-2 text-gray-600 hover:text-gray-800 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
+      >
+        <i class="fas fa-undo mr-2"></i>Reset
+      </button>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <div class="max-w-7xl mx-auto">
+    <div
+      class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden"
+    >
+      <!-- Message Type Selection -->
+      <div class="p-6 border-b border-gray-100">
+        <h3 class="text-lg font-semibold text-gray-900 mb-4">
+          <i class="fas fa-layer-group text-gray-400 mr-2"></i>Message Type
+        </h3>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+          <button
+            type="button"
+            (click)="onMessageTypeChange('general')"
+            [class]="
+              selectedMessageType === 'general'
+                ? 'bg-blue-50 border-blue-300 shadow-sm'
+                : 'bg-white border-gray-200 hover:border-gray-300 hover:shadow-sm'
+            "
+            class="p-4 rounded-xl border-2 transition-all duration-200 group"
+          >
+            <div class="flex flex-col items-center space-y-3">
+              <div
+                [class]="
+                  selectedMessageType === 'general'
+                    ? 'bg-blue-100 text-blue-600'
+                    : 'bg-gray-100 text-gray-600 group-hover:bg-gray-200'
+                "
+                class="w-12 h-12 rounded-xl flex items-center justify-center transition-colors"
+              >
+                <i class="fas fa-align-left text-lg"></i>
+              </div>
+              <div class="text-center">
+                <h4 class="font-medium text-gray-900">General Message</h4>
+                <p class="text-xs text-gray-500">Text-based content</p>
+              </div>
+            </div>
+          </button>
+
+          <button
+            type="button"
+            (click)="onMessageTypeChange('image')"
+            [class]="
+              selectedMessageType === 'image'
+                ? 'bg-blue-50 border-blue-300 shadow-sm'
+                : 'bg-white border-gray-200 hover:border-gray-300 hover:shadow-sm'
+            "
+            class="p-4 rounded-xl border-2 transition-all duration-200 group"
+          >
+            <div class="flex flex-col items-center space-y-3">
+              <div
+                [class]="
+                  selectedMessageType === 'image'
+                    ? 'bg-green-100 text-green-600'
+                    : 'bg-gray-100 text-gray-600 group-hover:bg-gray-200'
+                "
+                class="w-12 h-12 rounded-xl flex items-center justify-center transition-colors"
+              >
+                <i class="fas fa-image text-lg"></i>
+              </div>
+              <div class="text-center">
+                <h4 class="font-medium text-gray-900">Image Upload</h4>
+                <p class="text-xs text-gray-500">Upload image files</p>
+              </div>
+            </div>
+          </button>
+
+          <button
+            type="button"
+            (click)="onMessageTypeChange('video')"
+            [class]="
+              selectedMessageType === 'video'
+                ? 'bg-blue-50 border-blue-300 shadow-sm'
+                : 'bg-white border-gray-200 hover:border-gray-300 hover:shadow-sm'
+            "
+            class="p-4 rounded-xl border-2 transition-all duration-200 group"
+          >
+            <div class="flex flex-col items-center space-y-3">
+              <div
+                [class]="
+                  selectedMessageType === 'video'
+                    ? 'bg-purple-100 text-purple-600'
+                    : 'bg-gray-100 text-gray-600 group-hover:bg-gray-200'
+                "
+                class="w-12 h-12 rounded-xl flex items-center justify-center transition-colors"
+              >
+                <i class="fas fa-video text-lg"></i>
+              </div>
+              <div class="text-center">
+                <h4 class="font-medium text-gray-900">Video Upload</h4>
+                <p class="text-xs text-gray-500">Upload video files</p>
+              </div>
+            </div>
+          </button>
+
+          <button
+            type="button"
+            (click)="onMessageTypeChange('custom_image')"
+            [class]="
+              selectedMessageType === 'custom_image'
+                ? 'bg-blue-50 border-blue-300 shadow-sm'
+                : 'bg-white border-gray-200 hover:border-gray-300 hover:shadow-sm'
+            "
+            class="p-4 rounded-xl border-2 transition-all duration-200 group"
+          >
+            <div class="flex flex-col items-center space-y-3">
+              <div
+                [class]="
+                  selectedMessageType === 'custom_image'
+                    ? 'bg-orange-100 text-orange-600'
+                    : 'bg-gray-100 text-gray-600 group-hover:bg-gray-200'
+                "
+                class="w-12 h-12 rounded-xl flex items-center justify-center transition-colors"
+              >
+                <i class="fas fa-paint-brush text-lg"></i>
+              </div>
+              <div class="text-center">
+                <h4 class="font-medium text-gray-900">Custom Design</h4>
+                <p class="text-xs text-gray-500">Create custom graphics</p>
+              </div>
+            </div>
+          </button>
+        </div>
+      </div>
+
+      <form [formGroup]="messageForm" (ngSubmit)="onSubmit()">
+        <div class="grid grid-cols-1 xl:grid-cols-2 gap-8 p-6">
+          <!-- Left Column - Form Fields -->
+          <div class="space-y-6">
+            <div>
+              <h3 class="text-lg font-semibold text-gray-900 mb-4">
+                <i class="fas fa-cog text-gray-400 mr-2"></i>Basic Information
+              </h3>
+              <!-- In the "Basic Information" section, add this after the Duration field -->
+              <!-- In the "Basic Information" section, replace the existing select with this: -->
+              <div class="mb-5">
+                <label class="block text-sm font-medium text-gray-700 mb-2">
+                  Screen Size <span class="text-red-500">*</span>
+                  <span class="text-xs text-gray-500 ml-1"
+                    >(Canvas will be limited to this size)</span
+                  >
+                </label>
+
+                <p-dropdown
+                  #screenSizeDropdown
+                  formControlName="screenSize"
+                  [options]="screenSizeOptions"
+                  optionLabel="label"
+                  optionValue="id"
+                  [filter]="true"
+                  filterBy="name,label"
+                  [showClear]="true"
+                  placeholder="Select a screen size"
+                  [loading]="screenSizeLoading"
+                  [virtualScroll]="true"
+                  [virtualScrollItemSize]="38"
+                  (onChange)="onScreenSizeSelected($event)"
+                  (onFilter)="onScreenSizeFilter($event)"
+                  class="w-full"
+                  [style]="{ width: '100%' }"
+                >
+                  <ng-template pTemplate="header">
+                    <div class="p-3 border-b border-gray-200">
+                      <div class="flex justify-between items-center mb-2">
+                        <span class="font-semibold"
+                          >Available Screen Sizes</span
+                        >
+                        <span class="text-sm text-gray-500"
+                          >Total: {{ screenSizeTotalRecords }}</span
+                        >
+                      </div>
+                      <div class="flex gap-2" *ngIf="screenSizeHasPreviousPage">
+                        <button
+                          type="button"
+                          (click)="loadPreviousScreenSizes()"
+                          class="px-3 py-1 text-xs bg-gray-100 hover:bg-gray-200 rounded transition-colors"
+                        >
+                          <i class="fas fa-arrow-up mr-1"></i>Load Previous
+                        </button>
+                      </div>
+                    </div>
+                  </ng-template>
+
+                  <ng-template let-screen pTemplate="item">
+                    <div
+                      class="flex items-center justify-between p-2 hover:bg-gray-50"
+                    >
+                      <div>
+                        <div class="font-medium">{{ screen.name }}</div>
+                        <div class="text-xs text-gray-500">
+                          {{ screen.width }}x{{ screen.height }}px
+                        </div>
+                      </div>
+                      <span class="text-xs bg-gray-100 px-2 py-1 rounded">{{
+                        screen.aspectRatio ?? ""
+                      }}</span>
+                    </div>
+                  </ng-template>
+
+                  <ng-template pTemplate="footer">
+                    <div
+                      class="p-3 border-t border-gray-200"
+                      *ngIf="screenSizeHasNextPage"
+                    >
+                      <button
+                        type="button"
+                        (click)="loadMoreScreenSizes()"
+                        class="w-full px-3 py-2 text-sm bg-blue-50 hover:bg-blue-100 text-blue-600 rounded transition-colors flex items-center justify-center"
+                      >
+                        <i class="fas fa-arrow-down mr-2"></i>Load More ({{
+                          screenSizePageSize
+                        }}
+                        more)
+                      </button>
+                    </div>
+                  </ng-template>
+
+                  <ng-template pTemplate="empty">
+                    <div class="p-4 text-center text-gray-500">
+                      <i class="fas fa-search text-lg mb-2"></i>
+                      <p>No screen sizes found</p>
+                      <p class="text-sm mt-1" *ngIf="screenSizeSearchTerm">
+                        Try a different search term
+                      </p>
+                    </div>
+                  </ng-template>
+
+                  <!-- <ng-template pTemplate="loadingitem">
+                    <div class="flex items-center justify-center p-3">
+                      <i class="fas fa-spinner fa-spin mr-2"></i>
+                      <span>Loading screen sizes...</span>
+                    </div>
+                  </ng-template> -->
+                </p-dropdown>
+
+                <div class="mt-2">
+                  <p class="text-xs text-gray-500" *ngIf="selectedScreenSize">
+                    Selected: {{ selectedScreenSize.name }} -
+                    {{ selectedScreenSize.width }}x{{
+                      selectedScreenSize.height
+                    }}px
+                    <span *ngIf="selectedMessageType === 'custom_image'">
+                      | Canvas size: {{ canvasWidth }}x{{ canvasHeight }}
+                    </span>
+                  </p>
+                  <p class="text-xs text-gray-500" *ngIf="!selectedScreenSize">
+                    Please select a screen size
+                  </p>
+                </div>
+
+                <div
+                  *ngIf="
+                    messageForm.get('screenSize')?.invalid &&
+                    messageForm.get('screenSize')?.touched
+                  "
+                  class="mt-2 text-sm text-red-600"
+                >
+                  <i class="fas fa-exclamation-circle mr-1"></i>Screen size is
+                  required
+                </div>
+              </div>
+
+              <!-- Title Field -->
+              <div class="mb-5">
+                <label class="block text-sm font-medium text-gray-700 mb-2">
+                  Message Title <span class="text-red-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  formControlName="title"
+                  placeholder="Enter message title"
+                  class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                />
+                <div
+                  *ngIf="
+                    messageForm.get('title')?.invalid &&
+                    messageForm.get('title')?.touched
+                  "
+                  class="mt-2 text-sm text-red-600"
+                >
+                  <i class="fas fa-exclamation-circle mr-1"></i
+                  >{{ getErrorMessage("title") }}
+                </div>
+              </div>
+
+              <!-- Duration Field -->
+              <div *ngIf="false" class="mb-5">
+                <label class="block text-sm font-medium text-gray-700 mb-2">
+                  Duration (seconds) <span class="text-red-500">*</span>
+                </label>
+                <input
+                  type="number"
+                  formControlName="duration"
+                  min="1"
+                  max="300"
+                  placeholder="5"
+                  class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                />
+                <p class="mt-1 text-xs text-gray-500">
+                  Display duration between 1-300 seconds
+                </p>
+                <div
+                  *ngIf="
+                    messageForm.get('duration')?.invalid &&
+                    messageForm.get('duration')?.touched
+                  "
+                  class="mt-2 text-sm text-red-600"
+                >
+                  <i class="fas fa-exclamation-circle mr-1"></i
+                  >{{ getErrorMessage("duration") }}
+                </div>
+              </div>
+
+              <!-- Created By Field -->
+              <!-- <div class="mb-5">
+                <label class="block text-sm font-medium text-gray-700 mb-2">
+                  Created By <span class="text-red-500">*</span>
+                </label>
+                <input type="text" 
+                       formControlName="created_by" 
+                       placeholder="Enter creator name"
+                       class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors">
+                <div *ngIf="messageForm.get('created_by')?.invalid && messageForm.get('created_by')?.touched" 
+                     class="mt-2 text-sm text-red-600">
+                  <i class="fas fa-exclamation-circle mr-1"></i>{{ getErrorMessage('created_by') }}
+                </div>
+              </div> -->
+            </div>
+
+            <!-- Content Section -->
+            <div>
+              <h3 class="text-lg font-semibold text-gray-900 mb-4">
+                <i class="fas fa-edit text-gray-400 mr-2"></i>Content
+                Configuration
+              </h3>
+
+              <!-- General Message Content -->
+              <div *ngIf="selectedMessageType === 'general'" class="space-y-4">
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-2">
+                    Message Content <span class="text-red-500">*</span>
+                  </label>
+                  <textarea
+                    formControlName="content_data"
+                    rows="5"
+                    placeholder="Enter your message content here..."
+                    class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors resize-none"
+                  ></textarea>
+                  <div
+                    *ngIf="
+                      messageForm.get('content_data')?.invalid &&
+                      messageForm.get('content_data')?.touched
+                    "
+                    class="mt-2 text-sm text-red-600"
+                  >
+                    <i class="fas fa-exclamation-circle mr-1"></i>Message
+                    content is required
+                  </div>
+                </div>
+              </div>
+
+              <!-- File Upload for Image/Video -->
+              <div
+                *ngIf="
+                  selectedMessageType === 'image' ||
+                  selectedMessageType === 'video'
+                "
+                class="space-y-4"
+              >
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-2">
+                    {{
+                      selectedMessageType === "image"
+                        ? "Upload Image"
+                        : "Upload Video"
+                    }}
+                    <span class="text-red-500">*</span>
+                  </label>
+                  <div
+                    class="border-2 border-dashed border-gray-300 rounded-xl p-8 text-center hover:border-gray-400 transition-colors bg-gray-50"
+                  >
+                    <input
+                      #fileInput
+                      type="file"
+                      (change)="onFileSelected($event)"
+                      [accept]="
+                        selectedMessageType === 'image' ? 'image/*' : 'video/*'
+                      "
+                      class="hidden"
+                    />
+
+                    <div
+                      *ngIf="!selectedFile"
+                      class="cursor-pointer"
+                      (click)="fileInput.click()"
+                    >
+                      <div
+                        class="w-16 h-16 mx-auto rounded-full bg-gray-100 flex items-center justify-center mb-4"
+                      >
+                        <i
+                          [class]="
+                            selectedMessageType === 'image'
+                              ? 'fas fa-image'
+                              : 'fas fa-video'
+                          "
+                          class="text-2xl text-gray-400"
+                        ></i>
+                      </div>
+                      <h4 class="text-lg font-medium text-gray-900 mb-2">
+                        {{
+                          selectedMessageType === "image"
+                            ? "Upload an image"
+                            : "Upload a video"
+                        }}
+                      </h4>
+                      <p class="text-gray-500 mb-4">
+                        {{
+                          selectedMessageType === "image"
+                            ? "PNG, JPG, JPEG up to 10MB"
+                            : "MP4, AVI, MOV up to 100MB"
+                        }}
+                      </p>
+                      <div
+                        class="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                      >
+                        <i class="fas fa-cloud-upload-alt mr-2"></i>Browse Files
+                      </div>
+                    </div>
+
+                    <div *ngIf="selectedFile" class="space-y-4">
+                      <div
+                        class="w-16 h-16 mx-auto rounded-full bg-green-100 flex items-center justify-center"
+                      >
+                        <i class="fas fa-check text-green-600 text-2xl"></i>
+                      </div>
+                      <div>
+                        <p class="text-lg font-medium text-gray-900 mb-1">
+                          {{ selectedFile.name }}
+                        </p>
+                        <p class="text-sm text-gray-500">
+                          {{ (selectedFile.size / 1024 / 1024).toFixed(2) }} MB
+                        </p>
+                      </div>
+                      <button
+                        type="button"
+                        (click)="fileInput.click()"
+                        class="inline-flex items-center px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors"
+                      >
+                        <i class="fas fa-sync-alt mr-2"></i>Change File
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Enhanced Canvas Tools for Custom Image -->
+              <div
+                *ngIf="selectedMessageType === 'custom_image'"
+                class="space-y-6"
+              >
+                <!-- Tool Categories -->
+                <div class="flex flex-wrap gap-2 mb-4">
+                  <button
+                    type="button"
+                    [class]="
+                      activeToolCategory === 'shapes'
+                        ? 'bg-blue-600 text-white'
+                        : 'bg-gray-200 text-gray-700'
+                    "
+                    (click)="setActiveToolCategory('shapes')"
+                    class="px-4 py-2 rounded-lg transition-colors"
+                  >
+                    <i class="fas fa-shapes mr-2"></i>Shapes
+                  </button>
+                  <button
+                    type="button"
+                    [class]="
+                      activeToolCategory === 'text'
+                        ? 'bg-blue-600 text-white'
+                        : 'bg-gray-200 text-gray-700'
+                    "
+                    (click)="setActiveToolCategory('text')"
+                    class="px-4 py-2 rounded-lg transition-colors"
+                  >
+                    <i class="fas fa-font mr-2"></i>Text
+                  </button>
+                  <button
+                    type="button"
+                    [class]="
+                      activeToolCategory === 'colors'
+                        ? 'bg-blue-600 text-white'
+                        : 'bg-gray-200 text-gray-700'
+                    "
+                    (click)="setActiveToolCategory('colors')"
+                    class="px-4 py-2 rounded-lg transition-colors"
+                  >
+                    <i class="fas fa-palette mr-2"></i>Colors
+                  </button>
+                  <button
+                    type="button"
+                    [class]="
+                      activeToolCategory === 'layout'
+                        ? 'bg-blue-600 text-white'
+                        : 'bg-gray-200 text-gray-700'
+                    "
+                    (click)="setActiveToolCategory('layout')"
+                    class="px-4 py-2 rounded-lg transition-colors"
+                  >
+                    <i class="fas fa-layer-group mr-2"></i>Layout
+                  </button>
+                </div>
+
+                <!-- Shapes Tools -->
+                <div *ngIf="activeToolCategory === 'shapes'" class="space-y-4">
+                  <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-3"
+                      >Add Shapes</label
+                    >
+                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                      <button
+                        type="button"
+                        (click)="addText()"
+                        class="flex flex-col items-center px-4 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
+                      >
+                        <i class="fas fa-font text-lg mb-1"></i>
+                        <span class="text-xs">Text</span>
+                      </button>
+                      <button
+                        type="button"
+                        (click)="addRectangle()"
+                        class="flex flex-col items-center px-4 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+                      >
+                        <i class="fas fa-square text-lg mb-1"></i>
+                        <span class="text-xs">Rectangle</span>
+                      </button>
+                      <button
+                        type="button"
+                        (click)="addCircle()"
+                        class="flex flex-col items-center px-4 py-3 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 transition-colors"
+                      >
+                        <i class="fas fa-circle text-lg mb-1"></i>
+                        <span class="text-xs">Circle</span>
+                      </button>
+                      <button
+                        type="button"
+                        (click)="uploadImage()"
+                        class="flex flex-col items-center px-4 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors"
+                      >
+                        <i class="fas fa-image text-lg mb-1"></i>
+                        <span class="text-xs">Image</span>
+                      </button>
+                    </div>
+                  </div>
+
+                  <!-- Border Styles -->
+                  <div *ngIf="hasSelection">
+                    <label class="block text-sm font-medium text-gray-700 mb-3"
+                      >Border Styles</label
+                    >
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div>
+                        <label class="block text-xs text-gray-600 mb-1"
+                          >Border Width</label
+                        >
+                        <input
+                          type="range"
+                          min="0"
+                          max="10"
+                          step="1"
+                          [value]="selectedProperties?.strokeWidth || 0"
+                          (input)="changeStrokeWidth($event)"
+                          class="w-full"
+                        />
+                        <div class="text-xs text-gray-500 mt-1">
+                          {{ selectedProperties?.strokeWidth || 0 }}px
+                        </div>
+                      </div>
+                      <div>
+                        <label class="block text-xs text-gray-600 mb-1"
+                          >Border Radius</label
+                        >
+                        <input
+                          type="range"
+                          min="0"
+                          max="50"
+                          step="1"
+                          [value]="selectedProperties?.rx || 0"
+                          (input)="setBorderRadius($event)"
+                          class="w-full"
+                        />
+                        <div class="text-xs text-gray-500 mt-1">
+                          {{ selectedProperties?.rx || 0 }}px
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Border Patterns -->
+                    <div class="mt-3">
+                      <label class="block text-xs text-gray-600 mb-2"
+                        >Border Style</label
+                      >
+                      <div class="grid grid-cols-4 gap-2">
+                        <button
+                          type="button"
+                          (click)="setBorderStyle([])"
+                          class="px-3 py-2 border-2 border-gray-300 rounded text-xs hover:bg-gray-50"
+                        >
+                          Solid
+                        </button>
+                        <button
+                          type="button"
+                          (click)="setBorderStyle([5, 5])"
+                          class="px-3 py-2 border-2 border-dashed border-gray-300 rounded text-xs hover:bg-gray-50"
+                        >
+                          Dashed
+                        </button>
+                        <button
+                          type="button"
+                          (click)="setBorderStyle([2, 2])"
+                          class="px-3 py-2 border-2 border-dotted border-gray-300 rounded text-xs hover:bg-gray-50"
+                        >
+                          Dotted
+                        </button>
+                        <button
+                          type="button"
+                          (click)="setBorderStyle([10, 5, 2, 5])"
+                          class="px-3 py-2 border-2 border-gray-300 rounded text-xs hover:bg-gray-50"
+                        >
+                          Mixed
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Text Tools -->
+                <div *ngIf="activeToolCategory === 'text'" class="space-y-4">
+                  <div *ngIf="hasSelectedText">
+                    <label class="block text-sm font-medium text-gray-700 mb-3"
+                      >Text Formatting</label
+                    >
+
+                    <!-- Font Family -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+                      <div>
+                        <label class="block text-xs text-gray-600 mb-1"
+                          >Font Family</label
+                        >
+                        <select
+                          (change)="
+                            updateTextStyle('fontFamily', $event.target)
+                          "
+                          class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"
+                        >
+                          <option value="Arial">Arial</option>
+                          <option value="Times New Roman">
+                            Times New Roman
+                          </option>
+                          <option value="Helvetica">Helvetica</option>
+                          <option value="Georgia">Georgia</option>
+                          <option value="Verdana">Verdana</option>
+                          <option value="Comic Sans MS">Comic Sans MS</option>
+                          <option value="Impact">Impact</option>
+                          <option value="Trebuchet MS">Trebuchet MS</option>
+                        </select>
+                      </div>
+                      <div>
+                        <label class="block text-xs text-gray-600 mb-1"
+                          >Font Size</label
+                        >
+                        <input
+                          type="range"
+                          min="8"
+                          max="72"
+                          step="1"
+                          [value]="selectedProperties?.fontSize || 20"
+                          (input)="updateTextStyle('fontSize', $event.target)"
+                          class="w-full"
+                        />
+                        <div class="text-xs text-gray-500 mt-1">
+                          {{ selectedProperties?.fontSize || 20 }}px
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Text Style Buttons -->
+                    <div class="flex flex-wrap gap-2 mb-4">
+                      <button
+                        type="button"
+                        [class]="
+                          selectedProperties?.fontWeight === 'bold'
+                            ? 'bg-blue-600 text-white'
+                            : 'bg-gray-200 text-gray-700'
+                        "
+                        (click)="
+                          toggleTextStyle('fontWeight', 'bold', 'normal')
+                        "
+                        class="px-3 py-2 rounded-lg transition-colors"
+                      >
+                        <i class="fas fa-bold"></i>
+                      </button>
+                      <button
+                        type="button"
+                        [class]="
+                          selectedProperties?.fontStyle === 'italic'
+                            ? 'bg-blue-600 text-white'
+                            : 'bg-gray-200 text-gray-700'
+                        "
+                        (click)="
+                          toggleTextStyle('fontStyle', 'italic', 'normal')
+                        "
+                        class="px-3 py-2 rounded-lg transition-colors"
+                      >
+                        <i class="fas fa-italic"></i>
+                      </button>
+                      <button
+                        type="button"
+                        [class]="
+                          selectedProperties?.underline
+                            ? 'bg-blue-600 text-white'
+                            : 'bg-gray-200 text-gray-700'
+                        "
+                        (click)="toggleTextStyle('underline', true, false)"
+                        class="px-3 py-2 rounded-lg transition-colors"
+                      >
+                        <i class="fas fa-underline"></i>
+                      </button>
+                      <button
+                        type="button"
+                        [class]="
+                          selectedProperties?.linethrough
+                            ? 'bg-blue-600 text-white'
+                            : 'bg-gray-200 text-gray-700'
+                        "
+                        (click)="toggleTextStyle('linethrough', true, false)"
+                        class="px-3 py-2 rounded-lg transition-colors"
+                      >
+                        <i class="fas fa-strikethrough"></i>
+                      </button>
+                    </div>
+
+                    <!-- Text Alignment -->
+                    <div>
+                      <label class="block text-xs text-gray-600 mb-2"
+                        >Text Alignment</label
+                      >
+                      <div class="flex gap-2">
+                        <button
+                          type="button"
+                          [class]="
+                            selectedProperties?.textAlign === 'left'
+                              ? 'bg-blue-600 text-white'
+                              : 'bg-gray-200 text-gray-700'
+                          "
+                          (click)="updateTextStyle('textAlign', 'left')"
+                          class="px-3 py-2 rounded-lg transition-colors"
+                        >
+                          <i class="fas fa-align-left"></i>
+                        </button>
+                        <button
+                          type="button"
+                          [class]="
+                            selectedProperties?.textAlign === 'center'
+                              ? 'bg-blue-600 text-white'
+                              : 'bg-gray-200 text-gray-700'
+                          "
+                          (click)="updateTextStyle('textAlign', 'center')"
+                          class="px-3 py-2 rounded-lg transition-colors"
+                        >
+                          <i class="fas fa-align-center"></i>
+                        </button>
+                        <button
+                          type="button"
+                          [class]="
+                            selectedProperties?.textAlign === 'right'
+                              ? 'bg-blue-600 text-white'
+                              : 'bg-gray-200 text-gray-700'
+                          "
+                          (click)="updateTextStyle('textAlign', 'right')"
+                          class="px-3 py-2 rounded-lg transition-colors"
+                        >
+                          <i class="fas fa-align-right"></i>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div *ngIf="!hasSelectedText" class="text-center py-8">
+                    <div class="text-gray-500 mb-4">
+                      <i class="fas fa-font text-3xl"></i>
+                    </div>
+                    <p class="text-gray-600">
+                      Select text to access formatting options
+                    </p>
+                  </div>
+                </div>
+
+                <!-- Colors Tools -->
+                <div *ngIf="activeToolCategory === 'colors'" class="space-y-4">
+                  <div *ngIf="hasSelection">
+                    <label class="block text-sm font-medium text-gray-700 mb-3"
+                      >Color Options</label
+                    >
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <!-- Fill Color -->
+                      <div>
+                        <label class="block text-xs text-gray-600 mb-2"
+                          >Fill Color</label
+                        >
+                        <div class="flex items-center space-x-2">
+                          <input
+                            #fillColorInput
+                            type="color"
+                            [value]="selectedProperties?.fill || '#000000'"
+                            (change)="changeFillColor(fillColorInput.value)"
+                            class="w-10 h-10 border border-gray-300 rounded cursor-pointer"
+                          />
+
+                          <!-- <input type="color" 
+                                 [value]="selectedProperties?.fill || '#000000'"
+                                 (change)="changeFillColor($event.target.value)"
+                                 class="w-10 h-10 border border-gray-300 rounded cursor-pointer"> -->
+                          <input
+                            #TexttInput
+                            type="text"
+                            [value]="selectedProperties?.fill || '#000000'"
+                            (change)="changeFillColor(TexttInput.value)"
+                            class="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm"
+                          />
+                        </div>
+                      </div>
+
+                      <!-- Stroke Color -->
+                      <div>
+                        <label class="block text-xs text-gray-600 mb-2"
+                          >Border Color</label
+                        >
+                        <div class="flex items-center space-x-2">
+                          <input
+                            #strokeColor
+                            type="color"
+                            [value]="selectedProperties?.stroke || '#000000'"
+                            (change)="changeStrokeColor(strokeColor.value)"
+                            class="w-10 h-10 border border-gray-300 rounded cursor-pointer"
+                          />
+                          <input
+                            #changestrokeColor
+                            type="text"
+                            [value]="selectedProperties?.stroke || '#000000'"
+                            (change)="
+                              changeStrokeColor(changestrokeColor.value)
+                            "
+                            class="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm"
+                          />
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Opacity -->
+                    <div class="mt-4">
+                      <label class="block text-xs text-gray-600 mb-1"
+                        >Opacity</label
+                      >
+                      <input
+                        #opacityInput
+                        type="range"
+                        min="0"
+                        max="1"
+                        step="0.1"
+                        [value]="selectedProperties?.opacity || 1"
+                        (input)="changeOpacity(opacityInput.value)"
+                        class="w-full"
+                      />
+                      <div class="text-xs text-gray-500 mt-1">
+                        {{
+                          (selectedProperties?.opacity || 1) * 100
+                            | number: "1.0-0"
+                        }}%
+                      </div>
+                    </div>
+
+                    <!-- Preset Colors -->
+                    <div class="mt-4">
+                      <label class="block text-xs text-gray-600 mb-2"
+                        >Quick Colors</label
+                      >
+                      <div class="grid grid-cols-8 gap-2">
+                        <button
+                          *ngFor="let color of presetColors"
+                          type="button"
+                          [style.background-color]="color"
+                          (click)="changeFillColor(color)"
+                          class="w-8 h-8 border border-gray-300 rounded cursor-pointer hover:scale-110 transition-transform"
+                        ></button>
+                      </div>
+                    </div>
+
+                    <!-- Canvas Background -->
+                    <div class="mt-6 pt-4 border-t border-gray-200">
+                      <label
+                        class="block text-sm font-medium text-gray-700 mb-3"
+                        >Canvas Background</label
+                      >
+                      <div class="flex items-center space-x-3">
+                        <input
+                          #backColor
+                          type="color"
+                          [value]="canvasBackgroundColor"
+                          (change)="setCanvasBackgroundColor(backColor.value)"
+                          class="w-10 h-10 border border-gray-300 rounded cursor-pointer"
+                        />
+                        <button
+                          type="button"
+                          (click)="clearCanvasBackground()"
+                          class="px-3 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors text-sm"
+                        >
+                          Clear Background
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div *ngIf="!hasSelection" class="text-center py-8">
+                    <div class="text-gray-500 mb-4">
+                      <i class="fas fa-palette text-3xl"></i>
+                    </div>
+                    <p class="text-gray-600">Select objects to change colors</p>
+                  </div>
+                </div>
+
+                <!-- Layout Tools -->
+                <div *ngIf="activeToolCategory === 'layout'" class="space-y-4">
+                  <!-- Selection Tools -->
+                  <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-3"
+                      >Selection</label
+                    >
+                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                      <button
+                        type="button"
+                        (click)="selectAll()"
+                        class="px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm"
+                      >
+                        <i class="fas fa-select-all mr-1"></i>Select All
+                      </button>
+                      <button
+                        type="button"
+                        (click)="copySelected()"
+                        [disabled]="!hasSelection"
+                        class="px-3 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-sm"
+                      >
+                        <i class="fas fa-copy mr-1"></i>Copy
+                      </button>
+                      <button
+                        type="button"
+                        (click)="paste()"
+                        class="px-3 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors text-sm"
+                      >
+                        <i class="fas fa-paste mr-1"></i>Paste
+                      </button>
+                      <button
+                        type="button"
+                        (click)="duplicateSelected()"
+                        [disabled]="!hasSelection"
+                        class="px-3 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-sm"
+                      >
+                        <i class="fas fa-clone mr-1"></i>Duplicate
+                      </button>
+                    </div>
+                  </div>
+
+                  <!-- Alignment Tools -->
+                  <div *ngIf="hasSelection">
+                    <label class="block text-sm font-medium text-gray-700 mb-3"
+                      >Alignment</label
+                    >
+                    <div class="grid grid-cols-3 gap-2 mb-3">
+                      <button
+                        type="button"
+                        (click)="alignLeft()"
+                        class="px-3 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors text-sm"
+                      >
+                        <i class="fas fa-align-left mr-1"></i>Left
+                      </button>
+                      <button
+                        type="button"
+                        (click)="alignCenter()"
+                        class="px-3 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors text-sm"
+                      >
+                        <i class="fas fa-align-center mr-1"></i>Center
+                      </button>
+                      <button
+                        type="button"
+                        (click)="alignRight()"
+                        class="px-3 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors text-sm"
+                      >
+                        <i class="fas fa-align-right mr-1"></i>Right
+                      </button>
+                    </div>
+                    <div class="grid grid-cols-3 gap-2">
+                      <button
+                        type="button"
+                        (click)="alignTop()"
+                        class="px-3 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors text-sm"
+                      >
+                        <i class="fas fa-arrow-up mr-1"></i>Top
+                      </button>
+                      <button
+                        type="button"
+                        (click)="alignMiddle()"
+                        class="px-3 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors text-sm"
+                      >
+                        <i class="fas fa-minus mr-1"></i>Middle
+                      </button>
+                      <button
+                        type="button"
+                        (click)="alignBottom()"
+                        class="px-3 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors text-sm"
+                      >
+                        <i class="fas fa-arrow-down mr-1"></i>Bottom
+                      </button>
+                    </div>
+                  </div>
+
+                  <!-- Layer Management -->
+                  <div *ngIf="hasSelection">
+                    <label class="block text-sm font-medium text-gray-700 mb-3"
+                      >Layers</label
+                    >
+                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                      <button
+                        type="button"
+                        (click)="bringToFront()"
+                        class="px-3 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-colors text-sm"
+                      >
+                        <i class="fas fa-arrow-to-top mr-1"></i>To Front
+                      </button>
+                      <button
+                        type="button"
+                        (click)="bringForward()"
+                        class="px-3 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-colors text-sm"
+                      >
+                        <i class="fas fa-arrow-up mr-1"></i>Forward
+                      </button>
+                      <button
+                        type="button"
+                        (click)="sendBackward()"
+                        class="px-3 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-colors text-sm"
+                      >
+                        <i class="fas fa-arrow-down mr-1"></i>Backward
+                      </button>
+                      <button
+                        type="button"
+                        (click)="sendToBack()"
+                        class="px-3 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-colors text-sm"
+                      >
+                        <i class="fas fa-arrow-to-bottom mr-1"></i>To Back
+                      </button>
+                    </div>
+                  </div>
+
+                  <!-- Transform Tools -->
+                  <div *ngIf="hasSelection">
+                    <label class="block text-sm font-medium text-gray-700 mb-3"
+                      >Transform</label
+                    >
+                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-3">
+                      <button
+                        type="button"
+                        (click)="flipHorizontal()"
+                        class="px-3 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors text-sm"
+                      >
+                        <i class="fas fa-arrows-alt-h mr-1"></i>Flip H
+                      </button>
+                      <button
+                        type="button"
+                        (click)="flipVertical()"
+                        class="px-3 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors text-sm"
+                      >
+                        <i class="fas fa-arrows-alt-v mr-1"></i>Flip V
+                      </button>
+                      <button
+                        type="button"
+                        (click)="rotateSelected(-90)"
+                        class="px-3 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors text-sm"
+                      >
+                        <i class="fas fa-undo mr-1"></i>-90°
+                      </button>
+                      <button
+                        type="button"
+                        (click)="rotateSelected(90)"
+                        class="px-3 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors text-sm"
+                      >
+                        <i class="fas fa-redo mr-1"></i>+90°
+                      </button>
+                    </div>
+
+                    <!-- Custom Rotation -->
+                    <div>
+                      <label class="block text-xs text-gray-600 mb-1"
+                        >Rotation Angle</label
+                      >
+                      <div class="flex items-center space-x-2">
+                        <input
+                          #rotationInput
+                          type="range"
+                          min="0"
+                          max="360"
+                          step="1"
+                          [value]="selectedProperties?.angle || 0"
+                          (input)="setRotation(rotationInput.value)"
+                          class="flex-1"
+                        />
+                        <span class="text-xs text-gray-500 min-w-[40px]"
+                          >{{ selectedProperties?.angle || 0 }}°</span
+                        >
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Group/Ungroup -->
+                  <div *ngIf="hasSelection">
+                    <label class="block text-sm font-medium text-gray-700 mb-3"
+                      >Grouping</label
+                    >
+                    <div class="grid grid-cols-2 gap-2">
+                      <button
+                        type="button"
+                        (click)="groupSelected()"
+                        class="px-3 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition-colors text-sm"
+                      >
+                        <i class="fas fa-object-group mr-1"></i>Group
+                      </button>
+                      <button
+                        type="button"
+                        (click)="ungroupSelected()"
+                        class="px-3 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition-colors text-sm"
+                      >
+                        <i class="fas fa-object-ungroup mr-1"></i>Ungroup
+                      </button>
+                    </div>
+                  </div>
+
+                  <div *ngIf="!hasSelection" class="text-center py-8">
+                    <div class="text-gray-500 mb-4">
+                      <i class="fas fa-layer-group text-3xl"></i>
+                    </div>
+                    <p class="text-gray-600">
+                      Select objects to access layout tools
+                    </p>
+                  </div>
+                </div>
+
+                <!-- Global Actions -->
+                <div class="pt-4 border-t border-gray-200">
+                  <div class="flex flex-wrap gap-2">
+                    <button
+                      type="button"
+                      (click)="deleteSelected()"
+                      [disabled]="!hasSelection"
+                      class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                    >
+                      <i class="fas fa-trash mr-2"></i>Delete Selected
+                    </button>
+                    <button
+                      type="button"
+                      (click)="clearCanvas()"
+                      class="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors"
+                    >
+                      <i class="fas fa-eraser mr-2"></i>Clear All
+                    </button>
+                    <button
+                      type="button"
+                      (click)="downloadCanvas()"
+                      class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+                    >
+                      <i class="fas fa-download mr-2"></i>Download
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right Column - Preview -->
+          <div class="space-y-6">
+            <div>
+              <h3 class="text-lg font-semibold text-gray-900 mb-4">
+                <i class="fas fa-eye text-gray-400 mr-2"></i>Live Preview
+              </h3>
+
+              <!-- Preview Container -->
+              <div
+                class="bg-gray-50 rounded-xl border-2 border-gray-200 overflow-hidden"
+              >
+                <!-- General Message Preview -->
+                <div
+                  *ngIf="selectedMessageType === 'general'"
+                  class="p-8 min-h-[400px] flex items-center justify-center"
+                >
+                  <div
+                    class="text-center max-w-md"
+                    *ngIf="
+                      messageForm.get('content_data')?.value;
+                      else noContent
+                    "
+                  >
+                    <div
+                      class="bg-white rounded-lg shadow-sm p-6 border border-gray-100"
+                    >
+                      <h4 class="text-xl font-bold text-gray-900 mb-3">
+                        {{ messageForm.get("title")?.value || "Message Title" }}
+                      </h4>
+                      <p class="text-gray-600 leading-relaxed mb-4">
+                        {{ messageForm.get("content_data")?.value }}
+                      </p>
+                      <div
+                        *ngIf="false"
+                        class="flex items-center justify-center text-xs text-gray-500 bg-gray-50 px-3 py-1 rounded-full"
+                      >
+                        <i class="fas fa-clock mr-1"></i>
+                        Duration: {{ messageForm.get("duration")?.value || 5 }}s
+                      </div>
+                    </div>
+                  </div>
+                  <ng-template #noContent>
+                    <div class="text-center">
+                      <div
+                        class="w-20 h-20 mx-auto rounded-full bg-gray-200 flex items-center justify-center mb-4"
+                      >
+                        <i class="fas fa-align-left text-2xl text-gray-400"></i>
+                      </div>
+                      <h4 class="text-lg font-medium text-gray-500 mb-2">
+                        Message Preview
+                      </h4>
+                      <p class="text-gray-400">
+                        Your message preview will appear here
+                      </p>
+                    </div>
+                  </ng-template>
+                </div>
+
+                <!-- Image Preview -->
+                <div
+                  *ngIf="selectedMessageType === 'image'"
+                  class="p-8 min-h-[400px] flex items-center justify-center"
+                >
+                  <div *ngIf="imagePreview; else noImage" class="text-center">
+                    <div
+                      class="bg-white rounded-lg shadow-sm p-4 border border-gray-100 inline-block"
+                    >
+                      <img
+                        [src]="imagePreview"
+                        alt="Preview"
+                        class="max-w-full max-h-80 rounded-lg mb-4"
+                      />
+                      <h4 class="text-lg font-semibold text-gray-900 mb-2">
+                        {{ messageForm.get("title")?.value || "Image Message" }}
+                      </h4>
+                      <div
+                        *ngIf="false"
+                        class="flex items-center justify-center text-xs text-gray-500 bg-gray-50 px-3 py-1 rounded-full"
+                      >
+                        <i class="fas fa-clock mr-1"></i>
+                        Duration: {{ messageForm.get("duration")?.value || 5 }}s
+                      </div>
+                    </div>
+                  </div>
+                  <ng-template #noImage>
+                    <div class="text-center">
+                      <div
+                        class="w-20 h-20 mx-auto rounded-full bg-gray-200 flex items-center justify-center mb-4"
+                      >
+                        <i class="fas fa-image text-2xl text-gray-400"></i>
+                      </div>
+                      <h4 class="text-lg font-medium text-gray-500 mb-2">
+                        Image Preview
+                      </h4>
+                      <p class="text-gray-400">
+                        Your image preview will appear here
+                      </p>
+                    </div>
+                  </ng-template>
+                </div>
+
+                <!-- Video Preview -->
+                <div
+                  *ngIf="selectedMessageType === 'video'"
+                  class="p-8 min-h-[400px] flex items-center justify-center"
+                >
+                  <div *ngIf="videoPreview; else noVideo" class="text-center">
+                    <div
+                      class="bg-white rounded-lg shadow-sm p-4 border border-gray-100 inline-block"
+                    >
+                      <video
+                        [src]="videoPreview"
+                        controls
+                        class="max-w-full max-h-80 rounded-lg mb-4"
+                      ></video>
+                      <h4 class="text-lg font-semibold text-gray-900 mb-2">
+                        {{ messageForm.get("title")?.value || "Video Message" }}
+                      </h4>
+                      <div
+                        *ngIf="false"
+                        class="flex items-center justify-center text-xs text-gray-500 bg-gray-50 px-3 py-1 rounded-full"
+                      >
+                        <i class="fas fa-clock mr-1"></i>
+                        Duration:
+                        {{ messageForm.get("duration")?.value || 30 }}s
+                      </div>
+                    </div>
+                  </div>
+                  <ng-template #noVideo>
+                    <div class="text-center">
+                      <div
+                        class="w-20 h-20 mx-auto rounded-full bg-gray-200 flex items-center justify-center mb-4"
+                      >
+                        <i class="fas fa-video text-2xl text-gray-400"></i>
+                      </div>
+                      <h4 class="text-lg font-medium text-gray-500 mb-2">
+                        Video Preview
+                      </h4>
+                      <p class="text-gray-400">
+                        Your video preview will appear here
+                      </p>
+                    </div>
+                  </ng-template>
+                </div>
+
+                <!-- Canvas Preview -->
+                <div *ngIf="selectedMessageType === 'custom_image'" class="p-6">
+                  <div
+                    class="bg-white rounded-lg border border-gray-200 overflow-hidden"
+                  >
+                    <canvas
+                      #fabricCanvas
+                      class="w-full"
+                      style="max-width: 100%"
+                    ></canvas>
+                  </div>
+                  <div class="mt-4 text-center">
+                    <h4 class="text-lg font-semibold text-gray-900 mb-2">
+                      {{ messageForm.get("title")?.value || "Custom Design" }}
+                    </h4>
+                    <div
+                      *ngIf="false"
+                      class="flex items-center justify-center text-xs text-gray-500 bg-gray-50 px-3 py-1 rounded-full"
+                    >
+                      <i class="fas fa-clock mr-1"></i>
+                      Duration: {{ messageForm.get("duration")?.value || 5 }}s
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Submit Actions -->
+        <div class="px-6 py-6 bg-gray-50 border-t border-gray-100">
+          <div class="flex justify-end space-x-4">
+            <button
+              type="button"
+              (click)="resetForm()"
+              class="px-6 py-3 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 hover:border-gray-400 transition-colors"
+            >
+              <i class="fas fa-times mr-2"></i>Cancel
+            </button>
+            <button
+              type="submit"
+              [disabled]="messageForm.invalid || isLoading"
+              class="px-8 py-3 bg-primary text-white rounded-lg hover:bg-primary-light disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow-sm"
+            >
+              <span *ngIf="isLoading" class="inline-flex items-center">
+                <svg
+                  class="animate-spin -ml-1 mr-3 h-4 w-4 text-white"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                >
+                  <circle
+                    class="opacity-25"
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="currentColor"
+                    stroke-width="4"
+                  ></circle>
+                  <path
+                    class="opacity-75"
+                    fill="currentColor"
+                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                  ></path>
+                </svg>
+                Creating...
+              </span>
+              <span *ngIf="!isLoading" class="inline-flex items-center">
+                <i class="fas fa-plus mr-2"></i>Create Message
+              </span>
+            </button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

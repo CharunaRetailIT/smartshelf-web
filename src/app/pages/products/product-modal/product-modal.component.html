@@ -1,0 +1,2086 @@
+<div class="product-modal-container">
+  <p-dialog
+    [(visible)]="isDialogVisible"
+    [modal]="true"
+    [closable]="false"
+    [draggable]="false"
+    [resizable]="false"
+    styleClass="product-modal-clean"
+    [style]="{ width: '90vw', maxWidth: '1200px', height: '90vh' }"
+  >
+    <!-- Header -->
+    <ng-template pTemplate="header">
+      <div class="modal-header-content">
+        <div>
+          <h2 class="modal-title">
+            {{ getProductHeaderText() }}
+          </h2>
+          <p class="modal-subtitle">
+            {{ getProductDescriptionText() }}
+          </p>
+        </div>
+        <button
+          (click)="onCancel()"
+          class="close-button"
+          aria-label="Close dialog"
+        >
+          <i class="pi pi-times"></i>
+        </button>
+      </div>
+    </ng-template>
+
+    <!-- Content -->
+    <ng-template pTemplate="content">
+      <form (ngSubmit)="onSubmit()" #productFormEl="ngForm" class="modal-form">
+        <div class="form-scroll-container">
+          <p-tabView styleClass="clean-tabs">
+            <!-- Basic Information Tab -->
+            <p-tabPanel>
+              <ng-template pTemplate="header">
+                <i class="pi pi-info-circle"></i>
+                <span>Basic Info</span>
+              </ng-template>
+
+              <div class="tab-content-wrapper">
+                <!-- Product Details Section -->
+                <div class="form-section">
+                  <h3 class="section-title">Product Details</h3>
+
+                  <div class="form-grid">
+                    <!-- Product Name -->
+                    <div class="form-field">
+                      <label for="productName" class="field-label">
+                        Product Name <span class="required">*</span>
+                      </label>
+                      <input
+                        type="text"
+                        id="productName"
+                        name="productName"
+                        pInputText
+                        [(ngModel)]="productForm.productName"
+                        required
+                        placeholder="e.g., iPhone 15 Pro"
+                        class="field-input"
+                        [class.invalid-input]="
+                          productFormEl.controls['productName']?.invalid &&
+                          productFormEl.controls['productName']?.touched
+                        "
+                      />
+                      <small
+                        class="error-message"
+                        *ngIf="
+                          productFormEl.controls['productName']?.invalid &&
+                          productFormEl.controls['productName']?.touched
+                        "
+                      >
+                        Product name is required
+                      </small>
+                    </div>
+
+                    <!-- Product Code -->
+                    <div class="form-field">
+                      <label for="productCode" class="field-label">
+                        Product Code <span class="required">*</span>
+                      </label>
+                      <input
+                        type="text"
+                        id="productCode"
+                        name="productCode"
+                        pInputText
+                        [(ngModel)]="productForm.productCode"
+                        required
+                        placeholder="e.g., IPHONE-15-PRO"
+                        class="field-input"
+                        [class.invalid-input]="
+                          productFormEl.controls['productCode']?.invalid &&
+                          productFormEl.controls['productCode']?.touched
+                        "
+                      />
+                      <small
+                        class="error-message"
+                        *ngIf="
+                          productFormEl.controls['productCode']?.invalid &&
+                          productFormEl.controls['productCode']?.touched
+                        "
+                      >
+                        Product code is required
+                      </small>
+                    </div>
+
+                    <!-- Barcode -->
+                    <div class="form-field">
+                      <label for="barCode" class="field-label">
+                        Barcode <span class="required">*</span>
+                      </label>
+                      <input
+                        type="text"
+                        id="barCode"
+                        name="barCode"
+                        pInputText
+                        [(ngModel)]="productForm.barCode"
+                        required
+                        placeholder="e.g., 123456789012"
+                        class="field-input"
+                        [class.invalid-input]="
+                          productFormEl.controls['barCode']?.invalid &&
+                          productFormEl.controls['barCode']?.touched
+                        "
+                      />
+                      <small
+                        class="error-message"
+                        *ngIf="
+                          productFormEl.controls['barCode']?.invalid &&
+                          productFormEl.controls['barCode']?.touched
+                        "
+                      >
+                        Barcode is required
+                      </small>
+                    </div>
+                    <!-- Category -->
+                    <div class="form-field">
+                      <!-- <label for="categoryId" class="field-label">
+                        Category <span class="required">*</span>
+                      </label> -->
+                      <!-- <p-dropdown
+                        id="categoryId"
+                        [(ngModel)]="productForm.categoryId"
+                        name="categoryId"
+                        [options]="categories"
+                        optionLabel="categoryName"
+                        optionValue="id"
+                        placeholder="Select a category"
+                        required
+                        [filter]="true"
+                        filterBy="categoryName"
+                        [showClear]="true"
+                        (onChange)="onCategoryChange($event)"
+                        styleClass="field-input dropdown-field"
+                      >
+                      </p-dropdown> -->
+                      <small
+                        class="error-message"
+                        *ngIf="
+                          productFormEl.controls['categoryId']?.invalid &&
+                          productFormEl.controls['categoryId']?.touched
+                        "
+                      >
+                        Category is required
+                      </small>
+                    </div>
+
+                    <!-- Category -->
+                    <div class="form-field">
+                      <label for="categoryId" class="field-label">
+                        Category <span class="required">*</span>
+                      </label>
+                      <p-dropdown
+                        id="categoryId"
+                        [(ngModel)]="productForm.categoryId"
+                        name="categoryId"
+                        [options]="categoryOptions"
+                        optionLabel="categoryName"
+                        optionValue="id"
+                        placeholder="Search category..."
+                        required
+                        [filter]="true"
+                        filterBy="categoryName"
+                        (onFilter)="onCategoryFilter($event)"
+                        [showClear]="true"
+                        [lazy]="true"
+                        [virtualScroll]="true"
+                        [virtualScrollItemSize]="60"
+                        (onLazyLoad)="onCategoryLazyLoad($event)"
+                        (onChange)="onCategoryChange($event)"
+                        styleClass="field-input dropdown-field"
+                        [loading]="categoryPagination.loading"
+                      >
+                        <!-- Custom Header with Load Count -->
+                        <ng-template pTemplate="header">
+                          <div class="p-2 border-b bg-gray-50">
+                            <div class="flex justify-between items-center">
+                              <div class="text-sm font-medium text-gray-700">
+                                Categories ({{ categoryOptions.length }} loaded)
+                              </div>
+                              <div class="text-xs text-gray-500">
+                                Total: {{ categoryPagination.totalCount }}
+                              </div>
+                            </div>
+                          </div>
+
+                          <!-- Load Previous Button -->
+                          <div
+                            *ngIf="categoryPagination.pageNumber > 1"
+                            class="p-2 border-b"
+                          >
+                            <button
+                              type="button"
+                              class="w-full text-left p-2 hover:bg-gray-100 rounded flex items-center justify-center gap-2"
+                              (click)="
+                                loadPreviousCategories();
+                                $event.stopPropagation()
+                              "
+                              [disabled]="categoryPagination.loading"
+                            >
+                              <i class="pi pi-chevron-up"></i>
+                              <span>Load Previous Categories</span>
+                              <i
+                                *ngIf="categoryPagination.loading"
+                                class="pi pi-spin pi-spinner"
+                              ></i>
+                            </button>
+                          </div>
+                        </ng-template>
+
+                        <ng-template pTemplate="item" let-category>
+                          <div class="flex flex-col p-2">
+                            <span class="font-medium text-sm">{{
+                              category.categoryName
+                            }}</span>
+                            <span
+                              *ngIf="category.description"
+                              class="text-xs text-gray-500"
+                            >
+                              {{ category.description | truncate: 30 }}
+                            </span>
+                          </div>
+                        </ng-template>
+
+                        <!-- Custom Footer -->
+                        <ng-template pTemplate="footer">
+                          <div
+                            *ngIf="categoryPagination.hasMore"
+                            class="p-2 border-t"
+                          >
+                            <button
+                              type="button"
+                              class="w-full text-left p-2 hover:bg-gray-100 rounded flex items-center justify-center gap-2"
+                              (click)="
+                                loadMoreCategories(); $event.stopPropagation()
+                              "
+                              [disabled]="categoryPagination.loading"
+                            >
+                              <i class="pi pi-chevron-down"></i>
+                              <span>Load More Categories</span>
+                              <i
+                                *ngIf="categoryPagination.loading"
+                                class="pi pi-spin pi-spinner"
+                              ></i>
+                            </button>
+                          </div>
+                          <div
+                            class="p-2 border-t text-xs text-gray-500 bg-gray-50"
+                          >
+                            <div class="flex justify-between">
+                              <span
+                                >Showing {{ categoryOptions.length }} of
+                                {{ categoryPagination.totalCount }}</span
+                              >
+                              <span
+                                >Page {{ categoryPagination.pageNumber }}</span
+                              >
+                            </div>
+                          </div>
+                        </ng-template>
+
+                        <ng-template pTemplate="empty">
+                          <div class="p-4 text-center">
+                            <div
+                              *ngIf="categoryPagination.loading"
+                              class="flex items-center justify-center gap-2"
+                            >
+                              <i class="pi pi-spin pi-spinner"></i>
+                              <span>Loading categories...</span>
+                            </div>
+                            <div
+                              *ngIf="!categoryPagination.loading"
+                              class="text-gray-500"
+                            >
+                              No categories found
+                            </div>
+                          </div>
+                        </ng-template>
+                      </p-dropdown>
+                      <small
+                        class="error-message"
+                        *ngIf="
+                          productFormEl.controls['categoryId']?.invalid &&
+                          productFormEl.controls['categoryId']?.touched
+                        "
+                      >
+                        Category is required
+                      </small>
+                    </div>
+
+                    <!-- Subcategory -->
+                    <div class="form-field">
+                      <label for="subCategoryId" class="field-label">
+                        Subcategory <span class="required">*</span>
+                      </label>
+                      <p-dropdown
+                        id="subCategoryId"
+                        [(ngModel)]="productForm.subCategoryId"
+                        name="subCategoryId"
+                        [options]="subCategoryOptions"
+                        optionLabel="subCategoryName"
+                        optionValue="id"
+                        placeholder="{{
+                          productForm.categoryId
+                            ? 'Search subcategory...'
+                            : 'Select category first'
+                        }}"
+                        required
+                        [filter]="true"
+                        filterBy="subCategoryName"
+                        (onFilter)="onSubCategoryFilter($event)"
+                        [showClear]="true"
+                        [lazy]="true"
+                        [virtualScroll]="true"
+                        [virtualScrollItemSize]="60"
+                        (onLazyLoad)="onSubCategoryLazyLoad($event)"
+                        styleClass="field-input dropdown-field"
+                        [disabled]="
+                          !productForm.categoryId ||
+                          getSubCategoryPagination()?.loading ||
+                          false
+                        "
+                      >
+                        <!-- Custom Header with Load Count -->
+                        <ng-template pTemplate="header">
+                          <div
+                            *ngIf="productForm.categoryId"
+                            class="p-2 border-b bg-gray-50"
+                          >
+                            <div class="flex justify-between items-center">
+                              <div class="text-sm font-medium text-gray-700">
+                                Subcategories ({{ subCategoryOptions.length }}
+                                loaded)
+                              </div>
+                              <div class="text-xs text-gray-500">
+                                Total:
+                                {{
+                                  getSubCategoryPagination()?.totalCount || 0
+                                }}
+                              </div>
+                            </div>
+                          </div>
+
+                          <!-- Load Previous Button -->
+                          <div
+                            *ngIf="
+                              productForm.categoryId &&
+                              getSubCategoryPagination()?.pageNumber > 1
+                            "
+                            class="p-2 border-b"
+                          >
+                            <button
+                              type="button"
+                              class="w-full text-left p-2 hover:bg-gray-100 rounded flex items-center justify-center gap-2"
+                              (click)="
+                                loadPreviousSubCategories();
+                                $event.stopPropagation()
+                              "
+                              [disabled]="getSubCategoryPagination()?.loading"
+                            >
+                              <i class="pi pi-chevron-up"></i>
+                              <span>Load Previous Subcategories</span>
+                              <i
+                                *ngIf="getSubCategoryPagination()?.loading"
+                                class="pi pi-spin pi-spinner"
+                              ></i>
+                            </button>
+                          </div>
+                        </ng-template>
+
+                        <ng-template pTemplate="item" let-subCategory>
+                          <div class="flex flex-col p-2">
+                            <span class="font-medium text-sm">{{
+                              subCategory.subCategoryName
+                            }}</span>
+                            <span
+                              *ngIf="subCategory.description"
+                              class="text-xs text-gray-500"
+                            >
+                              {{ subCategory.description | truncate: 30 }}
+                            </span>
+                          </div>
+                        </ng-template>
+
+                        <!-- Custom Footer -->
+                        <ng-template pTemplate="footer">
+                          <div
+                            *ngIf="
+                              productForm.categoryId &&
+                              getSubCategoryPagination()?.hasMore
+                            "
+                            class="p-2 border-t"
+                          >
+                            <button
+                              type="button"
+                              class="w-full text-left p-2 hover:bg-gray-100 rounded flex items-center justify-center gap-2"
+                              (click)="
+                                loadMoreSubCategories();
+                                $event.stopPropagation()
+                              "
+                              [disabled]="getSubCategoryPagination()?.loading"
+                            >
+                              <i class="pi pi-chevron-down"></i>
+                              <span>Load More Subcategories</span>
+                              <i
+                                *ngIf="getSubCategoryPagination()?.loading"
+                                class="pi pi-spin pi-spinner"
+                              ></i>
+                            </button>
+                          </div>
+                          <div
+                            *ngIf="productForm.categoryId"
+                            class="p-2 border-t text-xs text-gray-500 bg-gray-50"
+                          >
+                            <div class="flex justify-between">
+                              <span
+                                >Showing {{ subCategoryOptions.length }} of
+                                {{
+                                  getSubCategoryPagination()?.totalCount || 0
+                                }}</span
+                              >
+                              <span
+                                >Page
+                                {{
+                                  getSubCategoryPagination()?.pageNumber || 1
+                                }}</span
+                              >
+                            </div>
+                          </div>
+                        </ng-template>
+
+                        <ng-template pTemplate="empty">
+                          <div class="p-4 text-center">
+                            <div
+                              *ngIf="getSubCategoryPagination()?.loading"
+                              class="flex items-center justify-center gap-2"
+                            >
+                              <i class="pi pi-spin pi-spinner"></i>
+                              <span>Loading subcategories...</span>
+                            </div>
+                            <div
+                              *ngIf="
+                                !getSubCategoryPagination()?.loading &&
+                                !productForm.categoryId
+                              "
+                            >
+                              <span class="text-gray-500"
+                                >Please select a category first</span
+                              >
+                            </div>
+                            <div
+                              *ngIf="
+                                !getSubCategoryPagination()?.loading &&
+                                productForm.categoryId &&
+                                subCategoryOptions.length === 0
+                              "
+                            >
+                              <span class="text-gray-500"
+                                >No subcategories found for this category</span
+                              >
+                            </div>
+                          </div>
+                        </ng-template>
+                      </p-dropdown>
+                      <div class="flex items-center gap-2 mt-1">
+                        <small
+                          *ngIf="
+                            productForm.categoryId &&
+                            getSubCategoryPagination()?.loading
+                          "
+                          class="text-blue-500"
+                        >
+                          <i class="pi pi-spin pi-spinner mr-1"></i>Loading
+                          subcategories...
+                        </small>
+                        <small
+                          class="error-message"
+                          *ngIf="
+                            productFormEl.controls['subCategoryId']?.invalid &&
+                            productFormEl.controls['subCategoryId']?.touched
+                          "
+                        >
+                          Subcategory is required
+                        </small>
+                      </div>
+                    </div>
+                    <!-- <div class="form-field">
+                      <label for="categoryId" class="field-label">
+                        Category <span class="required">*</span>
+                      </label>
+                      <p-dropdown
+                        id="categoryId"
+                        [(ngModel)]="productForm.categoryId"
+                        name="categoryId"
+                        [options]="categories"
+                        optionLabel="categoryName"
+                        optionValue="id"
+                        placeholder="Select a category"
+                        required
+                        [filter]="true"
+                        filterBy="categoryName"
+                        [showClear]="true"
+                        styleClass="field-input dropdown-field">
+                      </p-dropdown>
+                      <small class="error-message" *ngIf="productFormEl.controls['categoryId']?.invalid && productFormEl.controls['categoryId']?.touched">
+                        Category is required
+                      </small>
+                    </div> -->
+
+                    <!-- Subcategory -->
+                    <!-- <div class="form-field">
+                      <label for="subCategoryId" class="field-label">
+                        Subcategory <span class="required">*</span>
+                      </label>
+                      <p-dropdown
+                        id="subCategoryId"
+                        [(ngModel)]="productForm.subCategoryId"
+                        name="subCategoryId"
+                        [options]="subCategories"
+                        optionLabel="subCategoryName"
+                        optionValue="id"
+                        placeholder="Select a subcategory"
+                        required
+                        [filter]="true"
+                        filterBy="subCategoryName"
+                        [showClear]="true"
+                        styleClass="field-input dropdown-field">
+                      </p-dropdown>
+                      <small class="error-message" *ngIf="productFormEl.controls['subCategoryId']?.invalid && productFormEl.controls['subCategoryId']?.touched">
+                        Subcategory is required
+                      </small>
+                    </div> -->
+
+                    <!-- Quantity -->
+                    <div class="form-field">
+                      <label for="quantity" class="field-label">
+                        Quantity
+                      </label>
+                      <p-inputNumber
+                        id="quantity"
+                        [(ngModel)]="productForm.quantity"
+                        name="quantity"
+                        [min]="0"
+                        [maxFractionDigits]="3"
+                        [minFractionDigits]="0"
+                        placeholder="0.000"
+                        [showButtons]="true"
+                        [step]="getQuantityStep()"
+                        styleClass="field-input"
+                      >
+                      </p-inputNumber>
+                      <small class="field-hint">
+                        Stock quantity available (use decimals for units like
+                        1.5 ML)
+                      </small>
+                      <div
+                        class="quantity-preview"
+                        *ngIf="
+                          productForm.quantity > 0 && productForm.unitOfMeasure
+                        "
+                      >
+                        <span class="quantity-value">{{
+                          productForm.quantity | number: "1.0-3"
+                        }}</span>
+                        <span class="unit-badge">{{
+                          getUnitLabel(productForm.unitOfMeasure)
+                        }}</span>
+                      </div>
+                    </div>
+
+                    <!-- Unit of Measure -->
+                    <div class="form-field">
+                      <label for="unitOfMeasure" class="field-label">
+                        Unit of Measure <span class="required">*</span>
+                      </label>
+                      <p-dropdown
+                        id="unitOfMeasure"
+                        [(ngModel)]="productForm.unitOfMeasure"
+                        name="unitOfMeasure"
+                        [options]="unitOfMeasureOptions"
+                        placeholder="Select unit"
+                        required
+                        [filter]="true"
+                        styleClass="field-input dropdown-field"
+                      >
+                      </p-dropdown>
+                      <small
+                        class="error-message"
+                        *ngIf="
+                          productFormEl.controls['unitOfMeasure']?.invalid &&
+                          productFormEl.controls['unitOfMeasure']?.touched
+                        "
+                      >
+                        Unit of measure is required
+                      </small>
+                      <small class="field-hint">
+                        Measurement unit for this product
+                      </small>
+                    </div>
+
+                    <!-- Description (Full Width) -->
+                    <div class="form-field full-width">
+                      <label for="description" class="field-label">
+                        Description
+                      </label>
+                      <textarea
+                        pInputTextarea
+                        id="description"
+                        [(ngModel)]="productForm.description"
+                        name="description"
+                        rows="3"
+                        placeholder="Enter a detailed description of the product..."
+                        class="field-input textarea-field"
+                      ></textarea>
+                      <small class="field-hint">
+                        Optional: Provide a description to help identify this
+                        product
+                      </small>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Status Section -->
+                <div class="form-section">
+                  <h3 class="section-title">Status & Configuration</h3>
+
+                  <div class="status-toggle-box">
+                    <p-toggleswitch
+                      [(ngModel)]="productForm.isActive"
+                      name="isActive"
+                      id="productActive"
+                    >
+                    </p-toggleswitch>
+                    <label for="productActive" class="toggle-label">
+                      Product Active Status
+                    </label>
+                  </div>
+
+                  <div class="info-box">
+                    <svg
+                      class="info-icon"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                      ></path>
+                    </svg>
+                    <div>
+                      <p class="info-text">
+                        <strong>Note:</strong>
+                        {{
+                          isEditMode
+                            ? "Updating this product will affect all inventory and sales records."
+                            : "Active products will be available for sale immediately."
+                        }}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </p-tabPanel>
+
+            <!-- Pricing Tab -->
+            <p-tabPanel>
+              <ng-template pTemplate="header">
+                <i class="pi pi-money-bill"></i>
+                <span>Pricing</span>
+              </ng-template>
+
+              <div class="tab-content-wrapper">
+                <div class="form-section">
+                  <h3 class="section-title">Price Configuration</h3>
+
+                  <div class="form-grid">
+                    <!-- Cost Price -->
+                    <div class="form-field">
+                      <label for="costPrice" class="field-label">
+                        Cost Price <span class="required">*</span>
+                      </label>
+                      <p-inputNumber
+                        id="costPrice"
+                        [(ngModel)]="productForm.costPrice"
+                        name="costPrice"
+                        mode="currency"
+                        currency="LKR"
+                        locale="en-LK"
+                        [minFractionDigits]="2"
+                        [min]="0"
+                        placeholder="0.00"
+                        required
+                        styleClass="field-input"
+                      >
+                      </p-inputNumber>
+                      <small
+                        class="error-message"
+                        *ngIf="
+                          productFormEl.controls['costPrice']?.invalid &&
+                          productFormEl.controls['costPrice']?.touched
+                        "
+                      >
+                        Cost price is required
+                      </small>
+                    </div>
+                    <!-- Selling Price -->
+                    <div class="form-field">
+                      <label for="sellingPrice" class="field-label">
+                        Selling Price <span class="required">*</span>
+                      </label>
+                      <p-inputNumber
+                        id="sellingPrice"
+                        [(ngModel)]="productForm.sellingPrice"
+                        name="sellingPrice"
+                        mode="currency"
+                        currency="LKR"
+                        locale="en-LK"
+                        [minFractionDigits]="2"
+                        [min]="0"
+                        placeholder="0.00"
+                        required
+                        styleClass="field-input"
+                      >
+                      </p-inputNumber>
+                      <small
+                        class="error-message"
+                        *ngIf="
+                          productFormEl.controls['sellingPrice']?.invalid &&
+                          productFormEl.controls['sellingPrice']?.touched
+                        "
+                      >
+                        Selling price is required
+                      </small>
+                    </div>
+
+                    <!-- Discount Percentage -->
+                    <div class="form-field">
+                      <label for="discountPercentage" class="field-label">
+                        Discount Percentage (%)
+                      </label>
+                      <p-inputNumber
+                        id="discountPercentage"
+                        [(ngModel)]="productForm.discountPercentage"
+                        name="discountPercentage"
+                        suffix="%"
+                        [min]="0"
+                        [max]="100"
+                        [maxFractionDigits]="2"
+                        placeholder="0.00"
+                        (onInput)="calculateDiscountedPrice()"
+                        styleClass="field-input"
+                      >
+                      </p-inputNumber>
+                      <small class="field-hint">
+                        Enter discount percentage (0-100%)
+                      </small>
+                    </div>
+
+                    <!-- Discount Price -->
+                    <div class="form-field">
+                      <label for="discountPrice" class="field-label">
+                        Discount Amount (LKR)
+                      </label>
+                      <p-inputNumber
+                        id="discountPrice"
+                        [(ngModel)]="productForm.discountPrice"
+                        name="discountPrice"
+                        mode="currency"
+                        currency="LKR"
+                        locale="en-LK"
+                        [minFractionDigits]="2"
+                        [min]="0"
+                        placeholder="0.00"
+                        (onInput)="calculateDiscountPercentage()"
+                        styleClass="field-input"
+                      >
+                      </p-inputNumber>
+                      <small class="field-hint">
+                        Enter fixed discount amount in LKR
+                      </small>
+                    </div>
+
+                    <!-- Discounted Price (Read-only) -->
+                    <div class="form-field">
+                      <label for="discountedPrice" class="field-label">
+                        Final Price After Discount
+                      </label>
+                      <p-inputNumber
+                        id="discountedPrice"
+                        [(ngModel)]="productForm.discountedPrice"
+                        name="discountedPrice"
+                        mode="currency"
+                        currency="LKR"
+                        locale="en-LK"
+                        [minFractionDigits]="2"
+                        [min]="0"
+                        [readonly]="true"
+                        styleClass="field-input readonly-field"
+                      >
+                      </p-inputNumber>
+                      <div
+                        class="discount-summary"
+                        *ngIf="
+                          productForm.discountedPrice > 0 &&
+                          productForm.discountedPrice < productForm.sellingPrice
+                        "
+                      >
+                        <small class="text-green-600 font-medium">
+                          Save: LKR
+                          {{
+                            productForm.sellingPrice -
+                              productForm.discountedPrice | number: "1.2-2"
+                          }}
+                        </small>
+                      </div>
+                    </div>
+
+                    <!-- Wholesale Price -->
+                    <div class="form-field">
+                      <label for="wholesalePrice" class="field-label">
+                        Wholesale Price
+                      </label>
+                      <p-inputNumber
+                        id="wholesalePrice"
+                        [(ngModel)]="productForm.wholesalePrice"
+                        name="wholesalePrice"
+                        mode="currency"
+                        currency="LKR"
+                        locale="en-LK"
+                        [minFractionDigits]="2"
+                        [min]="0"
+                        placeholder="0.00"
+                        styleClass="field-input"
+                      >
+                      </p-inputNumber>
+                    </div>
+
+                    <!-- Minimum Price -->
+                    <div class="form-field">
+                      <label for="minimumPrice" class="field-label">
+                        Minimum Price
+                      </label>
+                      <p-inputNumber
+                        id="minimumPrice"
+                        [(ngModel)]="productForm.minimumPrice"
+                        name="minimumPrice"
+                        mode="currency"
+                        currency="LKR"
+                        locale="en-LK"
+                        [minFractionDigits]="2"
+                        [min]="0"
+                        placeholder="0.00"
+                        styleClass="field-input"
+                      >
+                      </p-inputNumber>
+                    </div>
+
+                    <!-- Maximum Price -->
+                    <div class="form-field">
+                      <label for="maximumPrice" class="field-label">
+                        Maximum Price
+                      </label>
+                      <p-inputNumber
+                        id="maximumPrice"
+                        [(ngModel)]="productForm.maximumPrice"
+                        name="maximumPrice"
+                        mode="currency"
+                        currency="LKR"
+                        locale="en-LK"
+                        [minFractionDigits]="2"
+                        [min]="0"
+                        placeholder="0.00"
+                        styleClass="field-input"
+                      >
+                      </p-inputNumber>
+                    </div>
+                  </div>
+
+                  <!-- Price Summary -->
+                  <div class="price-summary-grid">
+                    <div class="summary-card regular-price">
+                      <div class="summary-label">Regular Price</div>
+                      <div class="summary-value">
+                        LKR {{ productForm.sellingPrice | number: "1.2-2" }}
+                      </div>
+                    </div>
+                    <div
+                      class="summary-card member-price"
+                      *ngIf="productForm.discountedPrice > 0"
+                    >
+                      <div class="summary-label">Member Price</div>
+                      <div class="summary-value">
+                        LKR {{ productForm.discountedPrice | number: "1.2-2" }}
+                      </div>
+                      <div class="summary-savings">
+                        Save
+                        {{
+                          ((productForm.sellingPrice -
+                            productForm.discountPrice) /
+                            productForm.sellingPrice) *
+                            100 | number: "1.0-0"
+                        }}%
+                      </div>
+                    </div>
+                    <div
+                      class="summary-card wholesale-price"
+                      *ngIf="productForm.wholesalePrice > 0"
+                    >
+                      <div class="summary-label">Wholesale Price</div>
+                      <div class="summary-value">
+                        LKR {{ productForm.wholesalePrice | number: "1.2-2" }}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </p-tabPanel>
+
+            <!-- Device Assignments Tab -->
+            <p-tabPanel>
+              <ng-template pTemplate="header">
+                <i class="pi pi-desktop"></i>
+                <span>Device Assignments</span>
+                <p-badge
+                  *ngIf="deviceComboGroups.length > 0"
+                  [value]="deviceComboGroups.length"
+                  severity="success"
+                  styleClass="tab-badge"
+                ></p-badge>
+              </ng-template>
+
+              <div class="tab-content-wrapper">
+                <!-- Combo Type Selection -->
+                <div class="form-section">
+                  <h3 class="section-title">Assignment Configuration</h3>
+
+                  <div class="combo-type-section">
+                    <div class="combo-type-header">
+                      <label class="field-label">Combo Type</label>
+                      <p class="section-subtitle">
+                        Choose the type of assignment for this product
+                      </p>
+                    </div>
+
+                    <div class="combo-type-selector">
+                      <p-selectButton
+                        [options]="comboModeOptions"
+                        [(ngModel)]="comboMode"
+                        [ngModelOptions]="{ standalone: true }"
+                        (onChange)="toggleComboMode()"
+                        optionLabel="label"
+                        optionValue="value"
+                        styleClass="combo-mode-buttons"
+                      >
+                        <ng-template let-item pTemplate="item">
+                          <div class="flex items-center">
+                            <i [class]="item.icon + ' mr-2'"></i>
+                            <span>{{ item.label }}</span>
+                          </div>
+                        </ng-template>
+                      </p-selectButton>
+
+                      <div class="combo-stats flex items-center gap-2 mt-3">
+                        <span class="stats-label">Active Assignments</span>
+                        <p-tag
+                          [value]="deviceComboGroups.length.toString()"
+                          severity="info"
+                          [rounded]="true"
+                          styleClass="min-w-6 h-6 flex items-center justify-center bg-purple-500 text-white"
+                        >
+                        </p-tag>
+                      </div>
+                    </div>
+
+                    <div class="info-box">
+                      <i class="pi pi-info-circle info-icon"></i>
+                      <div class="info-content">
+                        <p class="info-text">
+                          <strong>{{
+                            comboMode === "device-template"
+                              ? "Device + Template:"
+                              : "Device + Message:"
+                          }}</strong>
+                          {{
+                            comboMode === "device-template"
+                              ? "Assign templates to devices for product display"
+                              : "Assign messages to devices for communication"
+                          }}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Existing Combos Selection Section -->
+                <div
+                  class="form-section"
+                  *ngIf="auth.hasAnyRole(['Admin', 'Manager', 'Operator'])"
+                >
+                  <div class="section-header-with-action">
+                    <div>
+                      <h3 class="section-title">
+                        Select Existing
+                        {{
+                          comboMode === "device-template"
+                            ? "Device-Template"
+                            : "Device-Message"
+                        }}
+                        Combos
+                      </h3>
+                      <p class="section-subtitle">
+                        Choose from pre-configured
+                        {{
+                          comboMode === "device-template"
+                            ? "device and template"
+                            : "device and message"
+                        }}
+                        combinations
+                      </p>
+                      <span
+                        *ngIf="
+                          (comboMode === 'device-template'
+                            ? selectedExistingCombos.length
+                            : selectedExistingMessageCombos.length) > 0
+                        "
+                        class="selection-count"
+                      >
+                        {{
+                          comboMode === "device-template"
+                            ? selectedExistingCombos.length
+                            : selectedExistingMessageCombos.length
+                        }}
+                        combo(s) selected
+                      </span>
+                    </div>
+                    <button
+                      type="button"
+                      class="action-button secondary"
+                      (click)="
+                        comboMode === 'device-template'
+                          ? togglePrimeNGCombos()
+                          : togglePrimeNGMessageCombos()
+                      "
+                    >
+                      <i
+                        class="pi"
+                        [class]="
+                          (
+                            comboMode === 'device-template'
+                              ? !showPrimeNGCombos
+                              : !showPrimeNGMessageCombos
+                          )
+                            ? 'pi-list'
+                            : 'pi-times'
+                        "
+                      ></i>
+                      {{
+                        (
+                          comboMode === "device-template"
+                            ? showPrimeNGCombos
+                            : showPrimeNGMessageCombos
+                        )
+                          ? "Hide Combos"
+                          : "Browse Combos"
+                      }}
+                    </button>
+                  </div>
+
+                  <!-- MultiSelect for Existing Combos -->
+                  <div
+                    *ngIf="
+                      (comboMode === 'device-template' && showPrimeNGCombos) ||
+                      (comboMode === 'device-message' &&
+                        showPrimeNGMessageCombos)
+                    "
+                    class="prime-ng-combos-section"
+                  >
+                    <div class="multi-select-container">
+                      <label class="field-label mb-2"
+                        >Search and Select Combos</label
+                      >
+
+                      <!-- Device-Template Combos MultiSelect -->
+                      <p-multiSelect
+                        *ngIf="comboMode === 'device-template'"
+                        [(ngModel)]="selectedExistingCombos"
+                        [ngModelOptions]="{ standalone: true }"
+                        [options]="combosList"
+                        optionLabel="deviceName"
+                        [filter]="true"
+                        [virtualScroll]="true"
+                        [virtualScrollItemSize]="65"
+                        [scrollHeight]="'250px'"
+                        [showToggleAll]="true"
+                        placeholder="Search and select device-template combos..."
+                        styleClass="w-full"
+                        [loading]="existingComboLoading"
+                        (onLazyLoad)="onCombosLazyLoad($event)"
+                      >
+                        <ng-template let-combo pTemplate="item">
+                          <div
+                            class="flex flex-col p-2"
+                            [style.min-height]="'60px'"
+                          >
+                            <div class="flex justify-between items-start mb-1">
+                              <div class="flex-1">
+                                <span
+                                  class="font-medium text-sm block truncate"
+                                >
+                                  {{ combo.deviceName || "Unnamed Device" }}
+                                </span>
+                                <!-- <span class="text-xs text-gray-500 block">
+                                  {{ (combo.deviceMac || 'No MAC') | truncate:20 }}
+                                </span> -->
+                              </div>
+                              <!-- <p-tag 
+                                [value]="combo.isDefault ? 'Default' : 'Standard'" 
+                                [severity]="combo.isDefault ? 'success' : 'info'"
+                                class="text-xs shrink-0"></p-tag> -->
+                            </div>
+
+                            <div class="text-sm text-gray-600 mt-1">
+                              <div class="flex items-center">
+                                <i class="pi pi-file mr-1 text-xs"></i>
+                                <span class="truncate text-xs">
+                                  {{ combo.templateName || "No Template" }}
+                                </span>
+                              </div>
+
+                              <!-- <div class="flex items-center mt-1">
+                                <i class="pi pi-desktop mr-1 text-xs"></i>
+                                <span class="text-xs">
+                                  {{ combo.screenWidth }}x{{ combo.screenHeight }}
+                                  <span *ngIf="combo.screenSize"> ({{ combo.screenSize }})</span>
+                                </span>
+                              </div> -->
+                            </div>
+                          </div>
+                        </ng-template>
+                      </p-multiSelect>
+
+                      <!-- Device-Message Combos MultiSelect -->
+                      <p-multiSelect
+                        *ngIf="comboMode === 'device-message'"
+                        [(ngModel)]="selectedExistingMessageCombos"
+                        [ngModelOptions]="{ standalone: true }"
+                        [options]="messageCombosList"
+                        optionLabel="deviceName"
+                        [filter]="true"
+                        [virtualScroll]="true"
+                        [virtualScrollItemSize]="65"
+                        [scrollHeight]="'250px'"
+                        [showToggleAll]="true"
+                        placeholder="Search and select device-message combos..."
+                        styleClass="w-full"
+                        [loading]="existingMessageComboLoading"
+                        (onLazyLoad)="onMessageCombosLazyLoad($event)"
+                      >
+                        <ng-template let-combo pTemplate="item">
+                          <div
+                            class="flex flex-col p-2"
+                            [style.min-height]="'60px'"
+                          >
+                            <div class="flex justify-between items-start mb-1">
+                              <div class="flex-1">
+                                <span
+                                  class="font-medium text-sm block truncate"
+                                >
+                                  {{ combo.deviceName || "Unnamed Device" }}
+                                </span>
+                                <span class="text-xs text-gray-500 block">
+                                  {{
+                                    combo.deviceMac || "No MAC" | truncate: 20
+                                  }}
+                                </span>
+                              </div>
+                              <p-tag
+                                [value]="combo.status || 'Active'"
+                                [severity]="
+                                  (combo.status || 'Active') === 'Active'
+                                    ? 'success'
+                                    : 'warning'
+                                "
+                                class="text-xs shrink-0"
+                              ></p-tag>
+                            </div>
+
+                            <div class="text-sm text-gray-600 mt-1">
+                              <div class="flex items-center">
+                                <i class="pi pi-comment mr-1 text-xs"></i>
+                                <span class="truncate text-xs">
+                                  {{ combo.messageTitle || "No Message" }}
+                                </span>
+                              </div>
+
+                              <div
+                                class="flex items-center mt-1"
+                                *ngIf="combo.contentType !== undefined"
+                              >
+                                <i class="pi pi-info-circle mr-1 text-xs"></i>
+                                <span class="text-xs">
+                                  {{ getContentTypeString(combo.contentType) }}
+                                  <span *ngIf="combo.duration">
+                                    • {{ combo.duration }}s</span
+                                  >
+                                </span>
+                              </div>
+                            </div>
+                          </div>
+                        </ng-template>
+                      </p-multiSelect>
+
+                      <!-- Selected Combos Preview (Card-like View) -->
+                      <div
+                        *ngIf="
+                          (comboMode === 'device-template' &&
+                            selectedExistingCombos.length > 0) ||
+                          (comboMode === 'device-message' &&
+                            selectedExistingMessageCombos.length > 0)
+                        "
+                        class="selected-combos-preview mt-4"
+                      >
+                        <h4 class="text-sm font-medium text-gray-700 mb-2">
+                          Selected Combos Preview
+                        </h4>
+                        <div class="selected-combos-grid">
+                          <!-- Device-Template Selected Combos -->
+                          <div
+                            *ngIf="comboMode === 'device-template'"
+                            class="space-y-2"
+                          >
+                            <div
+                              *ngFor="
+                                let combo of selectedExistingCombos;
+                                let i = index
+                              "
+                              class="selected-combo-card"
+                            >
+                              <div class="combo-card-header">
+                                <span class="combo-number">{{ i + 1 }}</span>
+                                <button
+                                  type="button"
+                                  class="remove-combo-btn"
+                                  (click)="removeSelectedCombo(combo.id)"
+                                >
+                                  <i class="pi pi-times"></i>
+                                </button>
+                              </div>
+                              <div class="combo-card-body">
+                                <div class="combo-card-row">
+                                  <span class="combo-card-label">
+                                    <i class="pi pi-desktop"></i> Device
+                                  </span>
+                                  <span class="combo-card-value">{{
+                                    combo.deviceName
+                                  }}</span>
+                                  <span class="combo-card-value mac-address">{{
+                                    combo.deviceMac || "No MAC"
+                                  }}</span>
+                                </div>
+                                <div class="combo-card-row">
+                                  <span class="combo-card-label">
+                                    <i class="pi pi-file"></i> Template
+                                  </span>
+                                  <span class="combo-card-value">{{
+                                    combo.templateName
+                                  }}</span>
+                                  <span
+                                    *ngIf="
+                                      combo.screenWidth && combo.screenHeight
+                                    "
+                                    class="combo-card-value text-xs"
+                                  >
+                                    {{ combo.screenWidth }}x{{
+                                      combo.screenHeight
+                                    }}
+                                    <span *ngIf="combo.screenSize"
+                                      >({{ combo.screenSize }})</span
+                                    >
+                                  </span>
+                                </div>
+                                <div
+                                  class="combo-card-row"
+                                  *ngIf="combo.isDefault"
+                                >
+                                  <p-tag
+                                    value="Default Template"
+                                    severity="success"
+                                    class="text-xs"
+                                  ></p-tag>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+
+                          <!-- Device-Message Selected Combos -->
+                          <div
+                            *ngIf="comboMode === 'device-message'"
+                            class="space-y-2"
+                          >
+                            <div
+                              *ngFor="
+                                let combo of selectedExistingMessageCombos;
+                                let i = index
+                              "
+                              class="selected-combo-card"
+                            >
+                              <div class="combo-card-header">
+                                <span class="combo-number">{{ i + 1 }}</span>
+                                <button
+                                  type="button"
+                                  class="remove-combo-btn"
+                                  (click)="removeSelectedMessageCombo(combo.id)"
+                                >
+                                  <i class="pi pi-times"></i>
+                                </button>
+                              </div>
+                              <div class="combo-card-body">
+                                <div class="combo-card-row">
+                                  <span class="combo-card-label">
+                                    <i class="pi pi-desktop"></i> Device
+                                  </span>
+                                  <span class="combo-card-value">{{
+                                    combo.deviceName
+                                  }}</span>
+                                  <span class="combo-card-value mac-address">{{
+                                    combo.deviceMac || "No MAC"
+                                  }}</span>
+                                </div>
+                                <div class="combo-card-row">
+                                  <span class="combo-card-label">
+                                    <i class="pi pi-comment"></i> Message
+                                  </span>
+                                  <span class="combo-card-value">{{
+                                    combo.messageTitle
+                                  }}</span>
+                                  <span
+                                    *ngIf="combo.contentType !== undefined"
+                                    class="combo-card-value text-xs"
+                                  >
+                                    {{
+                                      getContentTypeString(combo.contentType)
+                                    }}
+                                    <span *ngIf="combo.duration">
+                                      • {{ combo.duration }}s</span
+                                    >
+                                  </span>
+                                </div>
+                                <div class="combo-card-row">
+                                  <p-tag
+                                    [value]="combo.status || 'Active'"
+                                    [severity]="
+                                      (combo.status || 'Active') === 'Active'
+                                        ? 'success'
+                                        : 'warning'
+                                    "
+                                    class="text-xs"
+                                  ></p-tag>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      <!-- Add Selected Combos Button -->
+                      <div class="flex justify-end mt-3">
+                        <button
+                          *ngIf="
+                            auth.hasAnyRole(['Admin', 'Manager', 'Operator'])
+                          "
+                          type="button"
+                          pButton
+                          label="Add Selected Combos"
+                          icon="pi pi-plus"
+                          [disabled]="
+                            (comboMode === 'device-template'
+                              ? selectedExistingCombos.length
+                              : selectedExistingMessageCombos.length) === 0
+                          "
+                          (click)="addSelectedPrimeNGCombos()"
+                          class="p-button-outlined p-button-sm"
+                        ></button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Device Assignments Section -->
+                <div class="form-section">
+                  <div class="section-header-with-action">
+                    <div>
+                      <h3 class="section-title">
+                        {{
+                          comboMode === "device-template"
+                            ? "Device-Template Assignments"
+                            : "Device-Message Assignments"
+                        }}
+                      </h3>
+                      <p class="section-subtitle">
+                        Configure
+                        {{
+                          comboMode === "device-template"
+                            ? "device-template"
+                            : "device-message"
+                        }}
+                        combinations for this product
+                      </p>
+                    </div>
+                    <button
+                      *ngIf="auth.hasAnyRole(['Admin', 'Manager', 'Operator'])"
+                      type="button"
+                      class="action-button primary"
+                      (click)="addDeviceCombo()"
+                    >
+                      <i class="pi pi-plus"></i>
+                      Add Assignment
+                    </button>
+                  </div>
+
+                  <!-- Loading State -->
+                  <div *ngIf="isLoadingAssignments" class="loading-state">
+                    <p-progressSpinner styleClass="spinner"></p-progressSpinner>
+                    <p>Loading device assignments...</p>
+                  </div>
+
+                  <!-- Empty State -->
+                  <div
+                    *ngIf="
+                      deviceComboGroups.length === 0 && !isLoadingAssignments
+                    "
+                    class="empty-state large"
+                  >
+                    <i class="pi pi-inbox empty-icon large"></i>
+                    <p class="empty-title">No device assignments configured</p>
+                    <p class="empty-subtitle">
+                      Add
+                      {{
+                        comboMode === "device-template"
+                          ? "device-template"
+                          : "device-message"
+                      }}
+                      combinations that will display this product
+                    </p>
+                    <button
+                      *ngIf="auth.hasAnyRole(['Admin', 'Manager', 'Operator'])"
+                      type="button"
+                      class="action-button secondary outlined"
+                      (click)="addDeviceCombo()"
+                    >
+                      <i class="pi pi-plus"></i>
+                      Add Your First Assignment
+                    </button>
+                  </div>
+
+                  <!-- Device Combos List -->
+                  <div
+                    *ngIf="
+                      deviceComboGroups.length > 0 && !isLoadingAssignments
+                    "
+                  >
+                    <p-accordion [multiple]="true" [activeIndex]="[0]">
+                      <p-accordionTab
+                        *ngFor="let combo of deviceComboGroups; let i = index"
+                        [formGroup]="combo"
+                      >
+                        <ng-template pTemplate="header">
+                          <div class="accordion-header">
+                            <div class="header-left">
+                              <i class="pi pi-desktop"></i>
+                              <span class="assignment-label"
+                                >Assignment {{ i + 1 }}</span
+                              >
+
+                              <!-- Existing Combo Indicator -->
+                              <p-tag
+                                *ngIf="
+                                  combo.get('deviceTemplateComboId')?.value &&
+                                  comboMode === 'device-template'
+                                "
+                                value="Existing"
+                                severity="warning"
+                                [rounded]="true"
+                              >
+                              </p-tag>
+
+                              <p-tag
+                                *ngIf="
+                                  combo.get('deviceMessageComboId')?.value &&
+                                  comboMode === 'device-message'
+                                "
+                                value="Existing"
+                                severity="warning"
+                                [rounded]="true"
+                              >
+                              </p-tag>
+
+                              <!-- Active Status -->
+                              <p-tag
+                                [value]="
+                                  combo.get('isActive')?.value
+                                    ? 'Active'
+                                    : 'Inactive'
+                                "
+                                [severity]="
+                                  combo.get('isActive')?.value
+                                    ? 'success'
+                                    : 'danger'
+                                "
+                                [rounded]="true"
+                              >
+                              </p-tag>
+
+                              <!-- Default Template Indicator -->
+                              <p-tag
+                                *ngIf="
+                                  combo.get('isDefault')?.value &&
+                                  comboMode === 'device-template'
+                                "
+                                value="Default"
+                                severity="info"
+                                [rounded]="true"
+                              >
+                              </p-tag>
+                            </div>
+                            <button
+                              *ngIf="
+                                auth.hasAnyRole([
+                                  'Admin',
+                                  'Manager',
+                                  'Operator',
+                                ])
+                              "
+                              type="button"
+                              class="delete-btn"
+                              (click)="
+                                removeDeviceCombo(i); $event.stopPropagation()
+                              "
+                            >
+                              <i class="pi pi-trash"></i>
+                            </button>
+                          </div>
+                        </ng-template>
+
+                        <div class="accordion-content">
+                          <div class="form-grid">
+                            <!-- Device Selection -->
+                            <div class="form-field">
+                              <label class="field-label">
+                                Device <span class="required">*</span>
+                                <p-tag
+                                  *ngIf="
+                                    (combo.get('deviceTemplateComboId')
+                                      ?.value ||
+                                      combo.get('deviceMessageComboId')
+                                        ?.value) &&
+                                    !combo.get('deviceId')?.value
+                                  "
+                                  value="Original not found"
+                                  severity="warning"
+                                  styleClass="inline-tag"
+                                  [rounded]="true"
+                                >
+                                </p-tag>
+                              </label>
+
+                              <p-dropdown
+                                [options]="deviceOptions[i] || []"
+                                formControlName="deviceId"
+                                (onFilter)="onDeviceFilter($event, i)"
+                                (onLazyLoad)="onDeviceLazyLoad($event, i)"
+                                [filter]="true"
+                                filterBy="deviceName,mac"
+                                [virtualScroll]="true"
+                                [virtualScrollItemSize]="60"
+                                [lazy]="true"
+                                placeholder="Select a device"
+                                optionLabel="deviceName"
+                                optionValue="id"
+                                [showClear]="true"
+                                styleClass="field-input dropdown-field"
+                                [readonly]="!canEdit()"
+                                [loading]="devicePagination[i]?.loading"
+                              >
+                                <!-- <p-dropdown
+                                [options]="deviceOptions[i] || []"
+                                formControlName="deviceId"
+                                (onFilter)="onDeviceFilter($event, i)"
+                                (onLazyLoad)="onDeviceLazyLoad($event, i)"
+                                [filter]="true"
+                                [virtualScroll]="true"
+                                [virtualScrollItemSize]="60"
+                                [lazy]="true"
+                                placeholder="Select a device"
+                                optionLabel="deviceName"
+                                [showClear]="true"
+                                styleClass="field-input dropdown-field"
+                                [loading]="devicePagination[i]?.loading"
+                                > -->
+
+                                <ng-template pTemplate="item" let-device>
+                                  <div class="flex flex-col p-2">
+                                    <span class="font-medium text-sm">{{
+                                      device.deviceName
+                                    }}</span>
+                                    <span class="text-xs text-gray-500">{{
+                                      device.mac || "No MAC"
+                                    }}</span>
+                                  </div>
+                                </ng-template>
+                              </p-dropdown>
+                              <small
+                                class="error-message"
+                                *ngIf="getDeviceComboFieldError(i, 'deviceId')"
+                              >
+                                {{ getDeviceComboFieldError(i, "deviceId") }}
+                              </small>
+                            </div>
+
+                            <!-- Template Selection (only for device-template mode) -->
+                            <div
+                              class="form-field"
+                              *ngIf="comboMode === 'device-template'"
+                            >
+                              <label class="field-label">
+                                Template <span class="required">*</span>
+                                <p-tag
+                                  *ngIf="
+                                    combo.get('deviceTemplateComboId')?.value &&
+                                    !combo.get('templateId')?.value
+                                  "
+                                  value="Original not found"
+                                  severity="warning"
+                                  styleClass="inline-tag"
+                                  [rounded]="true"
+                                >
+                                </p-tag>
+                              </label>
+
+                              <p-dropdown
+                                *ngIf="comboMode === 'device-template'"
+                                [options]="templateOptions[i] || []"
+                                formControlName="templateId"
+                                (onFilter)="onTemplateFilter($event, i)"
+                                (onLazyLoad)="onTemplateLazyLoad($event, i)"
+                                [filter]="true"
+                                [virtualScroll]="true"
+                                [virtualScrollItemSize]="60"
+                                [lazy]="true"
+                                placeholder="Select a template"
+                                optionLabel="name"
+                                optionValue="id"
+                                [showClear]="true"
+                                styleClass="field-input dropdown-field"
+                                [readonly]="!canEdit()"
+                                [loading]="templatePagination[i]?.loading"
+                              >
+                                <!-- <p-dropdown
+                                [options]="templateOptions[i] || []"
+                                formControlName="templateId"
+                                (onFilter)="onTemplateFilter($event, i)"
+                                (onLazyLoad)="onTemplateLazyLoad($event, i)"
+                                [filter]="true"
+                                [virtualScroll]="true"
+                                [virtualScrollItemSize]="60"
+                                [lazy]="true"
+                                placeholder="Select a template"
+                                optionLabel="name"
+                                [showClear]="true"
+                                styleClass="field-input dropdown-field"
+                                [loading]="templatePagination[i]?.loading"
+                                > -->
+
+                                <ng-template pTemplate="item" let-template>
+                                  <div class="flex flex-col p-2">
+                                    <span class="font-medium text-sm">{{
+                                      template.name
+                                    }}</span>
+                                    <span class="text-xs text-gray-500">
+                                      {{ template.screenWidth }}x{{
+                                        template.screenHeight
+                                      }}
+                                      <span *ngIf="template.screenInch">
+                                        ({{ template.screenInch }}")</span
+                                      >
+                                    </span>
+                                  </div>
+                                </ng-template>
+                              </p-dropdown>
+                              <small
+                                class="error-message"
+                                *ngIf="
+                                  getDeviceComboFieldError(i, 'templateId')
+                                "
+                              >
+                                {{ getDeviceComboFieldError(i, "templateId") }}
+                              </small>
+                            </div>
+
+                            <!-- Message Selection (only for device-message mode) -->
+                            <div
+                              class="form-field"
+                              *ngIf="comboMode === 'device-message'"
+                            >
+                              <label class="field-label">
+                                Message <span class="required">*</span>
+                                <p-tag
+                                  *ngIf="
+                                    combo.get('deviceMessageComboId')?.value &&
+                                    !combo.get('messageId')?.value
+                                  "
+                                  value="Original not found"
+                                  severity="warning"
+                                  styleClass="inline-tag"
+                                  [rounded]="true"
+                                >
+                                </p-tag>
+                              </label>
+
+                              <p-dropdown
+                                [options]="messageOptions[i] || []"
+                                formControlName="messageId"
+                                (onFilter)="onMessageFilter($event, i)"
+                                (onLazyLoad)="onMessageLazyLoad($event, i)"
+                                [filter]="true"
+                                [virtualScroll]="true"
+                                [virtualScrollItemSize]="60"
+                                [lazy]="true"
+                                placeholder="Select a message"
+                                optionLabel="title"
+                                [showClear]="true"
+                                styleClass="field-input dropdown-field"
+                                [readonly]="!canEdit()"
+                                [loading]="messagePagination[i]?.loading"
+                              >
+                                <ng-template pTemplate="item" let-message>
+                                  <div class="flex flex-col p-2">
+                                    <span class="font-medium text-sm">{{
+                                      message.title
+                                    }}</span>
+                                    <span class="text-xs text-gray-500">
+                                      {{
+                                        getContentTypeString(
+                                          message.contentType
+                                        )
+                                      }}
+                                      <span *ngIf="message.duration">
+                                        • {{ message.duration }}s</span
+                                      >
+                                    </span>
+                                  </div>
+                                </ng-template>
+                              </p-dropdown>
+                              <small
+                                class="error-message"
+                                *ngIf="getDeviceComboFieldError(i, 'messageId')"
+                              >
+                                {{ getDeviceComboFieldError(i, "messageId") }}
+                              </small>
+                            </div>
+
+                            <!-- Display Order -->
+                            <div class="form-field">
+                              <label class="field-label">Display Order</label>
+                              <p-inputNumber
+                                formControlName="displayOrder"
+                                [min]="1"
+                                [showButtons]="true"
+                                placeholder="1"
+                                [readonly]="!canEdit()"
+                                styleClass="field-input"
+                              >
+                              </p-inputNumber>
+                            </div>
+                          </div>
+
+                          <!-- Active Status and Default (for templates) -->
+                          <div
+                            class="form-grid assignment-options grid grid-cols-3 gap-4 items-center"
+                          >
+                            <div class="toggle-field">
+                              <p-toggleswitch
+                                formControlName="isActive"
+                              ></p-toggleswitch>
+                              <label class="toggle-label"
+                                >Active Assignment</label
+                              >
+                            </div>
+
+                            <!-- Default Template (only for device-template mode) -->
+                            <div
+                              class="toggle-field"
+                              *ngIf="comboMode === 'device-template'"
+                            >
+                              <p-checkbox
+                                [binary]="true"
+                                formControlName="isDefault"
+                                inputId="isDefault{{ i }}"
+                                [readonly]="!canEdit()"
+                              >
+                              </p-checkbox>
+                              <label for="isDefault{{ i }}" class="toggle-label"
+                                >Default Template</label
+                              >
+                            </div>
+                          </div>
+
+                          <!-- Selected Combos Summary -->
+                          <div
+                            *ngIf="selectedExistingCombos.length > 0"
+                            class="selected-combos-summary"
+                          >
+                            <div class="summary-header">
+                              <div class="summary-header-left">
+                                <i class="pi pi-check-circle summary-icon"></i>
+                                <div>
+                                  <h4 class="summary-title">
+                                    Selected Combinations
+                                  </h4>
+                                  <p class="summary-count">
+                                    {{ selectedExistingCombos.length }} combo{{
+                                      selectedExistingCombos.length !== 1
+                                        ? "s"
+                                        : ""
+                                    }}
+                                    ready to add
+                                  </p>
+                                </div>
+                              </div>
+                              <p-badge
+                                [value]="selectedExistingCombos.length"
+                                severity="success"
+                                size="large"
+                              ></p-badge>
+                            </div>
+
+                            <div class="selected-combos-list">
+                              <div
+                                *ngFor="
+                                  let combo of selectedExistingCombos;
+                                  let i = index
+                                "
+                                class="selected-combo-card"
+                              >
+                                <div class="combo-card-header">
+                                  <div class="combo-number">{{ i + 1 }}</div>
+                                  <p-tag
+                                    [value]="
+                                      combo.isDefault ? 'Default' : 'Standard'
+                                    "
+                                    [severity]="
+                                      combo.isDefault ? 'success' : 'info'
+                                    "
+                                    [rounded]="true"
+                                  >
+                                  </p-tag>
+                                </div>
+
+                                <div class="combo-card-body">
+                                  <div class="combo-card-row">
+                                    <div class="combo-card-label">
+                                      <i class="pi pi-desktop"></i>
+                                      <span>Device</span>
+                                    </div>
+                                    <div class="combo-card-value">
+                                      {{ combo.deviceName }}
+                                    </div>
+                                  </div>
+
+                                  <div class="combo-card-row">
+                                    <div class="combo-card-label">
+                                      <i class="pi pi-id-card"></i>
+                                      <span>MAC</span>
+                                    </div>
+                                    <div class="combo-card-value mac-address">
+                                      {{ combo.deviceMac || "N/A" }}
+                                    </div>
+                                  </div>
+
+                                  <div class="combo-card-row">
+                                    <div class="combo-card-label">
+                                      <i class="pi pi-file"></i>
+                                      <span>Template</span>
+                                    </div>
+                                    <div class="combo-card-value">
+                                      {{ combo.templateName }}
+                                    </div>
+                                  </div>
+
+                                  <div
+                                    class="combo-card-row"
+                                    *ngIf="
+                                      combo.screenWidth && combo.screenHeight
+                                    "
+                                  >
+                                    <div class="combo-card-label">
+                                      <i class="pi pi-box"></i>
+                                      <span>Screen</span>
+                                    </div>
+                                    <div class="combo-card-value">
+                                      {{ combo.screenWidth }}×{{
+                                        combo.screenHeight
+                                      }}
+                                      <span
+                                        *ngIf="combo.screenInch"
+                                        class="screen-inch"
+                                        >({{ combo.screenInch }}")</span
+                                      >
+                                    </div>
+                                  </div>
+                                </div>
+
+                                <button
+                                  *ngIf="
+                                    auth.hasAnyRole([
+                                      'Admin',
+                                      'Manager',
+                                      'Operator',
+                                    ])
+                                  "
+                                  type="button"
+                                  (click)="removeSelectedCombo(combo.id)"
+                                  class="remove-combo-btn"
+                                  title="Remove this combo"
+                                >
+                                  <i class="pi pi-trash"></i>
+                                  <span>Remove</span>
+                                </button>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </p-accordionTab>
+                    </p-accordion>
+                  </div>
+                </div>
+
+                <!-- Bind Data Section (Only for device-template mode) -->
+                <div
+                  *ngIf="comboMode === 'device-template' && productForm.id"
+                  class="form-section bind-section"
+                >
+                  <div class="section-header-with-action">
+                    <div>
+                      <h3 class="section-title">Bind Data to Device</h3>
+                      <p class="section-subtitle">
+                        Send product data to the selected e-ink device
+                      </p>
+                    </div>
+                    <!-- <button
+                      *ngIf="auth.hasAnyRole(['Admin', 'Manager', 'Operator'])"
+                      type="button"
+                      class="action-button primary"
+                      (click)="bindDataToDevice()"
+                    >
+                      <i class="pi pi-send"></i>
+                      Bind Now
+                    </button> -->
+                  </div>
+
+                  <div class="info-box">
+                    <svg
+                      class="info-icon"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                      ></path>
+                    </svg>
+                    <div>
+                      <p class="info-text">
+                        The device will display product information in the
+                        selected template format
+                      </p>
+                    </div>
+                  </div>
+
+                  <div class="bind-details-grid">
+                    <div class="bind-detail">
+                      <span class="detail-label">Product:</span>
+                      <span class="detail-value">{{
+                        productForm.productName
+                      }}</span>
+                    </div>
+                    <div class="bind-detail">
+                      <span class="detail-label">Price:</span>
+                      <span class="detail-value price"
+                        >LKR
+                        {{ productForm.sellingPrice | number: "1.2-2" }}</span
+                      >
+                    </div>
+                    <div
+                      class="bind-detail"
+                      *ngIf="productForm.discountPrice > 0"
+                    >
+                      <span class="detail-label">Member Price:</span>
+                      <span class="detail-value member-price"
+                        >LKR
+                        {{ productForm.discountPrice | number: "1.2-2" }}</span
+                      >
+                    </div>
+                    <div class="bind-detail">
+                      <span class="detail-label">Barcode:</span>
+                      <span class="detail-value code">{{
+                        productForm.barCode
+                      }}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </p-tabPanel>
+          </p-tabView>
+        </div>
+      </form>
+    </ng-template>
+
+    <!-- Footer -->
+    <ng-template pTemplate="footer">
+      <div class="modal-footer-content">
+        <div class="footer-info">
+          <i class="pi pi-info-circle"></i>
+          {{
+            isEditMode && canEdit()
+              ? "Updating this product will affect all inventory and sales records"
+              : "Active products will be available for sale immediately"
+          }}
+        </div>
+        <div class="footer-actions">
+          <button
+            type="button"
+            class="action-button secondary"
+            (click)="onCancel()"
+          >
+            Cancel
+          </button>
+          <button
+            *ngIf="auth.hasAnyRole(['Admin', 'Manager', 'Operator'])"
+            type="button"
+            class="action-button primary"
+            (click)="onSubmit()"
+            [disabled]="loading"
+          >
+            <i
+              class="pi"
+              [class.pi-spin]="loading"
+              [class.pi-spinner]="loading"
+              [class.pi-save]="!loading"
+            ></i>
+            {{ isEditMode ? "Update Product" : "Create Product" }}
+          </button>
+        </div>
+      </div>
+    </ng-template>
+  </p-dialog>
+</div>

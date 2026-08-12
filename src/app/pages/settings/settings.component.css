@@ -1,0 +1,395 @@
+ :host ::ng-deep {
+      /* PrimeNG Card Customization */
+      .p-card {
+        border-radius: 12px;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        border: 1px solid #e5e7eb;
+        transition: all 0.3s ease;
+      }
+
+      .p-card:hover {
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        transform: translateY(-2px);
+      }
+
+      .p-card .p-card-body {
+        padding: 0;
+      }
+
+      .p-card .p-card-content {
+        padding: 1.5rem;
+      }
+
+      /* Select Dropdown Customization */
+      .p-select {
+        border-radius: 8px;
+        border: 2px solid #e5e7eb;
+        transition: all 0.2s ease;
+      }
+
+      .p-select:not(.p-disabled):hover {
+        border-color: #667eea;
+      }
+
+      .p-select:not(.p-disabled).p-focus {
+        border-color: #667eea;
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+      }
+
+      .p-select-overlay {
+        border-radius: 8px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+        margin-top: 4px;
+      }
+
+      /* Button Customization */
+      .p-button {
+        border-radius: 8px;
+        font-weight: 600;
+        transition: all 0.2s ease;
+      }
+
+      .p-button:not(.p-button-outlined) {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border: none;
+      }
+
+      .p-button:not(.p-button-outlined):hover {
+        background: linear-gradient(135deg, #5568d3 0%, #63408a 100%);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+      }
+
+      /* Store Settings Card - Full Width */
+      .store-settings-card {
+        grid-column: 1 / -1;
+      }
+    }
+
+    .settings-container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 2rem;
+      animation: fadeIn 0.4s ease-out;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* Header Section */
+    .header-section {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      border-radius: 16px;
+      padding: 2rem;
+      margin-bottom: 2rem;
+      color: white;
+      box-shadow: 0 8px 24px rgba(102, 126, 234, 0.25);
+    }
+
+    .header-content {
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+    }
+
+    .header-icon {
+      font-size: 3rem;
+      opacity: 0.9;
+    }
+
+    .header-title {
+      margin: 0;
+      font-size: 2rem;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+    }
+
+    .header-subtitle {
+      margin: 0.5rem 0 0;
+      font-size: 1rem;
+      opacity: 0.95;
+      font-weight: 400;
+    }
+
+    /* Settings Grid */
+    .settings-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 1.5rem;
+    }
+
+    /* Card Header */
+    .card-header-content {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      padding: 1.5rem;
+      background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+      border-bottom: 1px solid #e5e7eb;
+    }
+
+    .card-icon {
+      font-size: 2rem;
+      color: #667eea;
+      background: white;
+      padding: 0.75rem;
+      border-radius: 10px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .card-title {
+      margin: 0;
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: #1f2937;
+    }
+
+    .card-description {
+      margin: 0.25rem 0 0;
+      font-size: 0.875rem;
+      color: #6b7280;
+      font-weight: 400;
+    }
+
+    /* Card Body */
+    .card-body {
+      padding: 1.5rem;
+    }
+
+    /* Current Store Banner */
+    .current-store-banner {
+      background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+      border: 2px solid #86efac;
+      border-radius: 10px;
+      padding: 1.25rem;
+      margin-bottom: 1.5rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .banner-content {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      flex: 1;
+    }
+
+    .banner-icon {
+      font-size: 1.75rem;
+      color: #16a34a;
+    }
+
+    .banner-text {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+    }
+
+    .banner-label {
+      font-size: 0.75rem;
+      color: #166534;
+      text-transform: uppercase;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+    }
+
+    .banner-value {
+      font-size: 1.125rem;
+      font-weight: 700;
+      color: #14532d;
+    }
+
+    .banner-detail {
+      font-size: 0.875rem;
+      color: #166534;
+    }
+
+    /* Form Field */
+    .form-field {
+      margin-bottom: 1.5rem;
+    }
+
+    .field-label {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 0.75rem;
+      font-weight: 600;
+      color: #1f2937;
+      font-size: 0.9375rem;
+    }
+
+    .field-label i {
+      color: #667eea;
+    }
+
+    .field-hint {
+      display: block;
+      margin-top: 0.5rem;
+      color: #6b7280;
+      font-size: 0.8125rem;
+      line-height: 1.4;
+    }
+
+    /* Store Option (Dropdown Item) */
+    .store-option {
+      padding: 0.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.375rem;
+    }
+
+    .store-option-main {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .store-option-icon {
+      color: #667eea;
+      font-size: 1.25rem;
+    }
+
+    .store-option-text {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      flex: 1;
+    }
+
+    .store-option-name {
+      font-weight: 600;
+      color: #1f2937;
+    }
+
+    .store-option-code {
+      font-size: 0.75rem;
+      color: #6b7280;
+      background: #f3f4f6;
+      padding: 0.125rem 0.5rem;
+      border-radius: 4px;
+    }
+
+    .store-option-address {
+      font-size: 0.8125rem;
+      color: #6b7280;
+      padding-left: 2.25rem;
+    }
+
+    /* Dropdown Loader */
+    .dropdown-loader {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.75rem;
+      padding: 1rem;
+      color: #667eea;
+      font-size: 0.875rem;
+      font-weight: 500;
+    }
+
+    .dropdown-loader i {
+      font-size: 1.25rem;
+    }
+
+    /* Dropdown Empty State */
+    .dropdown-empty {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      padding: 2rem;
+      color: #9ca3af;
+    }
+
+    .dropdown-empty i {
+      font-size: 2rem;
+    }
+
+    /* Loading State */
+    .loading-state {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 1rem;
+      padding: 3rem;
+      color: #6b7280;
+      background: #f9fafb;
+      border-radius: 8px;
+    }
+
+    /* Coming Soon Content */
+    .coming-soon-content {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 1rem;
+      padding: 3rem 2rem;
+      color: #9ca3af;
+      background: #f9fafb;
+      border-radius: 8px;
+      text-align: center;
+    }
+
+    .coming-soon-icon {
+      font-size: 3rem;
+      color: #d1d5db;
+    }
+
+    .coming-soon-content p {
+      margin: 0;
+      font-size: 0.9375rem;
+    }
+
+    /* Card Footer */
+    .card-footer-actions {
+      padding: 1.5rem;
+      border-top: 1px solid #e5e7eb;
+      background: #f9fafb;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+      .settings-container {
+        padding: 1rem;
+      }
+
+      .header-section {
+        padding: 1.5rem;
+      }
+
+      .header-icon {
+        font-size: 2rem;
+      }
+
+      .header-title {
+        font-size: 1.5rem;
+      }
+
+      .settings-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .current-store-banner {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      :host ::ng-deep .p-button {
+        width: 100%;
+        justify-content: center;
+      }
+    }

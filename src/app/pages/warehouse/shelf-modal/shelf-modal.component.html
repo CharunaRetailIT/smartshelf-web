@@ -1,0 +1,1056 @@
+<!-- Modernized Shelf Modal -->
+<p-dialog
+  [(visible)]="visible"
+  [header]="header"
+  [modal]="true"
+  [style]="{ width: '90vw', maxWidth: '700px' }"
+  [maximizable]="true"
+  [breakpoints]="{ '960px': '75vw', '640px': '90vw' }"
+  [draggable]="false"
+  [resizable]="false"
+  (onHide)="onCancel()"
+>
+  <!-- Header -->
+  <!-- <ng-template pTemplate="header">
+    <div class="modal-header-content">
+      <div>
+        <h2 class="modal-title">
+          {{ getHeaderText() }}
+        </h2>
+        <p class="modal-subtitle">
+          {{ getDescriptionText() }}
+        </p>
+      </div>
+      <button
+        (click)="onCancel()"
+        class="close-button"
+        aria-label="Close dialog"
+      >
+        <i class="pi pi-times"></i>
+      </button>
+    </div>
+  </ng-template> -->
+  <form [formGroup]="shelfForm" (ngSubmit)="onSubmit()">
+    <!-- Main Content Area -->
+    <div class="px-6 py-5">
+      <!-- Header Description -->
+      <div class="mb-6">
+        <p class="text-sm text-gray-600 m-0">{{ getDescriptionText() }}</p>
+      </div>
+
+      <!-- Modern Tabs -->
+      <div class="flex mb-6 border-b border-gray-200">
+        <button
+          type="button"
+          class="tab-button"
+          [class.active]="activeTabIndex === 0"
+          (click)="toggleTab(0)"
+        >
+          <i class="pi pi-info-circle"></i>
+          Basic Information
+        </button>
+        <button
+          type="button"
+          class="tab-button"
+          [class.active]="activeTabIndex === 1"
+          (click)="toggleTab(1)"
+        >
+          <i class="pi pi-sliders-h"></i>
+          Device Assignments
+          <span *ngIf="deviceCombos.length > 0" class="counter-badge">
+            {{ deviceCombos.length }}
+          </span>
+        </button>
+      </div>
+
+      <!-- Tab 1: Basic Information -->
+      <div *ngIf="activeTabIndex === 0" class="space-y-6">
+        <!-- Basic Info Section -->
+        <div>
+          <h3 class="section-header">Basic Information</h3>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <!-- Rack Selection -->
+            <div>
+              <label class="field-label">
+                Rack <span class="required">*</span>
+              </label>
+              <p-dropdown
+                id="aisleId"
+                formControlName="aisleId"
+                [options]="aisles"
+                optionLabel="name"
+                optionValue="id"
+                placeholder="Select Rack"
+                [filter]="true"
+                filterBy="name,location"
+                [showClear]="true"
+                [readonly]="!canEdit()"
+                styleClass="w-full"
+              >
+                <ng-template pTemplate="item" let-aisle>
+                  <div class="py-2">
+                    <div class="font-medium text-sm text-gray-900">
+                      {{ aisle.name }}
+                    </div>
+                    <div class="text-xs text-gray-500 mt-0.5">
+                      {{ aisle.location }}
+                    </div>
+                  </div>
+                </ng-template>
+              </p-dropdown>
+              <small class="p-error" *ngIf="getFieldError('aisleId')">
+                {{ getFieldError("aisleId") }}
+              </small>
+            </div>
+
+            <!-- Shelf Name -->
+            <div>
+              <label class="field-label">
+                Shelf Name <span class="required">*</span>
+              </label>
+              <input
+                id="name"
+                type="text"
+                pInputText
+                formControlName="name"
+                placeholder="Enter shelf name"
+                [readonly]="!canEdit()"
+                class="w-full"
+              />
+              <small class="p-error" *ngIf="getFieldError('name')">
+                {{ getFieldError("name") }}
+              </small>
+            </div>
+
+            <!-- Location -->
+            <div>
+              <label class="field-label">
+                Location <span class="required">*</span>
+              </label>
+              <input
+                id="location"
+                type="text"
+                pInputText
+                formControlName="location"
+                placeholder="e.g., Section A - Level 2"
+                [readonly]="!canEdit()"
+                class="w-full"
+              />
+              <small class="p-error" *ngIf="getFieldError('location')">
+                {{ getFieldError("location") }}
+              </small>
+            </div>
+
+            <!-- Coordinates -->
+            <div>
+              <label class="field-label">Coordinates</label>
+              <input
+                id="coordinates"
+                type="text"
+                pInputText
+                formControlName="coordinates"
+                placeholder="e.g., x:15, y:25"
+                [readonly]="!canEdit()"
+                class="w-full"
+              />
+              <p class="helper-text">Optional: Physical coordinates</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Description Section -->
+        <div>
+          <label class="field-label">Description</label>
+          <textarea
+            id="description"
+            rows="3"
+            pInputTextarea
+            formControlName="description"
+            placeholder="Enter a detailed description of the shelf..."
+            [readonly]="!canEdit()"
+            class="w-full"
+          ></textarea>
+          <p class="helper-text">
+            Optional: Provide a description to help identify this shelf
+          </p>
+        </div>
+
+        <!-- Status Section -->
+        <div class="info-card">
+          <h4 class="info-card-header">Status & Configuration</h4>
+
+          <div class="flex items-center">
+            <p-checkbox
+              id="isActive"
+              formControlName="isActive"
+              [binary]="true"
+              inputId="isActive"
+              [readonly]="!canEdit()"
+              styleClass="mr-2"
+            ></p-checkbox>
+            <label for="isActive" class="text-sm text-gray-700 cursor-pointer">
+              Active shelves will be available immediately
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab 2: Device Assignments -->
+      <div *ngIf="activeTabIndex === 1" class="space-y-6">
+        <!-- Header -->
+        <div>
+          <h3 class="section-header">Device Assignments</h3>
+          <p class="section-description">
+            Configure device-template combinations for this shelf
+          </p>
+        </div>
+
+        <!-- Combo Type Selection -->
+        <div>
+          <label class="field-label mb-3">Combo Type</label>
+          <p-selectButton
+            [options]="comboModeOptions"
+            [(ngModel)]="comboMode"
+            [ngModelOptions]="{ standalone: true }"
+            (onChange)="toggleComboMode()"
+            optionLabel="label"
+            optionValue="value"
+          >
+            <ng-template let-item pTemplate="item">
+              <div class="flex items-center gap-2">
+                <i [class]="item.icon"></i>
+                <span>{{ item.label }}</span>
+              </div>
+            </ng-template>
+          </p-selectButton>
+        </div>
+
+        <!-- In the template section, use conditional rendering based on comboMode -->
+        <ng-container *ngIf="comboMode === 'device-template'">
+          <!-- Template Combos Section -->
+          <div class="info-card">
+            <h4 class="info-card-header">Select Existing Template Combos</h4>
+            <p class="text-sm text-gray-600 mb-4">
+              Select from existing device-template combos
+            </p>
+
+            <!-- MultiSelect for Template Combos -->
+            <div class="custom-multiselect-wrapper">
+              <p-multiSelect
+                [options]="existingComboVisibleItems"
+                [(ngModel)]="selectedExistingCombos"
+                [ngModelOptions]="{ standalone: true }"
+                optionLabel="deviceName"
+                [filter]="true"
+                filterBy="deviceName,templateName,deviceMAC"
+                placeholder="{{
+                  existingComboLoading
+                    ? 'Loading...'
+                    : 'Select template combos...'
+                }}"
+                styleClass="w-full"
+                [showToggleAll]="false"
+                [loading]="existingComboLoading"
+                (onShow)="onTemplateComboDropdownShow()"
+                (onFilter)="onTemplateComboFilter($event)"
+                #templateMultiSelect
+              >
+                <!-- Templates same as before -->
+                <!-- <ng-template pTemplate="loading">
+          <div class="p-3 text-center text-gray-500">
+            <i class="pi pi-spinner pi-spin mr-2"></i>
+            Loading template combos...
+          </div>
+        </ng-template> -->
+
+                <ng-template pTemplate="empty">
+                  <div class="p-4 text-center text-gray-500">
+                    <i
+                      class="pi pi-inbox text-2xl text-gray-400 block mb-2"
+                    ></i>
+                    <p class="text-sm mb-3" *ngIf="existingComboSearchTerm">
+                      No template combos found for "{{
+                        existingComboSearchTerm
+                      }}"
+                    </p>
+                    <p
+                      class="text-sm mb-3"
+                      *ngIf="!existingComboSearchTerm && !existingComboLoading"
+                    >
+                      No template combos loaded yet
+                    </p>
+                    <button
+                      type="button"
+                      pButton
+                      label="Load Template Combos"
+                      icon="pi pi-refresh"
+                      (click)="loadTemplateCombos('initial')"
+                      [loading]="existingComboLoading"
+                      *ngIf="!existingComboLoading"
+                      class="p-button-text p-button-sm"
+                    ></button>
+                  </div>
+                </ng-template>
+
+                <!-- Item template for message combos -->
+                <ng-template let-combo pTemplate="item">
+                  <div class="combo-item-template">
+                    <div class="combo-header">
+                      <span class="device-name">{{ combo.deviceName }}</span>
+                      <span class="device-mac"
+                        >({{ combo.deviceMAC || "No MAC" }})</span
+                      >
+                      <span class="message-badge">Template</span>
+                    </div>
+
+                    <div class="combo-details">
+                      <div class="message-info">
+                        <i class="pi pi-comment"></i>
+                        <span>{{ combo.templateName }}</span>
+                      </div>
+                      <div
+                        class="message-specs"
+                        *ngIf="combo.contentType || combo.duration"
+                      >
+                        <span *ngIf="combo.contentType">
+                          <i class="pi pi-file"></i>
+                          {{ getContentTypeString(combo.contentType) }}
+                        </span>
+                        <span *ngIf="combo.duration">
+                          <i class="pi pi-clock"></i>
+                          {{ combo.duration }}s
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </ng-template>
+
+                <!-- Footer -->
+                <ng-template pTemplate="footer">
+                  <div class="multiselect-footer">
+                    <!-- Previous Page Button -->
+                    <div *ngIf="hasPreviousTemplateCombos()" class="mb-2">
+                      <button
+                        type="button"
+                        pButton
+                        icon="pi pi-chevron-up"
+                        label="Load Previous"
+                        (click)="
+                          loadPreviousTemplateCombos(); $event.stopPropagation()
+                        "
+                        [disabled]="existingComboLoadingPrev"
+                        [loading]="existingComboLoadingPrev"
+                        class="p-button-text p-button-sm w-full justify-content-start"
+                      >
+                        <i
+                          *ngIf="existingComboLoadingPrev"
+                          class="pi pi-spinner pi-spin mr-2"
+                        ></i>
+                        <span *ngIf="!existingComboLoadingPrev"
+                          >Load Previous {{ pageSize }} Template Combos</span
+                        >
+                      </button>
+                    </div>
+
+                    <!-- Next Page Button -->
+                    <div *ngIf="hasMoreTemplateCombos()" class="mb-2">
+                      <button
+                        type="button"
+                        pButton
+                        icon="pi pi-chevron-down"
+                        label="Load More"
+                        (click)="
+                          loadMoreTemplateCombos(); $event.stopPropagation()
+                        "
+                        [disabled]="existingComboLoadingNext"
+                        [loading]="existingComboLoadingNext"
+                        class="p-button-text p-button-sm w-full justify-content-start"
+                      >
+                        <i
+                          *ngIf="existingComboLoadingNext"
+                          class="pi pi-spinner pi-spin mr-2"
+                        ></i>
+                        <span *ngIf="!existingComboLoadingNext"
+                          >Load Next {{ pageSize }} Template Combos</span
+                        >
+                      </button>
+                    </div>
+
+                    <!-- Search Info -->
+                    <div
+                      *ngIf="existingComboSearchTerm"
+                      class="mb-2 p-2 bg-blue-50 rounded"
+                    >
+                      <p class="text-xs text-blue-700 text-center">
+                        <i class="pi pi-search mr-1"></i>
+                        Showing search results for "{{
+                          existingComboSearchTerm
+                        }}"
+                      </p>
+                    </div>
+
+                    <!-- Pagination Info -->
+                    <div class="pagination-info">
+                      <small class="text-gray-500">
+                        <span *ngIf="existingComboSearchTerm">
+                          Found {{ existingComboTotalItems }} matching template
+                          combo{{ existingComboTotalItems !== 1 ? "s" : "" }}
+                        </span>
+                        <span *ngIf="!existingComboSearchTerm">
+                          Showing
+                          {{ (existingComboCurrentPage - 1) * pageSize + 1 }}-{{
+                            Math.min(
+                              existingComboCurrentPage * pageSize,
+                              existingComboTotalItems
+                            )
+                          }}
+                          of {{ existingComboTotalItems }} template combos
+                          <span *ngIf="existingComboTotalPages > 1">
+                            • Page {{ existingComboCurrentPage }} of
+                            {{ existingComboTotalPages }}
+                          </span>
+                        </span>
+                      </small>
+                    </div>
+                  </div>
+                </ng-template>
+              </p-multiSelect>
+            </div>
+
+            <!-- Add Selected Button -->
+            <div class="flex justify-between items-center mt-4">
+              <div class="text-sm text-gray-500">
+                <span *ngIf="selectedExistingCombos.length > 0">
+                  {{ selectedExistingCombos.length }} template combo{{
+                    selectedExistingCombos.length > 1 ? "s" : ""
+                  }}
+                  selected
+                </span>
+              </div>
+
+              <button
+                type="button"
+                pButton
+                label="Add Selected Combos"
+                icon="pi pi-plus"
+                [disabled]="selectedExistingCombos.length === 0"
+                (click)="addSelectedExistingCombos()"
+                class="p-button-text p-button-success"
+              ></button>
+            </div>
+          </div>
+        </ng-container>
+
+        <ng-container *ngIf="comboMode === 'device-message'">
+          <!-- Message Combos Section -->
+          <div class="info-card">
+            <h4 class="info-card-header">Select Existing Message Combos</h4>
+            <p class="text-sm text-gray-600 mb-4">
+              Select from existing device-message combos
+            </p>
+
+            <!-- MultiSelect for Message Combos -->
+            <div class="custom-multiselect-wrapper">
+              <p-multiSelect
+                [options]="existingMessageCombosVisibleItems"
+                [(ngModel)]="selectedExistingMessageCombos"
+                [ngModelOptions]="{ standalone: true }"
+                optionLabel="deviceName"
+                [filter]="true"
+                filterBy="deviceName,messageTitle,deviceMAC"
+                placeholder="{{
+                  existingMessageComboLoading
+                    ? 'Loading...'
+                    : 'Select message combos...'
+                }}"
+                styleClass="w-full"
+                [showToggleAll]="false"
+                [loading]="existingMessageComboLoading"
+                (onShow)="onMessageComboDropdownShow()"
+                (onFilter)="onMessageComboFilter($event)"
+                #messageMultiSelect
+              >
+                <!-- Loading template -->
+                <ng-template pTemplate="loading">
+                  <div class="p-3 text-center text-gray-500">
+                    <i class="pi pi-spinner pi-spin mr-2"></i>
+                    Loading message combos...
+                  </div>
+                </ng-template>
+
+                <!-- Empty template -->
+                <ng-template pTemplate="empty">
+                  <div class="p-4 text-center text-gray-500">
+                    <i
+                      class="pi pi-inbox text-2xl text-gray-400 block mb-2"
+                    ></i>
+                    <p
+                      class="text-sm mb-3"
+                      *ngIf="existingMessageComboSearchTerm"
+                    >
+                      No message combos found for "{{
+                        existingMessageComboSearchTerm
+                      }}"
+                    </p>
+                    <p
+                      class="text-sm mb-3"
+                      *ngIf="
+                        !existingMessageComboSearchTerm &&
+                        !existingMessageComboLoading
+                      "
+                    >
+                      No message combos loaded yet
+                    </p>
+                    <button
+                      type="button"
+                      pButton
+                      label="{{
+                        existingMessageComboLoading
+                          ? 'Loading...'
+                          : 'Load Message Combos'
+                      }}"
+                      icon="{{
+                        existingMessageComboLoading
+                          ? 'pi pi-spinner pi-spin'
+                          : 'pi pi-refresh'
+                      }}"
+                      (click)="loadMessageCombos('initial')"
+                      [disabled]="existingMessageComboLoading"
+                      class="p-button-text p-button-sm"
+                    ></button>
+                  </div>
+                </ng-template>
+                <!-- <ng-template pTemplate="empty">
+                  <div class="p-4 text-center text-gray-500">
+                    <i
+                      class="pi pi-inbox text-2xl text-gray-400 block mb-2"
+                    ></i>
+                    <p
+                      class="text-sm mb-3"
+                      *ngIf="existingMessageComboSearchTerm"
+                    >
+                      No message combos found for "{{
+                        existingMessageComboSearchTerm
+                      }}"
+                    </p>
+                    <p
+                      class="text-sm mb-3"
+                      *ngIf="
+                        !existingMessageComboSearchTerm &&
+                        !existingMessageComboLoading
+                      "
+                    >
+                      No message combos loaded yet
+                    </p>
+                    <button
+                      type="button"
+                      pButton
+                      label="Load Message Combos"
+                      icon="pi pi-refresh"
+                      (click)="loadMessageCombos('initial')"
+                      [loading]="existingMessageComboLoading"
+                      *ngIf="!existingMessageComboLoading"
+                      class="p-button-text p-button-sm"
+                    ></button>
+                  </div>
+                </ng-template> -->
+
+                <!-- Item template for message combos -->
+                <ng-template let-combo pTemplate="item">
+                  <div class="combo-item-template">
+                    <div class="combo-header">
+                      <span class="device-name">{{ combo.deviceName }}</span>
+                      <span class="device-mac"
+                        >({{ combo.deviceMAC || "No MAC" }})</span
+                      >
+                      <span class="message-badge">Message</span>
+                    </div>
+
+                    <div class="combo-details">
+                      <div class="message-info">
+                        <i class="pi pi-comment"></i>
+                        <span>{{ combo.messageTitle }}</span>
+                      </div>
+                      <div
+                        class="message-specs"
+                        *ngIf="combo.contentType || combo.duration"
+                      >
+                        <span *ngIf="combo.contentType">
+                          <i class="pi pi-file"></i>
+                          {{ getContentTypeString(combo.contentType) }}
+                        </span>
+                        <span *ngIf="combo.duration">
+                          <i class="pi pi-clock"></i>
+                          {{ combo.duration }}s
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </ng-template>
+
+                <!-- Footer -->
+                <ng-template pTemplate="footer">
+                  <div class="multiselect-footer">
+                    <!-- Previous Page Button -->
+                    <div *ngIf="hasPreviousMessageCombos()" class="mb-2">
+                      <button
+                        type="button"
+                        pButton
+                        icon="pi pi-chevron-up"
+                        label="Load Previous"
+                        (click)="
+                          loadPreviousMessageCombos(); $event.stopPropagation()
+                        "
+                        [disabled]="existingMessageComboLoadingPrev"
+                        [loading]="existingMessageComboLoadingPrev"
+                        class="p-button-text p-button-sm w-full justify-content-start"
+                      >
+                        <i
+                          *ngIf="existingMessageComboLoadingPrev"
+                          class="pi pi-spinner pi-spin mr-2"
+                        ></i>
+                        <span *ngIf="!existingMessageComboLoadingPrev"
+                          >Load Previous {{ pageSize }} Message Combos</span
+                        >
+                      </button>
+                    </div>
+
+                    <!-- Next Page Button -->
+                    <div *ngIf="hasMoreMessageCombos()" class="mb-2">
+                      <button
+                        type="button"
+                        pButton
+                        icon="pi pi-chevron-down"
+                        label="Load More"
+                        (click)="
+                          loadMoreMessageCombos(); $event.stopPropagation()
+                        "
+                        [disabled]="existingMessageComboLoadingNext"
+                        [loading]="existingMessageComboLoadingNext"
+                        class="p-button-text p-button-sm w-full justify-content-start"
+                      >
+                        <i
+                          *ngIf="existingMessageComboLoadingNext"
+                          class="pi pi-spinner pi-spin mr-2"
+                        ></i>
+                        <span *ngIf="!existingMessageComboLoadingNext"
+                          >Load Next {{ pageSize }} Message Combos</span
+                        >
+                      </button>
+                    </div>
+
+                    <!-- Search Info -->
+                    <div
+                      *ngIf="existingMessageComboSearchTerm"
+                      class="mb-2 p-2 bg-blue-50 rounded"
+                    >
+                      <p class="text-xs text-blue-700 text-center">
+                        <i class="pi pi-search mr-1"></i>
+                        Showing search results for "{{
+                          existingMessageComboSearchTerm
+                        }}"
+                      </p>
+                    </div>
+
+                    <!-- Pagination Info -->
+                    <div class="pagination-info">
+                      <small class="text-gray-500">
+                        <span *ngIf="existingMessageComboSearchTerm">
+                          Found {{ existingMessageComboTotalItems }} matching
+                          message combo{{
+                            existingMessageComboTotalItems !== 1 ? "s" : ""
+                          }}
+                        </span>
+                        <span *ngIf="!existingMessageComboSearchTerm">
+                          Showing
+                          {{
+                            (existingMessageComboCurrentPage - 1) * pageSize +
+                              1
+                          }}-{{
+                            Math.min(
+                              existingMessageComboCurrentPage * pageSize,
+                              existingMessageComboTotalItems
+                            )
+                          }}
+                          of {{ existingMessageComboTotalItems }} message combos
+                          <span *ngIf="existingMessageComboTotalPages > 1">
+                            • Page {{ existingMessageComboCurrentPage }} of
+                            {{ existingMessageComboTotalPages }}
+                          </span>
+                        </span>
+                      </small>
+                    </div>
+                  </div>
+                </ng-template>
+              </p-multiSelect>
+            </div>
+
+            <!-- Add Selected Button -->
+            <div class="flex justify-between items-center mt-4">
+              <div class="text-sm text-gray-500">
+                <span *ngIf="selectedExistingMessageCombos.length > 0">
+                  {{ selectedExistingMessageCombos.length }} message combo{{
+                    selectedExistingMessageCombos.length > 1 ? "s" : ""
+                  }}
+                  selected
+                </span>
+              </div>
+
+              <button
+                type="button"
+                pButton
+                label="Add Selected Combos"
+                icon="pi pi-plus"
+                [disabled]="selectedExistingMessageCombos.length === 0"
+                (click)="addSelectedExistingCombos()"
+                class="p-button-text p-button-success"
+              ></button>
+            </div>
+          </div>
+        </ng-container>
+
+        <!-- New Combos List -->
+        <div *ngIf="deviceCombos.length > 0" class="space-y-4">
+          <h4
+            class="text-sm font-semibold text-gray-700 uppercase tracking-wide"
+          >
+            Configured Assignments
+          </h4>
+
+          <div
+            *ngFor="let combo of deviceComboGroups; let i = index"
+            [formGroup]="combo"
+            class="assignment-card"
+          >
+            <!-- Assignment Header -->
+            <div class="assignment-header">
+              <div class="assignment-title">
+                <i class="pi pi-sliders-h"></i>
+                Assignment {{ i + 1 }}
+              </div>
+
+              <button
+                *ngIf="auth.hasAnyRole(['Admin', 'Manager', 'Operator'])"
+                type="button"
+                pButton
+                icon="pi pi-trash"
+                class="p-button-text p-button-danger p-button-sm"
+                (click)="removeDeviceCombo(i)"
+                pTooltip="Remove Assignment"
+              ></button>
+            </div>
+
+            <!-- Device and Template/Message Selection -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+              <div>
+                <label class="field-label">
+                  Device <span class="required">*</span>
+                </label>
+                <p-dropdown
+                  formControlName="deviceId"
+                  [options]="devices"
+                  optionLabel="deviceName"
+                  optionValue="id"
+                  placeholder="Select a device"
+                  [filter]="true"
+                  filterBy="deviceName,mac"
+                  [virtualScroll]="true"
+                  [virtualScrollItemSize]="38"
+                  styleClass="w-full"
+                  [loading]="deviceLoading"
+                  [readonly]="!canEdit()"
+                  (onLazyLoad)="onDeviceLazyLoad($event)"
+                >
+                  <ng-template let-device pTemplate="item">
+                    <div class="py-2">
+                      <div class="font-medium text-sm">
+                        {{ device.deviceName }}
+                      </div>
+                      <div class="text-xs text-gray-500 mt-0.5">
+                        {{ device.mac || "No MAC" }}
+                      </div>
+                    </div>
+                  </ng-template>
+                </p-dropdown>
+                <small
+                  class="p-error"
+                  *ngIf="getDeviceComboFieldError(i, 'deviceId')"
+                >
+                  {{ getDeviceComboFieldError(i, "deviceId") }}
+                </small>
+              </div>
+
+              <!-- Template Selection -->
+              <div *ngIf="comboMode === 'device-template'">
+                <label class="field-label">
+                  Template <span class="required">*</span>
+                </label>
+                <p-dropdown
+                  formControlName="templateId"
+                  [options]="filteredTemplates"
+                  optionLabel="name"
+                  optionValue="id"
+                  placeholder="Search templates..."
+                  [filter]="true"
+                  filterBy="name"
+                  [virtualScroll]="true"
+                  [virtualScrollItemSize]="38"
+                  [lazy]="false"
+                  [loading]="templateLoading"
+                  [readonly]="!canEdit()"
+                  (onFilter)="onTemplateFilter($event)"
+                  (onLazyLoad)="onTemplateLazyLoad($event)"
+                  styleClass="w-full"
+                >
+                  <ng-template let-template pTemplate="item">
+                    <div class="py-2">
+                      <div class="font-medium text-sm">{{ template.name }}</div>
+                      <div class="text-xs text-gray-500 mt-0.5">
+                        {{ template.screenWidth }}×{{ template.screenHeight }}
+                        <span *ngIf="template.screenInch">
+                          ({{ template.screenInch }}")</span
+                        >
+                      </div>
+                    </div>
+                  </ng-template>
+                </p-dropdown>
+                <small
+                  class="p-error"
+                  *ngIf="getDeviceComboFieldError(i, 'templateId')"
+                >
+                  {{ getDeviceComboFieldError(i, "templateId") }}
+                </small>
+              </div>
+
+              <!-- Message Selection -->
+              <div *ngIf="comboMode === 'device-message'">
+                <label class="field-label">
+                  Message <span class="required">*</span>
+                </label>
+                <p-dropdown
+                  formControlName="messageId"
+                  [options]="messages"
+                  optionLabel="title"
+                  optionValue="id"
+                  placeholder="Select a message"
+                  [filter]="true"
+                  [virtualScroll]="true"
+                  [virtualScrollItemSize]="38"
+                  styleClass="w-full"
+                  [loading]="messageLoading"
+                  [readonly]="!canEdit()"
+                  (onLazyLoad)="onMessageLazyLoad($event)"
+                >
+                  <ng-template let-message pTemplate="item">
+                    <div class="py-2">
+                      <div class="font-medium text-sm">{{ message.title }}</div>
+                      <div class="text-xs text-gray-500 mt-0.5">
+                        {{ getContentTypeString(message.contentType) }}
+                        <span *ngIf="message.duration">
+                          • {{ message.duration }}s</span
+                        >
+                      </div>
+                    </div>
+                  </ng-template>
+                </p-dropdown>
+                <small
+                  class="p-error"
+                  *ngIf="getDeviceComboFieldError(i, 'messageId')"
+                >
+                  {{ getDeviceComboFieldError(i, "messageId") }}
+                </small>
+              </div>
+
+              <!-- Display Order -->
+              <div>
+                <label class="field-label">Display Order</label>
+                <p-inputNumber
+                  [id]="'displayOrder' + i"
+                  formControlName="displayOrder"
+                  [min]="1"
+                  mode="decimal"
+                  [showButtons]="true"
+                  [readonly]="!canEdit()"
+                  styleClass="w-full"
+                ></p-inputNumber>
+              </div>
+
+              <!-- Status Checkboxes -->
+              <div class="flex items-center gap-6 pt-4">
+                <div class="flex items-center gap-2">
+                  <p-checkbox
+                    [id]="'isActive' + i"
+                    formControlName="isActive"
+                    [binary]="true"
+                    [inputId]="'isActive' + i"
+                    [readonly]="!canEdit()"
+                  ></p-checkbox>
+                  <label
+                    [for]="'isActive' + i"
+                    class="text-sm text-gray-700 cursor-pointer"
+                    >Active</label
+                  >
+                </div>
+
+                <div
+                  *ngIf="comboMode === 'device-template'"
+                  class="flex items-center gap-2"
+                >
+                  <p-checkbox
+                    [id]="'isDefault' + i"
+                    formControlName="isDefault"
+                    [binary]="true"
+                    [inputId]="'isDefault' + i"
+                    [readonly]="!canEdit()"
+                  ></p-checkbox>
+                  <label
+                    [for]="'isDefault' + i"
+                    class="text-sm text-gray-700 cursor-pointer"
+                    >Default</label
+                  >
+                </div>
+              </div>
+            </div>
+
+            <!-- Preview Section -->
+            <div
+              *ngIf="
+                combo.get('deviceId')?.value &&
+                (comboMode === 'device-template'
+                  ? combo.get('templateId')?.value
+                  : combo.get('messageId')?.value)
+              "
+              class="preview-section"
+            >
+              <h6 class="preview-title">Assignment Preview</h6>
+              <div class="preview-content">
+                <div>
+                  <p class="preview-item-label">Device Information</p>
+                  <div class="preview-item-value">
+                    <span>{{
+                      getDeviceName(combo.get("deviceId")?.value)
+                    }}</span>
+                    <p-tag
+                      [value]="getDeviceStatus(combo.get('deviceId')?.value)"
+                      [severity]="
+                        getDeviceStatus(combo.get('deviceId')?.value) ===
+                        'Active'
+                          ? 'success'
+                          : 'warning'
+                      "
+                    >
+                    </p-tag>
+                  </div>
+                </div>
+                <div>
+                  <p class="preview-item-label">
+                    {{
+                      comboMode === "device-template"
+                        ? "Template Information"
+                        : "Message Information"
+                    }}
+                  </p>
+                  <div class="preview-item-value">
+                    <span>
+                      {{
+                        comboMode === "device-template"
+                          ? getTemplateName(combo.get("templateId")?.value)
+                          : getMessageTitle(combo.get("messageId")?.value)
+                      }}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Add New Combo Button -->
+        <div class="pt-4">
+          <button
+            *ngIf="auth.hasAnyRole(['Admin', 'Manager', 'Operator'])"
+            type="button"
+            pButton
+            label="Add New Assignment"
+            icon="pi pi-plus"
+            (click)="addDeviceCombo()"
+            class="p-button-outlined w-full"
+          ></button>
+        </div>
+
+        <!-- Empty State -->
+        <div *ngIf="deviceCombos.length === 0" class="empty-state">
+          <i class="pi pi-inbox"></i>
+          <p class="empty-state-title">No assignments configured</p>
+          <p class="empty-state-description">
+            Add new assignments to configure device-template combinations
+          </p>
+          <button
+            type="button"
+            pButton
+            label="Add Your First Assignment"
+            icon="pi pi-plus"
+            (click)="addDeviceCombo()"
+            *ngIf="auth.hasAnyRole(['Admin', 'Manager', 'Operator'])"
+            class="p-button-outlined"
+          ></button>
+        </div>
+      </div>
+    </div>
+  </form>
+
+  <!-- Footer -->
+  <ng-template pTemplate="footer">
+    <div class="flex items-center justify-between w-full">
+      <!-- Left side: Cancel button -->
+      <button
+        type="button"
+        pButton
+        label="Cancel"
+        icon="pi pi-times"
+        (click)="onCancel()"
+        class="p-button-text"
+      ></button>
+
+      <!-- Right side: Navigation and Submit buttons -->
+      <div class="flex gap-2">
+        <button
+          type="button"
+          pButton
+          label="Previous"
+          icon="pi pi-chevron-left"
+          *ngIf="activeTabIndex > 0"
+          (click)="toggleTab(activeTabIndex - 1)"
+          class="p-button-outlined"
+        ></button>
+
+        <button
+          type="button"
+          pButton
+          label="Next"
+          icon="pi pi-chevron-right"
+          iconPos="right"
+          *ngIf="
+            activeTabIndex < 1 &&
+            auth.hasAnyRole(['Admin', 'Manager', 'Operator'])
+          "
+          (click)="toggleTab(activeTabIndex + 1)"
+          class="p-button-outlined"
+        ></button>
+
+        <button
+          type="submit"
+          pButton
+          [label]="isEditMode ? 'Update Shelf' : 'Create Shelf'"
+          [icon]="isEditMode ? 'pi pi-save' : 'pi pi-plus'"
+          (click)="onSubmit()"
+          [disabled]="shelfForm.invalid || isSubmitting"
+          [loading]="isSubmitting"
+          *ngIf="auth.hasAnyRole(['Admin', 'Manager', 'Operator'])"
+          class="p-button-primary"
+        ></button>
+      </div>
+    </div>
+  </ng-template>
+</p-dialog>

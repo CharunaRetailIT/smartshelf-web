@@ -1,0 +1,883 @@
+@import url("https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap");
+
+:root {
+  --sidebar-expanded: 16.875rem;
+  --sidebar-collapsed: 4.375rem;
+}
+.sidebar-container {
+  width: auto;
+  height: 100vh;
+  font-family: "Plus Jakarta Sans", sans-serif;
+}
+
+/* Header */
+.sidebar-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1rem;
+}
+
+.toggle-btn {
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 0.625rem;
+  border: none;
+  background: rgba(255, 255, 255, 0.12);
+  color: #fff;
+  cursor: pointer;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.brand {
+  font-weight: 700;
+  font-size: 1rem;
+  white-space: nowrap;
+}
+
+/* Navigation */
+.nav-list {
+  padding-top: 0.5rem;
+
+  a {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+
+    i {
+      width: 1.25rem;
+      text-align: center;
+      font-size: 1rem;
+    }
+
+    span {
+      font-size: 0.875rem;
+    }
+  }
+}
+
+/* Collapsed state */
+:host-context(.sidebar-collapsed) .sidebar {
+  width: var(--sidebar-collapsed);
+}
+
+/* Mobile behavior */
+@media (max-width: 768px) {
+  .sidebar {
+    width: 85vw;
+    max-width: 20rem;
+  }
+}
+
+.app-sidenav {
+  background: linear-gradient(180deg, #0d9488 0%, #0f766e 100%);
+  color: white;
+  box-shadow: 4px 0 10px rgba(0, 0, 0, 0.15);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  flex-direction: column;
+  overflow: visible;
+  border-right: none;
+
+  &.expanded {
+    width: 16.8625rem;
+    /* width: 270px; */
+  }
+
+  &.collapsed {
+    width: 70px;
+
+    .logo-text {
+      opacity: 0;
+      width: 0;
+    }
+
+    .nav-label {
+      opacity: 0;
+      width: 0;
+    }
+
+    .user-details {
+      opacity: 0;
+      width: 0;
+    }
+
+    .powered-by {
+      opacity: 0;
+      display: none;
+    }
+  }
+
+  ::ng-deep {
+    .mat-mdc-list-item {
+      height: auto !important;
+      min-height: 48px;
+    }
+
+    .mat-mdc-list-item-unscoped-content {
+      width: 100%;
+    }
+  }
+}
+
+/* Logo Section */
+.logo-section {
+  padding: clamp(20px, 2.5vw, 24px) 16px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  margin-bottom: 16px;
+  flex-shrink: 0;
+
+  .logo-content {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    transition: justify-content 0.3s ease;
+
+    &.centered {
+      justify-content: center;
+    }
+  }
+
+  .logo-icon {
+    background: #fff;
+    width: clamp(40px, 5vw, 48px);
+    height: clamp(40px, 5vw, 48px);
+    min-width: clamp(40px, 5vw, 48px);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    border: none;
+    flex-shrink: 0;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+
+    &:hover {
+      transform: scale(1.05);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+    }
+
+    i {
+      font-size: clamp(20px, 2.5vw, 24px);
+      color: #0d9488;
+    }
+  }
+
+  .logo-text {
+    display: flex;
+    flex-direction: column;
+    transition:
+      opacity 0.3s ease,
+      width 0.3s ease;
+    overflow: hidden;
+    white-space: nowrap;
+    flex: 1;
+
+    .brand-name {
+      font-size: clamp(18px, 2vw, 24px);
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      line-height: 1.2;
+      color: white;
+    }
+  }
+
+  .btn-close {
+    width: clamp(32px, 3.5vw, 36px);
+    height: clamp(32px, 3.5vw, 36px);
+    min-width: clamp(32px, 3.5vw, 36px);
+    border-radius: 50%;
+    background-color: rgba(255, 255, 255, 0.15);
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    &:hover {
+      background-color: rgba(255, 255, 255, 0.25);
+      transform: scale(1.05);
+    }
+
+    i {
+      color: white;
+      font-size: clamp(18px, 2vw, 20px);
+    }
+  }
+}
+
+/* Navigation List */
+.nav-list {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 0 8px;
+
+  /* Custom scrollbar */
+  &::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 3px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 3px;
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.3);
+    }
+  }
+}
+
+.nav-item {
+  display: flex !important;
+  align-items: center !important;
+  gap: 12px;
+  padding: clamp(10px, 1.2vw, 12px) 16px !important;
+  margin: 4px 0;
+  border-radius: 8px;
+  color: rgba(255, 255, 255, 0.9) !important;
+  text-decoration: none;
+  font-size: clamp(12px, 1.2vw, 14px);
+  font-weight: 500;
+  transition: all 0.2s ease;
+  cursor: pointer;
+  position: relative;
+  overflow: visible;
+  min-height: 44px;
+  flex-direction: row !important;
+  white-space: nowrap;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.1);
+    transform: translateX(4px);
+    color: white !important;
+
+    .nav-icon {
+      transform: scale(1.1);
+    }
+  }
+
+  &.active {
+    background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(10px);
+    font-weight: 600;
+    color: white !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+
+    .nav-icon {
+      color: white !important;
+      transform: scale(1.05);
+    }
+
+    &::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 4px;
+      height: 24px;
+      background: white;
+      border-radius: 0 4px 4px 0;
+    }
+  }
+
+  .nav-icon {
+    font-size: clamp(18px, 2vw, 22px);
+    width: 24px;
+    min-width: 24px;
+    height: 24px;
+    flex-shrink: 0;
+    transition: transform 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: rgba(255, 255, 255, 0.9) !important;
+  }
+
+  .nav-label {
+    flex: 1;
+    transition:
+      opacity 0.3s ease,
+      width 0.3s ease;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    color: white !important;
+  }
+}
+
+/* User Section */
+.user-section {
+  margin-top: auto;
+  flex-shrink: 0;
+  position: absolute;
+  bottom: 1rem;
+  left: 0;
+  right: 0;
+  padding: 0 12px;
+  /* left: 0; */
+  /* padding: 16px; */
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+
+  .user-separator {
+    height: 1px;
+    background: rgba(255, 255, 255, 0.1);
+    margin-bottom: 16px;
+  }
+
+  .user-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.1);
+    margin-bottom: 12px;
+    transition: all 0.3s ease;
+
+    &.centered {
+      justify-content: center;
+      padding: 8px;
+    }
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.15);
+    }
+
+    .user-avatar {
+      width: clamp(36px, 4vw, 40px);
+      height: clamp(36px, 4vw, 40px);
+      min-width: clamp(36px, 4vw, 40px);
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+
+      i {
+        font-size: clamp(16px, 1.8vw, 18px);
+        color: white !important;
+      }
+    }
+
+    .user-details {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      transition:
+        opacity 0.3s ease,
+        width 0.3s ease;
+      overflow: hidden;
+      white-space: nowrap;
+      flex: 1;
+
+      .user-name {
+        font-size: clamp(12px, 1.2vw, 14px);
+        font-weight: 600;
+        color: white !important;
+        line-height: 1.2;
+      }
+    }
+  }
+
+  .powered-by {
+    text-align: center;
+    font-size: clamp(9px, 1vw, 10px);
+    color: white !important;
+    line-height: 1.4;
+    transition: opacity 0.3s ease;
+    opacity: 0.9;
+
+    span {
+      display: block;
+      color: white !important;
+    }
+
+    .copyright {
+      font-size: clamp(8px, 0.9vw, 9px);
+      margin-top: 2px;
+      color: white !important;
+    }
+  }
+
+  .powered-by-collapsed {
+    text-align: center;
+    font-size: 10px;
+    font-weight: 700;
+    color: white !important;
+    background: rgba(255, 255, 255, 0.1);
+    padding: 6px;
+    border-radius: 6px;
+    cursor: default;
+  }
+}
+
+/* Main Content */
+.main-content {
+  background: #f9fafb;
+  height: 100vh;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+/* ========================================
+   RESPONSIVE DESIGN
+   ======================================== */
+
+/* Desktop (1024px+) */
+@media (min-width: 1024px) {
+  .app-sidenav {
+    &.expanded {
+      width: 270px;
+    }
+
+    &.collapsed {
+      width: 70px;
+    }
+  }
+}
+
+/* Tablet (768px - 1023px) */
+@media (min-width: 768px) and (max-width: 1023px) {
+  .app-sidenav {
+    &.expanded {
+      width: 240px;
+    }
+
+    &.collapsed {
+      width: 60px;
+    }
+  }
+
+  .logo-section {
+    padding: 20px 12px;
+  }
+
+  .nav-list {
+    padding: 0 6px;
+  }
+
+  .nav-item {
+    padding: 10px 12px !important;
+  }
+
+  .user-section {
+    padding: 12px;
+  }
+}
+
+/* Mobile Landscape & Small Tablet (641px - 767px) */
+@media (min-width: 641px) and (max-width: 767px) {
+  .sidebar-container {
+    ::ng-deep {
+      .mat-drawer-backdrop {
+        display: block !important;
+      }
+    }
+  }
+
+  .app-sidenav {
+    &.expanded {
+      width: 240px;
+      position: fixed;
+      z-index: 1000;
+    }
+
+    &.collapsed {
+      width: 0;
+      transform: translateX(-100%);
+    }
+  }
+}
+
+/* Mobile (max 640px) */
+@media (max-width: 640px) {
+  .sidebar-container {
+    ::ng-deep {
+      .mat-drawer-backdrop {
+        display: block !important;
+        background-color: rgba(0, 0, 0, 0.6) !important;
+      }
+    }
+  }
+
+  .app-sidenav {
+    &.expanded {
+      width: 280px;
+      max-width: 85vw;
+      position: fixed;
+      z-index: 1000;
+    }
+
+    &.collapsed {
+      width: 0;
+      transform: translateX(-100%);
+    }
+  }
+
+  .logo-section {
+    padding: 16px 12px;
+
+    .btn-close {
+      display: flex !important;
+    }
+  }
+
+  .nav-list {
+    padding: 0 8px;
+  }
+
+  .nav-item {
+    padding: 12px 14px !important;
+    margin: 6px 0;
+    min-height: 48px;
+
+    .nav-icon {
+      font-size: 20px;
+    }
+
+    .nav-label {
+      font-size: 14px;
+    }
+  }
+
+  .user-section {
+    padding: 12px;
+
+    .user-info {
+      .user-avatar {
+        width: 36px;
+        height: 36px;
+        min-width: 36px;
+
+        i {
+          font-size: 16px;
+        }
+      }
+
+      .user-details {
+        .user-name {
+          font-size: 13px;
+        }
+      }
+    }
+  }
+}
+
+/* Extra Small Mobile (max 375px) */
+@media (max-width: 375px) {
+  .app-sidenav {
+    &.expanded {
+      width: 100vw;
+      max-width: 100vw;
+    }
+  }
+
+  .logo-section {
+    padding: 14px 10px;
+
+    .logo-icon {
+      width: 36px;
+      height: 36px;
+      min-width: 36px;
+
+      i {
+        font-size: 18px;
+      }
+    }
+
+    .logo-text {
+      .brand-name {
+        font-size: 16px;
+      }
+    }
+
+    .btn-close {
+      width: 30px;
+      height: 30px;
+      min-width: 30px;
+
+      i {
+        font-size: 16px;
+      }
+    }
+  }
+
+  .nav-item {
+    padding: 10px 12px !important;
+
+    .nav-icon {
+      font-size: 18px;
+      width: 20px;
+      height: 20px;
+    }
+
+    .nav-label {
+      font-size: 13px;
+    }
+  }
+
+  .user-section {
+    padding: 10px;
+
+    .user-info {
+      padding: 8px;
+
+      .user-avatar {
+        width: 32px;
+        height: 32px;
+        min-width: 32px;
+
+        i {
+          font-size: 14px;
+        }
+      }
+
+      .user-details {
+        .user-name {
+          font-size: 12px;
+        }
+      }
+    }
+
+    .powered-by {
+      font-size: 8px;
+
+      .copyright {
+        font-size: 7px;
+      }
+    }
+  }
+}
+
+/* Material Design Overrides */
+::ng-deep {
+  .mat-mdc-list-item {
+    &.nav-item {
+      --mdc-list-list-item-hover-state-layer-color: transparent;
+      --mdc-list-list-item-focus-state-layer-color: transparent;
+    }
+
+    height: auto !important;
+    padding: 0 !important;
+  }
+
+  .mat-mdc-list-item-unscoped-content {
+    display: flex !important;
+    align-items: center !important;
+    width: 100% !important;
+    flex-direction: row !important;
+  }
+
+  .mdc-list-item__content {
+    display: flex !important;
+    align-items: center !important;
+    width: 100% !important;
+    flex-direction: row !important;
+  }
+
+  .mat-drawer-backdrop {
+    display: none;
+  }
+
+  .mat-drawer-container {
+    background-color: transparent;
+  }
+
+  /* Mobile-specific Material overrides */
+  @media (max-width: 767px) {
+    .mat-drawer-backdrop {
+      display: block !important;
+    }
+  }
+}
+
+/* Animation classes */
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.nav-item {
+  animation: slideIn 0.3s ease;
+}
+
+/* Accessibility improvements */
+@media (prefers-reduced-motion: reduce) {
+  .app-sidenav,
+  .nav-item,
+  .logo-icon,
+  .btn-close,
+  .logo-text,
+  .nav-label,
+  .user-details,
+  .nav-icon {
+    transition: none !important;
+    animation: none !important;
+  }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .app-sidenav {
+    border-right: 2px solid white;
+  }
+
+  .nav-item {
+    &.active {
+      outline: 2px solid white;
+      outline-offset: -2px;
+    }
+
+    &:hover {
+      outline: 1px solid rgba(255, 255, 255, 0.5);
+      outline-offset: -1px;
+    }
+  }
+}
+
+/* Print styles */
+@media print {
+  .app-sidenav {
+    display: none;
+  }
+
+  .main-content {
+    margin-left: 0 !important;
+  }
+}
+
+::ng-deep .mat-mdc-list-item,
+::ng-deep .mdc-list-item__content,
+::ng-deep .mat-mdc-list-item-unscoped-content {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  gap: 12px;
+}
+
+.nav-item .nav-icon {
+  font-size: 18px;
+  width: 20px;
+  min-width: 20px;
+  height: 20px;
+}
+
+/* In your CSS file, add these styles */
+
+::ng-deep .nav-item.mat-mdc-list-item {
+  --mdc-list-list-item-focus-state-layer-color: transparent !important;
+  --mdc-list-list-item-hover-state-layer-color: transparent !important;
+  --mdc-list-list-item-selected-container-color: transparent !important;
+
+  /* Remove focus outline */
+  &:focus {
+    outline: none !important;
+  }
+
+  /* Remove ripple effect */
+  .mat-mdc-list-item-ripple {
+    display: none !important;
+  }
+
+  /* Remove the state layers */
+  &::before {
+    display: none !important;
+  }
+}
+
+/* If using Angular Material 15+ with MDC */
+::ng-deep .mdc-list-item {
+  --mdc-list-list-item-focus-state-layer-color: transparent;
+  --mdc-list-list-item-hover-state-layer-color: transparent;
+}
+
+/* Specifically target the active state */
+::ng-deep .nav-item.active {
+  --mdc-list-list-item-focus-state-layer-color: transparent !important;
+  --mdc-list-list-item-hover-state-layer-color: transparent !important;
+}
+
+/* Remove Material's default states */
+::ng-deep .mat-mdc-list-item-interactive {
+  &:not(:disabled) {
+    &:focus::before {
+      opacity: 0 !important;
+    }
+
+    &:hover::before {
+      opacity: 0 !important;
+    }
+  }
+}
+
+/* Ensure your custom active state overrides Material's */
+.nav-item {
+  &.active {
+    position: relative;
+    z-index: 1;
+
+    /* Override any Material background layers */
+    &::after {
+      display: none !important;
+    }
+
+    /* Remove any focus indicator */
+    &:focus,
+    &:focus-visible {
+      outline: none;
+      box-shadow: none;
+    }
+  }
+}
+
+/* Remove any remaining focus visuals */
+.nav-item:focus-visible {
+  outline: none;
+  box-shadow: none;
+}
+
+/* 🔥 Kill MDC focus / selected overlay completely */
+::ng-deep .mat-mdc-list-item,
+::ng-deep .mdc-list-item {
+  --mdc-list-list-item-focus-state-layer-opacity: 0 !important;
+  --mdc-list-list-item-hover-state-layer-opacity: 0 !important;
+  --mdc-list-list-item-selected-state-layer-opacity: 0 !important;
+}
+
+/* Remove pseudo-element overlays */
+::ng-deep .mdc-list-item::before,
+::ng-deep .mdc-list-item::after {
+  opacity: 0 !important;
+  background: transparent !important;
+}
+
+/* Remove CDK focus styles */
+::ng-deep .cdk-focused,
+::ng-deep .cdk-program-focused {
+  outline: none !important;
+}
+
+/* Ensure active state is ONLY your custom one */
+::ng-deep .nav-item.active {
+  background: rgba(255, 255, 255, 0.2) !important;
+}

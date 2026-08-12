@@ -1,0 +1,409 @@
+<div class="min-h-screen bg-slate-50 flex items-center justify-center p-4">
+  <div
+    class="bg-white rounded-2xl shadow-2xl w-full border border-gray-200 transition-all duration-500"
+    [ngClass]="isSignUp() ? 'max-w-4xl' : 'max-w-md'"
+  >
+    <!-- Header with Toggle Buttons -->
+    <div class="bg-gradient-to-r from-teal-600 to-emerald-600 p-6 rounded-2xl">
+      <div class="flex justify-center mb-4">
+        <div class="bg-white/20 rounded-full p-3">
+          <svg
+            class="w-8 h-8 text-white"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+            ></path>
+          </svg>
+        </div>
+      </div>
+
+      <div class="flex bg-white/10 rounded-full p-1">
+        <button
+          (click)="switchToSignIn()"
+          [class]="
+            isSignUp()
+              ? 'text-white/70 hover:text-white'
+              : 'bg-white text-teal-600 shadow-lg'
+          "
+          class="flex-1 py-2 px-4 rounded-full text-sm font-medium transition-all duration-300"
+        >
+          Sign In
+        </button>
+        <button
+          (click)="switchToSignUp()"
+          [class]="
+            isSignUp()
+              ? 'bg-white text-teal-600 shadow-lg'
+              : 'text-white/70 hover:text-white'
+          "
+          class="flex-1 py-2 px-4 rounded-full text-sm font-medium transition-all duration-300"
+        >
+          Sign Up
+        </button>
+      </div>
+    </div>
+
+    <!-- Form Container -->
+    <div class="p-8">
+      <div class="text-center mb-8">
+        <h2 class="text-3xl font-bold text-gray-800 mb-2">
+          {{ isSignUp() ? "Create Account" : "Welcome Back" }}
+        </h2>
+        <p class="text-gray-600">
+          {{
+            isSignUp()
+              ? "Join our Smart Shelf portal"
+              : "Sign in to your account"
+          }}
+        </p>
+      </div>
+
+      <!-- Sign In Form -->
+      <form
+        *ngIf="!isSignUp()"
+        [formGroup]="signInForm"
+        (ngSubmit)="onSignIn()"
+        class="space-y-6"
+      >
+        <div class="space-y-1">
+          <label class="block text-sm font-medium text-gray-700 mb-2"
+            >Employee ID</label
+          >
+          <input
+            type="text"
+            formControlName="employeeId"
+            placeholder="Enter your employee ID"
+            class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-teal-500 focus:border-transparent bg-gray-50 focus:bg-white"
+          />
+        </div>
+
+        <div class="space-y-1">
+          <label class="block text-sm font-medium text-gray-700 mb-2"
+            >Password</label
+          >
+          <input
+            [type]="showPassword() ? 'text' : 'password'"
+            formControlName="password"
+            placeholder="Enter your password"
+            class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-teal-500 focus:border-transparent bg-gray-50 focus:bg-white"
+          />
+        </div>
+
+        <!-- <div class="flex items-center justify-between">
+          <label class="flex items-center">
+            <input
+              type="checkbox"
+              class="rounded border-gray-300 text-teal-600 focus:ring-teal-500"
+            />
+            <span class="ml-2 text-sm text-gray-600">Remember me</span>
+          </label>
+          <a
+            href="#"
+            class="text-sm text-teal-600 hover:text-teal-800 font-medium"
+            >Forgot Password?</a
+          >
+        </div> -->
+
+        <button
+          type="submit"
+          [disabled]="signInForm.invalid"
+          class="w-full bg-gradient-to-r from-teal-600 to-emerald-600 text-white py-3 px-4 rounded-xl hover:from-teal-700 hover:to-emerald-700 focus:ring-2 focus:ring-teal-500 focus:ring-offset-2 font-medium disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300"
+        >
+          Sign In
+        </button>
+        <div class="company-link">
+          Powered by
+          <a
+            href="https://retailit.lk/"
+            target="_blank"
+            rel="noopener noreferrer"
+            >Retail IT</a
+          >
+          – We Provide More than a Solution
+        </div>
+        <div class="flex justify-center mt-4">
+          <span class="text-sm text-gray-500">Version 1.2.0</span>
+        </div>
+      </form>
+
+      <!-- Sign Up Form -->
+      <form
+        *ngIf="isSignUp()"
+        [formGroup]="signUpForm"
+        (ngSubmit)="onSignUp()"
+        class="space-y-10"
+      >
+        <!-- Employee Info Section -->
+        <div>
+          <h3 class="text-lg font-semibold text-gray-800 mb-4">
+            Employee Information
+          </h3>
+          <div class="grid grid-cols-3 gap-4">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2"
+                >Employee ID</label
+              >
+              <input
+                type="text"
+                formControlName="employeeId"
+                placeholder="EMP12345"
+                class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-teal-500 bg-gray-50 focus:bg-white"
+              />
+              <div
+                *ngIf="
+                  signUpForm.get('employeeId')?.invalid &&
+                  (signUpForm.get('employeeId')?.touched ||
+                    signUpForm.get('employeeId')?.dirty)
+                "
+                class="text-red-500 text-xs mt-1"
+              >
+                Employee Id is required.
+              </div>
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2"
+                >First Name</label
+              >
+              <input
+                type="text"
+                formControlName="firstName"
+                placeholder="John"
+                class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-teal-500 bg-gray-50 focus:bg-white"
+              />
+              <div
+                *ngIf="
+                  signUpForm.get('firstName')?.invalid &&
+                  (signUpForm.get('firstName')?.touched ||
+                    signUpForm.get('firstName')?.dirty)
+                "
+                class="text-red-500 text-xs mt-1"
+              >
+                First name is required.
+              </div>
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2"
+                >Last Name</label
+              >
+              <input
+                type="text"
+                formControlName="lastName"
+                placeholder="Doe"
+                class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-teal-500 bg-gray-50 focus:bg-white"
+              />
+              <div
+                *ngIf="
+                  signUpForm.get('lastName')?.invalid &&
+                  (signUpForm.get('lastName')?.touched ||
+                    signUpForm.get('lastName')?.dirty)
+                "
+                class="text-red-500 text-xs mt-1"
+              >
+                Last name is required.
+              </div>
+            </div>
+          </div>
+
+          <div class="mt-4">
+            <label class="block text-sm font-medium text-gray-700 mb-2"
+              >Email</label
+            >
+            <input
+              type="email"
+              formControlName="email"
+              placeholder="john.doe@company.com"
+              class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-teal-500 bg-gray-50 focus:bg-white"
+            />
+            <div
+              *ngIf="
+                signUpForm.get('email')?.hasError('required') &&
+                (signUpForm.get('email')?.touched ||
+                  signUpForm.get('email')?.dirty)
+              "
+              class="text-red-500 text-xs mt-1"
+            >
+              Email is required.
+            </div>
+            <div
+              *ngIf="
+                signUpForm.get('email')?.hasError('email') &&
+                (signUpForm.get('email')?.touched ||
+                  signUpForm.get('email')?.dirty)
+              "
+              class="text-red-500 text-xs mt-1"
+            >
+              Enter a valid email.
+            </div>
+          </div>
+        </div>
+
+        <hr class="border-gray-200" />
+
+        <!-- Address Section -->
+        <div>
+          <h3 class="text-lg font-semibold text-gray-800 mb-4">Address</h3>
+          <div class="grid grid-cols-3 gap-4">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2"
+                >Address Line 1</label
+              >
+              <input
+                type="text"
+                formControlName="address1"
+                placeholder="Street Address"
+                class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-teal-500 bg-gray-50 focus:bg-white"
+              />
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2"
+                >Address Line 2</label
+              >
+              <input
+                type="text"
+                formControlName="address2"
+                placeholder="Apartment, suite (optional)"
+                class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-teal-500 bg-gray-50 focus:bg-white"
+              />
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2"
+                >Address Line 3</label
+              >
+              <input
+                type="text"
+                formControlName="address3"
+                placeholder="City / State"
+                class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-teal-500 bg-gray-50 focus:bg-white"
+              />
+            </div>
+          </div>
+        </div>
+
+        <hr class="border-gray-200" />
+
+        <!-- Department -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2"
+            >Department (Optional)</label
+          >
+          <select
+            formControlName="department"
+            class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-teal-500 bg-gray-50 focus:bg-white"
+          >
+            <option value="">Select Department (optional)</option>
+            <option value="engineering">Engineering</option>
+            <option value="marketing">Marketing</option>
+            <option value="sales">Sales</option>
+            <option value="hr">Human Resources</option>
+            <option value="finance">Finance</option>
+            <option value="operations">Operations</option>
+          </select>
+        </div>
+
+        <hr class="border-gray-200" />
+
+        <!-- Security -->
+        <div>
+          <h3 class="text-lg font-semibold text-gray-800 mb-4">Security</h3>
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2"
+                >Password</label
+              >
+              <input
+                type="password"
+                formControlName="password"
+                placeholder="Create a strong password"
+                class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-teal-500 bg-gray-50 focus:bg-white"
+              />
+              <div
+                *ngIf="
+                  signUpForm.get('password')?.hasError('required') &&
+                  (signUpForm.get('password')?.touched ||
+                    signUpForm.get('password')?.dirty)
+                "
+                class="text-red-500 text-xs mt-1"
+              >
+                Password is required.
+              </div>
+              <div
+                *ngIf="
+                  signUpForm.get('password')?.hasError('minlength') &&
+                  (signUpForm.get('password')?.touched ||
+                    signUpForm.get('password')?.dirty)
+                "
+                class="text-red-500 text-xs mt-1"
+              >
+                Password must be at least 8 characters.
+              </div>
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2"
+                >Confirm Password</label
+              >
+              <input
+                type="password"
+                formControlName="confirmPassword"
+                placeholder="Confirm your password"
+                class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-teal-500 bg-gray-50 focus:bg-white"
+              />
+              <div
+                *ngIf="
+                  signUpForm.hasError('mismatch') &&
+                  (signUpForm.get('confirmPassword')?.touched ||
+                    signUpForm.get('confirmPassword')?.dirty)
+                "
+                class="text-red-500 text-xs mt-1"
+              >
+                Passwords do not match.
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="flex items-start">
+          <input
+            type="checkbox"
+            formControlName="agreeToTerms"
+            class="mt-1 rounded border-gray-300 text-teal-600 focus:ring-teal-500"
+          />
+          <label class="ml-2 text-sm text-gray-600">
+            I agree to the
+            <a href="#" class="text-teal-600 hover:text-teal-800 font-medium"
+              >Terms of Service</a
+            >
+            and
+            <a href="#" class="text-teal-600 hover:text-teal-800 font-medium"
+              >Privacy Policy</a
+            >
+          </label>
+          <div
+            *ngIf="
+              signUpForm.get('agreeToTerms')?.invalid &&
+              signUpForm.get('agreeToTerms')?.touched
+            "
+            class="text-red-500 text-xs mt-1"
+          >
+            You must accept the terms.
+          </div>
+        </div>
+
+        <button
+          type="submit"
+          [disabled]="signUpForm.invalid"
+          class="w-full bg-gradient-to-r from-teal-600 to-emerald-600 text-white py-3 px-4 rounded-xl hover:from-teal-700 hover:to-emerald-700 focus:ring-2 focus:ring-teal-500 focus:ring-offset-2 font-medium disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300"
+        >
+          Create Account
+        </button>
+      </form>
+    </div>
+  </div>
+</div>
+<!-- for notifications -->
+<p-toast position="top-right"></p-toast>

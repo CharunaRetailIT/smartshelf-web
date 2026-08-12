@@ -1,0 +1,214 @@
+<!-- queue-details.component.html -->
+<div *ngIf="loading" class="loading-state">
+  <p-progressSpinner
+    [style]="{ width: '40px', height: '40px' }"
+  ></p-progressSpinner>
+  <span class="loading-text">Loading queue details...</span>
+</div>
+
+<div *ngIf="!loading && queue" class="queue-detail-panel">
+  <!-- Header Banner -->
+  <div class="detail-header">
+    <div class="header-left">
+      <div class="queue-badge">#{{ queue.id }}</div>
+      <div class="header-meta">
+        <h2 class="header-title">{{ queue.deviceName }}</h2>
+        <span class="header-sub">{{ queue.storeName }}</span>
+      </div>
+    </div>
+    <div class="header-tags">
+      <p-tag [value]="queue.queueType" severity="secondary"></p-tag>
+      <p-tag
+        [value]="queue.status"
+        [severity]="getStatusSeverity(queue.status)"
+      ></p-tag>
+      <p-tag
+        [value]="queue.priority"
+        [severity]="getPrioritySeverity(queue.priority)"
+      ></p-tag>
+    </div>
+  </div>
+
+  <!-- Main Grid Layout -->
+  <div class="detail-grid">
+    <!-- LEFT COLUMN -->
+    <div class="detail-col">
+      <!-- Basic Info Card -->
+      <div class="detail-card">
+        <div class="card-label">
+          <i class="pi pi-info-circle"></i> Basic Information
+        </div>
+        <div class="info-row">
+          <span class="info-key">Queue ID</span>
+          <span class="info-val mono">{{ queue.id }}</span>
+        </div>
+        <div class="info-row">
+          <span class="info-key">Queue Type</span>
+          <span class="info-val"
+            ><p-tag [value]="queue.queueType"></p-tag
+          ></span>
+        </div>
+        <div class="info-row">
+          <span class="info-key">Status</span>
+          <span class="info-val"
+            ><p-tag
+              [value]="queue.status"
+              [severity]="getStatusSeverity(queue.status)"
+            ></p-tag
+          ></span>
+        </div>
+        <div class="info-row">
+          <span class="info-key">Priority</span>
+          <span class="info-val"
+            ><p-tag
+              [value]="queue.priority"
+              [severity]="getPrioritySeverity(queue.priority)"
+            ></p-tag
+          ></span>
+        </div>
+        <div class="info-row">
+          <span class="info-key">Display Order</span>
+          <span class="info-val mono">{{ queue.displayOrder }}</span>
+        </div>
+        <div class="info-row">
+          <span class="info-key">Store</span>
+          <span class="info-val">{{ queue.storeName }}</span>
+        </div>
+      </div>
+
+      <!-- Device Card -->
+      <div class="detail-card">
+        <div class="card-label"><i class="pi pi-desktop"></i> Device</div>
+        <div class="info-row">
+          <span class="info-key">Name</span>
+          <span class="info-val">{{ queue.deviceName }}</span>
+        </div>
+        <div class="info-row">
+          <span class="info-key">MAC Address</span>
+          <span class="info-val mono">{{ queue.deviceMac }}</span>
+        </div>
+        <div class="info-row">
+          <span class="info-key">Type</span>
+          <span class="info-val">{{ queue.deviceType }}</span>
+        </div>
+      </div>
+
+      <!-- Location Card -->
+      <div class="detail-card">
+        <div class="card-label"><i class="pi pi-map-marker"></i> Location</div>
+        <div class="info-row">
+          <span class="info-key">Type</span>
+          <span class="info-val">{{ queue.locationType }}</span>
+        </div>
+        <div class="info-row">
+          <span class="info-key">Name</span>
+          <span class="info-val">{{ queue.locationName }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT COLUMN -->
+    <div class="detail-col">
+      <!-- Schedule Card -->
+      <div class="detail-card">
+        <div class="card-label"><i class="pi pi-calendar"></i> Schedule</div>
+        <div class="info-row">
+          <span class="info-key">Start Date</span>
+          <span class="info-val">{{ queue.startDate | date: "medium" }}</span>
+        </div>
+        <div class="info-row">
+          <span class="info-key">End Date</span>
+          <span class="info-val">{{
+            queue.endDate ? (queue.endDate | date: "medium") : "—  No End Date"
+          }}</span>
+        </div>
+        <div class="info-row" *ngIf="queue.isRecurring">
+          <span class="info-key">Recurrence</span>
+          <span class="info-val">
+            <p-tag value="Recurring" severity="info"></p-tag>
+            <span class="ml-2">{{ queue.recurrencePattern }}</span>
+          </span>
+        </div>
+      </div>
+
+      <!-- Content Card -->
+      <div class="detail-card" *ngIf="queue.templateName || queue.messageTitle">
+        <div class="card-label"><i class="pi pi-file"></i> Content</div>
+        <div *ngIf="queue.templateName">
+          <div class="info-row">
+            <span class="info-key">Template</span>
+            <span class="info-val">{{ queue.templateName }}</span>
+          </div>
+          <div class="info-row" *ngIf="queue.templateId">
+            <span class="info-key">Template ID</span>
+            <span class="info-val mono">{{ queue.templateId }}</span>
+          </div>
+        </div>
+        <div *ngIf="queue.messageTitle">
+          <div class="info-row">
+            <span class="info-key">Message</span>
+            <span class="info-val">{{ queue.messageTitle }}</span>
+          </div>
+          <div class="info-row" *ngIf="queue.duration">
+            <span class="info-key">Duration</span>
+            <span class="info-val mono">{{ queue.duration }}s</span>
+          </div>
+          <div class="info-row" *ngIf="queue.fileUrl">
+            <span class="info-key">File URL</span>
+            <span class="info-val"
+              ><a [href]="queue.fileUrl" target="_blank" class="file-link"
+                >Open File <i class="pi pi-external-link text-xs"></i></a
+            ></span>
+          </div>
+        </div>
+        <div *ngIf="queue.contentData" class="content-pre-wrap">
+          <span class="info-key">Content Data</span>
+          <pre class="content-pre">{{ queue.contentData }}</pre>
+        </div>
+      </div>
+
+      <!-- Audit Card -->
+      <div class="detail-card">
+        <div class="card-label"><i class="pi pi-clock"></i> Audit</div>
+        <div class="info-row">
+          <span class="info-key">Created By</span>
+          <span class="info-val">{{ queue.createdBy || "System" }}</span>
+        </div>
+        <div class="info-row">
+          <span class="info-key">Created Date</span>
+          <span class="info-val">{{ queue.createdDate | date: "medium" }}</span>
+        </div>
+        <div class="info-row" *ngIf="queue.updatedBy">
+          <span class="info-key">Updated By</span>
+          <span class="info-val">{{ queue.updatedBy }}</span>
+        </div>
+        <div class="info-row" *ngIf="queue.updatedDate">
+          <span class="info-key">Updated Date</span>
+          <span class="info-val">{{ queue.updatedDate | date: "medium" }}</span>
+        </div>
+      </div>
+
+      <!-- Execution / Error Card -->
+      <div
+        class="detail-card error-card"
+        *ngIf="queue.errorMessage || queue.retryCount > 0"
+      >
+        <div class="card-label danger">
+          <i class="pi pi-exclamation-triangle"></i> Execution Details
+        </div>
+        <div class="info-row">
+          <span class="info-key">Retry Count</span>
+          <span class="info-val mono">{{ queue.retryCount }}</span>
+        </div>
+        <div class="info-row" *ngIf="queue.lastAttempt">
+          <span class="info-key">Last Attempt</span>
+          <span class="info-val">{{ queue.lastAttempt | date: "medium" }}</span>
+        </div>
+        <div *ngIf="queue.errorMessage" class="error-box">
+          <span class="info-key">Error</span>
+          <p class="error-msg">{{ queue.errorMessage }}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

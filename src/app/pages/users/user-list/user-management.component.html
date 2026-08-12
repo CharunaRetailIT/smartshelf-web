@@ -1,0 +1,305 @@
+<div class="min-h-screen bg-gray-50 p-6">
+  <div class="max-w-7xl mx-auto">
+    <!-- Header -->
+    <div class="bg-white rounded-lg shadow-sm border border-gray-200 mb-6 p-6">
+      <div class="flex items-center justify-between">
+        <!-- Left content -->
+        <div class="flex items-center space-x-3">
+          <!-- <i class="fas fa-shield-alt text-2xl text-secondary"></i> -->
+          <i class="pi pi-user text-blue-600 text-2xl"></i>
+          <div>
+            <h1 class="text-2xl font-bold text-secondary-dark">
+              User Management
+            </h1>
+            <p class="text-secondary-light">Manage users and their roles</p>
+          </div>
+        </div>
+
+        <!-- Right button with proper spacing -->
+        <div class="pl-10" style="margin-left: 55%">
+          <button
+            (click)="createUser()"
+            id="addUserButton"
+            class="cursor-pointer bg-primary hover:bg-primary-light text-white px-4 py-2 rounded-lg flex items-center space-x-2 transition-colors"
+          >
+            <i class="fas fa-plus"></i>
+            <span>Add User</span>
+          </button>
+        </div>
+      </div>
+    </div>
+    <!-- Filters -->
+    <div class="bg-white rounded-lg shadow-sm border border-gray-200 mb-6 p-6">
+      <div class="flex justify-between items-center gap-4">
+        <!-- Search Input -->
+        <div class="relative w-1/2">
+          <div
+            class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"
+          >
+            <i class="fas fa-search text-gray-400"></i>
+          </div>
+          <input
+            type="text"
+            placeholder="Search users..."
+            [(ngModel)]="searchTerm"
+            (input)="onSearchChange()"
+            class="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+          />
+        </div>
+
+        <!-- Role Filter -->
+        <div class="w-1/4">
+          <select
+            [(ngModel)]="roleFilter"
+            (change)="onRoleFilterChange()"
+            class="px-3 py-2 w-full border border-gray-300 rounded-md bg-white text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+          >
+            <option value="all">All Roles</option>
+            <option *ngFor="let role of roles" [value]="role.name">
+              {{ role.name }}
+            </option>
+          </select>
+        </div>
+
+        <!-- Status Filter -->
+        <div class="w-1/4">
+          <select
+            [(ngModel)]="statusFilter"
+            (change)="onStatusFilterChange()"
+            class="px-3 py-2 w-full border border-gray-300 rounded-md bg-white text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+          >
+            <option value="all">All Status</option>
+            <option value="active">Active</option>
+            <option value="inactive">Inactive</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- Users Table -->
+    <!-- <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+  <div class="overflow-x-auto"> -->
+    <div class="bg-white rounded-lg shadow-sm border border-gray-200">
+      <div class="overflow-y-auto max-h-[calc(100vh-250px)]">
+        <table
+          mat-table
+          [dataSource]="dataSource"
+          class="mat-elevation-z0 w-full text-sm"
+        >
+          <!-- User Column -->
+          <ng-container matColumnDef="user">
+            <th
+              mat-header-cell
+              *matHeaderCellDef
+              class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase w-1/4 bg-gray-100"
+              style="border-bottom: 1px solid #e5e7eb !important"
+            >
+              User
+            </th>
+            <td
+              mat-cell
+              *matCellDef="let user"
+              class="px-6 py-4"
+              style="border-bottom: 1px solid #e5e7eb !important"
+            >
+              <div class="flex items-center space-x-3">
+                <!-- <div class="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold"
+                 [ngClass]="user.role">
+              {{ user.employeeId.charAt(0) }}{{ user.employeeId.split(' ')[1]?.charAt(0) }}
+            </div> -->
+                <!-- Avatar with initials -->
+                <div
+                  class="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold bg-indigo-500"
+                >
+                  {{ user.firstName?.charAt(0) }}{{ user.lastName?.charAt(0) }}
+                </div>
+                <div>
+                  <div class="font-medium text-gray-900">
+                    {{ user.employeeId }}
+                  </div>
+                  <div class="text-gray-500 text-xs">{{ user.email }}</div>
+                </div>
+              </div>
+            </td>
+          </ng-container>
+
+          <!-- Role Column -->
+          <ng-container matColumnDef="role">
+            <th
+              mat-header-cell
+              *matHeaderCellDef
+              class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase w-1/6 bg-gray-100"
+              style="border-bottom: 1px solid #e5e7eb !important"
+            >
+              Role
+            </th>
+            <td
+              mat-cell
+              *matCellDef="let user"
+              class="px-6 py-4"
+              style="border-bottom: 1px solid #e5e7eb !important"
+            >
+              <span
+                class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border"
+                [ngClass]="getRoleColor(user.role)"
+              >
+                <i class="fas fa-user-shield mr-1.5 text-xs"></i>
+                {{ user.role }}
+              </span>
+            </td>
+            <!-- <td mat-cell *matCellDef="let user" class="px-6 py-4" style="border-bottom: 1px solid #e5e7eb !important;">
+          <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border"
+                >
+            {{ user.role}}
+          </span>
+        </td> -->
+          </ng-container>
+
+          <!-- Status Column -->
+          <ng-container matColumnDef="status">
+            <th
+              mat-header-cell
+              *matHeaderCellDef
+              class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase w-1/6 bg-gray-100"
+              style="border-bottom: 1px solid #e5e7eb !important"
+            >
+              Status
+            </th>
+            <td
+              mat-cell
+              *matCellDef="let user"
+              class="px-6 py-4"
+              style="border-bottom: 1px solid #e5e7eb !important"
+            >
+              <span
+                class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border"
+                [ngClass]="getStatusColor(user.isActive)"
+              >
+                <i
+                  class="fas"
+                  [ngClass]="
+                    user.isActive
+                      ? 'fa-circle text-green-400'
+                      : 'fa-circle text-red-400'
+                  "
+                  [style.font-size.px]="8"
+                ></i>
+                <span class="ml-1.5">
+                  {{ user.isActive ? "Active" : "Inactive" }}</span
+                >
+              </span>
+            </td>
+          </ng-container>
+
+          <!-- Last Login Column -->
+          <ng-container matColumnDef="lastLogin">
+            <th
+              mat-header-cell
+              *matHeaderCellDef
+              class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase w-1/6 bg-gray-100"
+              style="border-bottom: 1px solid #e5e7eb !important"
+            >
+              Department
+            </th>
+            <td
+              mat-cell
+              *matCellDef="let user"
+              class="px-6 py-4 text-gray-600"
+              style="border-bottom: 1px solid #e5e7eb !important"
+            >
+              {{ user.department }}
+            </td>
+          </ng-container>
+
+          <!-- Created Column -->
+          <ng-container matColumnDef="createdAt">
+            <th
+              mat-header-cell
+              *matHeaderCellDef
+              class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase w-1/6 bg-gray-100"
+              style="border-bottom: 1px solid #e5e7eb !important"
+            >
+              Created
+            </th>
+            <td
+              mat-cell
+              *matCellDef="let user"
+              class="px-6 py-4 text-gray-600"
+              style="border-bottom: 1px solid #e5e7eb !important"
+            >
+              {{ user.createdDate | date: "MMM d, y" }}
+            </td>
+          </ng-container>
+
+          <!-- Actions Column -->
+          <ng-container matColumnDef="actions">
+            <th
+              mat-header-cell
+              *matHeaderCellDef
+              class="px-6 py-4 text-center text-xs font-medium text-gray-500 uppercase w-1/12 bg-gray-100"
+              style="border-bottom: 1px solid #e5e7eb !important"
+            >
+              Actions
+            </th>
+            <td
+              mat-cell
+              *matCellDef="let user"
+              class="px-6 py-4 text-center"
+              style="border-bottom: 1px solid #e5e7eb !important"
+            >
+              <div class="flex justify-center space-x-4">
+                <button
+                  class="text-secondary hover:text-secondary-light p-1 rounded hover:bg-blue-50 transition-colors duration-150 cursor-pointer"
+                  (click)="editUser(user)"
+                >
+                  <i class="fas fa-edit"></i>
+                </button>
+                <!-- Delete/Restore Button -->
+                <button
+                  *ngIf="auth.hasAnyRole(['Admin', 'Manager'])"
+                  class="p-1 rounded transition-colors duration-150 cursor-pointer"
+                  [ngClass]="{
+                    'text-red-600 hover:text-red-900 hover:bg-red-50':
+                      user.isActive,
+                    'text-green-600 hover:text-green-900 hover:bg-green-50':
+                      !user.isActive,
+                  }"
+                  (click)="
+                    user.isActive ? openDeleteDialog(user) : restoreUser(user)
+                  "
+                  [title]="user.isActive ? 'Deactivate User' : 'Restore User'"
+                >
+                  <i
+                    [class]="user.isActive ? 'fas fa-trash' : 'fas fa-undo'"
+                  ></i>
+                </button>
+                <!-- <button class="text-red-600 hover:text-red-900 p-1 rounded hover:bg-red-50 transition-colors duration-150 cursor-pointer" (click)="openDeleteDialog(user)">
+              <i class="fas fa-trash text-red-600"></i>
+            </button> -->
+              </div>
+            </td>
+          </ng-container>
+
+          <!-- Header & Row Declarations -->
+          <tr
+            mat-header-row
+            *matHeaderRowDef="displayedColumns"
+            class="bg-gray-100 hover:bg-secondary-light/5"
+          ></tr>
+          <tr
+            mat-row
+            *matRowDef="let row; columns: displayedColumns"
+            class="hover:bg-secondary-light/5"
+            style="border-bottom: 1px solid #e5e7eb !important"
+          ></tr>
+        </table>
+      </div>
+      <mat-paginator
+        [pageSizeOptions]="[5, 10, 20]"
+        showFirstLastButtons
+        aria-label="Select page of periodic elements"
+      >
+      </mat-paginator>
+    </div>
+  </div>
+</div>

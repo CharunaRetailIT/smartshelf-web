@@ -1,0 +1,188 @@
+/* Custom scrollbar for better UX */
+.flex-1.overflow-y-auto::-webkit-scrollbar {
+  width: 8px;
+}
+
+.flex-1.overflow-y-auto::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-radius: 4px;
+}
+
+.flex-1.overflow-y-auto::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 4px;
+}
+
+.flex-1.overflow-y-auto::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* Focus states for better accessibility */
+input:focus,
+select:focus,
+textarea:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--dlg-accent);
+  border-color: var(--dlg-accent);
+}
+
+/* Animation for the spinning loader */
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-spin {
+  animation: spin 1s linear infinite;
+}
+
+button {
+  cursor: pointer;
+}
+
+/* Enhanced button hover states */
+button:hover {
+  transition: all 0.2s ease-in-out;
+}
+
+/* Custom validation error styling */
+.border-red-500 {
+  border-color: #ef4444 !important;
+}
+
+/* Blue theme for category actions */
+.bg-blue-600 {
+  background-color: var(--dlg-primary);
+}
+
+.bg-blue-600:hover {
+  background-color: var(--dlg-primary-hover);
+}
+
+.focus\:ring-blue-500:focus {
+  --tw-ring-color: var(--dlg-primary);
+}
+
+.border-blue-200 {
+  border-color: #a7f3d0;
+}
+
+.bg-blue-50 {
+  background-color: #ecfdf5;
+}
+
+.text-blue-700 {
+  color: var(--dlg-primary-hover);
+}
+
+.text-blue-400 {
+  color: var(--dlg-primary);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .grid-cols-1.md\\:grid-cols-2 {
+    grid-template-columns: 1fr;
+  }
+  
+  .max-w-2xl {
+    max-width: 95vw;
+    margin: 0 10px;
+  }
+}
+
+/* Enhanced focus ring for accessibility */
+button:focus-visible {
+  outline: 2px solid var(--dlg-accent);
+  outline-offset: 2px;
+}
+
+/* Disabled state improvements */
+button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Form section styling */
+.space-y-4 > * + * {
+  margin-top: 1rem;
+}
+
+.space-y-2 > * + * {
+  margin-top: 0.5rem;
+}
+
+/* Icon styling */
+svg {
+  flex-shrink: 0;
+}
+
+/* Improved checkbox styling */
+input[type="checkbox"] {
+  border-radius: 0.25rem;
+}
+
+/* Info boxes styling */
+.bg-blue-50 {
+  background-color: #ecfdf5;
+}
+
+.border-blue-200 {
+  border-color: #a7f3d0;
+}
+
+.text-blue-700 {
+  color: var(--dlg-primary-hover);
+}
+
+.text-blue-400 {
+  color: var(--dlg-primary);
+}
+
+/* Dialog content spacing */
+.space-y-6 > * + * {
+  margin-top: 1.5rem;
+}
+
+/* Section header styling */
+h3.border-b {
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+/* Enhanced button states */
+.transition-colors {
+  transition-property: color, background-color, border-color;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 150ms;
+}
+
+/* Status section styling */
+.bg-gray-50 {
+  background-color: #f9fafb;
+}
+
+/* Textarea styling improvements */
+textarea {
+  min-height: 80px;
+}
+
+/* Form validation styling improvements */
+.invalid-field {
+  animation: shake 0.5s ease-in-out;
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-5px); }
+  75% { transform: translateX(5px); }
+}
+
+/* Required field indicator */
+.text-red-500 {
+  color: #ef4444;
+}

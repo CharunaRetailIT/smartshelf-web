@@ -1,0 +1,149 @@
+
+/* Custom animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.fade-in {
+  animation: fadeIn 0.3s ease-out;
+}
+
+/* Form field states */
+:host ::ng-deep {
+  .p-inputtext.ng-invalid.ng-dirty,
+  .p-inputtext.ng-invalid.ng-touched {
+    border-color: #ef4444;
+  }
+  
+  .p-inputtext.ng-invalid.ng-dirty:focus,
+  .p-inputtext.ng-invalid.ng-touched:focus {
+    border-color: #ef4444;
+    box-shadow: 0 0 0 0.2rem rgba(239, 68, 68, 0.25);
+  }
+  
+  .p-inputtext:disabled {
+    background-color: #f9fafb;
+    border-color: #e5e7eb;
+    color: #6b7280;
+  }
+  
+  /* Card styling */
+  .p-card {
+    border-radius: 0.75rem;
+    border: 1px solid #e5e7eb;
+    transition: box-shadow 0.3s ease;
+  }
+  
+  .p-card:hover {
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  }
+  
+  /* Button styling */
+  .p-button {
+    border-radius: 0.5rem;
+    font-weight: 500;
+    transition: all 0.2s ease;
+  }
+  
+  .p-button:not(:disabled):hover {
+    transform: translateY(-1px);
+  }
+  
+  /* Avatar styling */
+  .p-avatar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+  }
+  
+  /* File upload customization */
+  .p-fileupload .p-fileupload-buttonbar {
+    background: transparent;
+    border: none;
+    padding: 0;
+  }
+  
+  .custom-file-upload {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .custom-file-upload input[type="file"] {
+    display: none;
+  }
+  
+  /* Toast styling */
+  .p-toast {
+    z-index: 9999;
+  }
+  
+  .p-toast-message {
+    border-radius: 0.5rem;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  }
+  
+  /* Divider styling */
+  .p-divider {
+    margin: 1.5rem 0;
+  }
+  
+  .p-divider.p-divider-horizontal:before {
+    border-top-color: #e5e7eb;
+  }
+  
+  /* Message styling */
+  .p-message {
+    border-radius: 0.5rem;
+  }
+  
+  .p-message.p-message-info {
+    background-color: #eff6ff;
+    border: 1px solid #bfdbfe;
+    color: #1e40af;
+  }
+  
+  .p-message.p-message-info .p-message-icon {
+    color: #3b82f6;
+  }
+  
+  /* Skeleton styling */
+  .p-skeleton {
+    background-color: #e5e7eb;
+  }
+  
+  .p-skeleton:after {
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+  }
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  :host ::ng-deep .p-card .p-card-body {
+    padding: 1rem;
+  }
+}
+
+/* Focus visible for accessibility */
+:host ::ng-deep *:focus-visible {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+}
+
+/* Smooth transitions */
+* {
+  transition-property: color, background-color, border-color, text-decoration-color, fill, stroke;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 150ms;
+}

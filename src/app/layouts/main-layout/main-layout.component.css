@@ -1,0 +1,19 @@
+.layout {
+  display: flex;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.page {
+  flex: 1;
+  overflow-y: auto;
+  background: #f9fafb;
+  padding: 1.25rem;
+}

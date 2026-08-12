@@ -1,0 +1,828 @@
+<div class="min-h-screen bg-slate-50 pb-28">
+  <!-- Header -->
+  <div class="px-6 pt-6 pb-4">
+    <div
+      class="mb-2 flex items-center gap-2 text-sm font-semibold text-slate-500"
+    >
+      <span>Dashboard</span>
+      <i class="pi pi-angle-right text-xs"></i>
+      <span>Products</span>
+      <i class="pi pi-angle-right text-xs"></i>
+      <span class="text-emerald-700">
+        {{ isEditMode ? "Edit Product" : "Create New Product" }}
+      </span>
+    </div>
+
+    <div
+      class="flex flex-col gap-3 md:flex-row md:items-center md:justify-between"
+    >
+      <div>
+        <h1 class="text-4xl font-bold tracking-tight text-slate-900">
+          {{ isEditMode ? "Edit Product" : "Create New Product" }}
+        </h1>
+        <p class="mt-1 text-sm text-slate-500">
+          Manage product information, inventory, and ESL display assignments.
+        </p>
+      </div>
+
+      <button
+        pButton
+        type="button"
+        icon="pi pi-arrow-left"
+        label="Back to Products"
+        class="p-button-outlined"
+        (click)="cancel()"
+      ></button>
+    </div>
+  </div>
+
+  <form [formGroup]="form" class="px-6">
+    <div class="grid grid-cols-1 gap-6 xl:grid-cols-12 xl:items-start">
+      <!-- LEFT SIDE -->
+      <div class="space-y-6 xl:col-span-8">
+        <section class="portal-card tabs-card">
+          <div class="section-accent"></div>
+
+          <p-tabView styleClass="clean-tabs">
+            <!-- Product Details -->
+            <p-tabPanel header="Product Details" leftIcon="pi pi-box">
+              <div class="section-header">
+                <div class="section-icon">
+                  <i class="pi pi-box"></i>
+                </div>
+                <div>
+                  <h2>Product Details</h2>
+                  <p>Basic product information used in POS and ESL labels.</p>
+                </div>
+              </div>
+
+              <div
+                formGroupName="product"
+                class="grid grid-cols-1 gap-5 md:grid-cols-2"
+              >
+                <div class="field md:col-span-2">
+                  <label>Product Name <span>*</span></label>
+                  <input
+                    pInputText
+                    formControlName="productName"
+                    placeholder="e.g. Organic Gala Apples 1.5kg"
+                    class="w-full"
+                  />
+                  <small
+                    *ngIf="isInvalid(productGroup.get('productName'))"
+                    class="error-text"
+                  >
+                    Product name is required.
+                  </small>
+                </div>
+
+                <div class="field">
+                  <label>Product Code / SKU</label>
+                  <span class="p-input-icon-right w-full">
+                    <!-- <i class="pi pi-tag"></i> -->
+                    <input
+                      pInputText
+                      formControlName="productCode"
+                      placeholder="PRD-0001"
+                      class="w-full"
+                    />
+                  </span>
+                </div>
+
+                <div class="field">
+                  <label>Barcode</label>
+                  <span class="p-input-icon-right w-full">
+                    <!-- <i class="pi pi-barcode"></i> -->
+                    <input
+                      pInputText
+                      formControlName="barCode"
+                      placeholder="00123456789"
+                      class="w-full"
+                    />
+                  </span>
+                </div>
+
+                <div class="field">
+                  <label>Category <span>*</span></label>
+                  <p-dropdown
+                    formControlName="categoryId"
+                    [options]="categoryOptions"
+                    optionLabel="categoryName"
+                    optionValue="id"
+                    [filter]="true"
+                    [showClear]="true"
+                    placeholder="Select category"
+                    appendTo="body"
+                    styleClass="w-full"
+                    (onChange)="onCategoryChange($event)"
+                    (onFilter)="onCategoryFilter($event)"
+                  ></p-dropdown>
+                  <small
+                    *ngIf="isInvalid(productGroup.get('categoryId'))"
+                    class="error-text"
+                  >
+                    Category is required.
+                  </small>
+                </div>
+
+                <div class="field">
+                  <label>Sub Category</label>
+                  <p-dropdown
+                    formControlName="subCategoryId"
+                    [options]="subCategoryOptions"
+                    optionLabel="subCategoryName"
+                    optionValue="id"
+                    [filter]="true"
+                    [showClear]="true"
+                    placeholder="Select sub category"
+                    appendTo="body"
+                    styleClass="w-full"
+                    (onFilter)="onSubCategoryFilter($event)"
+                  ></p-dropdown>
+                </div>
+
+                <div class="field">
+                  <label>Unit of Measure</label>
+                  <p-dropdown
+                    formControlName="unitOfMeasure"
+                    [options]="unitOfMeasureOptions"
+                    optionLabel="label"
+                    optionValue="value"
+                    placeholder="Select unit"
+                    appendTo="body"
+                    styleClass="w-full"
+                  ></p-dropdown>
+                </div>
+
+                <div class="field">
+                  <label>Status</label>
+                  <div class="flex h-[46px] items-center">
+                    <p-toggleswitch formControlName="isActive"></p-toggleswitch>
+                    <span
+                      class="ml-3 rounded-full px-3 py-1 text-xs font-bold"
+                      [class.bg-emerald-100]="
+                        productGroup.get('isActive')?.value
+                      "
+                      [class.text-emerald-800]="
+                        productGroup.get('isActive')?.value
+                      "
+                      [class.bg-slate-200]="
+                        !productGroup.get('isActive')?.value
+                      "
+                      [class.text-slate-600]="
+                        !productGroup.get('isActive')?.value
+                      "
+                    >
+                      {{
+                        productGroup.get("isActive")?.value
+                          ? "Active"
+                          : "Inactive"
+                      }}
+                    </span>
+                  </div>
+                </div>
+
+                <div class="field md:col-span-2">
+                  <label>Description</label>
+                  <textarea
+                    pInputTextarea
+                    formControlName="description"
+                    rows="3"
+                    placeholder="Optional product description"
+                    class="w-full"
+                  ></textarea>
+                </div>
+              </div>
+            </p-tabPanel>
+
+            <!-- Pricing -->
+            <p-tabPanel header="Pricing" leftIcon="pi pi-dollar">
+              <div class="section-header">
+                <div class="section-icon">
+                  <i class="pi pi-dollar"></i>
+                </div>
+                <div>
+                  <h2>Pricing Details</h2>
+                  <p>Price values used for billing and ESL price display.</p>
+                </div>
+              </div>
+
+              <div
+                formGroupName="product"
+                class="grid grid-cols-1 gap-5 md:grid-cols-3"
+              >
+                <div class="field">
+                  <label>Cost Price</label>
+                  <p-inputNumber
+                    formControlName="costPrice"
+                    mode="decimal"
+                    [minFractionDigits]="2"
+                    [maxFractionDigits]="2"
+                    inputStyleClass="w-full"
+                    styleClass="w-full"
+                  ></p-inputNumber>
+                </div>
+
+                <div class="field">
+                  <label>Selling Price <span>*</span></label>
+                  <p-inputNumber
+                    formControlName="sellingPrice"
+                    mode="decimal"
+                    [minFractionDigits]="2"
+                    [maxFractionDigits]="2"
+                    inputStyleClass="w-full"
+                    styleClass="w-full"
+                    (onInput)="onSellingPriceChange()"
+                  ></p-inputNumber>
+                  <small
+                    *ngIf="isInvalid(productGroup.get('sellingPrice'))"
+                    class="error-text"
+                  >
+                    Selling price is required.
+                  </small>
+                </div>
+
+                <div class="field">
+                  <label>Wholesale Price</label>
+                  <p-inputNumber
+                    formControlName="wholesalePrice"
+                    mode="decimal"
+                    [minFractionDigits]="2"
+                    [maxFractionDigits]="2"
+                    inputStyleClass="w-full"
+                    styleClass="w-full"
+                  ></p-inputNumber>
+                </div>
+
+                <div class="field">
+                  <label>Discount Percentage (%)</label>
+                  <p-inputNumber
+                    formControlName="discountPercentage"
+                    mode="decimal"
+                    suffix="%"
+                    [min]="0"
+                    [max]="100"
+                    [minFractionDigits]="2"
+                    [maxFractionDigits]="2"
+                    inputStyleClass="w-full"
+                    styleClass="w-full"
+                    (onInput)="onDiscountPercentageChange()"
+                  ></p-inputNumber>
+                  <small>Enter discount percentage (0-100%)</small>
+                </div>
+
+                <div class="field">
+                  <label>Discount Price</label>
+                  <p-inputNumber
+                    formControlName="discountPrice"
+                    mode="decimal"
+                    [min]="0"
+                    [minFractionDigits]="2"
+                    [maxFractionDigits]="2"
+                    inputStyleClass="w-full"
+                    styleClass="w-full"
+                    (onInput)="onDiscountPriceChange()"
+                  ></p-inputNumber>
+                  <small>Enter fixed discount amount</small>
+                </div>
+
+                <div class="field">
+                  <label>Final Price After Discount</label>
+                  <p-inputNumber
+                    formControlName="discountedPrice"
+                    mode="decimal"
+                    [minFractionDigits]="2"
+                    [maxFractionDigits]="2"
+                    inputStyleClass="w-full"
+                    styleClass="w-full"
+                    [readonly]="true"
+                  ></p-inputNumber>
+                </div>
+
+                <div class="field">
+                  <label>Minimum Price</label>
+                  <p-inputNumber
+                    formControlName="minimumPrice"
+                    mode="decimal"
+                    [minFractionDigits]="2"
+                    [maxFractionDigits]="2"
+                    inputStyleClass="w-full"
+                    styleClass="w-full"
+                  ></p-inputNumber>
+                </div>
+
+                <div class="field">
+                  <label>Maximum Price</label>
+                  <p-inputNumber
+                    formControlName="maximumPrice"
+                    mode="decimal"
+                    [minFractionDigits]="2"
+                    [maxFractionDigits]="2"
+                    inputStyleClass="w-full"
+                    styleClass="w-full"
+                  ></p-inputNumber>
+                </div>
+              </div>
+            </p-tabPanel>
+
+            <!-- Inventory -->
+            <p-tabPanel header="Inventory" leftIcon="pi pi-warehouse">
+              <div class="section-header">
+                <div class="section-icon">
+                  <i class="pi pi-warehouse"></i>
+                </div>
+                <div>
+                  <h2>Inventory Management</h2>
+                  <p>Stock information for availability and reorder alerts.</p>
+                </div>
+              </div>
+
+              <div
+                formGroupName="product"
+                class="grid grid-cols-1 gap-5 md:grid-cols-2"
+              >
+                <div class="field">
+                  <label>Current Stock</label>
+                  <p-inputNumber
+                    formControlName="quantity"
+                    [min]="0"
+                    inputStyleClass="w-full"
+                    styleClass="w-full"
+                  ></p-inputNumber>
+                </div>
+
+                <div class="field">
+                  <label>Reorder Point</label>
+                  <p-inputNumber
+                    formControlName="reorderPoint"
+                    [min]="0"
+                    inputStyleClass="w-full"
+                    styleClass="w-full"
+                  ></p-inputNumber>
+                </div>
+              </div>
+            </p-tabPanel>
+
+            <!-- ESL Assignment -->
+            <p-tabPanel
+              [header]="'ESL Assignment (' + visibleAssignments.length + ')'"
+              leftIcon="pi pi-wifi"
+            >
+              <div class="section-header">
+                <div class="section-icon">
+                  <i class="pi pi-wifi"></i>
+                </div>
+                <div>
+                  <h2>ESL Assignment</h2>
+                  <p>
+                    Bind multiple ESL brands, devices, templates, or messages to
+                    this product.
+                  </p>
+                </div>
+              </div>
+
+              <div class="assignment-builder">
+                <div class="mb-4 flex items-center justify-between gap-3">
+                  <div>
+                    <h3 class="text-lg font-bold text-slate-800">
+                      Assignment Rows
+                    </h3>
+                    <p class="text-sm text-slate-500">
+                      Each row can use a different ESL brand and display format.
+                    </p>
+                  </div>
+
+                  <button
+                    pButton
+                    type="button"
+                    icon="pi pi-plus"
+                    label="Add ESL"
+                    class="p-button-success"
+                    (click)="addEslAssignment()"
+                    [disabled]="!canEdit()"
+                  ></button>
+                </div>
+
+                <div formArrayName="eslAssignments" class="space-y-4">
+                  <ng-container
+                    *ngFor="let group of eslAssignments.controls; let i = index"
+                  >
+                    <div
+                      *ngIf="!group.get('isDeleted')?.value"
+                      [formGroupName]="i"
+                      class="assignment-row"
+                    >
+                      <div class="assignment-row-header">
+                        <div class="flex items-center gap-3">
+                          <div class="row-number">{{ i + 1 }}</div>
+                          <div>
+                            <h4>
+                              {{ getBrandName(group.get("brandId")?.value) }}
+                              ESL Assignment
+                            </h4>
+                            <p>{{ getRowBindingLabel(group) }}</p>
+                          </div>
+                        </div>
+
+                        <button
+                          pButton
+                          type="button"
+                          icon="pi pi-trash"
+                          class="p-button-rounded p-button-text p-button-danger"
+                          (click)="removeAssignment(i)"
+                          [disabled]="!canEdit()"
+                        ></button>
+                      </div>
+
+                      <div class="mb-4 flex items-center gap-2">
+                        <button
+                          pButton
+                          type="button"
+                          label="New Pairing"
+                          class="p-button-sm"
+                          [class.p-button-outlined]="
+                            comboSourceMode[i] !== 'new'
+                          "
+                          (click)="toggleComboSourceMode(i, 'new')"
+                        ></button>
+                        <button
+                          pButton
+                          type="button"
+                          label="Use Existing Combo"
+                          class="p-button-sm"
+                          [class.p-button-outlined]="
+                            comboSourceMode[i] !== 'existing'
+                          "
+                          (click)="toggleComboSourceMode(i, 'existing')"
+                        ></button>
+                      </div>
+
+                      <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                        <div class="field">
+                          <label>ESL Brand <span>*</span></label>
+                          <p-dropdown
+                            formControlName="brandId"
+                            [options]="eslBrandOptions"
+                            optionLabel="name"
+                            optionValue="id"
+                            placeholder="Select brand"
+                            appendTo="body"
+                            styleClass="w-full"
+                            (onChange)="onBrandChange(i)"
+                          ></p-dropdown>
+                        </div>
+
+                        <ng-container
+                          *ngIf="
+                            comboSourceMode[i] !== 'existing';
+                            else existingCombosBlock
+                          "
+                        >
+                          <div class="field">
+                            <label>Device <span>*</span></label>
+                            <p-dropdown
+                              formControlName="deviceId"
+                              [options]="deviceOptions[i] || []"
+                              optionLabel="deviceName"
+                              optionValue="id"
+                              [filter]="true"
+                              filterBy="deviceName,mac"
+                              [showClear]="true"
+                              placeholder="Select device"
+                              appendTo="body"
+                              styleClass="w-full"
+                              (onFilter)="onDeviceFilter(i, $event)"
+                              (onChange)="onDeviceChange(i)"
+                            >
+                              <ng-template pTemplate="item" let-device>
+                                <div class="flex flex-col">
+                                  <span class="font-semibold">
+                                    {{ device.deviceName || device.name }}
+                                  </span>
+                                  <small class="text-slate-500">
+                                    {{ device.mac || "No MAC" }}
+                                  </small>
+                                </div>
+                              </ng-template>
+                            </p-dropdown>
+                          </div>
+
+                          <div class="field" *ngIf="brandSupportsTemplate(i)">
+                            <label>Template</label>
+                            <p-dropdown
+                              formControlName="templateId"
+                              [options]="templateOptions[i] || []"
+                              optionLabel="name"
+                              optionValue="id"
+                              [filter]="true"
+                              [showClear]="true"
+                              placeholder="Optionally pair a template"
+                              appendTo="body"
+                              styleClass="w-full"
+                              (onFilter)="onTemplateFilter(i, $event)"
+                            ></p-dropdown>
+                          </div>
+
+                          <div class="field">
+                            <label>
+                              Message
+                              <span *ngIf="!brandSupportsTemplate(i)">*</span>
+                            </label>
+                            <p-dropdown
+                              formControlName="messageId"
+                              [options]="messageOptions[i] || []"
+                              optionLabel="title"
+                              optionValue="id"
+                              [filter]="true"
+                              [showClear]="true"
+                              [placeholder]="
+                                brandSupportsTemplate(i)
+                                  ? 'Optionally pair a message'
+                                  : 'Select message'
+                              "
+                              appendTo="body"
+                              styleClass="w-full"
+                              (onFilter)="onMessageFilter(i, $event)"
+                            ></p-dropdown>
+                          </div>
+                        </ng-container>
+
+                        <ng-template #existingCombosBlock>
+                          <!-- Minew: pick from the DeviceTemplateCombos table. -->
+                          <div class="field" *ngIf="brandSupportsTemplate(i)">
+                            <label
+                              >Existing Device+Template Combo
+                              <span>*</span></label
+                            >
+                            <p-dropdown
+                              formControlName="deviceTemplateComboId"
+                              [options]="existingCombos[i] || []"
+                              optionLabel="templateName"
+                              optionValue="id"
+                              [filter]="true"
+                              [showClear]="true"
+                              placeholder="Select an existing template combo"
+                              appendTo="body"
+                              styleClass="w-full"
+                              (onFilter)="onExistingComboFilter(i, $event)"
+                              (onChange)="onExistingComboSelected(i)"
+                            >
+                              <ng-template pTemplate="item" let-combo>
+                                <div class="flex flex-col">
+                                  <span class="font-semibold">
+                                    {{ combo.templateName }}
+                                  </span>
+                                  <small class="text-slate-500">
+                                    {{ combo.deviceName }}
+                                  </small>
+                                </div>
+                              </ng-template>
+                            </p-dropdown>
+                          </div>
+
+                          <!-- Standard: pick from the DeviceMessageCombos table. -->
+                          <div class="field" *ngIf="!brandSupportsTemplate(i)">
+                            <label
+                              >Existing Device+Message Combo
+                              <span>*</span></label
+                            >
+                            <p-dropdown
+                              formControlName="deviceMessageComboId"
+                              [options]="existingMessageCombos[i] || []"
+                              optionLabel="messageTitle"
+                              optionValue="id"
+                              [filter]="true"
+                              [showClear]="true"
+                              placeholder="Select an existing message combo"
+                              appendTo="body"
+                              styleClass="w-full"
+                              (onFilter)="
+                                onExistingMessageComboFilter(i, $event)
+                              "
+                              (onChange)="onExistingMessageComboSelected(i)"
+                            >
+                              <ng-template pTemplate="item" let-combo>
+                                <div class="flex flex-col">
+                                  <span class="font-semibold">
+                                    {{ combo.messageTitle }}
+                                  </span>
+                                  <small class="text-slate-500">
+                                    {{ combo.deviceName }}
+                                  </small>
+                                </div>
+                              </ng-template>
+                            </p-dropdown>
+                          </div>
+
+                          <div
+                            class="field sm:col-span-2"
+                            *ngIf="existingComboPreview[i]"
+                          >
+                            <div class="combo-preview">
+                              <i class="pi pi-check-circle"></i>
+                              <span>
+                                Selected:
+                                <strong>{{
+                                  existingComboPreview[i]?.device
+                                }}</strong>
+                                &rarr;
+                                <strong>{{
+                                  existingComboPreview[i]?.binding
+                                }}</strong>
+                              </span>
+                            </div>
+                          </div>
+                        </ng-template>
+
+                        <div class="field">
+                          <label>Display Order</label>
+                          <p-inputNumber
+                            formControlName="displayOrder"
+                            [min]="1"
+                            inputStyleClass="w-full"
+                            styleClass="w-full"
+                          ></p-inputNumber>
+                        </div>
+
+                        <div class="field">
+                          <label>Status</label>
+                          <div class="flex h-[46px] items-center gap-3">
+                            <p-toggleswitch
+                              formControlName="isActive"
+                            ></p-toggleswitch>
+                            <span class="text-sm font-semibold text-slate-600">
+                              {{
+                                group.get("isActive")?.value
+                                  ? "Active"
+                                  : "Pending / Inactive"
+                              }}
+                            </span>
+                          </div>
+                        </div>
+
+                        <!-- Minew labels are driven from the Minew cloud, so a saved
+                         row can be pushed to the physical device from here. -->
+                        <div class="sm:col-span-2" *ngIf="isMinewRow(i)">
+                          <div
+                            class="flex flex-wrap items-center gap-2 border-t border-slate-200 pt-3"
+                          >
+                            <button
+                              pButton
+                              type="button"
+                              icon="pi pi-bolt"
+                              label="Quick Bind"
+                              class="p-button-sm p-button-success"
+                              [disabled]="!canBindRow(i)"
+                              [pTooltip]="bindDisabledReason(i)"
+                              tooltipPosition="top"
+                              (click)="quickBindRow(i)"
+                            ></button>
+                            <button
+                              pButton
+                              type="button"
+                              icon="pi pi-link"
+                              label="Bind with Message"
+                              class="p-button-sm p-button-outlined"
+                              [disabled]="
+                                !canBindRow(i) || !group.get('messageId')?.value
+                              "
+                              [pTooltip]="bindDisabledReason(i)"
+                              tooltipPosition="top"
+                              (click)="bindRowWithMessage(i)"
+                            ></button>
+                            <small
+                              class="text-slate-500"
+                              *ngIf="bindDisabledReason(i)"
+                            >
+                              {{ bindDisabledReason(i) }}
+                            </small>
+                          </div>
+                        </div>
+
+                        <div class="sm:col-span-2" *ngIf="hasNoBindingError(i)">
+                          <small class="error-text">
+                            Select at least a template or a message for this
+                            device.
+                          </small>
+                        </div>
+                      </div>
+                    </div>
+                  </ng-container>
+                </div>
+
+                <div
+                  *ngIf="visibleAssignments.length === 0"
+                  class="empty-state"
+                >
+                  <i class="pi pi-wifi text-3xl text-emerald-600"></i>
+                  <h4>No ESL assignments</h4>
+                  <p>
+                    Add at least one ESL device assignment for this product.
+                  </p>
+                  <button
+                    pButton
+                    type="button"
+                    icon="pi pi-plus"
+                    label="Add ESL Assignment"
+                    class="p-button-success"
+                    (click)="addEslAssignment()"
+                  ></button>
+                </div>
+              </div>
+            </p-tabPanel>
+          </p-tabView>
+        </section>
+      </div>
+
+      <!-- RIGHT SIDE -->
+      <div class="space-y-6 xl:col-span-4 xl:sticky xl:top-24">
+        <!-- Summary -->
+        <section class="portal-card">
+          <div class="section-header">
+            <div class="section-icon">
+              <i class="pi pi-list-check"></i>
+            </div>
+            <div>
+              <h2>Assignment Summary</h2>
+              <p>Currently attached ESL rows.</p>
+            </div>
+          </div>
+
+          <div class="space-y-3">
+            <div
+              *ngFor="let group of visibleAssignments; let i = index"
+              class="summary-row"
+            >
+              <div class="summary-icon">
+                <i class="pi pi-tablet"></i>
+              </div>
+
+              <div class="min-w-0 flex-1">
+                <h4>
+                  {{ getBrandName(group.get("brandId")?.value) }}
+                  -
+                  {{ getRowBindingLabel(group) }}
+                </h4>
+                <p>
+                  Device ID:
+                  {{ group.get("deviceId")?.value || "Not selected" }}
+                </p>
+              </div>
+
+              <span
+                class="status-pill"
+                [class.active]="group.get('isActive')?.value"
+              >
+                {{ group.get("isActive")?.value ? "Active" : "Pending" }}
+              </span>
+            </div>
+
+            <div
+              *ngIf="visibleAssignments.length === 0"
+              class="text-sm text-slate-500"
+            >
+              No active ESL assignments.
+            </div>
+          </div>
+        </section>
+
+        <!-- Tip -->
+        <section class="tip-card">
+          <div class="flex gap-4">
+            <i class="pi pi-info-circle mt-1 text-xl text-emerald-700"></i>
+            <div>
+              <h3>Deployment Tip</h3>
+              <p>
+                Multiple ESL brands can be attached to one product. Use one
+                final Save Product action to create, update, or remove all ESL
+                assignments.
+              </p>
+            </div>
+          </div>
+        </section>
+      </div>
+    </div>
+  </form>
+
+  <!-- Fixed Footer -->
+  <div class="fixed-save-bar">
+    <button
+      pButton
+      type="button"
+      label="Cancel"
+      class="p-button-text p-button-secondary"
+      (click)="cancel()"
+    ></button>
+
+    <button
+      pButton
+      type="button"
+      icon="pi pi-save"
+      [label]="isEditMode ? 'Update Product' : 'Save Product'"
+      class="p-button-success save-btn"
+      [loading]="loading"
+      [disabled]="loading || !canEdit()"
+      (click)="save()"
+    ></button>
+  </div>
+</div>

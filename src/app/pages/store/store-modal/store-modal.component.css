@@ -1,0 +1,239 @@
+/* store-dialog.component.css */
+
+/* Custom scrollbar for better UX */
+.flex-1.overflow-y-auto::-webkit-scrollbar {
+  width: 8px;
+}
+
+.flex-1.overflow-y-auto::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-radius: 4px;
+}
+
+.flex-1.overflow-y-auto::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 4px;
+}
+
+.flex-1.overflow-y-auto::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* Focus states */
+input:focus,
+select:focus,
+textarea:focus {
+  outline: none;
+  ring: 2px;
+  ring-color: var(--dlg-primary);
+  border-color: var(--dlg-accent);
+}
+
+/* Radio button cards */
+label.flex.items-center.p-3.border.rounded-lg.cursor-pointer {
+  transition: all 0.2s ease-in-out;
+  border: 2px solid transparent;
+}
+
+label.flex.items-center.p-3.border.rounded-lg.cursor-pointer:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+label.flex.items-center.p-3.border.rounded-lg.cursor-pointer.border-blue-500 {
+  border-color: var(--dlg-accent) !important;
+}
+
+label.flex.items-center.p-3.border.rounded-lg.cursor-pointer.border-purple-500 {
+  border-color: var(--dlg-accent) !important;
+}
+
+/* Toggle switch styling */
+.peer-checked\:bg-blue-600 {
+  background-color: var(--dlg-primary);
+}
+
+.peer-checked\:bg-purple-600 {
+  background-color: var(--dlg-primary-hover);
+}
+
+.peer:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.5);
+}
+
+/* Animation for the spinning loader */
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-spin {
+  animation: spin 1s linear infinite;
+}
+
+/* Enhanced button hover states */
+button:hover {
+  transition: all 0.2s ease-in-out;
+}
+
+button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Custom validation error styling */
+.border-red-500 {
+  border-color: #ef4444 !important;
+  animation: shake 0.5s ease-in-out;
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-5px); }
+  75% { transform: translateX(5px); }
+}
+
+/* Success and error snackbar styles */
+::ng-deep .success-snackbar {
+  background-color: #10b981 !important;
+  color: white !important;
+}
+
+::ng-deep .error-snackbar {
+  background-color: #ef4444 !important;
+  color: white !important;
+}
+
+::ng-deep .success-snackbar .mat-simple-snack-bar-action {
+  color: white !important;
+}
+
+::ng-deep .error-snackbar .mat-simple-snack-bar-action {
+  color: white !important;
+}
+
+/* Material dialog overlay customization */
+::ng-deep .cdk-overlay-pane {
+  max-width: 90vw !important;
+  max-height: 90vh !important;
+}
+
+/* Info boxes styling */
+.bg-blue-50 {
+  background-color: #ecfdf5;
+}
+
+.border-blue-200 {
+  border-color: #a7f3d0;
+}
+
+.text-blue-700 {
+  color: var(--dlg-primary-hover);
+}
+
+.text-blue-400 {
+  color: var(--dlg-primary);
+}
+
+.bg-purple-50 {
+  background-color: #faf5ff;
+}
+
+.border-purple-200 {
+  border-color: #e9d5ff;
+}
+
+.text-purple-700 {
+  color: var(--dlg-primary-hover);
+}
+
+.text-purple-400 {
+  color: #a78bfa;
+}
+
+/* Required field indicator */
+.text-red-500 {
+  color: #ef4444;
+}
+
+/* Form section styling */
+.space-y-4 > * + * {
+  margin-top: 1rem;
+}
+
+.space-y-2 > * + * {
+  margin-top: 0.5rem;
+}
+
+/* Icon styling */
+svg {
+  flex-shrink: 0;
+}
+
+/* Section header styling */
+h3.border-b {
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .grid-cols-1.md\\:grid-cols-2 {
+    grid-template-columns: 1fr;
+  }
+  
+  .max-w-2xl {
+    max-width: 95vw;
+    margin: 0 10px;
+  }
+}
+
+/* Better input placeholder styling */
+::placeholder {
+  color: #9ca3af;
+  opacity: 1;
+}
+
+/* Dialog content spacing */
+.space-y-6 > * + * {
+  margin-top: 1.5rem;
+}
+
+/* Status card styling */
+.flex.items-center.justify-between.p-3.border.rounded-lg.bg-gray-50 {
+  transition: all 0.2s ease;
+}
+
+.flex.items-center.justify-between.p-3.border.rounded-lg.bg-gray-50:hover {
+  background-color: #f9fafb;
+}
+
+/* Custom scroll for textarea */
+textarea {
+  min-height: 80px;
+}
+
+/* Number input spinner hiding */
+input[type=number]::-webkit-inner-spin-button,
+input[type=number]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Better focus ring for accessibility */
+button:focus-visible {
+  outline: 2px solid var(--dlg-accent);
+  outline-offset: 2px;
+}
+
+/* Transition effects */
+.transition-colors {
+  transition-property: color, background-color, border-color;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 150ms;
+}

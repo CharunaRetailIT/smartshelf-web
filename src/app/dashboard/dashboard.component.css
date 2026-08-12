@@ -1,0 +1,473 @@
+/* dashboard.component.css - Fixed Version */
+
+/* Custom animations */
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-pulse {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+.animate-spin {
+  animation: spin 1s linear infinite;
+}
+
+/* Custom hover effects */
+.hover-scale:hover {
+  transform: scale(1.05);
+  transition: transform 0.2s ease-in-out;
+}
+
+/* Loading skeleton */
+.skeleton {
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: loading 1.5s infinite;
+}
+
+@keyframes loading {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+/* Status indicators with pulse effect */
+.status-online {
+  position: relative;
+}
+
+.status-online::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 100%;
+  height: 100%;
+  background-color: inherit;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  animation: ping 1s cubic-bezier(0, 0, 0.2, 1) infinite;
+  opacity: 0.75;
+}
+
+@keyframes ping {
+  75%, 100% {
+    transform: translate(-50%, -50%) scale(2);
+    opacity: 0;
+  }
+}
+
+/* Card hover effects */
+.card-hover {
+  transition: all 0.3s ease;
+}
+
+.card-hover:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+}
+
+/* Alert animations */
+.alert-enter {
+  animation: slideInRight 0.3s ease-out;
+}
+
+@keyframes slideInRight {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+/* Table row hover effect */
+.table-row-hover:hover {
+  background-color: #f8fafc;
+  transition: background-color 0.2s ease;
+}
+
+/* Button loading state */
+.btn-loading {
+  position: relative;
+  color: transparent;
+}
+
+.btn-loading::after {
+  content: '';
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  top: 50%;
+  left: 50%;
+  margin-left: -8px;
+  margin-top: -8px;
+  border: 2px solid #ffffff;
+  border-radius: 50%;
+  border-top-color: transparent;
+  animation: spin 1s linear infinite;
+}
+
+/* Progress bars */
+.progress-bar {
+  background: linear-gradient(90deg, #3b82f6, #8b5cf6);
+  background-size: 200% 100%;
+  animation: progressShine 2s linear infinite;
+}
+
+@keyframes progressShine {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+/* Custom scrollbar */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 3px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 3px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #a1a1a1;
+}
+
+/* Responsive table */
+@media (max-width: 768px) {
+  .responsive-table {
+    font-size: 0.875rem;
+  }
+  
+  .responsive-table th,
+  .responsive-table td {
+    padding: 0.5rem;
+  }
+}
+
+/* Status badges with enhanced styling */
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.status-badge::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  margin-right: 6px;
+}
+
+.status-online .status-badge::before {
+  background-color: #10b981;
+}
+
+.status-offline .status-badge::before {
+  background-color: #6b7280;
+}
+
+.status-error .status-badge::before {
+  background-color: #ef4444;
+  animation: blink 1s linear infinite;
+}
+
+@keyframes blink {
+  0%, 50% {
+    opacity: 1;
+  }
+  51%, 100% {
+    opacity: 0.3;
+  }
+}
+
+/* Gradient text */
+.gradient-text {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Glass morphism effect */
+.glass-card {
+  background: rgba(255, 255, 255, 0.25);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+}
+
+/* FIXED: Activity timeline with proper spacing */
+.activity-timeline {
+  position: relative;
+  padding-left: 0;
+}
+
+/* Remove the timeline line as it's causing visual clutter */
+.activity-timeline::before {
+  display: none;
+}
+
+/* FIXED: Activity items with proper spacing */
+.activity-item {
+  display: flex;
+  align-items: flex-start;
+  padding: 16px 8px;
+  margin-bottom: 8px;
+  border-bottom: 1px solid #e5e7eb;
+  transition: background-color 0.2s ease;
+}
+
+.activity-item:last-child {
+  border-bottom: none;
+  margin-bottom: 0;
+}
+
+.activity-item:hover {
+  background-color: #f9fafb;
+  border-radius: 8px;
+}
+
+/* FIXED: Activity icon spacing */
+.activity-icon {
+  width: 40px;
+  height: 40px;
+  min-width: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 16px;
+  flex-shrink: 0;
+}
+
+/* FIXED: Activity content spacing */
+.activity-content {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+/* FIXED: Activity description */
+.activity-description {
+  font-size: 15px;
+  font-weight: 500;
+  color: #1f2937;
+  line-height: 1.4;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}
+
+/* FIXED: Activity meta information */
+.activity-meta {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  font-size: 13px;
+  color: #6b7280;
+  line-height: 1.5;
+}
+
+.activity-meta > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.activity-meta i {
+  font-size: 11px;
+}
+
+/* FIXED: Activity type badge */
+.activity-meta .bg-gray-100 {
+  white-space: nowrap;
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 500;
+}
+
+/* FIXED: Card header spacing */
+.card-header {
+  margin-bottom: 20px;
+}
+
+.card-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #1f2937;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+
+/* FIXED: Dashboard card padding */
+.dashboard-card {
+  padding: 24px;
+  min-height: 400px;
+}
+
+/* FIXED: View all link spacing */
+.dashboard-card > div:last-child {
+  margin-top: 16px;
+  padding-top: 16px;
+}
+
+/* Quick action buttons */
+.quick-action-btn {
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+  border: none;
+  font-family: inherit;
+}
+
+.quick-action-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+  transition: left 0.5s;
+}
+
+.quick-action-btn:hover::before {
+  left: 100%;
+}
+
+/* Metrics counter animation */
+.counter {
+  font-variant-numeric: tabular-nums;
+}
+
+/* FIXED: Bottom spacing for main content */
+.main-content {
+  padding-bottom: 40px;
+}
+
+/* FIXED: Data last updated section */
+.main-content > div:last-child {
+  margin-top: 32px;
+  margin-bottom: 20px;
+}
+
+/* FIXED: Stats grid spacing */
+.stats-grid {
+  margin-bottom: 32px;
+}
+
+/* FIXED: Dashboard grid spacing */
+.dashboard-grid {
+  gap: 32px;
+  margin-bottom: 32px;
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  .dark-mode {
+    background-color: #1f2937;
+    color: #f9fafb;
+  }
+  
+  .dark-mode .bg-white {
+    background-color: #374151;
+  }
+  
+  .dark-mode .text-gray-900 {
+    color: #f9fafb;
+  }
+  
+  .dark-mode .text-gray-500 {
+    color: #9ca3af;
+  }
+  
+  .dark-mode .border-gray-200 {
+    border-color: #4b5563;
+  }
+  
+  .dark-mode .activity-item:hover {
+    background-color: #374151;
+  }
+}
+
+/* Print styles */
+@media print {
+  .no-print {
+    display: none !important;
+  }
+  
+  .print-break {
+    page-break-after: always;
+  }
+  
+  .card-hover:hover {
+    transform: none;
+    box-shadow: none;
+  }
+}
+
+/* Responsive adjustments */
+@media (max-width: 1024px) {
+  .dashboard-card {
+    min-height: 350px;
+  }
+}
+
+@media (max-width: 768px) {
+  .activity-icon {
+    width: 36px;
+    height: 36px;
+    min-width: 36px;
+    margin-right: 12px;
+  }
+  
+  .activity-description {
+    font-size: 14px;
+  }
+  
+  .activity-meta {
+    font-size: 12px;
+  }
+  
+  .dashboard-card {
+    padding: 16px;
+    min-height: auto;
+  }
+}

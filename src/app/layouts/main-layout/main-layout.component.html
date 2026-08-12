@@ -1,0 +1,17 @@
+<app-sidebar
+  [isLeftSidebarCollapsed]="isSidebarCollapsed()"
+  (changeIsLeftSidebarCollapsed)="toggleSidebar($event)"
+>
+  <div class="body">
+    <app-header
+      *ngIf="showHeader()"
+      [isLeftSidebarCollapsed]="isSidebarCollapsed()"
+      (toggleSidebar)="changeIsLeftSidebarCollapsed($event)"
+    />
+    <main class="page-content" [class.no-header]="!showHeader()">
+      <!-- for notifications -->
+      <p-toast position="top-right"></p-toast>
+      <router-outlet></router-outlet>
+    </main>
+  </div>
+</app-sidebar>

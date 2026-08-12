@@ -1,0 +1,6 @@
+/* optional styling for dropdown footer buttons */
+.p-dropdown-footer {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.5rem;
+}

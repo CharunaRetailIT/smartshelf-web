@@ -1,0 +1,54 @@
+<p-dropdown
+  [(ngModel)]="selectedProduct"
+  [options]="products"
+  optionLabel="productName"
+  optionValue="id"
+  placeholder="Select Product"
+  [filter]="true"
+  filterBy="productName,productCode"
+  (onFilter)="onSearch($event)"
+  [virtualScroll]="false"
+  styleClass="w-full"
+>
+<ng-template pTemplate="item" let-product let-index="index">
+    <div class="flex flex-col">
+  {{ (pageNumber - 1) * pageSize + index + 1 }}. {{ product.productName }}
+      <small class="text-gray-500">
+        {{ product.productCode }} | {{ product.categoryName }}
+      </small>
+    </div>
+  </ng-template>
+
+  <!-- Footer: Previous / Next buttons -->
+  <ng-template pTemplate="footer">
+    <div class="flex justify-between p-2">
+      <button
+        pButton
+        type="button"
+        label="Previous"
+        icon="pi pi-chevron-left"
+        (click)="loadPrevious()"
+        [disabled]="pageNumber === 1 || loading"
+        class="p-button-text"
+      ></button>
+
+      <span class="text-gray-600 text-sm">
+        Page {{ pageNumber }} of {{ Math.ceil(totalCount / pageSize) }}
+      </span>
+
+      <button
+        pButton
+        type="button"
+        label="Next"
+        icon="pi pi-chevron-right"
+        iconPos="right"
+        (click)="loadNext()"
+        [disabled]="pageNumber * pageSize >= totalCount || loading"
+        class="p-button-text"
+      ></button>
+    </div>
+  </ng-template>
+</p-dropdown>
+
+<!-- Optional loading indicator -->
+<p-progressSpinner *ngIf="loading" styleClass="mx-auto mt-2"></p-progressSpinner>

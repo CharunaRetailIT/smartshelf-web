@@ -1,0 +1,686 @@
+/* minew-batch-add.component.css - Enhanced Version */
+
+/* ============================================
+   STEP INDICATOR STYLING
+   ============================================ */
+:host ::ng-deep .completed {
+  background: linear-gradient(135deg, #10b981, #059669);
+  color: white;
+  border: 2px solid #10b981;
+  box-shadow: 0 4px 6px -1px rgba(16, 185, 129, 0.3);
+}
+
+:host ::ng-deep .active {
+  background: linear-gradient(135deg, var(--dlg-accent), var(--dlg-primary));
+  color: white;
+  border: 2px solid var(--dlg-accent);
+  animation: pulse 2s infinite;
+  box-shadow: 0 4px 6px -1px rgba(16, 185, 129, 0.4);
+}
+
+:host ::ng-deep .pending {
+  background-color: #f3f4f6;
+  color: #9ca3af;
+  border: 2px solid #e5e7eb;
+}
+
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
+  }
+  70% {
+    box-shadow: 0 0 0 12px rgba(16, 185, 129, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(16, 185, 129, 0);
+  }
+}
+
+/* ============================================
+   STATUS COLORS
+   ============================================ */
+.status-success {
+  background: linear-gradient(135deg, #d1fae5, #a7f3d0) !important;
+  color: #065f46 !important;
+  border-left: 4px solid #10b981;
+}
+
+.status-maintenance {
+  background: linear-gradient(135deg, #fef3c7, #fde68a) !important;
+  color: #92400e !important;
+  border-left: 4px solid #f59e0b;
+}
+
+.status-failed {
+  background: linear-gradient(135deg, #fee2e2, #fecaca) !important;
+  color: #991b1b !important;
+  border-left: 4px solid #ef4444;
+}
+
+/* ============================================
+   CARD STYLES
+   ============================================ */
+.info-card {
+  border-left: 4px solid var(--dlg-accent);
+  background: linear-gradient(135deg, #ecfdf5, var(--dlg-accent-soft));
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+}
+
+.info-card:hover {
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  transform: translateY(-2px);
+}
+
+.warning-card {
+  border-left: 4px solid #f59e0b;
+  background: linear-gradient(135deg, #fffbeb, #fef3c7);
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+}
+
+.warning-card:hover {
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  transform: translateY(-2px);
+}
+
+.success-card {
+  border-left: 4px solid #10b981;
+  background: linear-gradient(135deg, #f0fdf4, #dcfce7);
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+}
+
+.success-card:hover {
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  transform: translateY(-2px);
+}
+
+.error-card {
+  border-left: 4px solid #ef4444;
+  background: linear-gradient(135deg, #fef2f2, #fee2e2);
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+}
+
+.error-card:hover {
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  transform: translateY(-2px);
+}
+
+/* ============================================
+   TABLE ROW HIGHLIGHTING
+   ============================================ */
+.highlight-success {
+  background: linear-gradient(135deg, #d1fae5, #ecfdf5) !important;
+  border-left: 3px solid #10b981;
+}
+
+.highlight-warning {
+  background: linear-gradient(135deg, #fef3c7, #fefce8) !important;
+  border-left: 3px solid #f59e0b;
+}
+
+.highlight-error {
+  background: linear-gradient(135deg, #fee2e2, #fef2f2) !important;
+  border-left: 3px solid #ef4444;
+}
+
+/* ============================================
+   SCROLLBAR STYLING
+   ============================================ */
+:host ::ng-deep .p-datatable-scrollable-body {
+  scrollbar-width: thin;
+  scrollbar-color: #cbd5e1 #f1f5f9;
+}
+
+:host ::ng-deep .p-datatable-scrollable-body::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+:host ::ng-deep .p-datatable-scrollable-body::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-radius: 8px;
+}
+
+:host ::ng-deep .p-datatable-scrollable-body::-webkit-scrollbar-thumb {
+  background: linear-gradient(135deg, #cbd5e1, #94a3b8);
+  border-radius: 8px;
+  border: 2px solid #f1f5f9;
+}
+
+:host ::ng-deep .p-datatable-scrollable-body::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(135deg, #94a3b8, #64748b);
+}
+
+/* ============================================
+   PROGRESS BAR STYLING
+   ============================================ */
+:host ::ng-deep .p-progressbar {
+  height: 0.75rem;
+  border-radius: 9999px;
+  background: #e5e7eb;
+  overflow: hidden;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+:host ::ng-deep .p-progressbar-value {
+  background: linear-gradient(90deg, var(--dlg-accent), var(--dlg-primary));
+  border-radius: 9999px;
+  animation: shimmer 2s infinite;
+  background-size: 200% 100%;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: 0% 0%;
+  }
+  100% {
+    background-position: 200% 0%;
+  }
+}
+
+/* ============================================
+   TAG STYLING
+   ============================================ */
+:host ::ng-deep .p-tag {
+  padding: 0.375rem 0.875rem;
+  font-weight: 600;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  letter-spacing: 0.025em;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+}
+
+:host ::ng-deep .p-tag.p-tag-success {
+  background: linear-gradient(135deg, #10b981, #059669);
+}
+
+:host ::ng-deep .p-tag.p-tag-danger {
+  background: linear-gradient(135deg, #ef4444, #dc2626);
+}
+
+:host ::ng-deep .p-tag.p-tag-warning {
+  background: linear-gradient(135deg, #f59e0b, #d97706);
+}
+
+/* ============================================
+   BUTTON STYLING
+   ============================================ */
+:host ::ng-deep .p-button {
+  font-weight: 600;
+  border-radius: 0.5rem;
+  transition: all 0.3s ease;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+}
+
+:host ::ng-deep .p-button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.15);
+}
+
+:host ::ng-deep .p-button-primary {
+  background: linear-gradient(135deg, var(--dlg-accent), var(--dlg-primary));
+  border: none;
+}
+
+:host ::ng-deep .p-button-primary:hover {
+  background: linear-gradient(135deg, var(--dlg-primary), var(--dlg-primary-hover));
+}
+
+:host ::ng-deep .p-button-success {
+  background: linear-gradient(135deg, #10b981, #059669);
+  border: none;
+}
+
+:host ::ng-deep .p-button-success:hover {
+  background: linear-gradient(135deg, #059669, #047857);
+}
+
+:host ::ng-deep .p-button-warning {
+  background: linear-gradient(135deg, #f59e0b, #d97706);
+  border: none;
+}
+
+:host ::ng-deep .p-button-warning:hover {
+  background: linear-gradient(135deg, #d97706, #b45309);
+}
+
+:host ::ng-deep .p-button-outlined {
+  border: 2px solid var(--dlg-accent);
+  color: var(--dlg-primary);
+  background: transparent;
+}
+
+:host ::ng-deep .p-button-outlined:hover {
+  background: #ecfdf5;
+  border-color: var(--dlg-accent);
+}
+
+/* ============================================
+   DIALOG STYLING
+   ============================================ */
+:host ::ng-deep .p-dialog {
+  border-radius: 1rem;
+  box-shadow:
+    0 20px 25px -5px rgba(0, 0, 0, 0.1),
+    0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+:host ::ng-deep .p-dialog .p-dialog-header {
+  background: linear-gradient(135deg, #f8fafc, #e2e8f0);
+  border-bottom: 2px solid #cbd5e1;
+  border-radius: 1rem 1rem 0 0;
+  padding: 1.5rem;
+}
+
+:host ::ng-deep .p-dialog .p-dialog-content {
+  padding: 1.5rem;
+  max-height: calc(90vh - 200px);
+  overflow-y: auto;
+}
+
+:host ::ng-deep .p-dialog .p-dialog-footer {
+  border-top: 2px solid #e5e7eb;
+  padding: 1.25rem 1.5rem;
+  border-radius: 0 0 1rem 1rem;
+}
+
+/* ============================================
+   TAB VIEW STYLING
+   ============================================ */
+:host ::ng-deep .p-tabview .p-tabview-nav {
+  background: #f8fafc;
+  border-bottom: 2px solid #e5e7eb;
+  border-radius: 0.5rem 0.5rem 0 0;
+}
+
+:host ::ng-deep .p-tabview .p-tabview-nav li .p-tabview-nav-link {
+  border-radius: 0.5rem 0.5rem 0 0;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+:host ::ng-deep .p-tabview .p-tabview-nav li.p-highlight .p-tabview-nav-link {
+  background: linear-gradient(135deg, var(--dlg-accent), var(--dlg-primary));
+  color: white;
+  border-color: var(--dlg-accent);
+}
+
+:host ::ng-deep .p-tabview .p-tabview-panels {
+  background: white;
+  border-radius: 0 0 0.5rem 0.5rem;
+}
+
+/* ============================================
+   INPUT STYLING
+   ============================================ */
+:host ::ng-deep .p-inputtext,
+:host ::ng-deep .p-textarea,
+:host ::ng-deep .p-dropdown {
+  border: 2px solid #e5e7eb;
+  border-radius: 0.5rem;
+  transition: all 0.3s ease;
+}
+
+:host ::ng-deep .p-inputtext:enabled:focus,
+:host ::ng-deep .p-textarea:enabled:focus,
+:host ::ng-deep .p-dropdown:not(.p-disabled).p-focus {
+  border-color: var(--dlg-accent);
+  box-shadow: 0 0 0 3px var(--dlg-primary-ring);
+}
+
+:host ::ng-deep .p-inputtext:enabled:hover,
+:host ::ng-deep .p-textarea:enabled:hover,
+:host ::ng-deep .p-dropdown:not(.p-disabled):hover {
+  border-color: #cbd5e1;
+}
+
+/* ============================================
+   MAC ADDRESS CELL
+   ============================================ */
+.mac-cell {
+  font-family: "Monaco", "Menlo", "Courier New", monospace;
+  font-size: 0.875rem;
+  letter-spacing: 0.05em;
+  background: #f8fafc;
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.375rem;
+  display: inline-block;
+}
+
+/* ============================================
+   STAT CARD HOVER EFFECTS
+   ============================================ */
+.stat-card {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  cursor: default;
+  border-radius: 0.75rem;
+  overflow: hidden;
+  position: relative;
+}
+
+.stat-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, var(--dlg-accent), var(--dlg-primary));
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.stat-card:hover::before {
+  opacity: 1;
+}
+
+.stat-card:hover {
+  transform: translateY(-4px) scale(1.02);
+  box-shadow:
+    0 12px 24px -4px rgba(0, 0, 0, 0.15),
+    0 8px 16px -4px rgba(0, 0, 0, 0.1);
+}
+
+/* ============================================
+   FILE UPLOAD AREA
+   ============================================ */
+.file-upload-area {
+  border: 3px dashed #cbd5e1;
+  border-radius: 0.75rem;
+  padding: 2.5rem;
+  text-align: center;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  background: linear-gradient(135deg, #f9fafb, #f3f4f6);
+}
+
+.file-upload-area:hover {
+  border-color: var(--dlg-accent);
+  background: linear-gradient(135deg, #ecfdf5, var(--dlg-accent-soft));
+  transform: scale(1.02);
+}
+
+.file-upload-area.dragover {
+  border-color: #10b981;
+  background: linear-gradient(135deg, #d1fae5, #a7f3d0);
+  transform: scale(1.05);
+  box-shadow: 0 8px 16px -4px rgba(16, 185, 129, 0.3);
+}
+
+/* ============================================
+   CHECKBOX STYLING
+   ============================================ */
+:host ::ng-deep .p-checkbox .p-checkbox-box {
+  border: 2px solid #cbd5e1;
+  border-radius: 0.375rem;
+  transition: all 0.3s ease;
+}
+
+:host ::ng-deep .p-checkbox .p-checkbox-box.p-highlight {
+  background: linear-gradient(135deg, var(--dlg-accent), var(--dlg-primary));
+  border-color: var(--dlg-accent);
+}
+
+:host ::ng-deep .p-checkbox:not(.p-checkbox-disabled) .p-checkbox-box:hover {
+  border-color: var(--dlg-accent);
+}
+
+/* ============================================
+   STEP INDICATOR WRAPPER
+   ============================================ */
+.step-indicator-wrapper {
+  padding: 1rem;
+  background: linear-gradient(135deg, #f8fafc, #f1f5f9);
+  border-radius: 0.75rem;
+  margin-bottom: 1.5rem;
+}
+
+/* ============================================
+   LOADING SPINNER
+   ============================================ */
+:host ::ng-deep .pi-spin {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ============================================
+   RESPONSIVE DESIGN
+   ============================================ */
+
+/* Tablets (768px - 1024px) */
+@media (max-width: 1024px) {
+  :host ::ng-deep .p-dialog {
+    width: 90% !important;
+    max-width: 800px !important;
+  }
+
+  .grid-cols-4 {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+
+  .grid-cols-2 {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* Mobile devices (max-width: 767px) */
+@media (max-width: 767px) {
+  :host ::ng-deep .p-dialog {
+    width: 95% !important;
+    margin: 0.5rem;
+    max-height: 95vh;
+  }
+
+  :host ::ng-deep .p-dialog .p-dialog-header {
+    padding: 1rem;
+    font-size: 1rem;
+  }
+
+  :host ::ng-deep .p-dialog .p-dialog-content {
+    padding: 1rem;
+    max-height: calc(95vh - 180px);
+  }
+
+  :host ::ng-deep .p-dialog .p-dialog-footer {
+    padding: 1rem;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  :host ::ng-deep .p-dialog .p-dialog-footer .p-button {
+    width: 100%;
+  }
+
+  .grid-cols-4,
+  .grid-cols-2 {
+    grid-template-columns: 1fr !important;
+    gap: 0.75rem !important;
+  }
+
+  .stat-card {
+    padding: 1rem !important;
+  }
+
+  .stat-card .text-2xl {
+    font-size: 1.5rem !important;
+  }
+
+  /* Make tables more mobile-friendly */
+  :host ::ng-deep .p-datatable-scrollable-body {
+    max-height: 250px !important;
+  }
+
+  :host ::ng-deep .p-datatable th,
+  :host ::ng-deep .p-datatable td {
+    padding: 0.5rem !important;
+    font-size: 0.875rem !important;
+  }
+
+  /* Adjust tab panels for mobile */
+  :host ::ng-deep .p-tabview .p-tabview-nav li {
+    flex: 1;
+  }
+
+  :host ::ng-deep .p-tabview .p-tabview-nav li .p-tabview-nav-link {
+    padding: 0.75rem 0.5rem;
+    font-size: 0.875rem;
+  }
+
+  /* File upload area */
+  .file-upload-area {
+    padding: 1.5rem 1rem;
+  }
+
+  /* Progress steps on mobile */
+  .step-indicator-wrapper {
+    padding: 0.75rem;
+  }
+
+  .step-indicator-wrapper .flex.justify-between > div {
+    flex: 1;
+  }
+
+  .step-indicator-wrapper .w-8.h-8 {
+    width: 1.75rem !important;
+    height: 1.75rem !important;
+    font-size: 0.75rem;
+  }
+
+  .step-indicator-wrapper .text-xs {
+    font-size: 0.65rem !important;
+  }
+
+  /* Textareas on mobile */
+  :host ::ng-deep .p-textarea {
+    font-size: 0.875rem;
+  }
+
+  /* MAC address cells on mobile */
+  .mac-cell {
+    font-size: 0.75rem;
+    padding: 0.25rem 0.375rem;
+  }
+
+  /* Adjust spacing */
+  .mb-6 {
+    margin-bottom: 1.5rem !important;
+  }
+
+  .mb-4 {
+    margin-bottom: 1rem !important;
+  }
+
+  .p-4 {
+    padding: 1rem !important;
+  }
+
+  .gap-4 {
+    gap: 0.75rem !important;
+  }
+}
+
+/* Small mobile devices (max-width: 480px) */
+@media (max-width: 480px) {
+  :host ::ng-deep .p-dialog {
+    width: 100% !important;
+    margin: 0;
+    border-radius: 0;
+    max-height: 100vh;
+  }
+
+  :host ::ng-deep .p-dialog .p-dialog-header {
+    border-radius: 0;
+    padding: 0.875rem;
+  }
+
+  :host ::ng-deep .p-dialog .p-dialog-content {
+    padding: 0.875rem;
+    max-height: calc(100vh - 160px);
+  }
+
+  .stat-card .text-2xl {
+    font-size: 1.25rem !important;
+  }
+
+  .stat-card .text-sm {
+    font-size: 0.75rem !important;
+  }
+
+  /* Even smaller step indicators */
+  .step-indicator-wrapper .w-8.h-8 {
+    width: 1.5rem !important;
+    height: 1.5rem !important;
+    font-size: 0.625rem;
+  }
+
+  .step-indicator-wrapper .text-xs {
+    font-size: 0.6rem !important;
+  }
+}
+
+/* Landscape orientation adjustments */
+@media (max-height: 600px) and (orientation: landscape) {
+  :host ::ng-deep .p-dialog .p-dialog-content {
+    max-height: calc(100vh - 140px) !important;
+  }
+
+  :host ::ng-deep .p-datatable-scrollable-body {
+    max-height: 150px !important;
+  }
+}
+
+/* ============================================
+   ACCESSIBILITY IMPROVEMENTS
+   ============================================ */
+:focus-visible {
+  outline: 2px solid var(--dlg-accent);
+  outline-offset: 2px;
+  border-radius: 0.375rem;
+}
+
+:host ::ng-deep .p-button:focus-visible {
+  box-shadow: 0 0 0 3px var(--dlg-primary-ring);
+}
+
+/* ============================================
+   UTILITY CLASSES
+   ============================================ */
+.fade-in {
+  animation: fadeIn 0.3s ease-in;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.slide-up {
+  animation: slideUp 0.4s ease-out;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

@@ -1,0 +1,944 @@
+<!-- Modernized Create Rack Modal -->
+<p-dialog
+  [(visible)]="visible"
+  header="Create New Rack"
+  [modal]="true"
+  [style]="{ width: '90vw', maxWidth: '900px' }"
+  [maximizable]="true"
+  [breakpoints]="{ '960px': '75vw', '640px': '90vw' }"
+  [draggable]="false"
+  [resizable]="false"
+  [closable]="true"
+  (onHide)="onCancel()"
+>
+  <!-- Custom Header -->
+  <!-- <ng-template pTemplate="header">
+    <div class="modal-header-content">
+      <div>
+        <h2 class="modal-title">
+          {{ getRackHeaderText() }}
+        </h2>
+        <p class="modal-subtitle">
+          {{ getRackDescriptionText() }}
+        </p>
+      </div>
+      <button
+        (click)="onCancel()"
+        class="close-button"
+        aria-label="Close dialog"
+      >
+        <i class="pi pi-times"></i>
+      </button>
+    </div>
+  </ng-template> -->
+  <form [formGroup]="rackForm" (ngSubmit)="onSubmit()" class="modal-form">
+    <!-- Main Content Area -->
+    <div class="px-6 py-5">
+      <!-- Header Description -->
+      <div class="mb-6">
+        <p class="text-sm text-gray-600 m-0">
+          Create a new rack with complete details, shelves, and device
+          assignments
+        </p>
+      </div>
+
+      <!-- Modern Tabs -->
+      <div class="flex mb-6 border-b border-gray-200">
+        <button
+          type="button"
+          class="tab-button"
+          [class.active]="activeTabIndex === 0"
+          (click)="activeTabIndex = 0"
+        >
+          <i class="pi pi-info-circle"></i>
+          Rack Details
+        </button>
+        <button
+          type="button"
+          class="tab-button"
+          [class.active]="activeTabIndex === 1"
+          (click)="activeTabIndex = 1"
+        >
+          <i class="pi pi-th-large"></i>
+          Shelves
+          <span *ngIf="shelves.length > 0" class="counter-badge">
+            {{ shelves.length }}
+          </span>
+        </button>
+      </div>
+
+      <!-- Tab 1: Rack Details -->
+      <div *ngIf="activeTabIndex === 0" class="space-y-6">
+        <!-- Basic Info Section -->
+        <div>
+          <h3 class="section-header">Rack Information</h3>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <!-- Store Selection -->
+            <div class="md:col-span-2">
+              <label class="field-label">
+                Store <span class="required">*</span>
+              </label>
+              <p-dropdown
+                [options]="stores"
+                formControlName="storeId"
+                optionValue="id"
+                optionLabel="storeName"
+                placeholder="Select Store"
+                [filter]="true"
+                [virtualScroll]="true"
+                [virtualScrollItemSize]="38"
+                [showClear]="true"
+                [loading]="isStoreLoading"
+                (onChange)="onStoreChange($event)"
+                (onClear)="onStoreClear()"
+                (onFilter)="onStoreSearch($event)"
+                styleClass="w-full"
+              >
+                <ng-template let-store pTemplate="item">
+                  <div class="py-2">
+                    <div class="font-medium text-sm text-gray-900">
+                      {{ store.storeName }}
+                    </div>
+                    <div class="text-xs text-gray-500 mt-0.5">
+                      {{ store.address }}
+                    </div>
+                  </div>
+                </ng-template>
+              </p-dropdown>
+              <small class="p-error" *ngIf="getFieldError('storeId')">
+                {{ getFieldError("storeId") }}
+              </small>
+            </div>
+
+            <!-- Rack Name -->
+            <div>
+              <label class="field-label">
+                Rack Name <span class="required">*</span>
+              </label>
+              <input
+                type="text"
+                pInputText
+                formControlName="name"
+                placeholder="Enter rack name"
+                class="w-full"
+              />
+              <small class="p-error" *ngIf="getFieldError('name')">
+                {{ getFieldError("name") }}
+              </small>
+            </div>
+
+            <!-- Location -->
+            <div>
+              <label class="field-label">
+                Location <span class="required">*</span>
+              </label>
+              <input
+                type="text"
+                pInputText
+                formControlName="location"
+                placeholder="e.g., Main Floor - Aisle 1"
+                class="w-full"
+              />
+              <small class="p-error" *ngIf="getFieldError('location')">
+                {{ getFieldError("location") }}
+              </small>
+            </div>
+
+            <!-- Coordinates -->
+            <div>
+              <label class="field-label">Coordinates</label>
+              <input
+                type="text"
+                pInputText
+                formControlName="coordinates"
+                placeholder="e.g., x:10, y:20"
+                class="w-full"
+              />
+              <p class="helper-text">Optional: Physical coordinates</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Description Section -->
+        <div>
+          <label class="field-label">Description</label>
+          <textarea
+            rows="3"
+            pInputText
+            formControlName="description"
+            placeholder="Enter a detailed description of the rack..."
+            class="w-full description-field"
+          ></textarea>
+          <p class="helper-text">
+            Optional: Provide a description to help identify this rack
+          </p>
+        </div>
+
+        <!-- Status Section -->
+        <div class="info-card">
+          <h4 class="info-card-header">Status & Configuration</h4>
+
+          <div class="flex items-center">
+            <p-checkbox
+              formControlName="isActive"
+              [binary]="true"
+              inputId="isActive"
+              styleClass="mr-2"
+            ></p-checkbox>
+            <label for="isActive" class="text-sm text-gray-700 cursor-pointer">
+              Active racks will be available immediately
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab 2: Shelves -->
+      <div *ngIf="activeTabIndex === 1" class="space-y-6">
+        <!-- Header -->
+        <div class="flex justify-between items-center">
+          <div>
+            <h3 class="section-header mb-0">Shelves Configuration</h3>
+            <p class="section-description mb-0">
+              Add and configure shelves with device assignments
+            </p>
+          </div>
+          <button
+            type="button"
+            pButton
+            label="Add Shelf"
+            icon="pi pi-plus"
+            (click)="addShelf()"
+            *ngIf="canEdit()"
+            class="p-button-outlined"
+          ></button>
+        </div>
+
+        <!-- Shelves List -->
+        <div *ngIf="shelves.length > 0" class="space-y-4">
+          <p-accordion>
+            <p-accordionTab
+              *ngFor="let shelf of shelves.controls; let shelfIdx = index"
+              [header]="'Shelf ' + (shelfIdx + 1)"
+            >
+              <!-- Shelf Header -->
+              <ng-template pTemplate="header">
+                <div class="shelf-header-content">
+                  <div class="shelf-header-info">
+                    <span class="shelf-header-title">
+                      <i class="pi pi-box mr-2"></i>
+                      {{
+                        getShelfFormGroup(shelfIdx).get("name")?.value ||
+                          "Shelf " + (shelfIdx + 1)
+                      }}
+                    </span>
+                    <span class="shelf-header-meta">
+                      {{
+                        getShelfFormGroup(shelfIdx).get("location")?.value ||
+                          "No location"
+                      }}
+                      <span *ngIf="getDeviceCount(shelfIdx) > 0" class="ml-2">
+                        • {{ getDeviceCount(shelfIdx) }} device assignment(s)
+                      </span>
+                    </span>
+                  </div>
+                  <div class="shelf-header-badges">
+                    <span
+                      [class]="
+                        getShelfFormGroup(shelfIdx).get('isActive')?.value
+                          ? 'status-indicator active'
+                          : 'status-indicator inactive'
+                      "
+                    >
+                      {{
+                        getShelfFormGroup(shelfIdx).get("isActive")?.value
+                          ? "Active"
+                          : "Inactive"
+                      }}
+                    </span>
+                  </div>
+                </div>
+              </ng-template>
+
+              <!-- Shelf Content -->
+              <div [formGroup]="getShelfFormGroup(shelfIdx)" class="space-y-6">
+                <!-- Basic Shelf Info -->
+                <div>
+                  <h4
+                    class="text-sm font-semibold text-gray-700 uppercase tracking-wide mb-4"
+                  >
+                    Basic Information
+                  </h4>
+
+                  <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <!-- Shelf Name -->
+                    <div>
+                      <label class="field-label">
+                        Shelf Name <span class="required">*</span>
+                      </label>
+                      <input
+                        type="text"
+                        pInputText
+                        formControlName="name"
+                        placeholder="Enter shelf name"
+                        class="w-full"
+                      />
+                      <small
+                        class="p-error"
+                        *ngIf="getShelfFieldError(shelfIdx, 'name')"
+                      >
+                        {{ getShelfFieldError(shelfIdx, "name") }}
+                      </small>
+                    </div>
+
+                    <!-- Location -->
+                    <div>
+                      <label class="field-label">
+                        Location <span class="required">*</span>
+                      </label>
+                      <input
+                        type="text"
+                        pInputText
+                        formControlName="location"
+                        placeholder="e.g., Level 2 - Section A"
+                        class="w-full"
+                      />
+                      <small
+                        class="p-error"
+                        *ngIf="getShelfFieldError(shelfIdx, 'location')"
+                      >
+                        {{ getShelfFieldError(shelfIdx, "location") }}
+                      </small>
+                    </div>
+
+                    <!-- Coordinates -->
+                    <div>
+                      <label class="field-label">Coordinates</label>
+                      <input
+                        type="text"
+                        pInputText
+                        formControlName="coordinates"
+                        placeholder="e.g., x:15, y:25"
+                        class="w-full"
+                      />
+                    </div>
+
+                    <!-- Description -->
+                    <div>
+                      <label class="field-label">Description</label>
+                      <input
+                        type="text"
+                        pInputText
+                        formControlName="description"
+                        placeholder="Brief description"
+                        class="w-full"
+                      />
+                    </div>
+
+                    <!-- Status -->
+                    <div class="flex items-center pt-6">
+                      <p-checkbox
+                        formControlName="isActive"
+                        [binary]="true"
+                        [inputId]="'shelfActive' + shelfIdx"
+                        styleClass="mr-2"
+                      ></p-checkbox>
+                      <label
+                        [for]="'shelfActive' + shelfIdx"
+                        class="text-sm text-gray-700 cursor-pointer"
+                      >
+                        Active
+                      </label>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Device Assignments Section -->
+                <div>
+                  <div class="flex justify-between items-center mb-4">
+                    <h4
+                      class="text-sm font-semibold text-gray-700 uppercase tracking-wide"
+                    >
+                      Device Assignments
+                    </h4>
+                  </div>
+
+                  <!-- Combo Type Selection -->
+                  <div class="mb-4">
+                    <label class="field-label mb-3">Combo Type</label>
+                    <p-selectButton
+                      [options]="comboModeOptions"
+                      [ngModel]="getShelfComboMode(shelfIdx)"
+                      [ngModelOptions]="{ standalone: true }"
+                      (onChange)="setShelfComboMode(shelfIdx, $event.value)"
+                      optionLabel="label"
+                      optionValue="value"
+                    >
+                      <ng-template let-item pTemplate="item">
+                        <div class="flex items-center gap-2">
+                          <i [class]="item.icon"></i>
+                          <span>{{ item.label }}</span>
+                        </div>
+                      </ng-template>
+                    </p-selectButton>
+                  </div>
+
+                  <!-- Existing Combos Selection -->
+                  <div
+                    *ngIf="canEdit() && selectedStore"
+                    class="info-card mb-4"
+                  >
+                    <h4 class="info-card-header">Select Existing Combos</h4>
+                    <p class="text-sm text-gray-600 mb-4">
+                      Select from existing
+                      {{
+                        getShelfComboMode(shelfIdx) === "device-template"
+                          ? "device-template"
+                          : "device-message"
+                      }}
+                      combos
+                    </p>
+
+                    <p-multiSelect
+                      [options]="
+                        getShelfComboMode(shelfIdx) === 'device-template'
+                          ? existingCombos
+                          : existingMessageCombos
+                      "
+                      [ngModel]="selectedExistingCombos.get(shelfIdx) || []"
+                      (ngModelChange)="
+                        selectedExistingCombos.set(shelfIdx, $event)
+                      "
+                      [ngModelOptions]="{ standalone: true }"
+                      optionLabel="deviceName"
+                      [filter]="true"
+                      [virtualScroll]="true"
+                      [virtualScrollItemSize]="65"
+                      [scrollHeight]="'250px'"
+                      [showToggleAll]="true"
+                      placeholder="Search and select combos..."
+                      styleClass="w-full mb-3"
+                      [loading]="
+                        getShelfComboMode(shelfIdx) === 'device-template'
+                          ? existingComboLoading
+                          : existingMessageComboLoading
+                      "
+                    >
+                      <!-- Loading template -->
+                      <ng-template pTemplate="loading">
+                        <div class="p-3 text-center text-gray-500">
+                          <i class="pi pi-spinner pi-spin mr-2"></i>
+                          Loading combos...
+                        </div>
+                      </ng-template>
+
+                      <!-- Empty template -->
+                      <ng-template pTemplate="empty">
+                        <div class="p-4 text-center text-gray-500">
+                          <i
+                            class="pi pi-inbox text-2xl text-gray-400 block mb-2"
+                          ></i>
+                          <p class="text-sm">No existing combos found</p>
+                        </div>
+                      </ng-template>
+
+                      <!-- Item template -->
+                      <ng-template let-combo pTemplate="item">
+                        <div class="combo-item-template">
+                          <div class="combo-header">
+                            <span class="device-name">{{
+                              combo.deviceName
+                            }}</span>
+                            <span class="device-mac"
+                              >({{ combo.deviceMAC || "No MAC" }})</span
+                            >
+                            <span
+                              [class]="
+                                combo.isDefault
+                                  ? 'default-badge'
+                                  : 'normal-badge'
+                              "
+                            >
+                              {{ combo.isDefault ? "Default" : "Normal" }}
+                            </span>
+                          </div>
+
+                          <div class="combo-details">
+                            <div class="template-info">
+                              <i class="pi pi-file"></i>
+                              <span>{{
+                                getShelfComboMode(shelfIdx) ===
+                                "device-template"
+                                  ? combo.templateName
+                                  : combo.messageTitle
+                              }}</span>
+                            </div>
+                            <div
+                              class="specs-info"
+                              *ngIf="
+                                getShelfComboMode(shelfIdx) ===
+                                  'device-template' &&
+                                combo.screenWidth &&
+                                combo.screenHeight
+                              "
+                            >
+                              <span>
+                                <i class="pi pi-expand"></i>
+                                {{ combo.screenWidth }}×{{ combo.screenHeight }}
+                              </span>
+                              <span *ngIf="combo.battery">
+                                <i class="pi pi-battery"></i>
+                                {{ combo.battery }}%
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                      </ng-template>
+
+                      <!-- Custom chip template -->
+                      <ng-template let-value pTemplate="chip">
+                        <div class="dlg-badge">
+                          <span>{{ value?.deviceName }}</span>
+                        </div>
+                      </ng-template>
+                    </p-multiSelect>
+
+                    <div class="flex justify-end">
+                      <button
+                        type="button"
+                        pButton
+                        label="Add Selected Combos"
+                        icon="pi pi-plus"
+                        [disabled]="
+                          !selectedExistingCombos.get(shelfIdx) ||
+                          selectedExistingCombos.get(shelfIdx)?.length === 0
+                        "
+                        (click)="addSelectedExistingCombosToShelf(shelfIdx)"
+                        class="p-button-text p-button-success"
+                      ></button>
+                    </div>
+                  </div>
+
+                  <!-- Device Combos List -->
+                  <div formArrayName="deviceCombos">
+                    <div
+                      *ngFor="
+                        let combo of getShelfCombos(shelfIdx).controls;
+                        let comboIdx = index
+                      "
+                      [formGroupName]="comboIdx"
+                      class="assignment-card mb-3"
+                    >
+                      <!-- Assignment Header -->
+                      <div class="assignment-header">
+                        <div class="assignment-title">
+                          <i class="pi pi-sliders-h"></i>
+                          Assignment {{ comboIdx + 1 }}
+                        </div>
+
+                        <button
+                          *ngIf="canEdit()"
+                          type="button"
+                          pButton
+                          icon="pi pi-trash"
+                          class="p-button-text p-button-danger p-button-sm"
+                          (click)="
+                            removeDeviceComboFromShelf(shelfIdx, comboIdx)
+                          "
+                          pTooltip="Remove Assignment"
+                        ></button>
+                      </div>
+
+                      <!-- Device and Template/Message Selection -->
+                      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                        <!-- Device -->
+                        <div>
+                          <label class="field-label">
+                            Device <span class="required">*</span>
+                          </label>
+                          <p-dropdown
+                            formControlName="deviceId"
+                            [options]="filteredDevices"
+                            optionLabel="deviceName"
+                            optionValue="id"
+                            placeholder="Select a device"
+                            [filter]="true"
+                            filterBy="deviceName,mac"
+                            [showClear]="true"
+                            [loading]="isDevicesLoading"
+                            styleClass="w-full"
+                          >
+                            <ng-template let-device pTemplate="item">
+                              <div class="py-2">
+                                <div class="font-medium text-sm">
+                                  {{ device.deviceName }}
+                                </div>
+                                <div class="text-xs text-gray-500 mt-0.5">
+                                  {{ device.mac || "No MAC" }}
+                                </div>
+                              </div>
+                            </ng-template>
+                          </p-dropdown>
+                          <small
+                            class="p-error"
+                            *ngIf="
+                              getDeviceComboFieldError(
+                                shelfIdx,
+                                comboIdx,
+                                'deviceId'
+                              )
+                            "
+                          >
+                            {{
+                              getDeviceComboFieldError(
+                                shelfIdx,
+                                comboIdx,
+                                "deviceId"
+                              )
+                            }}
+                          </small>
+                        </div>
+
+                        <!-- Template (for device-template mode) -->
+                        <div
+                          *ngIf="
+                            getShelfComboMode(shelfIdx) === 'device-template'
+                          "
+                        >
+                          <label class="field-label">
+                            Template <span class="required">*</span>
+                          </label>
+                          <p-dropdown
+                            formControlName="templateId"
+                            [options]="filteredTemplates"
+                            optionLabel="name"
+                            optionValue="id"
+                            placeholder="Select a template"
+                            [filter]="true"
+                            [showClear]="true"
+                            [loading]="isTemplatesLoading"
+                            styleClass="w-full"
+                          >
+                            <ng-template let-template pTemplate="item">
+                              <div class="py-2">
+                                <div class="font-medium text-sm">
+                                  {{ template.name }}
+                                </div>
+                                <div class="text-xs text-gray-500 mt-0.5">
+                                  {{ template.screenWidth }}×{{
+                                    template.screenHeight
+                                  }}
+                                  <span *ngIf="template.screenInch">
+                                    ({{ template.screenInch }}")</span
+                                  >
+                                </div>
+                              </div>
+                            </ng-template>
+                          </p-dropdown>
+                          <small
+                            class="p-error"
+                            *ngIf="
+                              getDeviceComboFieldError(
+                                shelfIdx,
+                                comboIdx,
+                                'templateId'
+                              )
+                            "
+                          >
+                            {{
+                              getDeviceComboFieldError(
+                                shelfIdx,
+                                comboIdx,
+                                "templateId"
+                              )
+                            }}
+                          </small>
+                        </div>
+
+                        <!-- Message (for device-message mode) -->
+                        <div
+                          *ngIf="
+                            getShelfComboMode(shelfIdx) === 'device-message'
+                          "
+                        >
+                          <label class="field-label">
+                            Message <span class="required">*</span>
+                          </label>
+                          <p-dropdown
+                            formControlName="messageId"
+                            [options]="messages"
+                            optionLabel="title"
+                            optionValue="id"
+                            placeholder="Select a message"
+                            [filter]="true"
+                            [showClear]="true"
+                            [loading]="messageLoading"
+                            styleClass="w-full"
+                          >
+                            <ng-template let-message pTemplate="item">
+                              <div class="py-2">
+                                <div class="font-medium text-sm">
+                                  {{ message.title }}
+                                </div>
+                                <div class="text-xs text-gray-500 mt-0.5">
+                                  {{
+                                    getContentTypeString(message.contentType)
+                                  }}
+                                  <span *ngIf="message.duration">
+                                    • {{ message.duration }}s</span
+                                  >
+                                </div>
+                              </div>
+                            </ng-template>
+                          </p-dropdown>
+                          <small
+                            class="p-error"
+                            *ngIf="
+                              getDeviceComboFieldError(
+                                shelfIdx,
+                                comboIdx,
+                                'messageId'
+                              )
+                            "
+                          >
+                            {{
+                              getDeviceComboFieldError(
+                                shelfIdx,
+                                comboIdx,
+                                "messageId"
+                              )
+                            }}
+                          </small>
+                        </div>
+
+                        <!-- Display Order -->
+                        <div>
+                          <label class="field-label">Display Order</label>
+                          <p-inputNumber
+                            formControlName="displayOrder"
+                            [min]="1"
+                            mode="decimal"
+                            [showButtons]="true"
+                            styleClass="w-full"
+                          ></p-inputNumber>
+                        </div>
+
+                        <!-- Status Checkboxes -->
+                        <div class="flex items-center gap-6 pt-4">
+                          <div class="flex items-center gap-2">
+                            <p-checkbox
+                              formControlName="isActive"
+                              [binary]="true"
+                              [inputId]="
+                                'comboActive' + shelfIdx + '_' + comboIdx
+                              "
+                            ></p-checkbox>
+                            <label
+                              [for]="'comboActive' + shelfIdx + '_' + comboIdx"
+                              class="text-sm text-gray-700 cursor-pointer"
+                              >Active</label
+                            >
+                          </div>
+
+                          <div
+                            *ngIf="
+                              getShelfComboMode(shelfIdx) === 'device-template'
+                            "
+                            class="flex items-center gap-2"
+                          >
+                            <p-checkbox
+                              formControlName="isDefault"
+                              [binary]="true"
+                              [inputId]="
+                                'comboDefault' + shelfIdx + '_' + comboIdx
+                              "
+                            ></p-checkbox>
+                            <label
+                              [for]="'comboDefault' + shelfIdx + '_' + comboIdx"
+                              class="text-sm text-gray-700 cursor-pointer"
+                              >Default</label
+                            >
+                          </div>
+                        </div>
+                      </div>
+
+                      <!-- Preview Section -->
+                      <div
+                        *ngIf="
+                          combo.get('deviceId')?.value &&
+                          (getShelfComboMode(shelfIdx) === 'device-template'
+                            ? combo.get('templateId')?.value
+                            : combo.get('messageId')?.value)
+                        "
+                        class="preview-section"
+                      >
+                        <h6 class="preview-title">Assignment Preview</h6>
+                        <div class="preview-content">
+                          <div>
+                            <p class="preview-item-label">Device Information</p>
+                            <div class="preview-item-value">
+                              <span>{{
+                                getDeviceName(combo.get("deviceId")?.value)
+                              }}</span>
+                              <p-tag
+                                [value]="
+                                  getDeviceStatus(combo.get('deviceId')?.value)
+                                "
+                                [severity]="
+                                  getDeviceStatus(
+                                    combo.get('deviceId')?.value
+                                  ) === 'online'
+                                    ? 'success'
+                                    : 'warning'
+                                "
+                              >
+                              </p-tag>
+                            </div>
+                          </div>
+                          <div>
+                            <p class="preview-item-label">
+                              {{
+                                getShelfComboMode(shelfIdx) ===
+                                "device-template"
+                                  ? "Template Information"
+                                  : "Message Information"
+                              }}
+                            </p>
+                            <div class="preview-item-value">
+                              <span>
+                                {{
+                                  getShelfComboMode(shelfIdx) ===
+                                  "device-template"
+                                    ? getTemplateName(
+                                        combo.get("templateId")?.value
+                                      )
+                                    : getMessageTitle(
+                                        combo.get("messageId")?.value
+                                      )
+                                }}
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Add Device Combo Button -->
+                  <div class="pt-2">
+                    <button
+                      *ngIf="canEdit()"
+                      type="button"
+                      pButton
+                      label="Add Device Assignment"
+                      icon="pi pi-plus"
+                      (click)="addDeviceComboToShelf(shelfIdx)"
+                      class="p-button-outlined w-full"
+                    ></button>
+                  </div>
+
+                  <!-- Empty State for Combos -->
+                  <div
+                    *ngIf="getDeviceCount(shelfIdx) === 0"
+                    class="empty-state mt-4"
+                  >
+                    <i class="pi pi-inbox"></i>
+                    <p class="empty-state-title">No device assignments</p>
+                    <p class="empty-state-description">
+                      Add device assignments to this shelf
+                    </p>
+                  </div>
+                </div>
+
+                <!-- Remove Shelf Button -->
+                <div class="pt-4 border-t border-gray-200">
+                  <button
+                    type="button"
+                    pButton
+                    label="Remove Shelf"
+                    icon="pi pi-trash"
+                    (click)="removeShelf(shelfIdx)"
+                    *ngIf="canEdit()"
+                    class="p-button-text p-button-danger"
+                  ></button>
+                </div>
+              </div>
+            </p-accordionTab>
+          </p-accordion>
+        </div>
+
+        <!-- Empty State for Shelves -->
+        <div *ngIf="shelves.length === 0" class="empty-state">
+          <i class="pi pi-inbox"></i>
+          <p class="empty-state-title">No shelves added</p>
+          <p class="empty-state-description">
+            Add shelves to organize your rack
+          </p>
+          <button
+            type="button"
+            pButton
+            label="Add Your First Shelf"
+            icon="pi pi-plus"
+            (click)="addShelf()"
+            *ngIf="canEdit()"
+            class="p-button-outlined"
+          ></button>
+        </div>
+      </div>
+    </div>
+  </form>
+
+  <!-- Footer -->
+  <ng-template pTemplate="footer">
+    <div class="flex items-center justify-between w-full">
+      <!-- Left side: Cancel button -->
+      <button
+        type="button"
+        pButton
+        label="Cancel"
+        icon="pi pi-times"
+        (click)="onCancel()"
+        class="p-button-text"
+      ></button>
+
+      <!-- Right side: Navigation and Submit buttons -->
+      <div class="flex gap-2">
+        <button
+          type="button"
+          pButton
+          label="Previous"
+          icon="pi pi-chevron-left"
+          *ngIf="activeTabIndex > 0"
+          (click)="goToPreviousTab()"
+          class="p-button-outlined"
+        ></button>
+
+        <button
+          type="button"
+          pButton
+          label="Next"
+          icon="pi pi-chevron-right"
+          iconPos="right"
+          *ngIf="activeTabIndex < 1"
+          (click)="goToNextTab()"
+          class="p-button-outlined"
+        ></button>
+
+        <button
+          type="submit"
+          pButton
+          label="Create Rack"
+          icon="pi pi-plus"
+          (click)="onSubmit()"
+          [disabled]="rackForm.invalid || isSubmitting"
+          [loading]="isSubmitting"
+          *ngIf="canEdit()"
+          class="p-button-primary"
+        ></button>
+      </div>
+    </div>
+  </ng-template>
+</p-dialog>
+
+<!-- Confirmation Dialog -->
+<p-confirmDialog></p-confirmDialog>

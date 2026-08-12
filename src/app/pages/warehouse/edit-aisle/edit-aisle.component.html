@@ -1,0 +1,193 @@
+<div class="dlg-shell">
+  <!-- Header -->
+  <div class="dlg-header">
+    <div>
+      <h2 class="dlg-title">Edit Rack</h2>
+      <p class="dlg-subtitle">Update rack information and configuration</p>
+    </div>
+    <button
+      type="button"
+      (click)="onCancel()"
+      class="dlg-close"
+      aria-label="Close dialog"
+    >
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M6 18L18 6M6 6l12 12"
+        ></path>
+      </svg>
+    </button>
+  </div>
+
+  <form
+    [formGroup]="aisleForm"
+    (ngSubmit)="onSubmit()"
+    class="flex flex-col flex-1 min-h-0"
+  >
+    <!-- Content -->
+    <div class="dlg-body">
+      <!-- Aisle Basic Information -->
+      <div class="dlg-section">
+        <h3 class="dlg-section-title">Basic Information</h3>
+
+        <div class="dlg-grid">
+          <!-- Name -->
+          <div class="dlg-field">
+            <label class="dlg-label">
+              Rack Name <span class="dlg-req">*</span>
+            </label>
+            <input
+              type="text"
+              formControlName="name"
+              class="dlg-input"
+              placeholder="Enter aisle name"
+              [class.is-invalid]="
+                aisleForm.get('name')?.invalid && aisleForm.get('name')?.touched
+              "
+            />
+            <p class="dlg-error" *ngIf="getFieldError('name')">
+              {{ getFieldError('name') }}
+            </p>
+          </div>
+
+          <!-- Location -->
+          <div class="dlg-field">
+            <label class="dlg-label">
+              Location <span class="dlg-req">*</span>
+            </label>
+            <input
+              type="text"
+              formControlName="location"
+              class="dlg-input"
+              placeholder="e.g., Ground Floor - Left"
+              [class.is-invalid]="
+                aisleForm.get('location')?.invalid &&
+                aisleForm.get('location')?.touched
+              "
+            />
+            <p class="dlg-error" *ngIf="getFieldError('location')">
+              {{ getFieldError('location') }}
+            </p>
+          </div>
+
+          <!-- Description -->
+          <div class="dlg-field">
+            <label class="dlg-label">Description</label>
+            <input
+              type="text"
+              formControlName="description"
+              class="dlg-input"
+              placeholder="e.g., Fresh Produce Section"
+            />
+          </div>
+
+          <!-- Coordinates -->
+          <div class="dlg-field">
+            <label class="dlg-label">Coordinates</label>
+            <input
+              type="text"
+              formControlName="coordinates"
+              class="dlg-input"
+              placeholder="e.g., x:10, y:20"
+            />
+          </div>
+        </div>
+      </div>
+
+      <!-- Network Configuration -->
+      <!-- <div class="dlg-section">
+        <h3 class="dlg-section-title">Network Configuration</h3>
+
+        <div class="dlg-grid">
+          <div class="dlg-field">
+            <label class="dlg-label">IP Address</label>
+            <input
+              type="text"
+              formControlName="ipAddress"
+              class="dlg-input"
+              placeholder="192.168.1.10"
+              [class.is-invalid]="aisleForm.get('ipAddress')?.invalid && aisleForm.get('ipAddress')?.touched">
+            <p class="dlg-error" *ngIf="getFieldError('ipAddress')">
+              {{ getFieldError('ipAddress') }}
+            </p>
+          </div>
+
+          <div class="dlg-field">
+            <label class="dlg-label">Network Name</label>
+            <input
+              type="text"
+              formControlName="networkName"
+              class="dlg-input"
+              placeholder="AISLE_NET_01">
+          </div>
+
+          <div class="dlg-field">
+            <label class="dlg-label">Device Name</label>
+            <input
+              type="text"
+              formControlName="deviceName"
+              class="dlg-input"
+              placeholder="Device name">
+          </div>
+
+          <div class="dlg-field">
+            <label class="dlg-label">MAC Address</label>
+            <input
+              type="text"
+              formControlName="macAddress"
+              class="dlg-input"
+              placeholder="MAC Address">
+          </div>
+        </div>
+      </div> -->
+
+      <!-- Status -->
+      <div class="dlg-section">
+        <h3 class="dlg-section-title">Status</h3>
+
+        <div class="dlg-check-row">
+          <input type="checkbox" formControlName="isActive" id="aisleActive" />
+          <label for="aisleActive" class="dlg-check-label">Rack Active</label>
+        </div>
+      </div>
+
+      <!-- Shelves Management Section -->
+      <!-- <div class="dlg-section">
+        <div class="flex items-center justify-between">
+          <h3 class="dlg-section-title">Associated Shelves</h3>
+          <button
+            type="button"
+            (click)="openShelfManager()"
+            class="dlg-btn dlg-btn-secondary">
+            <i class="fas fa-cog"></i>
+            Manage Shelves
+          </button>
+        </div>
+      </div> -->
+    </div>
+
+    <!-- Footer -->
+    <div class="dlg-footer">
+      <button
+        type="button"
+        (click)="onCancel()"
+        class="dlg-btn dlg-btn-secondary"
+      >
+        Cancel
+      </button>
+      <button
+        type="submit"
+        (click)="onSubmit()"
+        [disabled]="aisleForm.invalid || isSubmitting"
+        class="dlg-btn dlg-btn-primary"
+      >
+        <i class="fas fa-spinner fa-spin" *ngIf="isSubmitting"></i>
+        <i class="fas fa-save" *ngIf="!isSubmitting"></i>
+        {{ isSubmitting ? 'Updating...' : 'Update Rack' }}
+      </button>
+    </div>
+  </form>
+</div>

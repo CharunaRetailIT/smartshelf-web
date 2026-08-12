@@ -1,0 +1,122 @@
+/* user-edit-dialog.component.css */
+
+/* Custom scrollbar for better UX */
+.flex-1.overflow-y-auto::-webkit-scrollbar {
+  width: 8px;
+}
+
+.flex-1.overflow-y-auto::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-radius: 4px;
+}
+
+.flex-1.overflow-y-auto::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 4px;
+}
+
+.flex-1.overflow-y-auto::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* Focus states for better accessibility */
+input:focus,
+select:focus,
+textarea:focus {
+  outline: none;
+  ring: 2px;
+  ring-color: var(--dlg-primary);
+  border-color: var(--dlg-accent);
+}
+
+/* Animation for the spinning loader */
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-spin {
+  animation: spin 1s linear infinite;
+}
+
+/* Enhanced button hover states */
+button:hover {
+  transition: all 0.2s ease-in-out;
+}
+
+/* Custom validation error styling */
+.border-red-500 {
+  border-color: #ef4444 !important;
+}
+
+/* Success and error snackbar styles (to be used globally) */
+::ng-deep .success-snackbar {
+  background-color: #10b981 !important;
+  color: white !important;
+}
+
+::ng-deep .error-snackbar {
+  background-color: #ef4444 !important;
+  color: white !important;
+}
+
+::ng-deep .success-snackbar .mat-simple-snack-bar-action {
+  color: white !important;
+}
+
+::ng-deep .error-snackbar .mat-simple-snack-bar-action {
+  color: white !important;
+}
+
+/* Material dialog overlay customization */
+::ng-deep .cdk-overlay-pane {
+  max-width: 90vw !important;
+  max-height: 90vh !important;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .grid-cols-1.md\\:grid-cols-2 {
+    grid-template-columns: 1fr;
+  }
+  
+  .max-w-2xl {
+    max-width: 95vw;
+    margin: 0 10px;
+  }
+}
+
+/* Enhanced focus ring for accessibility */
+button:focus-visible {
+  outline: 2px solid var(--dlg-accent);
+  outline-offset: 2px;
+}
+
+/* Disabled state improvements */
+button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Form section styling */
+.space-y-4 > * + * {
+  margin-top: 1rem;
+}
+
+.space-y-2 > * + * {
+  margin-top: 0.5rem;
+}
+
+/* Icon styling */
+svg {
+  flex-shrink: 0;
+}
+
+/* Info box styling enhancement */
+.bg-blue-50 {
+  background-color: #ecfdf5;
+}

@@ -1,0 +1,208 @@
+  <p-toast />
+    
+    <div class="settings-container">
+      <!-- Header Section -->
+      <!-- <div class="header-section">
+        <div class="header-content">
+          <i class="pi pi-cog header-icon"></i>
+          <div>
+            <h1 class="header-title">Settings</h1>
+            <p class="header-subtitle">Manage your application preferences and configurations</p>
+          </div>
+        </div>
+      </div> -->
+
+      <div class="bg-white rounded-lg shadow-sm border border-gray-200 mb-6 p-6">
+  <div class="flex items-center justify-between">
+    <!-- Left content -->
+    <div class="flex items-center space-x-3">
+      <i class="pi pi-cog text-blue-600 text-2xl"></i>
+      <div>
+        <h1 class="text-2xl font-bold text-secondary-dark">Settings</h1>
+        <p class="text-secondary-light">Manage your application preferences and configurations</p>
+      </div>
+    </div>
+    
+    <!-- Right button with consistent styling -->
+    <div class="flex space-x-4">
+
+    </div>
+  </div>
+</div>
+
+      <!-- Main Content Grid -->
+      <div class="settings-grid">
+        
+        <!-- Store Settings Card -->
+        <p-card styleClass="store-settings-card">
+          <ng-template pTemplate="header">
+            <div class="card-header-content">
+              <i class="pi pi-building card-icon"></i>
+              <div>
+                <h2 class="card-title">Store Configuration</h2>
+                <p class="card-description">Set your default store for application-wide operations</p>
+              </div>
+            </div>
+          </ng-template>
+
+          <div class="card-body">
+            <!-- Current Default Store Display -->
+            <div *ngIf="currentDefaultStore" class="current-store-banner">
+              <div class="banner-content">
+                <i class="pi pi-check-circle banner-icon"></i>
+                <div class="banner-text">
+                  <span class="banner-label">Active Default Store</span>
+                  <span class="banner-value">{{ currentDefaultStore.storeName }}</span>
+                  <span class="banner-detail">{{ currentDefaultStore.address }}</span>
+                </div>
+              </div>
+              <p-button 
+              *ngIf="this.auth.hasAnyRole(['Admin','Manager'])"
+                icon="pi pi-times"
+                label="Clear"
+                severity="danger"
+                [outlined]="true"
+                size="small"
+                (onClick)="clearDefaultStore()" />
+            </div>
+
+            <!-- Store Selection -->
+            <div class="form-field">
+              <label for="storeSelect" class="field-label">
+                <i class="pi pi-map-marker"></i>
+                Select Default Store
+              </label>
+              <p-select
+                inputId="storeSelect"
+                [options]="stores"
+                [(ngModel)]="selectedStore"
+                optionLabel="storeName"
+                [filter]="true"
+                filterBy="storeName,storeCode,address"
+                [virtualScroll]="true"
+                [virtualScrollItemSize]="50"
+                [lazy]="true"
+                (onLazyLoad)="onLazyLoad($event)"
+                placeholder="Choose a store..."
+                [showClear]="true"
+                [disabled]="initialLoading"
+                styleClass="w-full"
+                (onChange)="onStoreChange()"
+                [disabled]="initialLoading || !auth.hasAnyRole(['Admin','Manager'])">
+                
+                <ng-template pTemplate="item" let-store>
+                  <div class="store-option">
+                    <div class="store-option-main">
+                      <i class="pi pi-building store-option-icon"></i>
+                      <div class="store-option-text">
+                        <span class="store-option-name">{{ store.storeName }}</span>
+                        <span class="store-option-code" *ngIf="store.storeCode">{{ store.storeCode }}</span>
+                      </div>
+                    </div>
+                    <span class="store-option-address">{{ store.address }}</span>
+                  </div>
+                </ng-template>
+
+                <ng-template pTemplate="loader">
+                  <div class="dropdown-loader">
+                    <i class="pi pi-spin pi-spinner"></i>
+                    <span>Loading more stores...</span>
+                  </div>
+                </ng-template>
+
+                <ng-template pTemplate="empty">
+                  <div class="dropdown-empty">
+                    <i class="pi pi-inbox"></i>
+                    <span>No stores found</span>
+                  </div>
+                </ng-template>
+              </p-select>
+              <small class="field-hint">
+                This store will be automatically selected throughout the application
+              </small>
+            </div>
+
+            <!-- Initial Loading State -->
+            <div *ngIf="initialLoading" class="loading-state">
+              <p-progressSpinner 
+                styleClass="custom-spinner"
+                strokeWidth="3"
+                [style]="{ width: '40px', height: '40px' }" />
+              <span>Loading stores...</span>
+            </div>
+
+            <!-- No Stores Message -->
+            <p-message 
+              *ngIf="!initialLoading && stores.length === 0" 
+              severity="warn" 
+              text="No stores available. Please add stores first." 
+              styleClass="w-full mt-3" />
+          </div>
+
+          <ng-template pTemplate="footer">
+            <div class="card-footer-actions">
+              <p-button 
+                label="Manage Stores"
+                icon="pi pi-building"
+                (onClick)="navigateToStoreManagement()"
+                [outlined]="true" />
+            </div>
+          </ng-template>
+        </p-card>
+
+        <!-- Application Settings Card -->
+        <p-card>
+          <ng-template pTemplate="header">
+            <div class="card-header-content">
+              <i class="pi pi-sliders-h card-icon"></i>
+              <div>
+                <h2 class="card-title">Application Settings</h2>
+                <p class="card-description">Configure general application behavior</p>
+              </div>
+            </div>
+          </ng-template>
+
+          <div class="coming-soon-content">
+            <i class="pi pi-clock coming-soon-icon"></i>
+            <p>Additional settings will be available soon</p>
+          </div>
+        </p-card>
+
+        <!-- Preferences Card -->
+        <p-card>
+          <ng-template pTemplate="header">
+            <div class="card-header-content">
+              <i class="pi pi-palette card-icon"></i>
+              <div>
+                <h2 class="card-title">User Preferences</h2>
+                <p class="card-description">Customize your experience</p>
+              </div>
+            </div>
+          </ng-template>
+
+          <div class="coming-soon-content">
+            <i class="pi pi-clock coming-soon-icon"></i>
+            <p>Preference configuration coming soon</p>
+          </div>
+        </p-card>
+
+        <!-- System Information Card -->
+        <p-card>
+          <ng-template pTemplate="header">
+            <div class="card-header-content">
+              <i class="pi pi-info-circle card-icon"></i>
+              <div>
+                <h2 class="card-title">System Information</h2>
+                <p class="card-description">View system details and diagnostics</p>
+              </div>
+            </div>
+          </ng-template>
+
+          <div class="coming-soon-content">
+            <i class="pi pi-clock coming-soon-icon"></i>
+            <p>System information coming soon</p>
+          </div>
+        </p-card>
+
+      </div>
+    </div>

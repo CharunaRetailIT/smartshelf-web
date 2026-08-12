@@ -1,0 +1,49 @@
+#addUserButton {
+  /* background-color: #2563eb;
+  color: #fff; */
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  display: flex;
+  align-items: center;
+  transition: background-color 0.2s, color 0.2s;
+}
+
+/* @keyframes modalAppear {
+  from {
+    opacity: 0;
+    transform: scale(0.9) translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.z-50 {
+  z-index: 50;
+}
+
+button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+button:active {
+  transform: translateY(0);
+}
+
+/* Smooth backdrop animation */
+.fixed.inset-0 {
+  animation: backdropFade 0.3s ease-out;
+}
+
+@keyframes backdropFade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+} 
+/* 
+body {
+  font-family: 'Segoe UI'!important;
+} */
+/* .bg-gray-50 { background-color: #f9fafb; } */
+/*  */

@@ -1,0 +1,954 @@
+<!-- minew-batch-add.component.html - Enhanced Version -->
+
+<!-- Batch Add Dialog -->
+<p-dialog
+  [(visible)]="displayDialog"
+  [modal]="true"
+  [style]="{ width: '1000px', maxHeight: '90vh' }"
+  [draggable]="false"
+  [resizable]="false"
+  [closable]="!isProcessing"
+  appendTo="body"
+  styleClass="batch-add-dialog"
+>
+  <!-- Dialog Header -->
+  <ng-template pTemplate="header">
+    <div class="flex items-center gap-3">
+      <div
+        class="w-10 h-10 rounded-full bg-gradient-to-br from-emerald-600 to-emerald-700 flex items-center justify-center"
+      >
+        <i class="pi pi-cloud-upload text-white text-lg"></i>
+      </div>
+      <div>
+        <h2 class="text-xl font-bold text-gray-800 m-0">
+          Batch Add Minew Devices
+        </h2>
+        <p class="text-sm text-gray-500 m-0">
+          Import multiple devices efficiently
+        </p>
+      </div>
+    </div>
+  </ng-template>
+
+  <!-- Dialog Content -->
+  <div class="dialog-content-wrapper">
+    <!-- Store Configuration Section -->
+    <div class="mb-6 fade-in">
+      <div class="flex items-center gap-2 mb-4">
+        <i class="pi pi-cog text-emerald-700 text-lg"></i>
+        <h3 class="text-lg font-semibold text-gray-800 m-0">
+          Store Configuration
+        </h3>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <!-- Minew Store Selection -->
+        <div class="form-group">
+          <label
+            class="block mb-2 font-medium text-gray-700 flex items-center gap-2"
+          >
+            <i class="pi pi-building text-sm"></i>
+            Minew Store *
+          </label>
+          <p-dropdown
+            [options]="stores"
+            [(ngModel)]="selectedStore"
+            placeholder="Select Store"
+            optionLabel="storeName"
+            optionValue="storeId"
+            [filter]="true"
+            class="w-full"
+            [disabled]="isProcessing"
+            [showClear]="true"
+          >
+          </p-dropdown>
+          <small class="text-gray-500 mt-1 block">
+            <i class="pi pi-info-circle text-xs"></i>
+            Select the Minew cloud store where devices will be added
+          </small>
+        </div>
+
+        <!-- Device Type Selection -->
+        <div class="form-group">
+          <label
+            class="block mb-2 font-medium text-gray-700 flex items-center gap-2"
+          >
+            <i class="pi pi-box text-sm"></i>
+            Device Type
+          </label>
+          <p-dropdown
+            [(ngModel)]="deviceType"
+            [options]="[
+              { label: '🏷️ ESL Tag', value: 1 },
+              { label: '⚠️ Warning Light', value: 5 },
+            ]"
+            placeholder="Select Type"
+            class="w-full"
+            [disabled]="isProcessing"
+          >
+          </p-dropdown>
+        </div>
+      </div>
+
+      <!-- Current Local Store Info Card -->
+      <div class="mt-4 p-4 info-card rounded-lg">
+        <div class="flex items-center gap-3">
+          <div
+            class="w-10 h-10 rounded-full bg-emerald-100 flex items-center justify-center flex-shrink-0"
+          >
+            <i class="pi pi-building text-emerald-700 text-lg"></i>
+          </div>
+          <div class="flex-1 min-w-0">
+            <div class="flex items-center gap-2 flex-wrap">
+              <span class="font-semibold text-gray-700">Local Store:</span>
+              <span class="font-medium text-emerald-700">{{
+                localStoreName
+              }}</span>
+            </div>
+            <small class="text-emerald-700 block mt-1">
+              <i class="pi pi-sync text-xs"></i>
+              Devices will be synced to this local store
+            </small>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Process Steps Indicator -->
+    <div *ngIf="isProcessing" class="mb-6 step-indicator-wrapper slide-up">
+      <div class="flex items-center justify-between mb-3">
+        <span class="font-semibold text-gray-700">
+          <i class="pi pi-list text-emerald-700"></i> Process Steps
+        </span>
+        <span
+          class="text-sm font-medium text-emerald-700 bg-emerald-50 px-3 py-1 rounded-full"
+        >
+          {{ stepProgress }}% Complete
+        </span>
+      </div>
+
+      <p-progressBar [value]="stepProgress" class="mb-4"></p-progressBar>
+
+      <!-- Step Icons -->
+      <div class="flex justify-between items-start gap-2">
+        <div
+          *ngFor="
+            let step of ['preview', 'adding', 'waking', 'syncing', 'complete']
+          "
+          class="flex flex-col items-center flex-1"
+        >
+          <div
+            [class]="
+              'w-8 h-8 md:w-10 md:h-10 rounded-full flex items-center justify-center mb-2 transition-all duration-300 ' +
+              getStepClass(step)
+            "
+          >
+            <i [class]="'pi text-sm md:text-base ' + getStepIcon(step)"></i>
+          </div>
+          <span
+            class="text-xs font-medium text-center capitalize"
+            [class.text-gray-400]="getStepClass(step) === 'pending'"
+            [class.text-emerald-700]="getStepClass(step) === 'active'"
+            [class.text-green-600]="getStepClass(step) === 'completed'"
+          >
+            {{ step }}
+          </span>
+        </div>
+      </div>
+
+      <!-- Current Step Status -->
+      <div class="mt-4 text-center">
+        <div
+          class="inline-flex items-center gap-2 bg-white px-4 py-2 rounded-full shadow-sm border border-gray-200"
+        >
+          <i
+            class="pi pi-spin pi-spinner text-emerald-700"
+            *ngIf="currentStep !== 'complete'"
+          ></i>
+          <i
+            class="pi pi-check-circle text-green-600"
+            *ngIf="currentStep === 'complete'"
+          ></i>
+          <span class="text-sm font-medium text-gray-700">
+            Processing:
+            <span class="text-emerald-700">{{ currentStep | titlecase }}</span>
+          </span>
+        </div>
+
+        <!-- Specific Status Messages -->
+        <div
+          *ngIf="currentStep === 'waking'"
+          class="mt-3 p-3 bg-yellow-50 rounded-lg border border-yellow-200"
+        >
+          <div class="flex items-center justify-center gap-2 text-yellow-700">
+            <i class="pi pi-power-off"></i>
+            <span class="text-sm font-medium">
+              Waking up devices ({{ wakeDelaySeconds }} seconds delay)
+            </span>
+          </div>
+        </div>
+
+        <div
+          *ngIf="currentStep === 'syncing'"
+          class="mt-3 p-3 bg-emerald-50 rounded-lg border border-emerald-200"
+        >
+          <div class="flex items-center justify-center gap-2 text-emerald-700">
+            <i class="pi pi-cloud-download"></i>
+            <span class="text-sm font-medium">
+              Syncing devices from cloud...
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Import Methods Tabs -->
+    <div *ngIf="!isProcessing" class="mb-6 fade-in">
+      <p-tabView [(activeIndex)]="activeTabIndex">
+        <!-- Manual Input Tab -->
+        <p-tabPanel>
+          <ng-template pTemplate="header">
+            <i class="pi pi-pencil mr-2"></i>
+            <span class="hidden md:inline">Manual Input</span>
+            <span class="md:hidden">Manual</span>
+          </ng-template>
+
+          <div class="p-4">
+            <div class="mb-4">
+              <label
+                class="block mb-2 font-medium text-gray-700 flex items-center gap-2"
+              >
+                <i class="pi pi-list"></i>
+                Enter MAC Addresses
+                <span class="text-xs text-gray-500 font-normal"
+                  >(one per line)</span
+                >
+              </label>
+              <textarea
+                pInputTextarea
+                [(ngModel)]="macAddressesInput"
+                rows="8"
+                class="w-full font-mono text-sm"
+                placeholder="Enter MAC addresses, one per line&#10;&#10;Format: 001A2B3C4D5E or 00:1A:2B:3C:4D:5E&#10;&#10;Example:&#10;ac233fd01335&#10;ac233fd01336&#10;ac233fd01337"
+                (input)="validateManualInput()"
+              >
+              </textarea>
+              <div class="flex items-start gap-2 mt-2 p-2 bg-gray-50 rounded">
+                <i class="pi pi-info-circle text-emerald-600 text-sm mt-0.5"></i>
+                <small class="text-gray-600">
+                  Enter one MAC address per line. Colons and dashes will be
+                  removed automatically.
+                </small>
+              </div>
+            </div>
+
+            <div class="flex justify-end">
+              <button
+                pButton
+                type="button"
+                icon="pi pi-check-circle"
+                label="Validate"
+                class="p-button-outlined p-button-sm"
+                (click)="validateManualInput()"
+              ></button>
+            </div>
+          </div>
+        </p-tabPanel>
+
+        <!-- File Upload Tab -->
+        <p-tabPanel>
+          <ng-template pTemplate="header">
+            <i class="pi pi-upload mr-2"></i>
+            <span class="hidden md:inline">File Upload</span>
+            <span class="md:hidden">File</span>
+          </ng-template>
+
+          <div class="p-4">
+            <div class="mb-4">
+              <label
+                class="block mb-3 font-medium text-gray-700 flex items-center gap-2"
+              >
+                <i class="pi pi-file"></i>
+                Upload File
+              </label>
+
+              <div class="file-upload-area">
+                <i class="pi pi-cloud-upload text-4xl text-gray-400 mb-3"></i>
+                <p-fileUpload
+                  mode="basic"
+                  chooseLabel="Choose File"
+                  accept=".csv,.xlsx,.xls,.txt"
+                  maxFileSize="1000000"
+                  (onSelect)="onFileSelect($event)"
+                  [disabled]="isProcessing"
+                  class="w-full"
+                >
+                </p-fileUpload>
+                <p class="text-sm text-gray-600 mt-3 mb-0">
+                  Drag and drop or click to browse
+                </p>
+              </div>
+
+              <div class="flex items-start gap-2 mt-3 p-2 bg-gray-50 rounded">
+                <i class="pi pi-info-circle text-emerald-600 text-sm mt-0.5"></i>
+                <small class="text-gray-600">
+                  Supported formats: Excel (.xlsx, .xls), CSV, Text (.txt) • Max
+                  size: 1MB
+                </small>
+              </div>
+
+              <!-- Uploaded File Info -->
+              <div
+                *ngIf="uploadedFile"
+                class="mt-4 p-4 bg-gradient-to-r from-green-50 to-emerald-50 rounded-lg border-l-4 border-green-500 slide-up"
+              >
+                <div class="flex items-center justify-between gap-3">
+                  <div class="flex items-center gap-3 flex-1 min-w-0">
+                    <div
+                      class="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0"
+                    >
+                      <i class="pi pi-file text-green-600 text-lg"></i>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                      <p class="font-medium text-gray-800 truncate">
+                        {{ uploadedFile.name }}
+                      </p>
+                      <p class="text-sm text-gray-600">
+                        {{ uploadedFile.size | fileSize }}
+                      </p>
+                    </div>
+                  </div>
+                  <button
+                    pButton
+                    type="button"
+                    icon="pi pi-times"
+                    class="p-button-text p-button-sm p-button-danger"
+                    (click)="uploadedFile = null; filePreview = []"
+                  ></button>
+                </div>
+              </div>
+            </div>
+
+            <!-- File Preview -->
+            <div *ngIf="filePreview.length > 0" class="mt-4 slide-up">
+              <div class="flex justify-between items-center mb-3">
+                <h4
+                  class="font-semibold text-gray-700 flex items-center gap-2 m-0"
+                >
+                  <i class="pi pi-eye text-emerald-700"></i>
+                  File Preview
+                </h4>
+                <span
+                  class="text-sm bg-emerald-50 text-emerald-700 px-3 py-1 rounded-full font-medium"
+                >
+                  {{ filePreview.length }} lines
+                </span>
+              </div>
+              <div
+                class="max-h-48 overflow-y-auto border-2 border-gray-200 rounded-lg p-3 bg-gray-50"
+              >
+                <div
+                  *ngFor="let line of filePreview; let i = index"
+                  class="text-sm font-mono py-2 px-2 rounded hover:bg-white transition-colors border-b last:border-b-0 border-gray-200"
+                >
+                  <span
+                    class="text-emerald-600 font-semibold mr-3 inline-block w-8 text-right"
+                    >{{ i + 1 }}</span
+                  >
+                  <span class="text-gray-700">{{ line }}</span>
+                </div>
+              </div>
+              <div class="mt-3 text-right">
+                <button
+                  pButton
+                  type="button"
+                  icon="pi pi-check-circle"
+                  label="Validate File"
+                  class="p-button-outlined p-button-sm"
+                  (click)="generatePreview(filePreview)"
+                ></button>
+              </div>
+            </div>
+          </div>
+        </p-tabPanel>
+      </p-tabView>
+    </div>
+
+    <!-- Import Preview Section -->
+    <div *ngIf="importPreview && !isProcessing" class="mt-6 slide-up">
+      <div class="flex items-center gap-2 mb-4">
+        <i class="pi pi-eye text-emerald-700 text-lg"></i>
+        <h3 class="text-lg font-semibold text-gray-800 m-0">Import Preview</h3>
+      </div>
+
+      <!-- Statistics Cards -->
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 mb-4">
+        <!-- Total MACs Card -->
+        <div
+          class="stat-card bg-gradient-to-br from-emerald-50 to-emerald-100 p-4 rounded-lg text-center border-2 border-emerald-200"
+        >
+          <div class="text-3xl font-bold text-emerald-700 mb-1">
+            {{ importPreview.totalCount }}
+          </div>
+          <div class="text-xs md:text-sm text-emerald-700 font-medium">
+            Total MACs
+          </div>
+        </div>
+
+        <!-- Valid MACs Card -->
+        <div
+          class="stat-card bg-gradient-to-br from-green-50 to-green-100 p-4 rounded-lg text-center border-2 border-green-200"
+        >
+          <div class="text-3xl font-bold text-green-700 mb-1">
+            {{ importPreview.validCount }}
+          </div>
+          <div class="text-xs md:text-sm text-green-600 font-medium">
+            Valid MACs
+          </div>
+        </div>
+
+        <!-- Invalid MACs Card -->
+        <div
+          class="stat-card bg-gradient-to-br from-red-50 to-red-100 p-4 rounded-lg text-center border-2 border-red-200"
+        >
+          <div class="text-3xl font-bold text-red-700 mb-1">
+            {{ importPreview.invalidCount }}
+          </div>
+          <div class="text-xs md:text-sm text-red-600 font-medium">
+            Invalid MACs
+          </div>
+        </div>
+
+        <!-- Status Card -->
+        <div
+          [class]="
+            selectedStore
+              ? 'bg-gradient-to-br from-green-50 to-green-100 border-green-200'
+              : 'bg-gradient-to-br from-red-50 to-red-100 border-red-200'
+          "
+          class="stat-card p-4 rounded-lg text-center border-2"
+        >
+          <div class="flex items-center justify-center mb-1">
+            <p-tag
+              [value]="selectedStore ? '✓ Ready' : '✗ No Store'"
+              [severity]="selectedStore ? 'success' : 'danger'"
+              styleClass="text-sm font-semibold"
+            >
+            </p-tag>
+          </div>
+          <div
+            class="text-xs md:text-sm font-medium"
+            [class.text-green-600]="selectedStore"
+            [class.text-red-600]="!selectedStore"
+          >
+            Status
+          </div>
+        </div>
+      </div>
+
+      <!-- Preview Table -->
+      <div *ngIf="previewData.length > 0" class="mb-4">
+        <div class="flex justify-between items-center mb-3">
+          <h4 class="font-semibold text-gray-700 m-0 flex items-center gap-2">
+            <i class="pi pi-table text-emerald-700"></i>
+            MAC Address Validation
+          </h4>
+          <span
+            class="text-xs md:text-sm text-gray-500 bg-gray-100 px-3 py-1 rounded-full"
+          >
+            Showing {{ previewData.length }} addresses
+          </span>
+        </div>
+
+        <div class="border-2 border-gray-200 rounded-lg overflow-hidden">
+          <p-table
+            [value]="previewData"
+            [paginator]="true"
+            [rows]="5"
+            styleClass="p-datatable-sm"
+            [scrollable]="true"
+            scrollHeight="200px"
+            [rowHover]="true"
+          >
+            <ng-template pTemplate="header">
+              <tr class="bg-gradient-to-r from-gray-50 to-gray-100">
+                <th class="font-semibold">
+                  <i class="pi pi-hashtag text-xs mr-1"></i>
+                  MAC Address
+                </th>
+                <th class="font-semibold" style="width: 120px">
+                  <i class="pi pi-shield text-xs mr-1"></i>
+                  Status
+                </th>
+                <th class="font-semibold">
+                  <i class="pi pi-info-circle text-xs mr-1"></i>
+                  Message
+                </th>
+              </tr>
+            </ng-template>
+            <ng-template pTemplate="body" let-item>
+              <tr
+                [class.highlight-success]="item.isValid"
+                [class.highlight-error]="!item.isValid"
+              >
+                <td>
+                  <span class="mac-cell">{{ item.macAddress }}</span>
+                </td>
+                <td>
+                  <p-tag
+                    [value]="item.isValid ? 'Valid' : 'Invalid'"
+                    [severity]="item.isValid ? 'success' : 'danger'"
+                    styleClass="text-xs"
+                  >
+                  </p-tag>
+                </td>
+                <td class="text-sm">{{ item.message }}</td>
+              </tr>
+            </ng-template>
+            <ng-template pTemplate="emptymessage">
+              <tr>
+                <td colspan="3" class="text-center py-8">
+                  <i class="pi pi-inbox text-4xl text-gray-300 mb-2"></i>
+                  <p class="text-gray-500 m-0">No MAC addresses to preview</p>
+                </td>
+              </tr>
+            </ng-template>
+          </p-table>
+        </div>
+      </div>
+
+      <!-- Invalid MACs Warning -->
+      <div
+        *ngIf="importPreview.invalidCount > 0"
+        class="warning-card p-4 rounded-lg slide-up"
+      >
+        <div class="flex items-start gap-3">
+          <div
+            class="w-10 h-10 rounded-full bg-yellow-100 flex items-center justify-center flex-shrink-0"
+          >
+            <i class="pi pi-exclamation-triangle text-yellow-600 text-lg"></i>
+          </div>
+          <div class="flex-1">
+            <p class="font-semibold text-yellow-800 m-0 mb-2">
+              Warning: {{ importPreview.invalidCount }} invalid MAC address(es)
+              found
+            </p>
+            <p class="text-sm text-yellow-700 m-0 mb-2">
+              These MAC addresses will be skipped during import:
+            </p>
+            <div class="p-3 bg-yellow-50 rounded border border-yellow-200">
+              <p class="text-sm font-mono break-all text-yellow-800 m-0">
+                {{ importPreview.invalidMacs.join(", ") }}
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Options Section -->
+    <div class="mt-6" *ngIf="!isProcessing">
+      <div class="flex items-center gap-2 mb-4">
+        <i class="pi pi-sliders-h text-emerald-700 text-lg"></i>
+        <h3 class="text-lg font-semibold text-gray-800 m-0">Options</h3>
+      </div>
+
+      <div class="space-y-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
+        <!-- Auto-sync Option -->
+        <div class="flex items-start gap-3">
+          <p-checkbox
+            [(ngModel)]="syncAfterAdd"
+            [binary]="true"
+            inputId="syncAfterAdd"
+            class="mt-1"
+          >
+          </p-checkbox>
+          <div class="flex-1">
+            <label
+              for="syncAfterAdd"
+              class="cursor-pointer font-medium text-gray-700 flex items-center gap-2"
+            >
+              <i class="pi pi-sync text-sm"></i>
+              Auto-sync after adding
+              <span
+                class="text-xs bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded-full font-semibold"
+              >
+                Recommended
+              </span>
+            </label>
+            <small class="block text-gray-600 mt-1">
+              Automatically sync devices from cloud after adding. This will wake
+              up devices, wait {{ wakeDelaySeconds }} seconds, then sync to
+              local database.
+            </small>
+          </div>
+        </div>
+
+        <!-- Wake Up Delay Setting -->
+        <div class="ml-8 pl-4 border-l-2 border-emerald-200">
+          <label
+            class="block mb-2 font-medium text-gray-700 text-sm flex items-center gap-2"
+          >
+            <i class="pi pi-clock text-sm"></i>
+            Wake Up Delay
+          </label>
+          <div class="flex items-center gap-3 flex-wrap">
+            <p-inputNumber
+              [(ngModel)]="wakeDelaySeconds"
+              [min]="10"
+              [max]="120"
+              [step]="5"
+              class="w-24"
+              [showButtons]="true"
+              buttonLayout="horizontal"
+              incrementButtonIcon="pi pi-plus"
+              decrementButtonIcon="pi pi-minus"
+            >
+            </p-inputNumber>
+            <span class="text-gray-700 font-medium">seconds</span>
+          </div>
+          <small class="text-gray-600 mt-2 block">
+            <i class="pi pi-info-circle text-xs"></i>
+            Time to wait for devices to wake up before syncing (10-120 seconds)
+          </small>
+        </div>
+      </div>
+    </div>
+
+    <!-- Results Section -->
+    <div *ngIf="importResult" class="mt-6 slide-up">
+      <div class="flex items-center gap-2 mb-4">
+        <i class="pi pi-chart-bar text-green-600 text-lg"></i>
+        <h3 class="text-lg font-semibold text-gray-800 m-0">Import Results</h3>
+      </div>
+
+      <!-- Result Statistics -->
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 mb-4">
+        <!-- Processed Card -->
+        <div
+          class="stat-card bg-gradient-to-br from-emerald-50 to-emerald-100 p-4 rounded-lg text-center border-2 border-emerald-200"
+        >
+          <div class="text-3xl font-bold text-emerald-700 mb-1">
+            {{ importResult.addedCount + importResult.failedCount }}
+          </div>
+          <div class="text-xs md:text-sm text-emerald-700 font-medium">
+            Processed
+          </div>
+        </div>
+
+        <!-- Added Card -->
+        <div
+          class="stat-card bg-gradient-to-br from-green-50 to-green-100 p-4 rounded-lg text-center border-2 border-green-200"
+        >
+          <div class="text-3xl font-bold text-green-700 mb-1">
+            {{ importResult.addedCount }}
+          </div>
+          <div class="text-xs md:text-sm text-green-600 font-medium">Added</div>
+        </div>
+
+        <!-- Failed Card -->
+        <div
+          class="stat-card bg-gradient-to-br from-red-50 to-red-100 p-4 rounded-lg text-center border-2 border-red-200"
+        >
+          <div class="text-3xl font-bold text-red-700 mb-1">
+            {{ importResult.failedCount }}
+          </div>
+          <div class="text-xs md:text-sm text-red-600 font-medium">Failed</div>
+        </div>
+
+        <!-- Overall Status Card -->
+        <div
+          [ngClass]="{
+            'bg-gradient-to-br from-green-50 to-green-100 border-green-200':
+              importResult.success,
+            'bg-gradient-to-br from-red-50 to-red-100 border-red-200':
+              !importResult.success,
+          }"
+          class="stat-card p-4 rounded-lg text-center border-2"
+        >
+          <div class="flex items-center justify-center mb-1">
+            <p-tag
+              [value]="importResult.success ? 'Success' : 'Failed'"
+              [severity]="importResult.success ? 'success' : 'danger'"
+              styleClass="text-sm font-semibold"
+            >
+            </p-tag>
+          </div>
+          <div
+            class="text-xs md:text-sm font-medium"
+            [class.text-green-600]="importResult.success"
+            [class.text-red-600]="!importResult.success"
+          >
+            Overall Status
+          </div>
+        </div>
+      </div>
+
+      <!-- Wake Up Results -->
+      <div *ngIf="importResult.wakeUpResult" class="mb-4">
+        <div
+          class="p-4 rounded-lg border-2"
+          [ngClass]="{
+            'success-card border-green-200': importResult.wakeUpResult.success,
+            'warning-card border-yellow-200':
+              !importResult.wakeUpResult.success,
+          }"
+        >
+          <div class="flex items-start gap-3">
+            <div
+              class="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0"
+              [ngClass]="{
+                'bg-green-100': importResult.wakeUpResult.success,
+                'bg-yellow-100': !importResult.wakeUpResult.success,
+              }"
+            >
+              <i
+                [class]="
+                  'pi text-lg ' +
+                  (importResult.wakeUpResult.success
+                    ? 'pi-check-circle text-green-600'
+                    : 'pi-exclamation-triangle text-yellow-600')
+                "
+              ></i>
+            </div>
+            <div class="flex-1">
+              <p
+                class="font-semibold m-0 mb-2"
+                [class.text-green-800]="importResult.wakeUpResult.success"
+                [class.text-yellow-800]="!importResult.wakeUpResult.success"
+              >
+                <i class="pi pi-power-off text-sm mr-1"></i>
+                Wake Up Status
+              </p>
+              <p
+                class="text-sm m-0 mb-3"
+                [class.text-green-700]="importResult.wakeUpResult.success"
+                [class.text-yellow-700]="!importResult.wakeUpResult.success"
+              >
+                {{ importResult.wakeUpResult.message }}
+              </p>
+              <div class="flex gap-4 flex-wrap text-sm">
+                <span
+                  class="flex items-center gap-2 bg-white px-3 py-1 rounded-full"
+                >
+                  <i class="pi pi-check-circle text-green-600"></i>
+                  <span class="font-medium"
+                    >Woke up: {{ importResult.wakeUpResult.wokeCount }}</span
+                  >
+                </span>
+                <span
+                  class="flex items-center gap-2 bg-white px-3 py-1 rounded-full"
+                  *ngIf="importResult.wakeUpResult.failedCount > 0"
+                >
+                  <i class="pi pi-exclamation-circle text-yellow-600"></i>
+                  <span class="font-medium"
+                    >Failed: {{ importResult.wakeUpResult.failedCount }}</span
+                  >
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Detailed Results Table -->
+      <div *ngIf="results.length > 0">
+        <div class="flex justify-between items-center mb-3 flex-wrap gap-2">
+          <h4 class="font-semibold text-gray-700 m-0 flex items-center gap-2">
+            <i class="pi pi-list text-emerald-700"></i>
+            Device Status Details
+          </h4>
+          <button
+            pButton
+            type="button"
+            icon="pi pi-power-off"
+            label="Wake Up ({{ getMaintenanceCount() }})"
+            class="p-button-warning p-button-sm"
+            *ngIf="hasMaintenanceDevices() && !isWakingUp && !isProcessing"
+            [disabled]="isWakingUp"
+            (click)="wakeUpDevices()"
+          >
+            <i *ngIf="isWakingUp" class="pi pi-spin pi-spinner mr-2"></i>
+          </button>
+        </div>
+
+        <div class="border-2 border-gray-200 rounded-lg overflow-hidden">
+          <p-table
+            [value]="results"
+            [paginator]="true"
+            [rows]="5"
+            styleClass="p-datatable-sm"
+            [scrollable]="true"
+            scrollHeight="250px"
+            [rowHover]="true"
+          >
+            <ng-template pTemplate="header">
+              <tr class="bg-gradient-to-r from-gray-50 to-gray-100">
+                <th class="font-semibold">
+                  <i class="pi pi-hashtag text-xs mr-1"></i>
+                  MAC Address
+                </th>
+                <th class="font-semibold" style="width: 120px">
+                  <i class="pi pi-shield text-xs mr-1"></i>
+                  Status
+                </th>
+                <th class="font-semibold">
+                  <i class="pi pi-comment text-xs mr-1"></i>
+                  Message
+                </th>
+              </tr>
+            </ng-template>
+            <ng-template pTemplate="body" let-item>
+              <tr
+                [ngClass]="{
+                  'highlight-success': item.status === 'success',
+                  'highlight-error': item.status === 'failed',
+                  'highlight-warning': item.status === 'maintenance',
+                }"
+              >
+                <td>
+                  <span class="mac-cell">{{ item.macAddress }}</span>
+                </td>
+                <td>
+                  <p-tag
+                    [value]="getStatusLabel(item.status)"
+                    [severity]="getStatusSeverity(item.status)"
+                    styleClass="text-xs"
+                  >
+                  </p-tag>
+                </td>
+                <td class="text-sm">{{ item.message }}</td>
+              </tr>
+            </ng-template>
+          </p-table>
+        </div>
+      </div>
+
+      <!-- Post-Import Actions -->
+      <div
+        *ngIf="!isProcessing && importResult.addedCount > 0"
+        class="mt-6 p-4 bg-gradient-to-r from-emerald-50 to-emerald-50 rounded-lg border-2 border-emerald-200"
+      >
+        <h4 class="font-semibold text-gray-800 mb-4 flex items-center gap-2">
+          <i class="pi pi-arrow-right text-emerald-700"></i>
+          Next Steps
+        </h4>
+        <div class="space-y-3">
+          <!-- Devices Added Info -->
+          <div class="flex items-start gap-3 p-3 bg-white rounded-lg">
+            <i class="pi pi-check-circle text-green-500 text-lg mt-0.5"></i>
+            <div>
+              <span class="font-semibold text-gray-800">Devices Added:</span>
+              <p class="text-sm text-gray-600 m-0 mt-1">
+                {{ importResult.addedCount }} device(s) have been added to
+                <span class="font-medium text-emerald-700">{{
+                  getSelectedStoreName()
+                }}</span>
+              </p>
+            </div>
+          </div>
+
+          <!-- Wake Up Status Info -->
+          <div
+            *ngIf="importResult.wakeUpResult"
+            class="flex items-start gap-3 p-3 bg-white rounded-lg"
+          >
+            <i
+              [class]="
+                'text-lg mt-0.5 pi ' +
+                (importResult.wakeUpResult.success
+                  ? 'pi-check-circle text-green-500'
+                  : 'pi-exclamation-triangle text-yellow-500')
+              "
+            ></i>
+            <div>
+              <span class="font-semibold text-gray-800">Wake Up Status:</span>
+              <p class="text-sm text-gray-600 m-0 mt-1">
+                {{
+                  importResult.wakeUpResult.success
+                    ? "Devices have been woken up successfully."
+                    : "Some devices failed to wake up and are in maintenance status."
+                }}
+              </p>
+            </div>
+          </div>
+
+          <!-- Maintenance Devices Warning -->
+          <div
+            *ngIf="hasMaintenanceDevices()"
+            class="flex items-start gap-3 p-3 bg-yellow-50 rounded-lg border border-yellow-200"
+          >
+            <i
+              class="pi pi-exclamation-triangle text-yellow-500 text-lg mt-0.5"
+            ></i>
+            <div>
+              <span class="font-semibold text-yellow-800"
+                >Maintenance Devices:</span
+              >
+              <p class="text-sm text-yellow-700 m-0 mt-1">
+                {{ getMaintenanceCount() }} device(s) are in maintenance status.
+                You can try waking them up again using the button above.
+              </p>
+            </div>
+          </div>
+
+          <!-- Next Sync Info -->
+          <div class="flex items-start gap-3 p-3 bg-white rounded-lg">
+            <i class="pi pi-info-circle text-emerald-600 text-lg mt-0.5"></i>
+            <div>
+              <span class="font-semibold text-gray-800">Next Sync:</span>
+              <p class="text-sm text-gray-600 m-0 mt-1">
+                Devices will appear in your local device list after the next
+                cloud sync. You can manually trigger a sync from the Devices
+                tab.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Dialog Footer -->
+  <ng-template pTemplate="footer">
+    <div class="flex justify-end gap-2 flex-wrap">
+      <button
+        pButton
+        type="button"
+        label="Cancel"
+        icon="pi pi-times"
+        class="p-button-text p-button-secondary"
+        [disabled]="isProcessing"
+        (click)="displayDialog = false"
+      ></button>
+
+      <button
+        pButton
+        type="button"
+        label="Preview"
+        icon="pi pi-eye"
+        class="p-button-outlined"
+        [disabled]="
+          !selectedStore ||
+          (!macAddressesInput && !uploadedFile) ||
+          isProcessing
+        "
+        (click)="validateManualInput()"
+      ></button>
+
+      <button
+        pButton
+        type="button"
+        [label]="isProcessing ? 'Importing...' : 'Import Devices'"
+        [icon]="isProcessing ? 'pi pi-spin pi-spinner' : 'pi pi-cloud-upload'"
+        class="p-button-primary"
+        [disabled]="
+          !selectedStore ||
+          (!macAddressesInput && !uploadedFile) ||
+          isProcessing
+        "
+        (click)="executeImport()"
+      ></button>
+    </div>
+  </ng-template>
+</p-dialog>
