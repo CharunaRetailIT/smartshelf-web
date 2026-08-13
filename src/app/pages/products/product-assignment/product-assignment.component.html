@@ -516,6 +516,7 @@
                       </div>
                       <div class="grid grid-cols-2 gap-2 mt-2">
                         <p-dropdown
+                          appendTo="body"
                           [(ngModel)]="selectedCategoryId"
                           [options]="filteredCategories"
                           optionLabel="categoryName"
@@ -527,6 +528,7 @@
                         >
                         </p-dropdown>
                         <p-dropdown
+                          appendTo="body"
                           *ngIf="subCategories.length > 0"
                           [(ngModel)]="selectedSubCategoryId"
                           [options]="filteredSubCategories"
@@ -949,6 +951,7 @@
                         Select Category
                       </label>
                       <p-dropdown
+                        appendTo="body"
                         [(ngModel)]="selectedCategoryId"
                         [options]="filteredCategories"
                         optionLabel="categoryName"
@@ -1026,6 +1029,7 @@
                         Select Category First
                       </label>
                       <p-dropdown
+                        appendTo="body"
                         [(ngModel)]="selectedCategoryId"
                         [options]="filteredCategories"
                         optionLabel="categoryName"
@@ -1046,6 +1050,7 @@
                         Select SubCategory
                       </label>
                       <p-dropdown
+                        appendTo="body"
                         [(ngModel)]="selectedSubCategoryId"
                         [options]="filteredSubCategories"
                         optionLabel="subCategoryName"
@@ -1591,31 +1596,38 @@
 </div>
 
 <!-- Bind Message Dialog -->
-<p-dialog
-  [(visible)]="showBindDialog"
-  [modal]="true"
-  [closable]="true"
-  [draggable]="false"
-  [resizable]="false"
-  [style]="{ width: '90vw', maxWidth: '1000px' }"
-  (onHide)="closeBindDialog()"
->
-  <ng-template pTemplate="header">
-    <div class="flex items-center gap-3">
-      <div class="bg-blue-100 p-2 rounded-lg">
-        <i class="pi pi-link text-blue-600"></i>
+<ng-template #bindDialogTpl>
+  <div class="dlg-shell">
+    <div class="dlg-header">
+      <div class="flex items-center gap-3">
+        <div class="bg-blue-100 p-2 rounded-lg">
+          <i class="pi pi-link text-blue-600"></i>
+        </div>
+        <div>
+          <h2 class="dlg-title">Bind Message to Device</h2>
+          <p class="dlg-subtitle">
+            Device: {{ getDeviceDisplayName(selectedAssignmentForBind!) }}
+          </p>
+        </div>
       </div>
-      <div>
-        <h3 class="text-lg font-semibold text-gray-900">
-          Bind Message to Device
-        </h3>
-        <p class="text-sm text-gray-600">
-          Device: {{ getDeviceDisplayName(selectedAssignmentForBind!) }}
-        </p>
-      </div>
+      <button
+        type="button"
+        (click)="closeBindDialog()"
+        class="dlg-close"
+        aria-label="Close dialog"
+      >
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M6 18L18 6M6 6l12 12"
+          ></path>
+        </svg>
+      </button>
     </div>
-  </ng-template>
 
+    <div class="dlg-body">
   <!-- Search and Filters -->
   <div class="mb-4">
     <div class="grid grid-cols-1 gap-3">
@@ -1768,8 +1780,10 @@
     </div>
   </div>
 
-  <ng-template pTemplate="footer">
-    <div class="flex justify-between items-center">
+    </div>
+
+  <div class="dlg-footer">
+    <div class="flex justify-between items-center w-full">
       <div class="text-sm text-gray-600">
         <span *ngIf="selectedMessageId">
           <span class="font-medium">{{ getSelectedMessageTitle() }}</span>
@@ -1805,5 +1819,6 @@
         </p-button>
       </div>
     </div>
-  </ng-template>
-</p-dialog>
+  </div>
+  </div>
+</ng-template>

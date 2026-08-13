@@ -10,6 +10,8 @@ import { QueueDetailsComponent } from '../queue-details/queue-details.component'
 import { CreateQueueComponent } from '../create-queue/create-queue.component';
 import { AuthService } from '../../../core/services/auth.service';
 import { SettingsService } from '../../../core/services/settings.service';
+import { MatDialog } from '@angular/material/dialog';
+import { DeleteConfirmationComponent } from '../../../shared/components/dialog/delete-confirmation/delete-confirmation.component';
 
 @Component({
   selector: 'app-queue-list',
@@ -44,11 +46,14 @@ export class QueueListComponent implements OnInit {
 
   // Dropdown options
   stores: any[] = [];
+  // Values must match the Status.Name rows a queue can actually have
+  // (QueueStatus: Pending=5, Processing=6, Completed=7, Failed=8). "Active" was
+  // not one of them, so that option could never match a row.
   statusOptions: any[] = [
-    { label: 'Pending', value: 'PENDING' },
-    { label: 'Active', value: 'ACTIVE' },
-    { label: 'Completed', value: 'COMPLETED' },
-    { label: 'Failed', value: 'FAILED' },
+    { label: 'Pending', value: 'Pending' },
+    { label: 'Processing', value: 'Processing' },
+    { label: 'Completed', value: 'Completed' },
+    { label: 'Failed', value: 'Failed' },
   ];
 
   queueTypeOptions: any[] = [
@@ -87,6 +92,7 @@ export class QueueListComponent implements OnInit {
     private confirmationService: ConfirmationService,
     public auth: AuthService,
     private settingsService: SettingsService,
+    private dialog: MatDialog,
   ) {}
 
   ngOnInit() {
@@ -205,8 +211,12 @@ export class QueueListComponent implements OnInit {
   }
 
   getStatusSeverity(status: string): string {
-    switch (status) {
+    // The API returns Status.Name ("Completed", "Pending"), not the uppercase
+    // constants this compared against - so every row fell through to the
+    // default severity. Normalise before matching.
+    switch ((status || '').toUpperCase()) {
       case 'ACTIVE':
+      case 'PROCESSING':
         return 'success';
       case 'PENDING':
         return 'warning';
@@ -289,12 +299,26 @@ export class QueueListComponent implements OnInit {
   }
 
   deleteQueue(queue: any) {
-    this.confirmationService.confirm({
-      message: `Are you sure you want to delete this queue?`,
-      header: 'Confirm Delete',
-      icon: 'pi pi-exclamation-triangle',
-      accept: () => {
-        this.queueService.deleteQueue(queue.id).subscribe({
+    // Was PrimeNG's ConfirmationService, but the page has no <p-confirmDialog>
+    // to render it - confirm() published to nothing, so `accept` never ran and
+    // delete silently did nothing. Use the Material dialog the rest of the app
+    // already confirms deletes with.
+    const dialogRef = this.dialog.open(DeleteConfirmationComponent, {
+      width: '400px',
+      data: {
+        title: 'Delete Queue',
+        message: `Are you sure you want to delete queue #${queue.id}? This action cannot be undone.`,
+        confirmText: 'Delete',
+        cancelText: 'Cancel',
+      },
+      panelClass: ['rounded-lg'],
+      disableClose: true,
+    });
+
+    dialogRef.afterClosed().subscribe((confirmed: boolean) => {
+      if (!confirmed) return;
+
+      this.queueService.deleteQueue(queue.id).subscribe({
           next: () => {
             this.messageService.add({
               severity: 'success',
@@ -304,15 +328,14 @@ export class QueueListComponent implements OnInit {
             this.loadQueues({ first: 0, rows: 10 });
             this.loadStats();
           },
-          error: (err) => {
-            this.messageService.add({
-              severity: 'error',
-              summary: 'Error',
-              detail: err.error?.message || 'Failed to delete queue',
-            });
-          },
-        });
-      },
+        error: (err) => {
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Error',
+            detail: err.error?.message || 'Failed to delete queue',
+          });
+        },
+      });
     });
   }
 
@@ -329,6 +352,12 @@ export class QueueListComponent implements OnInit {
 
   //   // window.location.href = '#/queue/create';
   // }
+
+  /** The create dialog reports success here so the list reflects it at once. */
+  onQueueCreated() {
+    this.loadQueues({ first: 0, rows: 10 });
+    this.loadStats();
+  }
 
   openCreateDialog() {
     this.createQueueRef.open();

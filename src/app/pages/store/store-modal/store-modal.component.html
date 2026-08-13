@@ -52,6 +52,7 @@
           <div class="space-y-2">
             <label for="storeCode" class="block text-sm font-medium text-gray-700">
               Store Code
+              <span class="text-red-500" *ngIf="isMinewStore">*</span>
             </label>
             <input
               id="storeCode"
@@ -120,6 +121,7 @@
         <div class="space-y-2">
           <label for="address" class="block text-sm font-medium text-gray-700">
             Address
+            <span class="text-red-500" *ngIf="isMinewStore">*</span>
           </label>
           <textarea
             id="address"

@@ -1,4 +1,13 @@
-import { Component, OnInit, Output, EventEmitter } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  Output,
+  EventEmitter,
+  TemplateRef,
+  ViewChild,
+  inject,
+} from '@angular/core';
+import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MessageService } from 'primeng/api';
@@ -33,6 +42,12 @@ export class MinewBatchAddComponent implements OnInit {
 
   displayDialog = false;
   activeTabIndex = 0;
+
+  // Material dialog shell, opened from this component's own template so all
+  // state and handlers stay here.
+  @ViewChild('dialogTpl') dialogTpl!: TemplateRef<unknown>;
+  private dialog = inject(MatDialog);
+  private dialogRef?: MatDialogRef<unknown>;
 
   // Store selection
   stores: MinewStore[] = [];
@@ -107,6 +122,22 @@ export class MinewBatchAddComponent implements OnInit {
   openDialog(): void {
     this.displayDialog = true;
     this.resetForm();
+    this.dialogRef = this.dialog.open(this.dialogTpl, {
+      width: '1000px',
+      maxWidth: '95vw',
+      maxHeight: '90vh',
+      disableClose: true, // closing is gated on isProcessing, same as before
+    });
+    this.dialogRef.afterClosed().subscribe(() => {
+      this.displayDialog = false;
+      this.dialogRef = undefined;
+    });
+  }
+
+  closeDialog(): void {
+    if (this.isProcessing) return;
+    this.dialogRef?.close();
+    this.displayDialog = false;
   }
 
   resetForm(): void {

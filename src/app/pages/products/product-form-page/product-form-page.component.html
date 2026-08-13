@@ -89,7 +89,7 @@
                   </span>
                 </div>
 
-                <div class="field">
+                <div class="field" *ngIf="showBarcodeField">
                   <label>Barcode</label>
                   <span class="p-input-icon-right w-full">
                     <!-- <i class="pi pi-barcode"></i> -->
@@ -272,7 +272,7 @@
                 </div>
 
                 <div class="field">
-                  <label>Discount Price</label>
+                  <label>Discount Amount</label>
                   <p-inputNumber
                     formControlName="discountPrice"
                     mode="decimal"
@@ -523,7 +523,12 @@
                             ></p-dropdown>
                           </div>
 
-                          <div class="field">
+                          <div
+                            class="field"
+                            *ngIf="
+                              showDeviceMessageCombos || !brandSupportsTemplate(i)
+                            "
+                          >
                             <label>
                               Message
                               <span *ngIf="!brandSupportsTemplate(i)">*</span>
@@ -678,6 +683,7 @@
                               (click)="quickBindRow(i)"
                             ></button>
                             <button
+                              *ngIf="showDeviceMessageCombos"
                               pButton
                               type="button"
                               icon="pi pi-link"

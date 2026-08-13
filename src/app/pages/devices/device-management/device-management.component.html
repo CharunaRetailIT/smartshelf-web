@@ -16,13 +16,25 @@
 
       <!-- Right button with consistent styling -->
       <div class="flex space-x-4">
-        <ng-container *ngIf="activeTabIndex === 0">
+        <ng-container *ngIf="activeTabKey === 'devices'">
           <button
             pButton
             icon="pi pi-sync"
             label="Sync"
             class="p-button-info"
             (click)="openSyncDialog()"
+          ></button>
+          <button
+            *ngIf="auth.hasAnyRole(['Admin', 'Manager'])"
+            pButton
+            icon="pi pi-desktop"
+            label="Refresh Screens"
+            class="p-button-outlined"
+            [loading]="screensRefreshing"
+            [disabled]="screensRefreshing"
+            (click)="refreshDeviceScreens()"
+            pTooltip="Fill in screen size from Minew for devices added locally"
+            tooltipPosition="bottom"
           ></button>
           <p-splitButton
             label="Add Device"
@@ -48,7 +60,7 @@
                   (click)="openMinewBatchDialog()">
                 </button> -->
         </ng-container>
-        <ng-container *ngIf="activeTabIndex === 1">
+        <ng-container *ngIf="activeTabKey === 'templates'">
           <button
             pButton
             icon="pi pi-sync"
@@ -57,7 +69,7 @@
             (click)="syncTemplates()"
           ></button>
         </ng-container>
-        <ng-container *ngIf="activeTabIndex === 2">
+        <ng-container *ngIf="activeTabKey === 'combos'">
           <button
             pButton
             icon="pi pi-plus"
@@ -66,7 +78,7 @@
             (click)="openComboDialog()"
           ></button>
         </ng-container>
-        <ng-container *ngIf="activeTabIndex === 4">
+        <ng-container *ngIf="activeTabKey === 'assignments'">
           <button
             pButton
             icon="pi pi-plus"
@@ -75,7 +87,7 @@
             (click)="openAssignmentDialog()"
           ></button>
         </ng-container>
-        <ng-container *ngIf="activeTabIndex === 5">
+        <ng-container *ngIf="activeTabKey === 'gateways'">
           <button
             pButton
             icon="pi pi-sync"
@@ -139,6 +151,7 @@
                 styleClass="w-32">
               </p-dropdown> -->
               <p-dropdown
+                appendTo="body"
                 [(ngModel)]="deviceStatusFilter"
                 [options]="statusOptions"
                 placeholder="Status"
@@ -813,6 +826,7 @@
 
               <!-- Device Filter -->
               <p-dropdown
+                appendTo="body"
                 [(ngModel)]="comboDeviceFilter"
                 [options]="deviceOptions"
                 placeholder="Filter by Device"
@@ -823,6 +837,7 @@
 
               <!-- Template Filter -->
               <p-dropdown
+                appendTo="body"
                 [(ngModel)]="comboTemplateFilter"
                 [options]="templateOptions"
                 placeholder="Filter by Template"
@@ -1123,7 +1138,7 @@
       </p-tabPanel>
 
       <!-- Tab 4: Message Combos -->
-      <p-tabPanel header="Message Combos">
+      <p-tabPanel header="Message Combos" *ngIf="showMessageCombosTab">
         <ng-template pTemplate="header">
           <div class="flex items-center gap-2">
             <i class="pi pi-comment"></i>
@@ -1151,6 +1166,7 @@
 
               <!-- Device Filter -->
               <p-dropdown
+                appendTo="body"
                 [(ngModel)]="messageComboDeviceFilter"
                 [options]="deviceOptions"
                 placeholder="Filter by Device"
@@ -1161,6 +1177,7 @@
 
               <!-- Message Filter -->
               <p-dropdown
+                appendTo="body"
                 [(ngModel)]="messageComboMessageFilter"
                 [options]="messageOptions"
                 placeholder="Filter by Message"
@@ -1522,6 +1539,7 @@
 
               <!-- Location Type Filter -->
               <p-dropdown
+                appendTo="body"
                 [(ngModel)]="assignmentLocationTypeFilter"
                 [options]="locationTypeOptions"
                 placeholder="Location Type"
@@ -1532,6 +1550,7 @@
 
               <!-- Combo Filter -->
               <p-dropdown
+                appendTo="body"
                 [(ngModel)]="assignmentComboFilter"
                 [options]="comboOptions"
                 placeholder="Filter by Combo"
@@ -1551,6 +1570,7 @@
 
               <!-- Assignment Type -->
               <p-dropdown
+                appendTo="body"
                 [(ngModel)]="assignmentTypeFilter"
                 [options]="comboTypeOptions"
                 placeholder="Assignment Type"
@@ -2354,16 +2374,35 @@
   >
   </app-minew-batch-add>
 
-  <p-dialog
-    [(visible)]="displayDeviceDialog"
-    [modal]="true"
-    [style]="{ width: '750px' }"
-    [draggable]="false"
-    [resizable]="false"
-    [header]="isEditMode ? 'Edit Device' : 'Add New Device'"
-    appendTo="body"
-    styleClass="device-modal-dialog"
-  >
+<ng-template #displayDeviceDialogTpl>
+  <div class="dlg-shell">
+    <div class="dlg-header">
+      <div>
+        <h2 class="dlg-title">{{ isEditMode ? 'Edit Device' : 'Add New Device' }}</h2>
+      </div>
+        <button
+          type="button"
+          (click)="closeTplDialog('displayDeviceDialog')"
+          class="dlg-close"
+          aria-label="Close dialog"
+        >
+          <svg
+            class="w-5 h-5"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M6 18L18 6M6 6l12 12"
+            ></path>
+          </svg>
+        </button>
+    </div>
+
+    <div class="dlg-body">
     <!-- Main Form Container -->
     <form
       [formGroup]="deviceForm"
@@ -2373,7 +2412,7 @@
       <!-- Scrollable Content Area -->
       <div class="modal-scrollable-content">
         <!-- Device Type Selection -->
-        <div class="form-section mb-6">
+        <div class="form-section mb-6" *ngIf="showDeviceTypeSelector">
           <label for="deviceType" class="form-label"
             >Device Type <span class="required">*</span></label
           >
@@ -2431,23 +2470,9 @@
                 id="macAddress"
                 pInputText
                 formControlName="macAddress"
-                placeholder="e.g., 00:1A:2B:3C:4D:5E"
+                placeholder="e.g., e1000005e79d or 00:1A:2B:3C:4D:5E"
                 class="form-input"
-                [ngClass]="{
-                  'input-error':
-                    deviceForm.get('macAddress')?.invalid &&
-                    deviceForm.get('macAddress')?.touched,
-                }"
               />
-              <small
-                *ngIf="
-                  deviceForm.get('macAddress')?.invalid &&
-                  deviceForm.get('macAddress')?.touched
-                "
-                class="error-message"
-              >
-                Valid MAC address is required
-              </small>
             </div>
           </div>
         </div>
@@ -2465,6 +2490,7 @@
               </span>
             </label>
             <p-dropdown
+              appendTo="body"
               id="storeId"
               formControlName="storeId"
               [options]="storeOptions"
@@ -2543,6 +2569,7 @@
           <div class="field">
             <label for="screenId" class="form-label">Screen Properties</label>
             <p-dropdown
+              appendTo="body"
               id="screenId"
               formControlName="screenId"
               [options]="screenOptions"
@@ -2633,6 +2660,7 @@
             <div class="field">
               <label for="statusId" class="form-label">Status</label>
               <p-dropdown
+                appendTo="body"
                 id="statusId"
                 formControlName="statusId"
                 [options]="[
@@ -2675,7 +2703,7 @@
       <button
         type="button"
         class="dialog-btn dialog-btn-secondary"
-        (click)="displayDeviceDialog = false"
+        (click)="closeTplDialog('displayDeviceDialog')"
       >
         <span>Cancel</span>
       </button>
@@ -2685,23 +2713,45 @@
         [disabled]="deviceForm.invalid || loading"
         (click)="saveDevice()"
       >
-        <i class="pi" [ngClass]="isEditMode ? 'pi-check' : 'pi-plus'"></i>
         <span>{{ isEditMode ? "Update Device" : "Create Device" }}</span>
         <i *ngIf="loading" class="pi pi-spin pi-spinner ml-2"></i>
       </button>
     </div>
     <!-- </ng-template> -->
-  </p-dialog>
+    </div>
+  </div>
+</ng-template>
 
   <!-- Screen Dimension Dialog -->
-  <p-dialog
-    [(visible)]="displayScreenDimensionDialog"
-    [modal]="true"
-    [style]="{ width: '600px' }"
-    [draggable]="false"
-    [resizable]="false"
-    header="Device Screen Dimensions"
-  >
+<ng-template #displayScreenDimensionDialogTpl>
+  <div class="dlg-shell">
+    <div class="dlg-header">
+      <div>
+        <h2 class="dlg-title">Device Screen Dimensions</h2>
+      </div>
+        <button
+          type="button"
+          (click)="closeTplDialog('displayScreenDimensionDialog')"
+          class="dlg-close"
+          aria-label="Close dialog"
+        >
+          <svg
+            class="w-5 h-5"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M6 18L18 6M6 6l12 12"
+            ></path>
+          </svg>
+        </button>
+    </div>
+
+    <div class="dlg-body">
     <div *ngIf="selectedDevice" class="mb-4">
       <p-card>
         <div class="flex items-center space-x-3">
@@ -2788,6 +2838,7 @@
         <div class="field">
           <label for="orientation" class="font-medium">Orientation *</label>
           <p-dropdown
+            appendTo="body"
             id="orientation"
             formControlName="orientation"
             [options]="orientationOptions"
@@ -2845,7 +2896,7 @@
           type="button"
           label="Cancel"
           class="p-button-text"
-          (click)="displayScreenDimensionDialog = false"
+          (click)="closeTplDialog('displayScreenDimensionDialog')"
         ></button>
         <button
           pButton
@@ -2856,18 +2907,40 @@
         ></button>
       </div>
     </form>
-  </p-dialog>
+    </div>
+  </div>
+</ng-template>
 
   <!-- Sync Dialog -->
-  <p-dialog
-    [(visible)]="displayDeviceSyncDialog"
-    [modal]="true"
-    [style]="{ width: '500px' }"
-    [draggable]="false"
-    [resizable]="false"
-    appendTo="body"
-    header="Sync Devices"
-  >
+<ng-template #displayDeviceSyncDialogTpl>
+  <div class="dlg-shell">
+    <div class="dlg-header">
+      <div>
+        <h2 class="dlg-title">Sync Devices</h2>
+      </div>
+        <button
+          type="button"
+          (click)="closeTplDialog('displayDeviceSyncDialog')"
+          class="dlg-close"
+          aria-label="Close dialog"
+        >
+          <svg
+            class="w-5 h-5"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M6 18L18 6M6 6l12 12"
+            ></path>
+          </svg>
+        </button>
+    </div>
+
+    <div class="dlg-body">
     <!-- Remove the form tag and use a regular div -->
     <div class="space-y-4">
       <!-- Sync Type -->
@@ -2876,6 +2949,7 @@
           Sync Type *
         </label>
         <p-dropdown
+          appendTo="body"
           [(ngModel)]="selectedSyncType"
           [options]="syncOptions"
           placeholder="Select Sync Type"
@@ -2913,13 +2987,15 @@
       </div>
     </div>
 
-    <ng-template pTemplate="footer">
+    </div>
+
+    <div class="dlg-footer">
       <button
         pButton
         type="button"
         label="Cancel"
         class="p-button-text"
-        (click)="displayDeviceSyncDialog = false"
+        (click)="closeTplDialog('displayDeviceSyncDialog')"
       ></button>
       <button
         pButton
@@ -2931,19 +3007,40 @@
         <i *ngIf="loading" class="pi pi-spin pi-spinner mr-2"></i>
         {{ loading ? "Syncing..." : "Start Sync" }}
       </button>
-    </ng-template>
-  </p-dialog>
+    </div>
+  </div>
+</ng-template>
 
   <!-- Template Sync Dialog -->
-  <p-dialog
-    [(visible)]="displayTemplateSyncDialog"
-    [modal]="true"
-    [style]="{ width: '500px' }"
-    [draggable]="false"
-    [resizable]="false"
-    appendTo="body"
-    header="Sync Templates"
-  >
+<ng-template #displayTemplateSyncDialogTpl>
+  <div class="dlg-shell">
+    <div class="dlg-header">
+      <div>
+        <h2 class="dlg-title">Sync Templates</h2>
+      </div>
+        <button
+          type="button"
+          (click)="closeTplDialog('displayTemplateSyncDialog')"
+          class="dlg-close"
+          aria-label="Close dialog"
+        >
+          <svg
+            class="w-5 h-5"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M6 18L18 6M6 6l12 12"
+            ></path>
+          </svg>
+        </button>
+    </div>
+
+    <div class="dlg-body">
     <div class="p-4">
       <p class="text-gray-600 mb-4">
         This will sync templates from the cloud for the current store. Existing
@@ -2961,13 +3058,15 @@
       </div>
     </div>
 
-    <ng-template pTemplate="footer">
+    </div>
+
+    <div class="dlg-footer">
       <button
         pButton
         type="button"
         label="Cancel"
         class="p-button-text"
-        (click)="displayTemplateSyncDialog = false"
+        (click)="closeTplDialog('displayTemplateSyncDialog')"
       ></button>
       <button
         pButton
@@ -2979,18 +3078,40 @@
         <i *ngIf="syncingTemplates" class="pi pi-spin pi-spinner mr-2"></i>
         {{ syncingTemplates ? "Syncing..." : "Sync Templates" }}
       </button>
-    </ng-template>
-  </p-dialog>
+    </div>
+  </div>
+</ng-template>
 
   <!-- Template Dialog -->
-  <p-dialog
-    [(visible)]="displayTemplateDialog"
-    [modal]="true"
-    [style]="{ width: '600px' }"
-    [draggable]="false"
-    [resizable]="false"
-    [header]="isEditMode ? 'Edit Template' : 'Add New Template'"
-  >
+<ng-template #displayTemplateDialogTpl>
+  <div class="dlg-shell">
+    <div class="dlg-header">
+      <div>
+        <h2 class="dlg-title">{{ isEditMode ? 'Edit Template' : 'Add New Template' }}</h2>
+      </div>
+        <button
+          type="button"
+          (click)="closeTplDialog('displayTemplateDialog')"
+          class="dlg-close"
+          aria-label="Close dialog"
+        >
+          <svg
+            class="w-5 h-5"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M6 18L18 6M6 6l12 12"
+            ></path>
+          </svg>
+        </button>
+    </div>
+
+    <div class="dlg-body">
     <form
       [formGroup]="templateForm"
       (ngSubmit)="saveTemplate()"
@@ -3127,7 +3248,7 @@
           type="button"
           label="Cancel"
           class="p-button-text"
-          (click)="displayTemplateDialog = false"
+          (click)="closeTplDialog('displayTemplateDialog')"
         ></button>
         <button
           pButton
@@ -3138,23 +3259,46 @@
         ></button>
       </div>
     </form>
-  </p-dialog>
+    </div>
+  </div>
+</ng-template>
 
   <!-- Combo Dialog -->
-  <p-dialog
-    [(visible)]="displayComboDialog"
-    [modal]="true"
-    [style]="{ width: '500px' }"
-    [draggable]="false"
-    [resizable]="false"
-    appendTo="body"
-    header="Create Device-Template Combo"
-  >
+<ng-template #displayComboDialogTpl>
+  <div class="dlg-shell">
+    <div class="dlg-header">
+      <div>
+        <h2 class="dlg-title">Create Device-Template Combo</h2>
+      </div>
+        <button
+          type="button"
+          (click)="closeTplDialog('displayComboDialog')"
+          class="dlg-close"
+          aria-label="Close dialog"
+        >
+          <svg
+            class="w-5 h-5"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M6 18L18 6M6 6l12 12"
+            ></path>
+          </svg>
+        </button>
+    </div>
+
+    <div class="dlg-body">
     <form [formGroup]="comboForm" (ngSubmit)="saveCombo()" class="p-fluid">
       <div class="space-y-4">
         <div class="field">
           <label for="deviceId" class="font-medium">Device *</label>
           <p-dropdown
+            appendTo="body"
             id="deviceId"
             formControlName="deviceId"
             [options]="deviceOptions"
@@ -3181,6 +3325,7 @@
         <div class="field">
           <label for="templateId" class="font-medium">Template *</label>
           <p-dropdown
+            appendTo="body"
             id="templateId"
             formControlName="templateId"
             [options]="templateOptions"
@@ -3229,7 +3374,7 @@
           type="button"
           label="Cancel"
           class="p-button-text"
-          (click)="displayComboDialog = false"
+          (click)="closeTplDialog('displayComboDialog')"
         ></button>
         <button
           pButton
@@ -3240,18 +3385,40 @@
         ></button>
       </div>
     </form>
-  </p-dialog>
+    </div>
+  </div>
+</ng-template>
 
   <!-- Assignment Dialog -->
-  <p-dialog
-    [(visible)]="displayAssignmentDialog"
-    [modal]="true"
-    [style]="{ width: '500px' }"
-    [draggable]="false"
-    [resizable]="false"
-    appendTo="body"
-    header="Create Assignment"
-  >
+<ng-template #displayAssignmentDialogTpl>
+  <div class="dlg-shell">
+    <div class="dlg-header">
+      <div>
+        <h2 class="dlg-title">Create Assignment</h2>
+      </div>
+        <button
+          type="button"
+          (click)="closeTplDialog('displayAssignmentDialog')"
+          class="dlg-close"
+          aria-label="Close dialog"
+        >
+          <svg
+            class="w-5 h-5"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M6 18L18 6M6 6l12 12"
+            ></path>
+          </svg>
+        </button>
+    </div>
+
+    <div class="dlg-body">
     <form
       [formGroup]="assignmentForm"
       (ngSubmit)="saveAssignment()"
@@ -3261,6 +3428,7 @@
         <div class="field">
           <label for="comboId" class="font-medium">Combo *</label>
           <p-dropdown
+            appendTo="body"
             id="comboId"
             formControlName="comboId"
             [options]="comboOptions"
@@ -3288,6 +3456,7 @@
         <div>
           <label for="locationType" class="font-medium">Location Type *</label>
           <p-dropdown
+            appendTo="body"
             id="locationType"
             formControlName="locationType"
             [options]="locationTypeOptions"
@@ -3333,6 +3502,7 @@
           <!-- Product Dropdown -->
           <div *ngIf="assignmentForm.get('locationType')?.value === 'Product'">
             <p-dropdown
+              appendTo="body"
               formControlName="locationId"
               [options]="products"
               optionLabel="productName"
@@ -3341,7 +3511,7 @@
               [showClear]="true"
               [loading]="loadingProducts"
               [virtualScroll]="true"
-              [virtualScrollItemSize]="38"
+              [virtualScrollItemSize]="52"
               filterBy="productName,productCode"
               (onFilter)="onProductSearch($event)"
               (onShow)="loadProducts()"
@@ -3446,6 +3616,7 @@
           <!-- Shelf Dropdown -->
           <div *ngIf="assignmentForm.get('locationType')?.value === 'Shelf'">
             <p-dropdown
+              appendTo="body"
               formControlName="locationId"
               [options]="shelves"
               optionLabel="name"
@@ -3454,7 +3625,7 @@
               [showClear]="true"
               [loading]="loadingShelves"
               [virtualScroll]="true"
-              [virtualScrollItemSize]="38"
+              [virtualScrollItemSize]="52"
               filterBy="name,location"
               (onFilter)="onShelfSearch($event)"
               (onShow)="loadShelves()"
@@ -3621,7 +3792,7 @@
           type="button"
           label="Cancel"
           class="p-button-text"
-          (click)="displayAssignmentDialog = false"
+          (click)="closeTplDialog('displayAssignmentDialog')"
         ></button>
         <button
           pButton
@@ -3632,19 +3803,40 @@
         ></button>
       </div>
     </form>
-  </p-dialog>
+    </div>
+  </div>
+</ng-template>
 
   <!-- Template Preview Dialog -->
-  <p-dialog
-    [(visible)]="displayTemplatePreviewDialog"
-    [modal]="true"
-    [style]="{ width: '700px' }"
-    [draggable]="false"
-    [resizable]="false"
-    header="Template Preview"
-    appendTo="body"
-    (onHide)="closeTemplatePreview()"
-  >
+<ng-template #displayTemplatePreviewDialogTpl>
+  <div class="dlg-shell">
+    <div class="dlg-header">
+      <div>
+        <h2 class="dlg-title">Template Preview</h2>
+      </div>
+        <button
+          type="button"
+          (click)="closeTemplatePreview()"
+          class="dlg-close"
+          aria-label="Close dialog"
+        >
+          <svg
+            class="w-5 h-5"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M6 18L18 6M6 6l12 12"
+            ></path>
+          </svg>
+        </button>
+    </div>
+
+    <div class="dlg-body">
     <div *ngIf="selectedTemplateForPreview" class="space-y-4">
       <!-- Template Information -->
       <div class="bg-emerald-50 border border-emerald-200 rounded-lg p-4">
@@ -3752,18 +3944,40 @@
         </div>
       </div>
     </div>
-  </p-dialog>
+    </div>
+  </div>
+</ng-template>
 
   <!-- Gateway Dialog -->
-  <p-dialog
-    [(visible)]="displayGatewayDialog"
-    [modal]="true"
-    [style]="{ width: '600px' }"
-    [draggable]="false"
-    [resizable]="false"
-    appendTo="body"
-    [header]="isEditMode ? 'Edit Gateway' : 'Add New Gateway'"
-  >
+<ng-template #displayGatewayDialogTpl>
+  <div class="dlg-shell">
+    <div class="dlg-header">
+      <div>
+        <h2 class="dlg-title">{{ isEditMode ? 'Edit Gateway' : 'Add New Gateway' }}</h2>
+      </div>
+        <button
+          type="button"
+          (click)="closeTplDialog('displayGatewayDialog')"
+          class="dlg-close"
+          aria-label="Close dialog"
+        >
+          <svg
+            class="w-5 h-5"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M6 18L18 6M6 6l12 12"
+            ></path>
+          </svg>
+        </button>
+    </div>
+
+    <div class="dlg-body">
     <form [formGroup]="gatewayForm" (ngSubmit)="saveGateway()" class="p-fluid">
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div class="space-y-4">
@@ -3798,7 +4012,7 @@
               id="macAddress"
               pInputText
               formControlName="macAddress"
-              placeholder="e.g., 00:1A:2B:3C:4D:5E"
+              placeholder="e.g., e1000005e79d or 00:1A:2B:3C:4D:5E"
               class="w-full"
               [ngClass]="{
                 'p-invalid':
@@ -3820,6 +4034,7 @@
           <div class="field">
             <label for="storeId" class="font-medium">Store *</label>
             <p-dropdown
+              appendTo="body"
               id="storeId"
               formControlName="storeId"
               [options]="storeOptions"
@@ -3848,6 +4063,7 @@
           <div class="field">
             <label for="gatewayType" class="font-medium">Gateway Type</label>
             <p-dropdown
+              appendTo="body"
               id="gatewayType"
               formControlName="gatewayType"
               [options]="gatewayTypeOptions"
@@ -3923,7 +4139,7 @@
           type="button"
           label="Cancel"
           class="p-button-text"
-          (click)="displayGatewayDialog = false"
+          (click)="closeTplDialog('displayGatewayDialog')"
         ></button>
         <button
           pButton
@@ -3934,5 +4150,7 @@
         ></button>
       </div>
     </form>
-  </p-dialog>
+    </div>
+  </div>
+</ng-template>
 </div>

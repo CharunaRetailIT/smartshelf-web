@@ -113,6 +113,22 @@ export class DeviceService {
   //#endregion
 
   //#region Device Management - Cloud Sync & Operations
+  /**
+   * Fills in screen dimensions for a store's devices from Minew. A device added
+   * locally has no screen - the panel size is only knowable from the cloud.
+   */
+  refreshDeviceScreens(
+    storeId: number,
+  ): Observable<{ message: string; updated: number }> {
+    const params = new HttpParams().set('storeId', storeId);
+
+    return this.http.post<{ message: string; updated: number }>(
+      `${this.API_URL}/device/devices/refresh-screens`,
+      {},
+      { params },
+    );
+  }
+
   syncDevicesFromCloud(
     storeId: number,
     eqstatus: string = '2,8,9',

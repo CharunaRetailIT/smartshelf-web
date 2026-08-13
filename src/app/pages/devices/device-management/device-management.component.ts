@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, OnDestroy, viewChild, EventEmitter, Input, Output } from '@angular/core';
+import { Component, OnInit, ViewChild, OnDestroy, viewChild, EventEmitter, Input, Output, TemplateRef } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { firstValueFrom, Subject } from 'rxjs';
@@ -31,7 +31,7 @@ import { TableLazyLoadEvent } from 'primeng/table';
 import { ImportsModule } from '../../../imports/imports';
 import { MinewStore } from '../../../core/interfaces/minew.interface';
 import { ConfirmationDialogComponent } from '../../../shared/components/dialog/confirmation-dialog/confirmation-dialog.component';
-import { MatDialog } from '@angular/material/dialog';
+import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { CreateDeviceScreenDimensionRequest, DeviceScreenDimensionResponse } from '../../../core/interfaces/device-screen-dimension.interface';
 import { DeleteConfirmationComponent } from '../../../shared/components/dialog/delete-confirmation/delete-confirmation.component';
 import { MinewBatchAddComponent } from "../minew-batch-add/minew-batch-add.component";
@@ -184,6 +184,42 @@ export class DeviceManagementComponent implements OnInit, OnDestroy {
 
   // UI State
   activeTabIndex: number = 0;
+
+  // Message Combos is hidden for now. Flip to true to bring the tab back - the
+  // panel, its table and every handler are still in place.
+  showMessageCombosTab = false;
+
+  // Tabs are addressed by name, not by position: hiding a panel re-indexes the
+  // ones after it, so a hard-coded `activeTabIndex === 4` silently points at
+  // the wrong tab the moment a tab is added, removed or hidden.
+  get visibleTabs(): string[] {
+    return [
+      'devices',
+      'templates',
+      'combos',
+      ...(this.showMessageCombosTab ? ['messageCombos'] : []),
+      'assignments',
+      'gateways',
+    ];
+  }
+
+  get activeTabKey(): string {
+    return this.visibleTabs[this.activeTabIndex] ?? 'devices';
+  }
+  // Every popup on this page is a Material dialog rendered from a TemplateRef
+  // below, so all the state and handlers stay on this component. The boolean
+  // flags are kept because other logic still reads them.
+  @ViewChild('displayDeviceDialogTpl') displayDeviceDialogTpl!: TemplateRef<unknown>;
+  @ViewChild('displayTemplateDialogTpl') displayTemplateDialogTpl!: TemplateRef<unknown>;
+  @ViewChild('displayComboDialogTpl') displayComboDialogTpl!: TemplateRef<unknown>;
+  @ViewChild('displayAssignmentDialogTpl') displayAssignmentDialogTpl!: TemplateRef<unknown>;
+  @ViewChild('displayScreenDimensionDialogTpl') displayScreenDimensionDialogTpl!: TemplateRef<unknown>;
+  @ViewChild('displayDeviceSyncDialogTpl') displayDeviceSyncDialogTpl!: TemplateRef<unknown>;
+  @ViewChild('displayTemplateSyncDialogTpl') displayTemplateSyncDialogTpl!: TemplateRef<unknown>;
+  @ViewChild('displayGatewayDialogTpl') displayGatewayDialogTpl!: TemplateRef<unknown>;
+  @ViewChild('displayTemplatePreviewDialogTpl') displayTemplatePreviewDialogTpl!: TemplateRef<unknown>;
+  private tplDialogRefs = new Map<string, MatDialogRef<unknown>>();
+
   displayDeviceDialog: boolean = false;
   displayTemplateDialog: boolean = false;
   displayComboDialog: boolean = false;
@@ -230,6 +266,11 @@ export class DeviceManagementComponent implements OnInit, OnDestroy {
   // Store ID
   storeId: number = 0;
   storeName: string = '';
+  /** The active store's Minew cloud id; empty until the store is synced. */
+  minewStoreId: string = '';
+
+  /** Guards the Refresh Screens button while the cloud read is in flight. */
+  screensRefreshing = false;
 
   storeTotalRecords: number = 0;
   storeLoading: boolean = false;
@@ -255,6 +296,11 @@ export class DeviceManagementComponent implements OnInit, OnDestroy {
     { label: 'Online', value: 'online' },
     { label: 'Offline', value: 'offline' }
   ];
+
+  // Every device is Minew for now, so the picker is hidden and the form's
+  // 'Minew' default stands. Flip to true to bring the choice back - the
+  // Standard-device branches in the template and TS are all still in place.
+  showDeviceTypeSelector = false;
 
   deviceTypeOptions = [
     { label: 'Minew ESL', value: 'Minew' },
@@ -337,7 +383,9 @@ export class DeviceManagementComponent implements OnInit, OnDestroy {
     // Initialize forms
     this.deviceForm = this.fb.group({
       id: [''],
-      macAddress: ['', [Validators.pattern(/^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$/)]],
+      // No client-side format check: MACs are accepted as typed (bare
+      // e1000005e79d, separated, or whatever the hardware reports).
+      macAddress: [''],
       deviceName: ['', Validators.required],
       deviceType: ['Minew', Validators.required],
       storeId: [0, Validators.required],
@@ -463,6 +511,8 @@ export class DeviceManagementComponent implements OnInit, OnDestroy {
     if (currentStore) {
       this.storeId = currentStore.id;
       this.storeName = currentStore.storeName;
+      // Minew addresses stores by its own cloud id, not our local one.
+      this.minewStoreId = currentStore.minewStoreId ?? '';
       console.log('Current default store:', currentStore);
     }
   }
@@ -1599,24 +1649,24 @@ export class DeviceManagementComponent implements OnInit, OnDestroy {
 
   //handle when search term becomes empty
   private handleEmptySearch(): void {
-    switch (this.activeTabIndex) {
-      case 0: // Devices
+    switch (this.activeTabKey) {
+      case 'devices':
         this.deviceSearchTerm = '';
         this.onDeviceSearch();
         break;
-      case 1: // Templates
+      case 'templates':
         this.templateSearchTerm = '';
         this.onTemplateSearch();
         break;
-      case 2: // Combos
+      case 'combos':
         this.comboSearchTerm = '';
         this.onComboSearch();
         break;
-      case 3: // Message Combos
+      case 'messageCombos':
         this.messageComboSearchTerm = '';
         this.onMessageComboSearch();
         break;
-      case 4: // Assignments
+      case 'assignments':
         this.assignmentSearchTerm = '';
         this.onAssignmentSearch();
         break;
@@ -1628,39 +1678,39 @@ export class DeviceManagementComponent implements OnInit, OnDestroy {
     this.activeTabIndex = event.index;
 
     // Load data when switching tabs
-    switch (event.index) {
-      case 0: // Devices
+    switch (this.visibleTabs[event.index]) {
+      case 'devices':
         if (this.devices.length === 0) {
           this.loadDevicesLazy({ first: 0, rows: this.devicesRows });
         }
         break;
-      case 1: // Templates
+      case 'templates':
         if (this.templates.length === 0) {
           this.loadLocalTemplatesLazy({ first: 0, rows: this.templatesRows });
         }
         break;
-      case 2: // Combos
+      case 'combos':
         if (this.combos.length === 0) {
           this.loadCombosLazy({ first: 0, rows: this.combosRows });
         }
         // Load combo options for assignment dialog
         this.loadComboOptions();
         break;
-      case 3: // Message Combos
+      case 'messageCombos':
         if (this.messageCombos.length === 0) {
           this.loadMessageCombosLazy({ first: 0, rows: this.messageCombosRows });
         }
         // Load message combo options for assignment dialog
         this.loadMessageComboOptions();
         break;
-      case 4: // Assignments
+      case 'assignments':
         if (this.assignments.length === 0) {
           this.loadAssignmentsLazy({ first: 0, rows: this.assignmentsRows });
         }
         this.loadComboOptions();
         this.loadMessageComboOptions();
         break;
-      case 5: // Gateways
+      case 'gateways':
         if (this.gateways.length === 0) {
           this.loadGatewaysLazy({ first: 0, rows: this.gatewaysRows });
         }
@@ -1739,7 +1789,10 @@ export class DeviceManagementComponent implements OnInit, OnDestroy {
         id: device.id,
         macAddress: device.mac,
         deviceName: device.deviceName,
-        deviceType: device.deviceType || 'Minew',
+        // Forced rather than carried over: the device type picker is hidden
+        // (see showDeviceTypeSelector) and everything is Minew for now, so
+        // saving an existing Standard device normalises it to Minew.
+        deviceType: 'Minew',
         storeId: device.storeId,
         screenId: device.screenId || null,
         ipAddress: device.ipAddress || '',
@@ -1768,6 +1821,37 @@ export class DeviceManagementComponent implements OnInit, OnDestroy {
     this.loadInitialStores();
     this.loadScreenOptions();
     this.displayDeviceDialog = true;
+    this.openTplDialog('displayDeviceDialog', this.displayDeviceDialogTpl, '750px');
+  }
+
+  /**
+   * Opens one of this page's dialog templates in a Material dialog. Re-opening
+   * an already-open key closes the previous instance first so the map never
+   * leaks a stale ref.
+   */
+  private openTplDialog(
+    key: string,
+    tpl: TemplateRef<unknown>,
+    width: string,
+  ): void {
+    this.tplDialogRefs.get(key)?.close();
+    const ref = this.dialog.open(tpl, {
+      width,
+      maxWidth: '95vw',
+      maxHeight: '90vh',
+    });
+    this.tplDialogRefs.set(key, ref);
+    ref.afterClosed().subscribe(() => {
+      if (this.tplDialogRefs.get(key) === ref) {
+        this.tplDialogRefs.delete(key);
+      }
+    });
+  }
+
+  closeTplDialog(key: string): void {
+    this.tplDialogRefs.get(key)?.close();
+    this.tplDialogRefs.delete(key);
+    (this as unknown as Record<string, unknown>)[key] = false;
   }
 
   openMinewBatchDialog(): void {
@@ -1813,6 +1897,7 @@ export class DeviceManagementComponent implements OnInit, OnDestroy {
       });
     }
     this.displayTemplateDialog = true;
+    this.openTplDialog('displayTemplateDialog', this.displayTemplateDialogTpl, '600px');
   }
 
   openComboDialog(): void {
@@ -1820,6 +1905,7 @@ export class DeviceManagementComponent implements OnInit, OnDestroy {
       isDefault: false
     });
     this.displayComboDialog = true;
+    this.openTplDialog('displayComboDialog', this.displayComboDialogTpl, '500px');
   }
 
   // openAssignmentDialog(): void {
@@ -1850,24 +1936,68 @@ export class DeviceManagementComponent implements OnInit, OnDestroy {
     }
 
     this.displayAssignmentDialog = true;
+    this.openTplDialog('displayAssignmentDialog', this.displayAssignmentDialogTpl, '500px');
   }
 
+
+  /**
+   * Fills in screen size for devices in the active store. A device added from
+   * the portal has no screen - the panel size is only knowable from Minew, so
+   * this reads the store's labels back and maps each one onto the matching
+   * DeviceScreens row, creating that row when the size is new.
+   */
+  refreshDeviceScreens(): void {
+    if (!this.storeId) {
+      this.showError('Select a store first.');
+      return;
+    }
+
+    if (!this.minewStoreId) {
+      this.showError(
+        'This store is not linked to Minew yet. Sync the store to the cloud first.',
+      );
+      return;
+    }
+
+    this.screensRefreshing = true;
+
+    this.deviceService.refreshDeviceScreens(this.storeId).subscribe({
+      next: (res) => {
+        this.screensRefreshing = false;
+        if (res?.updated > 0) {
+          this.showSuccess(res.message || 'Screen details updated.');
+          this.loadDevicesLazy({ first: 0, rows: this.devicesRows });
+        } else {
+          this.showSuccess(res?.message || 'No devices needed a screen update.');
+        }
+      },
+      error: (err) => {
+        this.screensRefreshing = false;
+        this.showError(
+          err?.error?.message || 'Failed to refresh screen details',
+        );
+      },
+    });
+  }
 
   openSyncDialog(): void {
     this.selectedSyncType = 'localToCloud';
     this.loading = false; // Reset loading state
     this.displayDeviceSyncDialog = true;
+    this.openTplDialog('displayDeviceSyncDialog', this.displayDeviceSyncDialogTpl, '500px');
   }
 
   openScreenDimensionDialog(device?: any) {
     this.selectedDevice = device;   // so your *ngIf="selectedDevice" works
     this.loadScreenDimensions(device.id); // optional
     this.displayScreenDimensionDialog = true;
+    this.openTplDialog('displayScreenDimensionDialog', this.displayScreenDimensionDialogTpl, '600px');
   }
 
 
   syncTemplates(): void {
     this.displayTemplateSyncDialog = true;
+    this.openTplDialog('displayTemplateSyncDialog', this.displayTemplateSyncDialogTpl, '500px');
   }
 
   syncGateways(): void {
@@ -1923,6 +2053,7 @@ export class DeviceManagementComponent implements OnInit, OnDestroy {
 
     this.loadInitialStores();
     this.displayGatewayDialog = true;
+    this.openTplDialog('displayGatewayDialog', this.displayGatewayDialogTpl, '600px');
   }
 
 
@@ -1964,6 +2095,7 @@ export class DeviceManagementComponent implements OnInit, OnDestroy {
         next: (device) => {
           this.showSuccess('Device updated successfully');
           this.displayDeviceDialog = false;
+          this.closeTplDialog('displayDeviceDialog');
           if (this.devicesTable) {
             this.devicesTable.reset();
           }
@@ -1978,6 +2110,7 @@ export class DeviceManagementComponent implements OnInit, OnDestroy {
         next: (device) => {
           this.showSuccess('Device created successfully');
           this.displayDeviceDialog = false;
+          this.closeTplDialog('displayDeviceDialog');
           if (this.devicesTable) {
             this.devicesTable.reset();
           }
@@ -2004,6 +2137,7 @@ export class DeviceManagementComponent implements OnInit, OnDestroy {
     }
 
     this.displayTemplateDialog = false;
+    this.closeTplDialog('displayTemplateDialog');
     // Refresh templates list
     if (this.templatesTable) {
       this.templatesTable.reset();
@@ -2028,6 +2162,7 @@ export class DeviceManagementComponent implements OnInit, OnDestroy {
       next: (combo) => {
         this.showSuccess('Combo created successfully');
         this.displayComboDialog = false;
+        this.closeTplDialog('displayComboDialog');
         // Refresh combos list
         if (this.combosTable) {
           this.combosTable.reset();
@@ -2062,6 +2197,7 @@ export class DeviceManagementComponent implements OnInit, OnDestroy {
       next: (assignment) => {
         this.showSuccess('Assignment created successfully');
         this.displayAssignmentDialog = false;
+        this.closeTplDialog('displayAssignmentDialog');
         // Refresh assignments list
         if (this.assignmentsTable) {
           this.assignmentsTable.reset();
@@ -2105,6 +2241,7 @@ export class DeviceManagementComponent implements OnInit, OnDestroy {
         next: (gateway) => {
           this.showSuccess('Gateway updated successfully');
           this.displayGatewayDialog = false;
+          this.closeTplDialog('displayGatewayDialog');
           if (this.gatewaysTable) {
             this.gatewaysTable.reset();
           }
@@ -2132,6 +2269,7 @@ export class DeviceManagementComponent implements OnInit, OnDestroy {
         next: (gateway) => {
           this.showSuccess('Gateway created successfully');
           this.displayGatewayDialog = false;
+          this.closeTplDialog('displayGatewayDialog');
           if (this.gatewaysTable) {
             this.gatewaysTable.reset();
           }
@@ -2144,13 +2282,101 @@ export class DeviceManagementComponent implements OnInit, OnDestroy {
   }
 
 
+  /**
+   * Pushes local-only devices for the active store up to the Minew cloud.
+   *
+   * Minew has no single-device create - `apis/esl/label/batchAdd` (behind our
+   * devices/batch-add-minew) is the only way in, which is the same call the
+   * Batch Add dialog makes. Only devices without a MinewDeviceId are sent; the
+   * cloud answers per MAC, and a label it already knows about comes back as
+   * "already added" rather than as a failure.
+   */
   private syncLocalToCloud(): void {
-    // Note: Implement local to cloud sync logic
-    setTimeout(() => {
+    if (!this.minewStoreId) {
       this.loading = false;
-      this.showSuccess('Devices synced to cloud successfully');
-      this.loadDevicesLazy({ first: 0, rows: this.devicesRows });
-    }, 2000);
+      this.showError(
+        'This store is not linked to Minew yet. Sync the store to the cloud first.',
+      );
+      return;
+    }
+
+    this.deviceService.getLocalDevices().subscribe({
+      next: (devices) => {
+        // Every local device for this store is offered to Minew. MinewDeviceId
+        // cannot be used to pre-filter: CreateDeviceAsync sets it to the MAC for
+        // any Minew device at creation, whether or not the cloud has ever seen
+        // it. Minew dedupes for us, answering per MAC, and the summary below
+        // separates genuinely-added from already-present.
+        const pending = (devices || []).filter(
+          (d) => String(d.storeId) === String(this.storeId) && !!d.mac,
+        );
+
+        if (pending.length === 0) {
+          this.loading = false;
+          this.showSuccess('There are no devices in this store to sync.');
+          return;
+        }
+
+        this.deviceService
+          .batchAddDevicesToMinew({
+            storeId: this.minewStoreId,
+            macAddresses: pending.map((d) => d.mac),
+            type: 1, // 1 = ESL tag (5 = warning light)
+            userId: this.currentUserId,
+          })
+          .subscribe({
+            next: (response) => {
+              this.loading = false;
+              const result = response?.result;
+
+              if (!response?.success || !result) {
+                this.showError(response?.message || 'Failed to sync devices to cloud');
+                return;
+              }
+
+              // Minew answers per MAC in the account's own language, so classify
+              // on its wording rather than trusting a single count.
+              const verdicts = Object.entries(result.results || {});
+              const isAdded = (v: string) => /^(success|成功)$/i.test((v || '').trim());
+              const isAlreadyThere = (v: string) => (v || '').includes('已被添加');
+
+              const added = verdicts.filter(([, v]) => isAdded(v)).length;
+              const already = verdicts.filter(([, v]) => isAlreadyThere(v)).length;
+              const rejected = verdicts.filter(
+                ([, v]) => !isAdded(v) && !isAlreadyThere(v),
+              );
+
+              const parts: string[] = [];
+              if (added) parts.push(`${added} added`);
+              if (already) parts.push(`${already} already in Minew`);
+              if (rejected.length) parts.push(`${rejected.length} rejected`);
+
+              const summary = parts.length ? parts.join(', ') : 'nothing to do';
+
+              if (rejected.length) {
+                // Surface Minew's own wording - it explains why (unknown label,
+                // wrong store, and so on).
+                this.showError(
+                  `Sync to Minew: ${summary}. ` +
+                    rejected.map(([mac, reason]) => `${mac}: ${reason}`).join('; '),
+                );
+              } else {
+                this.showSuccess(`Sync to Minew: ${summary}.`);
+              }
+
+              this.loadDevicesLazy({ first: 0, rows: this.devicesRows });
+            },
+            error: () => {
+              this.loading = false;
+              this.showError('Failed to sync devices to cloud');
+            },
+          });
+      },
+      error: () => {
+        this.loading = false;
+        this.showError('Could not read the local device list');
+      },
+    });
   }
 
   private syncFromCloud(): void {
@@ -2193,6 +2419,7 @@ export class DeviceManagementComponent implements OnInit, OnDestroy {
       next: (dimension) => {
         this.showSuccess('Screen dimension added successfully');
         this.displayScreenDimensionDialog = false;
+        this.closeTplDialog('displayScreenDimensionDialog');
         this.loadScreenDimensions(this.selectedDevice!.id);
       },
       error: (error) => {
@@ -2203,6 +2430,7 @@ export class DeviceManagementComponent implements OnInit, OnDestroy {
 
   confirmTemplateSync(): void {
     this.displayTemplateSyncDialog = false;
+    this.closeTplDialog('displayTemplateSyncDialog');
 
     const dialogRef = this.dialog.open(ConfirmationDialogComponent, {
       width: '420px',
@@ -2236,7 +2464,12 @@ export class DeviceManagementComponent implements OnInit, OnDestroy {
         },
         error: (error) => {
           console.error('Template sync failed:', error);
-          this.showError('Failed to sync templates from cloud');
+          const reason = error?.error?.message || error?.message;
+          this.showError(
+            reason
+              ? `Failed to sync templates from cloud: ${reason}`
+              : 'Failed to sync templates from cloud',
+          );
           this.syncingTemplates = false;
         }
       });
@@ -2250,6 +2483,7 @@ export class DeviceManagementComponent implements OnInit, OnDestroy {
     }
 
     this.displayDeviceSyncDialog = false;
+    this.closeTplDialog('displayDeviceSyncDialog');
 
     // Confirmation before sync
     const dialogRef = this.dialog.open(ConfirmationDialogComponent, {
@@ -2347,8 +2581,16 @@ export class DeviceManagementComponent implements OnInit, OnDestroy {
       next: () => {
         this.showSuccess(`Blinking "${device.deviceName}"`);
       },
-      error: () => {
-        this.showError(`Failed to blink "${device.deviceName}"`);
+      error: (err) => {
+        // The API returns Minew's own reason (gateway offline, unknown label,
+        // store not linked). Swallowing it left only "Failed to blink", which
+        // says nothing about what to fix.
+        const reason = err?.error?.message || err?.message;
+        this.showError(
+          reason
+            ? `Failed to blink "${device.deviceName}": ${reason}`
+            : `Failed to blink "${device.deviceName}"`,
+        );
       },
     });
   }
@@ -2662,6 +2904,7 @@ export class DeviceManagementComponent implements OnInit, OnDestroy {
     this.selectedTemplateForPreview = template;
     this.isLoadingPreview = true;
     this.displayTemplatePreviewDialog = true;
+    this.openTplDialog('displayTemplatePreviewDialog', this.displayTemplatePreviewDialogTpl, '700px');
     this.templatePreviewImage = null;
 
     // Assuming your device service has a method to get template preview
@@ -2682,6 +2925,7 @@ export class DeviceManagementComponent implements OnInit, OnDestroy {
   // Add this method to close the preview dialog
   closeTemplatePreview(): void {
     this.displayTemplatePreviewDialog = false;
+    this.closeTplDialog('displayTemplatePreviewDialog');
     this.selectedTemplateForPreview = null;
     this.templatePreviewImage = null;
     this.isLoadingPreview = false;

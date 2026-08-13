@@ -133,6 +133,20 @@ export class ProductFormPageComponent implements OnInit, OnDestroy {
     return (brand?.code || '').toLowerCase() !== 'standard';
   }
 
+  // Message pairing is available on the product form: a Minew row binds through
+  // its device+template combo and may carry a message on top, which the bind
+  // sends as the dynamic image. Template-only stays valid - the message is
+  // optional for a template-capable brand and required only for 'standard'
+  // brands, which have no template path.
+  showDeviceMessageCombos = true;
+
+  // Barcode is hidden for now. Nothing requires it: neither Create nor Update
+  // ProductDto validates it, and Minew accepts an empty barcode on
+  // goods/updateToStore (verified against the live cloud). The control stays in
+  // the form, so the payload shape is unchanged and an existing product keeps
+  // whatever barcode it already had. Flip to true to show the field again.
+  showBarcodeField = false;
+
   brandSupportsTemplate(index: number): boolean {
     const brandId = this.eslAssignments.at(index)?.get('brandId')?.value;
     return this.isTemplateCapableBrand(brandId);
@@ -238,6 +252,8 @@ export class ProductFormPageComponent implements OnInit, OnDestroy {
     product: this.fb.group({
       id: [0],
       productCode: [''],
+      // Kept in the form even while the field is hidden, so create/edit keep
+      // sending barCode and an existing product's value survives a save.
       barCode: [''],
       productName: ['', Validators.required],
       quantity: [0],
@@ -1233,12 +1249,58 @@ export class ProductFormPageComponent implements OnInit, OnDestroy {
       });
   }
 
+  /** Friendly names for the controls that are actually blocking a save. */
+  private describeInvalidControls(): string[] {
+    const labels: Record<string, string> = {
+      productName: 'Product Name',
+      categoryId: 'Category',
+      sellingPrice: 'Selling Price',
+      brandId: 'ESL Brand',
+      deviceId: 'Device',
+      displayOrder: 'Display Order',
+    };
+
+    const missing: string[] = [];
+
+    Object.keys(this.productGroup.controls).forEach((key) => {
+      if (this.productGroup.get(key)?.invalid) {
+        missing.push(labels[key] ?? key);
+      }
+    });
+
+    this.eslAssignments.controls.forEach((group, index) => {
+      if (group.get('isDeleted')?.value || group.valid) return;
+
+      const row = `ESL row ${index + 1}`;
+      Object.keys(group.controls).forEach((key) => {
+        if (group.get(key)?.invalid) {
+          missing.push(`${row}: ${labels[key] ?? key}`);
+        }
+      });
+
+      // Group-level rule - neither a template nor a message was chosen.
+      if (group.errors?.['noBinding']) {
+        missing.push(`${row}: Template or Message`);
+      }
+    });
+
+    return missing;
+  }
+
   save(): void {
     if (!this.canEdit()) return;
 
     if (this.form.invalid) {
       this.form.markAllAsTouched();
-      this.showError('Please fill required fields');
+      // Naming the offenders matters here: markAllAsTouched lights up every
+      // invalid control across both tabs, so a single missing field looked like
+      // "everything is required" with no way to tell what was actually blocking.
+      const missing = this.describeInvalidControls();
+      this.showError(
+        missing.length
+          ? `Please complete: ${missing.join(', ')}`
+          : 'Please fill required fields',
+      );
       return;
     }
 

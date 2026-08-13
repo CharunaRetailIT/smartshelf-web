@@ -18,7 +18,6 @@ import { MessageListComponent } from './pages/message/message-list/message-list.
 // import { ViewShelfProductsDialogComponent } from './pages/shelves/product-assign/view-shelf-products-dialog/view-shelf-products-dialog.component';
 import { ProductManagementComponent } from './pages/products/product-management/product-management.component';
 import { UserProfileComponent } from './pages/users/user-profile/user-profile.component';
-import { ProductModalComponent } from './pages/products/product-modal/product-modal.component';
 
 export const routes: Routes = [
   // Redirect root to dashboard
@@ -63,7 +62,7 @@ export const routes: Routes = [
         path: 'user-management',
         component: UserManagementComponent,
         canActivate: [RoleGuard],
-        data: { roles: ['Admin', 'Manager'], showHeader: false }, // Only Admin and Manager can access
+        data: { roles: ['Admin'], showHeader: false }, // Admin only, matches the sidebar entry
       },
       // {
       //   path: 'shelf-management',
@@ -81,7 +80,10 @@ export const routes: Routes = [
         path: 'aisle-management',
         component: AilseManagementComponent,
         canActivate: [RoleGuard],
-        data: { role: ['Operator', 'Viewer', 'Admin'], showHeader: false }, // Operator and above can access (Operator, Manager, Admin)
+        data: {
+          roles: ['Viewer', 'Admin', 'Manager', 'Operator'],
+          showHeader: false,
+        }, // All roles; write actions are gated inside the page
       },
       // {
       //   path: 'product-assignment',
@@ -93,13 +95,16 @@ export const routes: Routes = [
         path: 'create-message',
         component: CreateMessageComponent,
         canActivate: [RoleGuard],
-        data: { role: ['Operator', 'Viewer', 'Admin'], showHeader: false }, // Operator and above can access (Operator, Manager, Admin)
+        data: { roles: ['Admin', 'Manager', 'Operator'], showHeader: false }, // Viewer is read-only, no message authoring
       },
       {
         path: 'message-list',
         component: MessageListComponent,
         canActivate: [RoleGuard],
-        data: { role: ['Operator', 'Viewer'], showHeader: false }, // Operator and above can access (Operator, Manager, Admin)
+        data: {
+          roles: ['Viewer', 'Admin', 'Manager', 'Operator'],
+          showHeader: false,
+        }, // All roles; edit/delete are gated inside the page
       },
       // {
       //   path: 'queue-management',
@@ -126,7 +131,10 @@ export const routes: Routes = [
             (m) => m.ProductAssignmentComponent,
           ),
         canActivate: [RoleGuard],
-        data: { role: ['Operator', 'Viewer'], showHeader: false }, // Operator and above can access (Operator, Manager, Admin)
+        data: {
+          roles: ['Viewer', 'Admin', 'Manager', 'Operator'],
+          showHeader: false,
+        }, // Viewer lands in read-only 'view' mode inside the component
       },
       //   {
       //     path: 'assign-products/:type/:id',
@@ -144,18 +152,22 @@ export const routes: Routes = [
         path: 'product-management',
         component: ProductManagementComponent,
         canActivate: [RoleGuard],
-        data: { role: ['Operator', 'Viewer'], showHeader: false }, // Operator and above can access (Operator, Manager, Admin)
+        data: {
+          roles: ['Viewer', 'Admin', 'Manager', 'Operator'],
+          showHeader: false,
+        }, // All roles; write actions are gated inside the page
       },
+      // The product modal is retired in favour of the full-page product form.
+      // These two redirects keep any existing links/bookmarks working.
       {
         path: 'product-management/new',
-        component: ProductModalComponent,
-        canActivate: [RoleGuard],
-        data: {
-          mode: 'create',
-          role: ['Operator', 'Viewer', 'Admin', 'Manager'],
-          showHeader: false,
-          fullScreen: true,
-        },
+        redirectTo: 'products/create',
+        pathMatch: 'full',
+      },
+      {
+        path: 'product-management/edit/:id',
+        redirectTo: 'products/edit/:id',
+        pathMatch: 'full',
       },
 
       {
@@ -167,7 +179,7 @@ export const routes: Routes = [
         canActivate: [RoleGuard],
         data: {
           mode: 'create',
-          role: ['Operator', 'Viewer', 'Admin', 'Manager'],
+          roles: ['Admin', 'Manager', 'Operator'], // Viewer cannot create products
           showHeader: false,
           fullScreen: true,
         },
@@ -181,20 +193,7 @@ export const routes: Routes = [
         canActivate: [RoleGuard],
         data: {
           mode: 'edit',
-          role: ['Operator', 'Viewer', 'Admin', 'Manager'],
-          showHeader: false,
-          fullScreen: true,
-        },
-      },
-
-      // Edit existing product (full screen)
-      {
-        path: 'product-management/edit/:id',
-        component: ProductModalComponent,
-        canActivate: [RoleGuard],
-        data: {
-          mode: 'edit',
-          role: ['Operator', 'Viewer', 'Admin', 'Manager'],
+          roles: ['Viewer', 'Admin', 'Manager', 'Operator'], // Viewer opens it read-only
           showHeader: false,
           fullScreen: true,
         },

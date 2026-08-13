@@ -318,16 +318,7 @@
           <td class="qm-td qm-td--actions">
             <div class="qm-actions">
               <button
-                pButton
-                icon="pi pi-eye"
-                class="p-button-sm p-button-text qm-action qm-action--view"
-                [routerLink]="['/queue', queue.id]"
-                pTooltip="View"
-                tooltipPosition="top"
-              ></button>
-
-              <button
-                *ngIf="queue.status === 'PENDING'"
+                *ngIf="(queue.status | uppercase) === 'PENDING'"
                 pButton
                 icon="pi pi-play"
                 class="p-button-sm p-button-text qm-action qm-action--play"
@@ -337,7 +328,7 @@
               ></button>
 
               <button
-                *ngIf="queue.status === 'ACTIVE'"
+                *ngIf="(queue.status | uppercase) === 'PROCESSING'"
                 pButton
                 icon="pi pi-stop"
                 class="p-button-sm p-button-text qm-action qm-action--stop"
@@ -397,4 +388,7 @@
   </div>
 </div>
 
-<app-create-queue #createQueueRef></app-create-queue>
+<app-create-queue
+  #createQueueRef
+  (onQueueCreated)="onQueueCreated()"
+></app-create-queue>

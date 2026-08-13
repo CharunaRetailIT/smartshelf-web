@@ -1,4 +1,14 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import {
+  Component,
+  EventEmitter,
+  Input,
+  OnInit,
+  Output,
+  TemplateRef,
+  ViewChild,
+  inject,
+} from '@angular/core';
+import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { MessageService } from 'primeng/api';
 import { DeviceService } from '../../../core/services/device.service';
@@ -82,6 +92,12 @@ export class CreateQueueComponent implements OnInit {
 
   visible: boolean = false;
 
+  // The dialog shell is a Material dialog opened from this template, so the
+  // component keeps all its own state and handlers.
+  @ViewChild('dialogTpl') dialogTpl!: TemplateRef<unknown>;
+  private dialog = inject(MatDialog);
+  private dialogRef?: MatDialogRef<unknown>;
+
   constructor(
     private fb: FormBuilder,
     private queueService: QueueService,
@@ -155,10 +171,20 @@ export class CreateQueueComponent implements OnInit {
 
   open(): void {
     this.visible = true;
+    this.dialogRef = this.dialog.open(this.dialogTpl, {
+      width: '860px',
+      maxWidth: '95vw',
+      maxHeight: '90vh',
+    });
+    this.dialogRef.afterClosed().subscribe(() => {
+      this.visible = false;
+      this.dialogRef = undefined;
+    });
   }
 
   cancel(): void {
-    this.visible = false;  // ← was probably just emitting, change to set visible
+    this.dialogRef?.close();
+    this.visible = false;
   }
 
   //#region Brand-driven content selection
@@ -339,6 +365,16 @@ export class CreateQueueComponent implements OnInit {
   }
 
   //#endregion
+
+  /**
+   * Tab click. Writes through the form control so the existing valueChanges
+   * subscription still fires - that is what loads assignments and re-applies
+   * the per-source validators.
+   */
+  selectSource(value: string): void {
+    if (this.queueForm.get('sourceType')?.value === value) return;
+    this.queueForm.patchValue({ sourceType: value });
+  }
 
   onSourceTypeChange(type: string) {
     if (type === 'assignment') {
@@ -577,9 +613,15 @@ export class CreateQueueComponent implements OnInit {
       detail: 'Queue created successfully'
     });
     this.loading = false;
-    setTimeout(() => {
-      window.location.href = '#/queue';
-    }, 1500);
+
+    // This used to set window.location.href = '#/queue'. The app uses path
+    // routing, not hash routing, so that appended a '#/queue' fragment to the
+    // current URL and forced a full reload - a blank frame, then the wildcard
+    // route sending you to the dashboard. The form is opened as a dialog from
+    // the list, so just close it and let the list refresh itself.
+    this.onQueueCreated.emit();
+    this.dialogRef?.close(true);
+    this.visible = false;
   }
 
   handleError(err: any) {

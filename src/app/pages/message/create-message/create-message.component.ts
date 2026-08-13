@@ -40,7 +40,14 @@ export class CreateMessageComponent implements OnInit, OnDestroy {
   @ViewChild('screenSizeDropdown') screenSizeDropdown!: Dropdown;
 
   messageForm: FormGroup;
-  selectedMessageType: string = 'general';
+  // General and Video message types are hidden for now. Flip to true to bring
+  // them back - the cards, content sections, previews and submit paths for both
+  // are all still in place.
+  showGeneralAndVideoTypes = false;
+
+  // Must default to a type that is actually offered, or the page opens on a
+  // hidden type with no card selected and no matching content section.
+  selectedMessageType: string = 'image';
   isLoading = false;
   canvas: Canvas | null = null;
 

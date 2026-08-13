@@ -93,6 +93,11 @@ export class ShelfModalComponent implements OnInit {
   messages: MessageWithUser[] = [];
   storeId: number = 0;
 
+  // Device+Message combos are hidden from this view; device binding by message
+  // is done from Device Management. Flip this to true to bring the UI back —
+  // the handlers, service calls and template blocks are all still in place.
+  showDeviceMessageCombos = false;
+
   // Combo mode selection
   comboMode: 'device-template' | 'device-message' = 'device-template';
   comboModeOptions: ComboModeOption[] = [
@@ -1082,7 +1087,10 @@ export class ShelfModalComponent implements OnInit {
 
     // Set the combo mode based on assignments
     // Priority: If any template assignments exist, use template mode
-    this.comboMode = hasTemplateAssignments ? 'device-template' : 'device-message';
+    this.comboMode =
+      hasTemplateAssignments || !this.showDeviceMessageCombos
+        ? 'device-template'
+        : 'device-message';
 
     console.log(`Setting combo mode to: ${this.comboMode}`);
 

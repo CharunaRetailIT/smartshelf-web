@@ -1,48 +1,32 @@
-<!-- Modernized Create Rack Modal -->
-<p-dialog
-  [(visible)]="visible"
-  header="Create New Rack"
-  [modal]="true"
-  [style]="{ width: '90vw', maxWidth: '900px' }"
-  [maximizable]="true"
-  [breakpoints]="{ '960px': '75vw', '640px': '90vw' }"
-  [draggable]="false"
-  [resizable]="false"
-  [closable]="true"
-  (onHide)="onCancel()"
->
-  <!-- Custom Header -->
-  <!-- <ng-template pTemplate="header">
-    <div class="modal-header-content">
-      <div>
-        <h2 class="modal-title">
-          {{ getRackHeaderText() }}
-        </h2>
-        <p class="modal-subtitle">
-          {{ getRackDescriptionText() }}
-        </p>
-      </div>
-      <button
-        (click)="onCancel()"
-        class="close-button"
-        aria-label="Close dialog"
-      >
-        <i class="pi pi-times"></i>
-      </button>
+<!-- Create Rack Modal - Material dialog shell, PrimeNG fields inside -->
+<div class="dlg-shell">
+  <!-- Header -->
+  <div class="dlg-header">
+    <div>
+      <h2 class="dlg-title">{{ getRackHeaderText() }}</h2>
+      <p class="dlg-subtitle">{{ getRackDescriptionText() }}</p>
     </div>
-  </ng-template> -->
-  <form [formGroup]="rackForm" (ngSubmit)="onSubmit()" class="modal-form">
-    <!-- Main Content Area -->
-    <div class="px-6 py-5">
-      <!-- Header Description -->
-      <div class="mb-6">
-        <p class="text-sm text-gray-600 m-0">
-          Create a new rack with complete details, shelves, and device
-          assignments
-        </p>
-      </div>
-
-      <!-- Modern Tabs -->
+    <button
+      type="button"
+      (click)="onCancel()"
+      class="dlg-close"
+      aria-label="Close dialog"
+    >
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M6 18L18 6M6 6l12 12"
+        ></path>
+      </svg>
+    </button>
+  </div>
+  <div class="dlg-body">
+    <form [formGroup]="rackForm" (ngSubmit)="onSubmit()" class="modal-form">
+      <!-- Main Content Area -->
+      <div>
+        <!-- Modern Tabs -->
       <div class="flex mb-6 border-b border-gray-200">
         <button
           type="button"
@@ -80,6 +64,7 @@
                 Store <span class="required">*</span>
               </label>
               <p-dropdown
+                appendTo="body"
                 [options]="stores"
                 formControlName="storeId"
                 optionValue="id"
@@ -87,7 +72,7 @@
                 placeholder="Select Store"
                 [filter]="true"
                 [virtualScroll]="true"
-                [virtualScrollItemSize]="38"
+                [virtualScrollItemSize]="54"
                 [showClear]="true"
                 [loading]="isStoreLoading"
                 (onChange)="onStoreChange($event)"
@@ -364,7 +349,7 @@
                   </div>
 
                   <!-- Combo Type Selection -->
-                  <div class="mb-4">
+                  <div class="mb-4" *ngIf="showDeviceMessageCombos">
                     <label class="field-label mb-3">Combo Type</label>
                     <p-selectButton
                       [options]="comboModeOptions"
@@ -400,6 +385,7 @@
                     </p>
 
                     <p-multiSelect
+                      appendTo="body"
                       [options]="
                         getShelfComboMode(shelfIdx) === 'device-template'
                           ? existingCombos
@@ -532,8 +518,8 @@
                       <!-- Assignment Header -->
                       <div class="assignment-header">
                         <div class="assignment-title">
-                          <i class="pi pi-sliders-h"></i>
-                          Assignment {{ comboIdx + 1 }}
+                          <div class="row-number">{{ comboIdx + 1 }}</div>
+                          <h4>ESL Assignment</h4>
                         </div>
 
                         <button
@@ -541,7 +527,7 @@
                           type="button"
                           pButton
                           icon="pi pi-trash"
-                          class="p-button-text p-button-danger p-button-sm"
+                          class="p-button-rounded p-button-text p-button-danger"
                           (click)="
                             removeDeviceComboFromShelf(shelfIdx, comboIdx)
                           "
@@ -557,6 +543,7 @@
                             Device <span class="required">*</span>
                           </label>
                           <p-dropdown
+                            appendTo="body"
                             formControlName="deviceId"
                             [options]="filteredDevices"
                             optionLabel="deviceName"
@@ -609,6 +596,7 @@
                             Template <span class="required">*</span>
                           </label>
                           <p-dropdown
+                            appendTo="body"
                             formControlName="templateId"
                             [options]="filteredTemplates"
                             optionLabel="name"
@@ -658,6 +646,7 @@
                         <!-- Message (for device-message mode) -->
                         <div
                           *ngIf="
+                            showDeviceMessageCombos &&
                             getShelfComboMode(shelfIdx) === 'device-message'
                           "
                         >
@@ -665,6 +654,7 @@
                             Message <span class="required">*</span>
                           </label>
                           <p-dropdown
+                            appendTo="body"
                             formControlName="messageId"
                             [options]="messages"
                             optionLabel="title"
@@ -886,23 +876,13 @@
         </div>
       </div>
     </div>
-  </form>
+    </form>
+  </div>
 
   <!-- Footer -->
-  <ng-template pTemplate="footer">
-    <div class="flex items-center justify-between w-full">
-      <!-- Left side: Cancel button -->
-      <button
-        type="button"
-        pButton
-        label="Cancel"
-        icon="pi pi-times"
-        (click)="onCancel()"
-        class="p-button-text"
-      ></button>
-
-      <!-- Right side: Navigation and Submit buttons -->
-      <div class="flex gap-2">
+  <div class="dlg-footer">
+    <!-- Navigation and Submit buttons; dismissal is the header's X. -->
+    <div class="flex gap-2">
         <button
           type="button"
           pButton
@@ -935,10 +915,9 @@
           *ngIf="canEdit()"
           class="p-button-primary"
         ></button>
-      </div>
     </div>
-  </ng-template>
-</p-dialog>
+  </div>
+</div>
 
 <!-- Confirmation Dialog -->
 <p-confirmDialog></p-confirmDialog>

@@ -1006,11 +1006,8 @@
                     product.discountedPrice < product.sellingPrice
                   "
                 >
-                  Disc: LKR
-                  {{
-                    product.sellingPrice - product.discountedPrice
-                      | number: "1.0-0"
-                  }}
+                  After disc: LKR
+                  {{ product.discountedPrice | number: "1.0-0" }}
                 </div>
               </td>
             </ng-container>
@@ -1144,17 +1141,43 @@
     </div>
   </div>
 
-  <!-- Assigned Devices Popup -->
-  <p-dialog
-    [(visible)]="deviceListDialogVisible"
-    [modal]="true"
-    [style]="{ width: '32rem' }"
-    [header]="
-      'Assigned Devices' +
-      (deviceListProduct ? ' - ' + deviceListProduct.productName : '')
-    "
-    (onHide)="closeDeviceListDialog()"
-  >
+  <!-- Assigned Devices Popup - Material shell -->
+</div>
+
+<!-- Assigned Devices popup lives at the template root so its TemplateRef always resolves. -->
+  <ng-template #deviceListDialogTpl>
+    <div class="dlg-shell">
+      <div class="dlg-header">
+        <div>
+          <h2 class="dlg-title">
+            Assigned Devices{{
+              deviceListProduct ? " - " + deviceListProduct.productName : ""
+            }}
+          </h2>
+        </div>
+        <button
+          type="button"
+          (click)="closeDeviceListDialog()"
+          class="dlg-close"
+          aria-label="Close dialog"
+        >
+          <svg
+            class="w-5 h-5"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M6 18L18 6M6 6l12 12"
+            ></path>
+          </svg>
+        </button>
+      </div>
+
+      <div class="dlg-body">
     <div *ngIf="deviceListLoading" class="flex justify-center py-8">
       <mat-spinner diameter="32"></mat-spinner>
     </div>
@@ -1197,5 +1220,6 @@
         </div>
       </div>
     </div>
-  </p-dialog>
-</div>
+      </div>
+    </div>
+  </ng-template>

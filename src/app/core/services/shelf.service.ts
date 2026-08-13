@@ -112,7 +112,8 @@ export class ShelfService {
     );
   }
 
-  deleteShelf(id: number, user: number, storeId?:number): Observable<void> {
+  // storeId goes into the URL path - optional here would ship /store/undefined.
+  deleteShelf(id: number, user: number, storeId: number): Observable<void> {
     return this.http.delete<HttpResponseData<void>>(`${this.API_URL}/shelf/${id}/store/${storeId}/user/${user}`)
       .pipe(
         map(response => {
@@ -127,7 +128,7 @@ export class ShelfService {
   }
 
 // Restore shelf (soft delete reversal)
-restoreShelf(id: number, user: number, storeId?:number): Observable<void> {
+restoreShelf(id: number, user: number, storeId: number): Observable<void> {
   return this.http.put<HttpResponseData<void>>(`${this.API_URL}/shelf/${id}/restore/store/${storeId}/user/${user}`, {})
     .pipe(
       map(response => {
@@ -160,7 +161,7 @@ restoreShelf(id: number, user: number, storeId?:number): Observable<void> {
 
   //#region Product Assignment
 
-  assignProduct(shelfId: number, productId: number,storeId?:number,userId?:number): Observable<any> {
+  assignProduct(shelfId: number, productId: number, storeId: number, userId: number): Observable<any> {
     return this.http.post<HttpResponseData<any>>(`${this.API_URL}/shelf/${shelfId}/store/${storeId}/assign/${productId}/user/${userId}`, {}, {
       headers: new HttpHeaders({ 'Content-Type': 'application/json' })
     }).pipe(
@@ -175,7 +176,7 @@ restoreShelf(id: number, user: number, storeId?:number): Observable<void> {
     );
   }
 
-  removeProduct(shelfId: number, productId: number,storeId?:number, userId?:number): Observable<any> {
+  removeProduct(shelfId: number, productId: number, storeId: number, userId: number): Observable<any> {
     return this.http.delete<HttpResponseData<any>>(`${this.API_URL}/shelf/${shelfId}/store/${storeId}/remove/${productId}/user/${userId}`)
       .pipe(
         map(response => {
@@ -189,7 +190,10 @@ restoreShelf(id: number, user: number, storeId?:number): Observable<void> {
       );
   }
 
-  assignProductsByCategory(shelfId: number, categoryId: number, storeId?:number, userId?:number): Observable<any> {
+  // storeId/userId are required: they were optional, so a call that omitted the
+  // last argument compiled fine and shipped "user/undefined" into the URL, which
+  // the API rejects with a 400 before the action even runs.
+  assignProductsByCategory(shelfId: number, categoryId: number, storeId: number, userId: number): Observable<any> {
     return this.http.post<HttpResponseData<any>>(`${this.API_URL}/shelf/${shelfId}/store/${storeId}/assign/category/${categoryId}/user/${userId}`, {}, {
       headers: new HttpHeaders({ 'Content-Type': 'application/json' })
     }).pipe(
@@ -204,7 +208,7 @@ restoreShelf(id: number, user: number, storeId?:number): Observable<void> {
     );
   }
 
-  getProductsByShelf(shelfId: number,storeId?:number): Observable<Product[]> {
+  getProductsByShelf(shelfId: number, storeId: number): Observable<Product[]> {
     return this.http.get<HttpResponseData<Product[]>>(`${this.API_URL}/shelf/${shelfId}/store/${storeId}/products`)
       .pipe(
         map(response => {

@@ -270,6 +270,7 @@
                 <h6 class="dlg-label">Use Existing Combos</h6>
 
                 <p-multiSelect
+                  appendTo="body"
                   [options]="existingCombos"
                   [(ngModel)]="selectedExistingCombos"
                   [ngModelOptions]="{standalone: true}"
@@ -407,6 +408,7 @@
 
                       <!-- Using p-dropdown for better search functionality -->
                       <p-dropdown
+                        appendTo="body"
                         [options]="localTemplates"
                         optionLabel="name"
                         optionValue="id"
@@ -415,7 +417,7 @@
                         [filter]="true"
                         filterBy="name"
                         [virtualScroll]="true"
-                        [virtualScrollItemSize]="38"
+                        [virtualScrollItemSize]="44"
                         [lazy]="true"
                         (onLazyLoad)="onTemplateLazyLoad($event)"
                         (onChange)="updateComboDetails(i, j)"

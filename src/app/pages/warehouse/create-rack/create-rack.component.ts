@@ -125,6 +125,11 @@ export class CreateRackComponent implements OnInit, AfterViewInit, OnDestroy {
   shelfComboModes: Map<number, 'device-template' | 'device-message'> = new Map();
   selectedExistingCombos: Map<number, any[]> = new Map(); // shelfIndex => selected combos
 
+  // Device+Message combos are hidden from this view; device binding by message
+  // is done from Device Management. Flip this to true to bring the UI back —
+  // the handlers, service calls and template blocks are all still in place.
+  showDeviceMessageCombos = false;
+
   comboModeOptions: ComboModeOption[] = [
     { label: 'Device + Template', value: 'device-template', icon: 'pi pi-sliders-h' },
     { label: 'Device + Message', value: 'device-message', icon: 'pi pi-comment' }

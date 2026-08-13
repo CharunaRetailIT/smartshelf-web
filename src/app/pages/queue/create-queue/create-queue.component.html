@@ -1,52 +1,57 @@
 <!-- queue-create.component.html -->
-<!-- The component owns its own dialog — no wrapper needed in the parent -->
+<!-- Material dialog shell (opened from open()), PrimeNG fields inside -->
 
-<p-dialog
-  header="Create Scheduled Queue"
-  [(visible)]="visible"
-  [modal]="true"
-  [draggable]="false"
-  [resizable]="false"
-  [style]="{ width: '860px', 'max-width': '95vw' }"
-  [contentStyle]="{ padding: '0' }"
-  appendTo="body"
-  styleClass="queue-create-dialog"
-  (onHide)="cancel()"
->
-  <!-- ─── Subtitle in subheader ─────────────────────────────────── -->
-  <ng-template pTemplate="header">
-    <div class="dialog-header-content">
-      <div class="dialog-header-icon">
-        <i class="pi pi-calendar-plus"></i>
+<ng-template #dialogTpl>
+  <div class="dlg-shell">
+    <!-- ─── Header ────────────────────────────────────────────────── -->
+    <div class="dlg-header">
+      <div class="dialog-header-content">
+        <div class="dialog-header-icon">
+          <i class="pi pi-calendar-plus"></i>
+        </div>
+        <div>
+          <h2 class="dlg-title">Create Scheduled Queue</h2>
+          <p class="dlg-subtitle">
+            Schedule content to display on your ESL devices
+          </p>
+        </div>
       </div>
-      <div>
-        <span class="dialog-title">Create Scheduled Queue</span>
-        <p class="dialog-subtitle">
-          Schedule content to display on your ESL devices
-        </p>
-      </div>
-    </div>
-  </ng-template>
-
-  <!-- ─── Scrollable Body ───────────────────────────────────────── -->
-  <form [formGroup]="queueForm" class="modal-body">
-    <!-- Queue Source -->
-    <div class="section">
-      <h2 class="section-title">Queue Source</h2>
-      <p-selectButton
-        [options]="sourceOptions"
-        formControlName="sourceType"
-        optionLabel="label"
-        optionValue="value"
-        class="source-toggle"
+      <button
+        type="button"
+        (click)="cancel()"
+        class="dlg-close"
+        aria-label="Close dialog"
       >
-        <ng-template let-item>
-          <span class="flex align-items-center gap-2">
-            <i [class]="item.icon"></i>
-            <span>{{ item.label }}</span>
-          </span>
-        </ng-template>
-      </p-selectButton>
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M6 18L18 6M6 6l12 12"
+          ></path>
+        </svg>
+      </button>
+    </div>
+
+    <!-- ─── Scrollable Body ───────────────────────────────────────── -->
+    <div class="dlg-body">
+      <form [formGroup]="queueForm" class="modal-body">
+    <!-- Queue Source -->
+    <div class="section section--tabs">
+      <div class="source-tabs" role="tablist" aria-label="Queue source">
+        <button
+          *ngFor="let opt of sourceOptions"
+          type="button"
+          role="tab"
+          class="source-tab"
+          [class.active]="queueForm.get('sourceType')?.value === opt.value"
+          [attr.aria-selected]="queueForm.get('sourceType')?.value === opt.value"
+          (click)="selectSource(opt.value)"
+        >
+          <i [class]="opt.icon"></i>
+          <span>{{ opt.label }}</span>
+        </button>
+      </div>
     </div>
 
     <!-- From Assignment -->
@@ -389,7 +394,7 @@
           <p-calendar
             formControlName="startDate"
             [showTime]="true"
-            [hourFormat]="'24'"
+            [hourFormat]="'12'"
             [showIcon]="true"
             [showButtonBar]="true"
             [minDate]="minStartDate"
@@ -416,7 +421,7 @@
           <p-calendar
             formControlName="endDate"
             [showTime]="true"
-            [hourFormat]="'24'"
+            [hourFormat]="'12'"
             [showIcon]="true"
             [showButtonBar]="true"
             [minDate]="queueForm.get('startDate')?.value"
@@ -495,33 +500,35 @@
         </div>
       </div>
     </div>
-  </form>
+      </form>
+    </div>
 
-  <!-- ─── Footer via pTemplate ──────────────────────────────────── -->
-  <ng-template pTemplate="footer">
-    <div class="modal-footer-inner">
-      <span class="footer-hint">
-        <i class="pi pi-info-circle"></i>
-        Active queues will be pushed to devices immediately
-      </span>
-      <div class="footer-actions">
-        <button
-          pButton
-          label="Cancel"
-          icon="pi pi-times"
-          class="p-button-outlined cancel-btn"
-          (click)="cancel()"
-        ></button>
-        <button
-          pButton
-          label="Create Queue"
-          icon="pi pi-calendar-plus"
-          class="p-button-primary"
-          [disabled]="!queueForm.valid || loading"
-          [loading]="loading"
-          (click)="createQueue()"
-        ></button>
+    <!-- ─── Footer ────────────────────────────────────────────────── -->
+    <div class="dlg-footer">
+      <div class="modal-footer-inner">
+        <span class="footer-hint">
+          <i class="pi pi-info-circle"></i>
+          Active queues will be pushed to devices immediately
+        </span>
+        <div class="footer-actions">
+          <button
+            pButton
+            label="Cancel"
+            icon="pi pi-times"
+            class="p-button-outlined cancel-btn"
+            (click)="cancel()"
+          ></button>
+          <button
+            pButton
+            label="Create Queue"
+            icon="pi pi-calendar-plus"
+            class="p-button-primary"
+            [disabled]="!queueForm.valid || loading"
+            [loading]="loading"
+            (click)="createQueue()"
+          ></button>
+        </div>
       </div>
     </div>
-  </ng-template>
-</p-dialog>
+  </div>
+</ng-template>

@@ -4,6 +4,7 @@ import {
   OnInit,
   ViewChild,
   AfterViewInit,
+  TemplateRef,
   inject,
 } from '@angular/core';
 import {
@@ -31,7 +32,6 @@ import {
   MatDialogModule,
   MatDialogRef,
 } from '@angular/material/dialog';
-import { ProductModalComponent } from '../product-modal/product-modal.component';
 import { DeleteConfirmationComponent } from '../../../shared/components/dialog/delete-confirmation/delete-confirmation.component';
 import { MinewService } from '../../../core/services/minew.service';
 import {
@@ -623,6 +623,8 @@ export class ProductManagementComponent implements OnInit {
   // ============ ESL BIND / DEVICE LIST (per product row) ============
   bindingProductId: number | null = null;
   deviceListDialogVisible = false;
+  @ViewChild('deviceListDialogTpl') deviceListDialogTpl!: TemplateRef<unknown>;
+  private deviceListDialogRef?: MatDialogRef<unknown>;
   deviceListLoading = false;
   deviceListProduct: Product | null = null;
   deviceListItems: DeviceAssignmentDto[] = [];
@@ -713,6 +715,15 @@ export class ProductManagementComponent implements OnInit {
     this.deviceListItems = [];
     this.deviceListLoading = true;
     this.deviceListDialogVisible = true;
+    this.deviceListDialogRef = this.dialog.open(this.deviceListDialogTpl, {
+      width: '32rem',
+      maxWidth: '95vw',
+      maxHeight: '90vh',
+    });
+    this.deviceListDialogRef.afterClosed().subscribe(() => {
+      this.deviceListDialogVisible = false;
+      this.deviceListDialogRef = undefined;
+    });
 
     this.getProductAssignments(product.id).subscribe({
       next: (response) => {
@@ -728,6 +739,7 @@ export class ProductManagementComponent implements OnInit {
   }
 
   closeDeviceListDialog(): void {
+    this.deviceListDialogRef?.close();
     this.deviceListDialogVisible = false;
     this.deviceListProduct = null;
     this.deviceListItems = [];
@@ -848,28 +860,7 @@ export class ProductManagementComponent implements OnInit {
   //#endregion
 
   openAddProductModal(): void {
-    const dialogRef = this.dialog.open(ProductModalComponent, {
-      width: '90vw',
-      maxWidth: '1200px',
-      height: '90vh',
-      disableClose: false, // Allow closing by clicking outside
-      data: {
-        product: null,
-        categories: this.categories,
-        subCategories: this.subCategories,
-        isEditMode: false,
-      },
-    });
-
-    dialogRef.afterClosed().subscribe((result) => {
-      if (result) {
-        console.log('Product created successfully');
-        // Refresh your product list
-        this.loadProducts();
-      } else {
-        console.log('Modal closed without saving');
-      }
-    });
+    this.router.navigate(['/products/create']);
   }
   openEditProductModal(product: Product): void {
     this.router.navigate(['/products/edit', product.id]);
@@ -879,27 +870,6 @@ export class ProductManagementComponent implements OnInit {
   // openProductModal(product?: Product): void {
   //   console.log('Opening product modal with:', product); // Debug log
   //   const dialogRef = this.dialog.open(CreateProductComponent, {
-  //     width: '800px',
-  //     maxWidth: '90vw',
-  //     maxHeight: '90vh',
-  //     panelClass: 'custom-dialog-container',
-  //     data: {
-  //       product: product || null,
-  //       categories: this.categories,
-  //       subCategories: this.subCategories,
-  //       isEditMode: !!product
-  //     }
-  //   });
-
-  //   dialogRef.afterClosed().subscribe((result: boolean) => {
-  //     console.log('Product modal closed with result:', result);
-  //     if (result) {
-  //       this.loadProducts();
-  //     }
-  //   });
-  // }
-  // openProductModal(product?: Product): void {
-  //   const dialogRef = this.dialog.open(ProductModalComponent, {
   //     width: '800px',
   //     maxWidth: '90vw',
   //     maxHeight: '90vh',

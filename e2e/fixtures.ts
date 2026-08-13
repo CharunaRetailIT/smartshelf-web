@@ -47,7 +47,15 @@ export function runId(): string {
   return `${Date.now().toString().slice(-8)}`;
 }
 
-export async function login(page: Page): Promise<void> {
+/**
+ * `seedStore: false` skips the default-store seeding for specs that run against
+ * an empty StoreMaster - provisioning creates the first store itself, and
+ * ensureDefaultStore throws when there is nothing to pick.
+ */
+export async function login(
+  page: Page,
+  opts: { seedStore?: boolean } = {},
+): Promise<void> {
   const { employeeId, password } = credentials();
 
   await page.goto('/auth');
@@ -61,7 +69,32 @@ export async function login(page: Page): Promise<void> {
   // AuthGuard redirects to the dashboard once the token is stored.
   await page.waitForURL(/\/dashboard/, { timeout: 60_000 });
 
-  await ensureDefaultStore(page);
+  if (opts.seedStore !== false) await ensureDefaultStore(page);
+}
+
+/**
+ * Points the app at a specific store, the way the Settings screen would.
+ * Provisioning specs call this right after creating their store, since every
+ * list endpoint is scoped by whatever sits in `defaultStore`.
+ */
+export async function setDefaultStore(page: Page, store: any): Promise<void> {
+  await page.evaluate(
+    (s) => localStorage.setItem('defaultStore', JSON.stringify(s)),
+    store,
+  );
+  await page.reload();
+}
+
+/** Fetches the local StoreMaster list straight from the API. */
+export async function fetchStores(page: Page): Promise<any[]> {
+  const token = await authToken(page);
+  const res = await page.request.fetch(
+    `${API_URL}/Store?pageNumber=1&pageSize=50`,
+    { headers: { Authorization: `Bearer ${token}` } },
+  );
+  if (!res.ok()) throw new Error(`could not list stores: ${res.status()}`);
+  const body = await res.json();
+  return body?.result?.items ?? body?.items ?? body?.result ?? [];
 }
 
 /**

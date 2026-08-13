@@ -112,9 +112,31 @@ export class StoreModalComponent implements OnInit {
       this.storeForm.get('minewTemplateId')?.clearValidators();
     }
 
+    // Minew's store/add rejects a blank number, name or address outright
+    // (code 54029), so a cloud store needs all three before it can sync.
+    // Locally-managed stores keep them optional.
+    const address = this.storeForm.get('address');
+    const storeCode = this.storeForm.get('storeCode');
+
+    if (isMinew) {
+      address?.setValidators([Validators.required, Validators.maxLength(500)]);
+      storeCode?.setValidators([Validators.required, Validators.maxLength(50)]);
+    } else {
+      address?.setValidators([Validators.maxLength(500)]);
+      storeCode?.setValidators([Validators.maxLength(50)]);
+    }
+
+    address?.updateValueAndValidity();
+    storeCode?.updateValueAndValidity();
+
     // Update form controls
     this.storeForm.get('minewStoreId')?.updateValueAndValidity();
     this.storeForm.get('minewTemplateId')?.updateValueAndValidity();
+  }
+
+  /** True when the current store type needs the Minew-mandatory fields. */
+  get isMinewStore(): boolean {
+    return this.storeForm?.get('storeType')?.value === 'minew';
   }
   //#endregion
 
@@ -124,16 +146,26 @@ export class StoreModalComponent implements OnInit {
       this.isSubmitting.set(true);
 
       const formValue = this.storeForm.value;
+
+      // An untouched optional field is '' , and the API's [EmailAddress] rejects
+      // an empty string outright (null passes), so sending '' made every store
+      // without an email fail with a bare 400. Send null for blanks instead.
+      // undefined (not null) so JSON.stringify drops the key entirely.
+      const orNull = (v: unknown): string | undefined => {
+        const s = typeof v === 'string' ? v.trim() : v;
+        return s ? (s as string) : undefined;
+      };
+
       const storeDto: StoreDto = {
         storeName: formValue.storeName,
-        storeCode: formValue.storeCode,
-        address: formValue.address,
-        phone: formValue.phone,
-        email: formValue.email,
-        contactPerson: formValue.contactPerson,
+        storeCode: orNull(formValue.storeCode),
+        address: orNull(formValue.address),
+        phone: orNull(formValue.phone),
+        email: orNull(formValue.email),
+        contactPerson: orNull(formValue.contactPerson),
         storeType: formValue.storeType,
-        minewStoreId: formValue.minewStoreId || '',
-        minewTemplateId: formValue.minewTemplateId || '',
+        minewStoreId: orNull(formValue.minewStoreId),
+        minewTemplateId: orNull(formValue.minewTemplateId),
         latitude: formValue.latitude,
         longitude: formValue.longitude,
         isActive: formValue.isActive,

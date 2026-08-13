@@ -216,6 +216,34 @@
   transition: border-color 0.15s ease, box-shadow 0.15s ease;
 }
 
+/* Trigger-style controls (select/dropdown/multiselect) size themselves from
+   their inner label's padding, so a shared `min-height` still leaves them
+   taller than a plain input sitting beside them. Pin the trigger to the
+   control height and let the label centre inside it instead. */
+.p-dialog .p-select,
+.p-dialog .p-dropdown,
+.p-dialog .p-multiselect,
+.mat-mdc-dialog-container .p-select,
+.mat-mdc-dialog-container .p-dropdown,
+.mat-mdc-dialog-container .p-multiselect {
+  height: var(--dlg-control-h);
+  display: inline-flex;
+  align-items: center;
+}
+
+.p-dialog .p-select-label,
+.p-dialog .p-dropdown-label,
+.p-dialog .p-multiselect-label,
+.mat-mdc-dialog-container .p-select-label,
+.mat-mdc-dialog-container .p-dropdown-label,
+.mat-mdc-dialog-container .p-multiselect-label {
+  display: flex;
+  align-items: center;
+  height: 100%;
+  padding-top: 0;
+  padding-bottom: 0;
+}
+
 /* A textarea grows, so only enforce a floor. */
 .p-dialog .p-textarea,
 .mat-mdc-dialog-container .p-textarea {
@@ -254,9 +282,35 @@
   outline-offset: 2px;
 }
 
-/* Invalid state stays legible rather than only turning red. */
-.p-dialog .ng-invalid.ng-touched:not(form):not([role='group']),
-.mat-mdc-dialog-container .ng-invalid.ng-touched:not(form):not([role='group']) {
+/* Invalid state stays legible rather than only turning red. Scoped to actual
+   controls: a div carrying formGroup/formGroupName also picks up .ng-invalid,
+   and a blanket rule painted the whole surrounding card red. */
+.p-dialog
+  :is(
+    input,
+    textarea,
+    select,
+    .p-inputtext,
+    .p-inputnumber,
+    .p-dropdown,
+    .p-select,
+    .p-multiselect,
+    .p-calendar,
+    .p-inputwrapper
+  ).ng-invalid.ng-touched,
+.mat-mdc-dialog-container
+  :is(
+    input,
+    textarea,
+    select,
+    .p-inputtext,
+    .p-inputnumber,
+    .p-dropdown,
+    .p-select,
+    .p-multiselect,
+    .p-calendar,
+    .p-inputwrapper
+  ).ng-invalid.ng-touched {
   border-color: var(--dlg-danger);
 }
 
@@ -319,18 +373,50 @@
   color: var(--dlg-text);
 }
 
-/* Destructive */
-.p-dialog .p-button.p-button-danger,
-.mat-mdc-dialog-container .p-button.p-button-danger {
+/* Destructive - solid only for real buttons, not the text/outlined variants. */
+.p-dialog .p-button.p-button-danger:not(.p-button-text):not(.p-button-outlined),
+.mat-mdc-dialog-container
+  .p-button.p-button-danger:not(.p-button-text):not(.p-button-outlined) {
   background: var(--dlg-danger);
   border-color: var(--dlg-danger);
   color: #ffffff;
 }
 
-.p-dialog .p-button.p-button-danger:enabled:hover,
-.mat-mdc-dialog-container .p-button.p-button-danger:enabled:hover {
+.p-dialog
+  .p-button.p-button-danger:not(.p-button-text):not(
+    .p-button-outlined
+  ):enabled:hover,
+.mat-mdc-dialog-container
+  .p-button.p-button-danger:not(.p-button-text):not(
+    .p-button-outlined
+  ):enabled:hover {
   background: var(--dlg-danger-hover);
   border-color: var(--dlg-danger-hover);
+}
+
+/* Quiet destructive: an icon-only remove button should read as a red glyph,
+   not a solid red block whose icon only appears on hover. */
+.p-dialog .p-button.p-button-danger.p-button-text,
+.mat-mdc-dialog-container .p-button.p-button-danger.p-button-text {
+  background: transparent;
+  border-color: transparent;
+  color: var(--dlg-danger);
+}
+
+.p-dialog .p-button.p-button-danger.p-button-outlined,
+.mat-mdc-dialog-container .p-button.p-button-danger.p-button-outlined {
+  background: transparent;
+  border-color: var(--dlg-danger);
+  color: var(--dlg-danger);
+}
+
+.p-dialog .p-button.p-button-danger.p-button-text:enabled:hover,
+.p-dialog .p-button.p-button-danger.p-button-outlined:enabled:hover,
+.mat-mdc-dialog-container .p-button.p-button-danger.p-button-text:enabled:hover,
+.mat-mdc-dialog-container
+  .p-button.p-button-danger.p-button-outlined:enabled:hover {
+  background: var(--dlg-danger-soft);
+  color: var(--dlg-danger-hover);
 }
 
 /* Native buttons used by the Material dialogs get the same hierarchy. */
@@ -464,6 +550,17 @@
   background: var(--dlg-surface);
   border-radius: var(--dlg-radius);
   overflow: hidden;
+}
+
+/* Inside a Material dialog the surface is `height: 100%` of the panel, and the
+   panel can reach 92vh (or whatever maxHeight the open() call passes). A vh cap
+   on the shell therefore stops it short of the surface, and the surface's own
+   background shows through as a pale strip below the footer. Fill the surface
+   instead of imposing a second, smaller cap. */
+.mat-mdc-dialog-container .dlg-shell {
+  max-height: 100%;
+  flex: 1 1 auto;
+  min-height: 0;
 }
 
 /* ---- Header ---- */
@@ -1061,6 +1158,28 @@
   .dlg-footer .dlg-btn {
     width: 100%;
   }
+}
+
+/* ---- PrimeNG overlays vs Material dialogs ----
+   A dropdown/calendar inside a dialog needs appendTo="body", otherwise the
+   panel is clipped by .dlg-body's `overflow-y: auto`. But that lands it in
+   <body> while the dialog lives in .cdk-overlay-container, which is
+   `z-index: 1000` - and PrimeNG's own overlay z-index base is also 1000, so
+   the panel loses the tie and renders behind the dialog. Lift the panels
+   above the dialog layer explicitly. */
+body > .p-select-overlay,
+body > .p-dropdown-panel,
+body > .p-multiselect-overlay,
+body > .p-multiselect-panel,
+body > .p-datepicker-panel,
+body > .p-datepicker,
+body > .p-autocomplete-overlay,
+body > .p-autocomplete-panel,
+body > .p-treeselect-overlay,
+body > .p-cascadeselect-overlay,
+body > .p-popover,
+body > .p-overlaypanel {
+  z-index: 1100 !important;
 }
 
 /* Respect users who ask for reduced motion. */

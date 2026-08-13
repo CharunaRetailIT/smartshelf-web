@@ -187,7 +187,7 @@ export class AuthService {
   canAccess(requiredRole: string): boolean {
     const user = this.getCurrentUserValue();
     if (!user) return false;
-    const roleHierarchy: Record<string, number> = { 'User': 1, 'Operator': 2, 'Manager': 3, 'Admin': 4 };
+    const roleHierarchy: Record<string, number> = { 'Viewer': 1, 'User': 1, 'Operator': 2, 'Manager': 3, 'Admin': 4 };
     return (roleHierarchy[user.roles[0]] || 0) >= (roleHierarchy[requiredRole] || 0);
   }
   //#endregion

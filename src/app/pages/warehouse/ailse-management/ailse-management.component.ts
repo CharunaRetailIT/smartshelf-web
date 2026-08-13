@@ -494,9 +494,11 @@ export class AilseManagementComponent implements OnInit {
 
   openShelfModal(mode: 'create' | 'edit', shelfData?: any, aisleId?: number): void {
     const dialogRef = this.dialog.open(ShelfModalComponent, {
-      width: 'auto',
-      height: 'auto',
-      maxWidth: '1200px',
+      // The panel used to size itself to the inner p-dialog; now that the
+      // Material shell is the only shell, the width lives here.
+      width: '90vw',
+      maxWidth: '700px',
+      maxHeight: '90vh',
       data: mode === 'edit' ? { shelf: shelfData } : { aisleID: aisleId }
     });
     console.log("open with", mode, shelfData)

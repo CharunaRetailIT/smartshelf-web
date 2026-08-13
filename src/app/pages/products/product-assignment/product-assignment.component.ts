@@ -1,5 +1,5 @@
 // product-assignment.component.ts - REFACTORED FOR PRIMENG 19
-import { Component, OnInit, inject, HostListener, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, inject, HostListener, ChangeDetectorRef, TemplateRef, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -26,7 +26,7 @@ import { Message } from '../../../core/interfaces/message.interface';
 import { FilterPipe } from './filter.pipe';
 import { ImportsModule } from '../../../imports/imports';
 import { DeleteConfirmationComponent } from '../../../shared/components/dialog/delete-confirmation/delete-confirmation.component';
-import { MatDialog } from '@angular/material/dialog';
+import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { ConfirmationDialogComponent } from '../../../shared/components/dialog/confirmation-dialog/confirmation-dialog.component';
 import { Shelf } from '../../../core/interfaces/shelf.interface';
 import { SettingsService } from '../../../core/services/settings.service';
@@ -130,6 +130,8 @@ export class ProductAssignmentComponent implements OnInit {
 
   // Bind message dialog
   showBindDialog = false;
+  @ViewChild('bindDialogTpl') bindDialogTpl!: TemplateRef<unknown>;
+  private bindDialogRef?: MatDialogRef<unknown>;
   selectedAssignmentForBind: DeviceAssignmentDto | null = null;
   availableMessages: Message[] = [];
   selectedMessageId: number | null = null;
@@ -1717,7 +1719,7 @@ export class ProductAssignmentComponent implements OnInit {
 
     try {
       await firstValueFrom(
-        this.shelfService.assignProductsByCategory(this.shelf.id!, this.selectedCategoryId, this.currentUserId)
+        this.shelfService.assignProductsByCategory(this.shelf.id!, this.selectedCategoryId, this.storeId, this.currentUserId)
       );
 
       await this.loadAssignedProducts();
@@ -1790,9 +1792,19 @@ export class ProductAssignmentComponent implements OnInit {
     this.showBindDialog = true;
     this.selectedMessageId = null;
     this.loadMessages();
+    this.bindDialogRef = this.dialog.open(this.bindDialogTpl, {
+      width: '90vw',
+      maxWidth: '1000px',
+      maxHeight: '90vh',
+    });
+    this.bindDialogRef.afterClosed().subscribe(() => {
+      this.showBindDialog = false;
+      this.bindDialogRef = undefined;
+    });
   }
 
   closeBindDialog(): void {
+    this.bindDialogRef?.close();
     this.showBindDialog = false;
     this.selectedAssignmentForBind = null;
     this.selectedMessageId = null;

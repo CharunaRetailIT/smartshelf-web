@@ -313,39 +313,56 @@
 }
 
 /* Assignment card styles */
+/* Matches the ESL assignment rows on the product form page so the two
+   surfaces read as the same component. */
 .assignment-card {
   background: #ffffff;
-  border: 1px solid #e5e7eb;
-  border-radius: 0.75rem;
-  padding: 1.25rem;
-  transition: all 0.2s ease;
+  border: 1px solid #bbcabf;
+  border-radius: 15px;
+  padding: 18px;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    transform 0.2s ease;
 }
 
 .assignment-card:hover {
-  border-color: #d1d5db;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+  border-color: #10b981;
+  box-shadow: 0 8px 18px rgba(16, 185, 129, 0.09);
+  transform: translateY(-1px);
 }
 
 .assignment-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding-bottom: 0.75rem;
-  margin-bottom: 1rem;
-  border-bottom: 1px solid #f3f4f6;
+  gap: 16px;
+  margin-bottom: 18px;
 }
 
 .assignment-title {
-  font-size: 0.875rem;
-  font-weight: 600;
-  color: #111827;
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 12px;
 }
 
-.assignment-title i {
-  color: #6b7280;
+.assignment-title h4 {
+  margin: 0;
+  color: #0f172a;
+  font-size: 16px;
+  font-weight: 800;
+}
+
+.row-number {
+  width: 36px;
+  height: 36px;
+  border-radius: 12px;
+  display: grid;
+  place-items: center;
+  background: #10b981;
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: 900;
 }
 
 /* Preview section */
@@ -663,7 +680,7 @@
   position: relative;
 }
 
-* Custom styling for the footer */
+/* Custom styling for the footer */
 .multiselect-footer {
   border-top: 1px solid #e5e7eb;
   padding: 0.75rem;

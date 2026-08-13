@@ -37,8 +37,12 @@
         <h3 class="text-lg font-semibold text-gray-900 mb-4">
           <i class="fas fa-layer-group text-gray-400 mr-2"></i>Message Type
         </h3>
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+        <div
+          class="grid grid-cols-1 sm:grid-cols-2 gap-3"
+          [ngClass]="showGeneralAndVideoTypes ? 'lg:grid-cols-4' : 'lg:grid-cols-2'"
+        >
           <button
+            *ngIf="showGeneralAndVideoTypes"
             type="button"
             (click)="onMessageTypeChange('general')"
             [class]="
@@ -95,6 +99,7 @@
           </button>
 
           <button
+            *ngIf="showGeneralAndVideoTypes"
             type="button"
             (click)="onMessageTypeChange('video')"
             [class]="
@@ -171,6 +176,7 @@
                 </label>
 
                 <p-dropdown
+                  appendTo="body"
                   #screenSizeDropdown
                   formControlName="screenSize"
                   [options]="screenSizeOptions"

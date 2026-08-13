@@ -1,37 +1,42 @@
 <!-- minew-batch-add.component.html - Enhanced Version -->
 
-<!-- Batch Add Dialog -->
-<p-dialog
-  [(visible)]="displayDialog"
-  [modal]="true"
-  [style]="{ width: '1000px', maxHeight: '90vh' }"
-  [draggable]="false"
-  [resizable]="false"
-  [closable]="!isProcessing"
-  appendTo="body"
-  styleClass="batch-add-dialog"
->
-  <!-- Dialog Header -->
-  <ng-template pTemplate="header">
-    <div class="flex items-center gap-3">
-      <div
-        class="w-10 h-10 rounded-full bg-gradient-to-br from-emerald-600 to-emerald-700 flex items-center justify-center"
+<!-- Batch Add Dialog - Material shell, PrimeNG fields inside -->
+<ng-template #dialogTpl>
+  <div class="dlg-shell">
+    <!-- Dialog Header -->
+    <div class="dlg-header">
+      <div class="flex items-center gap-3">
+        <div
+          class="w-10 h-10 rounded-full bg-gradient-to-br from-emerald-600 to-emerald-700 flex items-center justify-center"
+        >
+          <i class="pi pi-cloud-upload text-white text-lg"></i>
+        </div>
+        <div>
+          <h2 class="dlg-title">Batch Add Minew Devices</h2>
+          <p class="dlg-subtitle">Import multiple devices efficiently</p>
+        </div>
+      </div>
+      <button
+        type="button"
+        (click)="closeDialog()"
+        class="dlg-close"
+        [disabled]="isProcessing"
+        aria-label="Close dialog"
       >
-        <i class="pi pi-cloud-upload text-white text-lg"></i>
-      </div>
-      <div>
-        <h2 class="text-xl font-bold text-gray-800 m-0">
-          Batch Add Minew Devices
-        </h2>
-        <p class="text-sm text-gray-500 m-0">
-          Import multiple devices efficiently
-        </p>
-      </div>
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M6 18L18 6M6 6l12 12"
+          ></path>
+        </svg>
+      </button>
     </div>
-  </ng-template>
 
   <!-- Dialog Content -->
-  <div class="dialog-content-wrapper">
+  <div class="dlg-body">
+    <div class="dialog-content-wrapper">
     <!-- Store Configuration Section -->
     <div class="mb-6 fade-in">
       <div class="flex items-center gap-2 mb-4">
@@ -51,6 +56,7 @@
             Minew Store *
           </label>
           <p-dropdown
+            appendTo="body"
             [options]="stores"
             [(ngModel)]="selectedStore"
             placeholder="Select Store"
@@ -77,6 +83,7 @@
             Device Type
           </label>
           <p-dropdown
+            appendTo="body"
             [(ngModel)]="deviceType"
             [options]="[
               { label: '🏷️ ESL Tag', value: 1 },
@@ -909,8 +916,10 @@
     </div>
   </div>
 
+  </div>
+
   <!-- Dialog Footer -->
-  <ng-template pTemplate="footer">
+  <div class="dlg-footer">
     <div class="flex justify-end gap-2 flex-wrap">
       <button
         pButton
@@ -919,7 +928,7 @@
         icon="pi pi-times"
         class="p-button-text p-button-secondary"
         [disabled]="isProcessing"
-        (click)="displayDialog = false"
+        (click)="closeDialog()"
       ></button>
 
       <button
@@ -950,5 +959,6 @@
         (click)="executeImport()"
       ></button>
     </div>
-  </ng-template>
-</p-dialog>
+  </div>
+  </div>
+</ng-template>

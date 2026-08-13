@@ -11,8 +11,14 @@ export class RoleGuard implements CanActivate {
   private router = inject(Router);
 
   canActivate(route: ActivatedRouteSnapshot): Observable<boolean> {
-    const requiredRoles = route.data?.['roles'] as string[];
-    const requiredRole = route.data?.['role'] as string;
+    // Accept both `roles: string[]` and the legacy singular `role`, which may be
+    // a single role name or an array. Anything else is treated as "no restriction".
+    const declared = route.data?.['roles'] ?? route.data?.['role'];
+    const requiredRoles: string[] | null = Array.isArray(declared)
+      ? declared
+      : typeof declared === 'string'
+        ? [declared]
+        : null;
 
     return this.authService.currentUser$.pipe(
       take(1),
@@ -23,13 +29,7 @@ export class RoleGuard implements CanActivate {
         }
 
         // Check if user has any of the required roles
-        if (requiredRoles && !this.authService.hasAnyRole(requiredRoles)) {
-          this.router.navigate(['/unauthorized']);
-          return false;
-        }
-
-        // Check if user has access based on role hierarchy
-        if (requiredRole && !this.authService.canAccess(requiredRole)) {
+        if (requiredRoles?.length && !this.authService.hasAnyRole(requiredRoles)) {
           this.router.navigate(['/unauthorized']);
           return false;
         }
