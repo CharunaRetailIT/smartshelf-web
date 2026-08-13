@@ -1,0 +1,253 @@
+.scanner {
+  display: flex;
+  flex-direction: column;
+  width: min(92vw, 460px);
+  background: #fff;
+}
+
+.scanner-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.scanner-title {
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: #111827;
+  margin: 0;
+}
+
+.scanner-close {
+  background: none;
+  border: 0;
+  color: #6b7280;
+  cursor: pointer;
+  padding: 0.25rem;
+  line-height: 1;
+}
+
+.scanner-close:hover {
+  color: #111827;
+}
+
+.scanner-body {
+  padding: 1rem 1.25rem;
+}
+
+/* Square stage keeps the framing predictable across webcams and phones. */
+.scanner-stage {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  border-radius: 0.5rem;
+  overflow: hidden;
+  background: #0f172a;
+}
+
+.scanner-video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* Aiming guide - purely visual, ZXing scans the whole frame. */
+.scanner-reticle {
+  position: absolute;
+  inset: 18% 10%;
+  border: 2px solid rgba(16, 185, 129, 0.9);
+  border-radius: 0.375rem;
+  box-shadow: 0 0 0 100vmax rgba(15, 23, 42, 0.35);
+  pointer-events: none;
+}
+
+.scanner-loading {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  color: #e5e7eb;
+  font-size: 0.875rem;
+  background: rgba(15, 23, 42, 0.6);
+}
+
+.scanner-hint {
+  margin: 0.75rem 0 0;
+  font-size: 0.8125rem;
+  color: #4b5563;
+  text-align: center;
+}
+
+.scanner-rejected {
+  margin: 0.5rem 0 0;
+  font-size: 0.75rem;
+  color: #b45309;
+  text-align: center;
+  word-break: break-all;
+}
+
+.scanner-error {
+  display: flex;
+  gap: 0.625rem;
+  align-items: flex-start;
+  padding: 0.875rem;
+  border: 1px solid #fecaca;
+  background: #fef2f2;
+  border-radius: 0.5rem;
+  color: #991b1b;
+  font-size: 0.875rem;
+}
+
+.scanner-error p {
+  margin: 0;
+}
+
+.scanner-camera-picker {
+  margin-top: 0.875rem;
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+}
+
+.scanner-camera-picker label {
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: #374151;
+}
+
+.scanner-camera-picker select {
+  flex: 1;
+  padding: 0.4rem 0.6rem;
+  border: 1px solid #d1d5db;
+  border-radius: 0.375rem;
+  font-size: 0.8125rem;
+  background: #fff;
+}
+
+.scanner-duplicate {
+  margin: 0.5rem 0 0;
+  font-size: 0.75rem;
+  color: #6b7280;
+  text-align: center;
+}
+
+.scanner-collected {
+  margin-top: 0.875rem;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.5rem;
+  overflow: hidden;
+}
+
+.scanner-collected-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.5rem 0.75rem;
+  background: #f9fafb;
+  border-bottom: 1px solid #e5e7eb;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: #374151;
+}
+
+.scanner-count {
+  background: #059669;
+  color: #fff;
+  border-radius: 999px;
+  padding: 0.05rem 0.5rem;
+  font-size: 0.75rem;
+}
+
+.scanner-collected-empty {
+  margin: 0;
+  padding: 0.75rem;
+  font-size: 0.8125rem;
+  color: #9ca3af;
+  text-align: center;
+}
+
+/* Capped so a long run of scans does not push the footer off screen. */
+.scanner-collected-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  max-height: 8.5rem;
+  overflow-y: auto;
+}
+
+.scanner-collected-list li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.35rem 0.75rem;
+  border-bottom: 1px solid #f3f4f6;
+}
+
+.scanner-collected-list li:last-child {
+  border-bottom: 0;
+}
+
+.scanner-mac {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.8125rem;
+  color: #111827;
+}
+
+.scanner-remove {
+  background: none;
+  border: 0;
+  color: #9ca3af;
+  cursor: pointer;
+  padding: 0.15rem 0.25rem;
+  line-height: 1;
+}
+
+.scanner-remove:hover {
+  color: #dc2626;
+}
+
+.scanner-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  padding: 0.875rem 1.25rem;
+  border-top: 1px solid #e5e7eb;
+}
+
+.scanner-done {
+  padding: 0.45rem 1rem;
+  border: 1px solid #059669;
+  border-radius: 0.375rem;
+  background: #059669;
+  color: #fff;
+  font-size: 0.875rem;
+  cursor: pointer;
+}
+
+.scanner-done:hover:not(:disabled) {
+  background: #047857;
+}
+
+.scanner-done:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.scanner-cancel {
+  padding: 0.45rem 1rem;
+  border: 1px solid #d1d5db;
+  border-radius: 0.375rem;
+  background: #fff;
+  color: #374151;
+  font-size: 0.875rem;
+  cursor: pointer;
+}
+
+.scanner-cancel:hover {
+  background: #f9fafb;
+}

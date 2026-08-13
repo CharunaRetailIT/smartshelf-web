@@ -1,3 +1,5 @@
+import { Store } from './store.interface';
+
 export interface User {
   id: number;
   employeeId: string;
@@ -6,6 +8,8 @@ export interface User {
   email: string;
   departmentId: string;
   profileImageUrl?: string;
+  storeId?: number;
+  store?: Store;
   roles: string[];
 }
 export interface LoginRequest {
@@ -21,6 +25,7 @@ export interface RegisterRequest {
   address1?: string;
   address2?: string;
   address3?: string;
+  storeId: number;
   password: string;
 }
 export interface LoginApiResponse {
@@ -42,6 +47,7 @@ export interface LoginResponse {
 export interface JwtPayload {
   id: string;
   employeeId: string;
+  storeId?: string;
   role: string;
   exp: number;
   iat: number;

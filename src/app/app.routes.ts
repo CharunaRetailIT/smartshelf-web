@@ -246,18 +246,6 @@ export const routes: Routes = [
           showHeader: false,
         },
       },
-      {
-        path: 'settings',
-        loadComponent: () =>
-          import('./pages/settings/settings.component').then(
-            (m) => m.SettingsComponent,
-          ),
-        canActivate: [RoleGuard],
-        data: {
-          roles: ['Viewer', 'Admin', 'Manager', 'Operator'],
-          showHeader: false,
-        },
-      },
     ],
   },
 

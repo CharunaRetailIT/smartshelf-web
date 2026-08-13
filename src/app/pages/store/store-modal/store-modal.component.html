@@ -51,63 +51,31 @@
           <!-- Store Code Field -->
           <div class="space-y-2">
             <label for="storeCode" class="block text-sm font-medium text-gray-700">
-              Store Code
-              <span class="text-red-500" *ngIf="isMinewStore">*</span>
+              Store Code <span class="text-red-500">*</span>
             </label>
             <input
               id="storeCode"
               type="text"
               formControlName="storeCode"
-              placeholder="e.g., STORE-001"
+              inputmode="numeric"
+              placeholder="Digits only, e.g. 950728"
               class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-emerald-600 focus:border-emerald-600 placeholder-gray-400"
               [class.border-red-500]="storeForm.get('storeCode')?.invalid && storeForm.get('storeCode')?.touched">
-            <div *ngIf="storeForm.get('storeCode')?.invalid && storeForm.get('storeCode')?.touched" 
+            <div *ngIf="storeForm.get('storeCode')?.invalid && storeForm.get('storeCode')?.touched"
                  class="text-red-500 text-sm">
-              Store code must be less than 50 characters
+              <span *ngIf="storeForm.get('storeCode')?.errors?.['required']">Store code is required</span>
+              <span *ngIf="storeForm.get('storeCode')?.errors?.['pattern']">Minew only accepts a numeric store code — digits only, no letters or dashes</span>
+              <span *ngIf="storeForm.get('storeCode')?.errors?.['maxlength']">Store code must be less than 50 characters</span>
             </div>
           </div>
         </div>
 
-        <!-- Store Type Field -->
-        <div class="space-y-2">
-          <label for="storeType" class="block text-sm font-medium text-gray-700">
-            Store Type <span class="text-red-500">*</span>
-          </label>
-          <div class="grid grid-cols-2 gap-3">
-            <label class="flex items-center p-3 border rounded-lg cursor-pointer hover:bg-gray-50"
-                   [class.border-emerald-600]="storeForm.get('storeType')?.value === 'local'"
-                   [class.bg-emerald-50]="storeForm.get('storeType')?.value === 'local'">
-              <input
-                type="radio"
-                formControlName="storeType"
-                value="local"
-                class="h-4 w-4 text-emerald-700 focus:ring-emerald-600"
-                (change)="onStoreTypeChange('local')">
-              <div class="ml-3">
-                <span class="text-sm font-medium text-gray-900">Local Store</span>
-                <p class="text-xs text-gray-500 mt-1">Store managed locally only</p>
-              </div>
-            </label>
-            
-            <label class="flex items-center p-3 border rounded-lg cursor-pointer hover:bg-gray-50"
-                   [class.border-emerald-600]="storeForm.get('storeType')?.value === 'minew'"
-                   [class.bg-emerald-50]="storeForm.get('storeType')?.value === 'minew'">
-              <input
-                type="radio"
-                formControlName="storeType"
-                value="minew"
-                class="h-4 w-4 text-emerald-700 focus:ring-emerald-600"
-                (change)="onStoreTypeChange('minew')">
-              <div class="ml-3">
-                <span class="text-sm font-medium text-gray-900">Minew Cloud Store</span>
-                <p class="text-xs text-gray-500 mt-1">Store synchronized with Minew cloud</p>
-              </div>
-            </label>
-          </div>
-          <div *ngIf="storeForm.get('storeType')?.invalid && storeForm.get('storeType')?.touched" 
-               class="text-red-500 text-sm">
-            Store type is required
-          </div>
+        <!-- Every store is created locally and published to Minew -->
+        <div class="flex items-start p-3 border border-emerald-200 rounded-lg bg-emerald-50">
+          <i class="fas fa-cloud-upload-alt text-emerald-600 mt-0.5"></i>
+          <p class="ml-3 text-xs text-emerald-800">
+            This store is created locally and automatically synced to the Minew cloud.
+          </p>
         </div>
       </div>
 
@@ -120,8 +88,7 @@
         <!-- Address Field -->
         <div class="space-y-2">
           <label for="address" class="block text-sm font-medium text-gray-700">
-            Address
-            <span class="text-red-500" *ngIf="isMinewStore">*</span>
+            Address <span class="text-red-500">*</span>
           </label>
           <textarea
             id="address"
@@ -131,9 +98,10 @@
             class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-emerald-600 focus:border-emerald-600 placeholder-gray-400 resize-none"
             [class.border-red-500]="storeForm.get('address')?.invalid && storeForm.get('address')?.touched">
           </textarea>
-          <div *ngIf="storeForm.get('address')?.invalid && storeForm.get('address')?.touched" 
+          <div *ngIf="storeForm.get('address')?.invalid && storeForm.get('address')?.touched"
                class="text-red-500 text-sm">
-            Address must be less than 500 characters
+            <span *ngIf="storeForm.get('address')?.errors?.['required']">Address is required</span>
+            <span *ngIf="storeForm.get('address')?.errors?.['maxlength']">Address must be less than 500 characters</span>
           </div>
         </div>
 
@@ -232,8 +200,8 @@
         </div>
       </div>
 
-      <!-- Minew Cloud Settings Section (only for Minew stores) -->
-      <div *ngIf="storeForm.get('storeType')?.value === 'minew'" class="space-y-4">
+      <!-- Minew Cloud Settings Section -->
+      <div class="space-y-4">
         <h3 class="text-lg font-medium text-gray-900 border-b border-gray-200 pb-2">
           Minew Cloud Settings
         </h3>
@@ -313,9 +281,8 @@
             </label>
           </div>
 
-          <!-- Auto-sync (only for Minew stores) -->
-          <div *ngIf="storeForm.get('storeType')?.value === 'minew'" 
-               class="flex items-center justify-between p-3 border rounded-lg bg-gray-50">
+          <!-- Auto-sync -->
+          <div class="flex items-center justify-between p-3 border rounded-lg bg-gray-50">
             <div>
               <h4 class="text-sm font-medium text-gray-900">Auto-sync with Cloud</h4>
               <p class="text-xs text-gray-500 mt-1">Automatically sync changes to Minew cloud</p>

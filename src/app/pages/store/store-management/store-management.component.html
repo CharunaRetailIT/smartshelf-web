@@ -65,7 +65,7 @@
         </div>
       </div>
 
-      <!-- Minew Stores Card -->
+      <!-- Synced to Minew Card -->
       <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
         <div class="flex items-center">
           <div class="flex-shrink-0">
@@ -74,8 +74,13 @@
             </div>
           </div>
           <div class="ml-4">
-            <p class="text-sm font-medium text-gray-600">Minew Stores</p>
-            <p class="text-2xl font-bold text-gray-900">{{ statistics?.minewStores || 0 }}</p>
+            <p class="text-sm font-medium text-gray-600">Synced to Minew</p>
+            <p class="text-2xl font-bold text-gray-900">
+              {{ statistics?.syncedStores || 0 }}
+              <span class="text-sm font-normal text-gray-500" *ngIf="statistics?.pendingSyncStores">
+                ({{ statistics.pendingSyncStores }} pending)
+              </span>
+            </p>
           </div>
         </div>
       </div>
@@ -111,18 +116,6 @@
             [(ngModel)]="searchTerm"
             (input)="onSearchChange()"
             class="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
-        </div>
-
-        <!-- Store Type Filter -->
-        <div>
-          <select
-            [(ngModel)]="storeTypeFilter"
-            (change)="onFilterChange()"
-            class="px-3 py-2 w-full border border-gray-300 rounded-md bg-white text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500">
-            <option value="">All Types</option>
-            <option value="local">Local Store</option>
-            <option value="minew">Minew Store</option>
-          </select>
         </div>
 
         <!-- Status Filter -->
@@ -204,9 +197,7 @@
             <td mat-cell *matCellDef="let store" class="px-6 py-4" style="border-bottom: 1px solid #e5e7eb !important;">
               <div class="flex items-center space-x-3">
                 <!-- Avatar with initials -->
-                <div 
-                  class="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold"
-                  [ngClass]="getStoreTypeColor(store.storeType)">
+                <div class="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold bg-emerald-600">
                   {{ getStoreInitials(store.storeName) }}
                 </div>
                 <div>
@@ -215,23 +206,6 @@
                   <div class="text-gray-400 text-xs">{{ store.address || 'No address' }}</div>
                 </div>
               </div>
-            </td>
-          </ng-container>
-
-          <!-- Type Column -->
-          <ng-container matColumnDef="type">
-            <th mat-header-cell *matHeaderCellDef class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase w-1/6 bg-gray-100" style="border-bottom: 1px solid #e5e7eb !important;">
-              Type
-            </th>
-            <td mat-cell *matCellDef="let store"
-                class="px-6 py-4"
-                style="border-bottom: 1px solid #e5e7eb !important;">
-              <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border"
-                    [ngClass]="getStoreTypeBadgeClass(store.storeType)">
-                <i class="fas mr-1.5 text-xs" 
-                   [ngClass]="getStoreTypeIcon(store.storeType)"></i>
-                {{ getStoreTypeLabel(store.storeType) }}
-              </span>
             </td>
           </ng-container>
 
@@ -251,9 +225,8 @@
                   <span class="ml-1.5">{{ store.isActive ? 'Active' : 'Inactive' }}</span>
                 </span>
                 
-                <!-- Sync Status (only for Minew stores) -->
-                <span *ngIf="store.storeType === 'minew'" 
-                      class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border"
+                <!-- Sync Status -->
+                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border"
                       [ngClass]="getSyncStatusColor(store.syncStatus)">
                   <i class="fas mr-1.5 text-xs" 
                      [ngClass]="getSyncStatusIcon(store.syncStatus)"></i>
@@ -328,8 +301,8 @@
                   <i class="fas fa-edit"></i>
                 </button>
                 
-                <!-- Sync Button (for Minew stores) -->
-                <button *ngIf="store.storeType === 'minew'"
+                <!-- Sync Button -->
+                <button
                   class="text-blue-600 hover:text-blue-900 p-1 rounded hover:bg-blue-50 transition-colors duration-150 cursor-pointer"
                   (click)="syncSingleStore(store)"
                   [title]="store.isSynced ? 'Re-sync Store' : 'Sync Store'">

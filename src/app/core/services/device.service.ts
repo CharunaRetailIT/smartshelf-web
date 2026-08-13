@@ -62,55 +62,11 @@ export class DeviceService {
   constructor(private http: HttpClient) {}
   //#endregion
 
-  //#region Store Management
-  getStoresforrack(): Observable<any[]> {
-    return this.http.get<any[]>(`${this.API_URL}/device/stores`);
-  }
-
-  getActiveStoresrack(): Observable<MinewStore[]> {
-    return this.http.get<any>(`${this.API_URL}/device/stores`).pipe(
-      map((res) => {
-        const list = res?.data ?? [];
-        console.log('Fetched stores:', list);
-
-        return list
-          .filter((s: any) => s.active)
-          .map((s: any) => ({
-            storeId: s.id,
-            storeName: s.name,
-            address: s.address,
-            active: s.active,
-          }));
-      }),
-    );
-  }
-
-  getStores(): Observable<any[]> {
-    return this.http.get<any[]>(`${this.API_URL}/device/stores`);
-  }
-
-  getActiveStores(): Observable<MinewStore[]> {
-    return this.http.get<any>(`${this.API_URL}/device/stores`).pipe(
-      map((res) => {
-        const list = res?.data ?? [];
-        console.log('Fetched stores:', list);
-
-        return list
-          .filter((s: any) => s.active)
-          .map((s: any) => ({
-            storeId: s.id,
-            storeName: s.name,
-            address: s.address,
-            active: s.active,
-          }));
-      }),
-      catchError((error) => {
-        console.error('Error fetching stores:', error);
-        return of([]);
-      }),
-    );
-  }
-  //#endregion
+  // Store lists come from StoreService. getStores/getActiveStores/
+  // getStoresforrack/getActiveStoresrack used to live here backed by
+  // /device/stores; that endpoint was removed along with the Minew store pull,
+  // and it served cloud ids anyway - every device endpoint keys off the local
+  // StoreMaster id.
 
   //#region Device Management - Cloud Sync & Operations
   /**

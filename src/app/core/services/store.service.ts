@@ -6,7 +6,7 @@ import { MinewStore } from '../interfaces/minew.interface';
 import { environment } from '../../../environments/environment';
 import { HttpResponseData } from '../interfaces/http-response.interface';
 import { PagedResult } from '../interfaces/pagination-result.interface';
-import { StoreFilterParams, Store, StoreSyncRequest, StoreSyncResult } from '../interfaces/store.interface';
+import { StoreFilterParams, Store, StoreLookup, StoreSyncRequest, StoreSyncResult } from '../interfaces/store.interface';
 
 @Injectable({
   providedIn: 'root'
@@ -121,6 +121,23 @@ isStoreActive(storeId: string): Observable<boolean> {
       );
   }
 
+  /**
+   * Minimal id/name list of active stores. Anonymous endpoint, used by the
+   * registration form before the user has a token.
+   */
+  getStoreLookup(): Observable<StoreLookup[]> {
+    return this.http.get<HttpResponseData<StoreLookup[]>>(`${this.API_URL}/Store/lookup`)
+      .pipe(
+        map(response => {
+          if (response.success) {
+            return response.result;
+          } else {
+            throw new Error(response.message);
+          }
+        })
+      );
+  }
+
   getStore(id: number): Observable<Store> {
     return this.http.get<HttpResponseData<Store>>(`${this.API_URL}/Store/${id}`)
       .pipe(
@@ -184,18 +201,6 @@ isStoreActive(storeId: string): Observable<boolean> {
       );
   }
 
-  getMinewCloudStores(): Observable<any> {
-    return this.http.get<HttpResponseData<any>>(`${this.API_URL}/minew-cloud`)
-      .pipe(
-        map(response => {
-          if (response.success) {
-            return response.result;
-          } else {
-            throw new Error(response.message);
-          }
-        })
-      );
-  }
 
   getStoreStatistics(): Observable<any> {
     return this.http.get<HttpResponseData<any>>(`${this.API_URL}/Store/statistics`)

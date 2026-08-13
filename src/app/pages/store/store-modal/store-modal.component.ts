@@ -25,7 +25,6 @@ export class StoreModalComponent implements OnInit {
 
   // Default store settings
   readonly defaultSettings = {
-    storeType: 'local',
     isActive: true,
     autoSync: true
   };
@@ -46,9 +45,11 @@ export class StoreModalComponent implements OnInit {
 
     this.storeForm = this.fb.group({
       storeName: ['', [Validators.required, Validators.maxLength(200)]],
-      storeCode: ['', [Validators.maxLength(50)]],
-      storeType: [this.defaultSettings.storeType, [Validators.required]],
-      address: ['', [Validators.maxLength(500)]],
+      // Minew's store/add rejects a blank number, name or address (code 54029),
+      // and every store is published to Minew, so both are required. It also
+      // rejects a non-numeric code (54030), hence the digits-only pattern.
+      storeCode: ['', [Validators.required, Validators.pattern(/^\d+$/), Validators.maxLength(50)]],
+      address: ['', [Validators.required, Validators.maxLength(500)]],
       contactPerson: ['', [Validators.maxLength(100)]],
       phone: ['', [Validators.maxLength(20)]],
       email: ['', [Validators.email, Validators.maxLength(100)]],
@@ -67,14 +68,6 @@ export class StoreModalComponent implements OnInit {
     if (this.isEditMode && this.data.store) {
       this.loadStoreData(this.data.store);
     }
-
-    // Watch for store type changes
-    this.storeForm.get('storeType')?.valueChanges.subscribe(type => {
-      this.handleStoreTypeChange(type);
-    });
-
-    // Initialize store type handling
-    this.handleStoreTypeChange(this.storeForm.get('storeType')?.value);
   }
   //#endregion
 
@@ -83,7 +76,6 @@ export class StoreModalComponent implements OnInit {
     this.storeForm.patchValue({
       storeName: store.storeName,
       storeCode: store.storeCode || '',
-      storeType: store.storeType || 'local',
       address: store.address || '',
       contactPerson: store.contactPerson || '',
       phone: store.phone || '',
@@ -97,47 +89,6 @@ export class StoreModalComponent implements OnInit {
     });
   }
 
-  onStoreTypeChange(type: string): void {
-    this.storeForm.patchValue({ storeType: type });
-  }
-
-  private handleStoreTypeChange(type: string): void {
-    const isMinew = type === 'minew';
-
-    // Update Minew field validators based on store type
-    if (isMinew) {
-      this.storeForm.get('minewStoreId')?.setValidators([Validators.maxLength(100)]);
-    } else {
-      this.storeForm.get('minewStoreId')?.clearValidators();
-      this.storeForm.get('minewTemplateId')?.clearValidators();
-    }
-
-    // Minew's store/add rejects a blank number, name or address outright
-    // (code 54029), so a cloud store needs all three before it can sync.
-    // Locally-managed stores keep them optional.
-    const address = this.storeForm.get('address');
-    const storeCode = this.storeForm.get('storeCode');
-
-    if (isMinew) {
-      address?.setValidators([Validators.required, Validators.maxLength(500)]);
-      storeCode?.setValidators([Validators.required, Validators.maxLength(50)]);
-    } else {
-      address?.setValidators([Validators.maxLength(500)]);
-      storeCode?.setValidators([Validators.maxLength(50)]);
-    }
-
-    address?.updateValueAndValidity();
-    storeCode?.updateValueAndValidity();
-
-    // Update form controls
-    this.storeForm.get('minewStoreId')?.updateValueAndValidity();
-    this.storeForm.get('minewTemplateId')?.updateValueAndValidity();
-  }
-
-  /** True when the current store type needs the Minew-mandatory fields. */
-  get isMinewStore(): boolean {
-    return this.storeForm?.get('storeType')?.value === 'minew';
-  }
   //#endregion
 
   //#region Form Actions
@@ -158,12 +109,12 @@ export class StoreModalComponent implements OnInit {
 
       const storeDto: StoreDto = {
         storeName: formValue.storeName,
-        storeCode: orNull(formValue.storeCode),
-        address: orNull(formValue.address),
+        // Required by the form, so always present - and Minew rejects blanks.
+        storeCode: (formValue.storeCode ?? '').trim(),
+        address: (formValue.address ?? '').trim(),
         phone: orNull(formValue.phone),
         email: orNull(formValue.email),
         contactPerson: orNull(formValue.contactPerson),
-        storeType: formValue.storeType,
         minewStoreId: orNull(formValue.minewStoreId),
         minewTemplateId: orNull(formValue.minewTemplateId),
         latitude: formValue.latitude,

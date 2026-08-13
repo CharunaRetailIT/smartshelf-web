@@ -222,15 +222,27 @@
 
           <div class="p-4">
             <div class="mb-4">
-              <label
-                class="block mb-2 font-medium text-gray-700 flex items-center gap-2"
-              >
-                <i class="pi pi-list"></i>
-                Enter MAC Addresses
-                <span class="text-xs text-gray-500 font-normal"
-                  >(one per line)</span
+              <div class="flex items-center justify-between mb-2 gap-2">
+                <label
+                  class="font-medium text-gray-700 flex items-center gap-2 mb-0"
                 >
-              </label>
+                  <i class="pi pi-list"></i>
+                  Enter MAC Addresses
+                  <span class="text-xs text-gray-500 font-normal"
+                    >(one per line)</span
+                  >
+                </label>
+                <button
+                  type="button"
+                  (click)="scanMacAddresses()"
+                  [disabled]="isProcessing"
+                  class="inline-flex items-center gap-2 px-3 py-1.5 border border-emerald-600 text-emerald-700 rounded-md hover:bg-emerald-50 transition-colors cursor-pointer whitespace-nowrap disabled:opacity-50 disabled:cursor-not-allowed"
+                  title="Scan device barcode stickers with your camera"
+                >
+                  <i class="pi pi-qrcode"></i>
+                  <span>Scan barcodes</span>
+                </button>
+              </div>
               <textarea
                 pInputTextarea
                 [(ngModel)]="macAddressesInput"

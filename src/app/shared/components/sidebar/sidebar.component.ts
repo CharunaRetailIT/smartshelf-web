@@ -94,9 +94,9 @@ export class SidebarComponent {
         roles: ['Viewer', 'Admin', 'Manager', 'Operator'],
       },
       {
-        routeLink: 'settings',
-        icon: 'pi pi-cog',
-        label: 'Settings',
+        routeLink: 'store-management',
+        icon: 'pi pi-building',
+        label: 'Store Management',
         roles: ['Viewer', 'Admin', 'Manager', 'Operator'],
       },
     ];

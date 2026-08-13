@@ -5,8 +5,9 @@ import { AisleService } from '../../../core/services/aisle.service';
 import { ProductService } from '../../../core/services/product.service';
 import { ShelfService } from '../../../core/services/shelf.service';
 import { StoreService } from '../../../core/services/store.service';
+import { SettingsService } from '../../../core/services/settings.service';
 import { CommonModule } from '@angular/common';
-import { MinewStore } from '../../../core/interfaces/minew.interface';
+import { StoreLookup } from '../../../core/interfaces/store.interface';
 import { DeviceSelectionModalComponent } from '../device-selection-modal-component/device-selection-modal-component.component';
 import { ComboCreationResult, DeviceSelectionModalData, TemplateSelectionModalData } from '../../../core/interfaces/combo-create.models';
 import { MatDialog } from '@angular/material/dialog';
@@ -23,7 +24,7 @@ import { AuthService } from '../../../core/services/auth.service';
 })
 export class DeviceTemplateManagementComponent implements OnInit {
     // Data sources
-    stores: MinewStore[] = [];
+    stores: StoreLookup[] = [];
     minewDevices: any[] = [];
     filteredDevices: any[] = [];
     minewTemplates: any[] = [];
@@ -63,6 +64,7 @@ export class DeviceTemplateManagementComponent implements OnInit {
         private shelfService: ShelfService,
         private productService: ProductService,
         private storeService: StoreService,
+        private settingsService: SettingsService,
         public auth: AuthService,
         private dialog: MatDialog,
         private fb: FormBuilder
@@ -96,10 +98,23 @@ export class DeviceTemplateManagementComponent implements OnInit {
 
     // ============ STORE MANAGEMENT ============
 
+    // Local stores, not Minew's cloud list. Every endpoint this page calls
+    // (devices/sync, templates/sync, light-up) keys off the local StoreMaster
+    // id, so listing cloud stores here handed them an id they could not
+    // resolve - "Store not found".
     loadStores() {
-        this.deviceService.getActiveStores().subscribe({
+        this.storeService.getStoreLookup().subscribe({
             next: (stores) => {
                 this.stores = stores;
+
+                // Store is mandatory per user now, so preselect theirs and the
+                // page is usable without touching the dropdown.
+                const currentStore = this.settingsService.getCurrentDefaultStore();
+                if (currentStore && stores.some(s => s.id === currentStore.id)) {
+                    this.selectedStoreId = currentStore.id;
+                } else if (stores.length === 1) {
+                    this.selectedStoreId = stores[0].id;
+                }
             },
             error: (error) => {
                 console.error('Failed to load stores:', error);

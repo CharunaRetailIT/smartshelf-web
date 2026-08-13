@@ -80,6 +80,7 @@ export class AuthService {
         email: decoded.email,
         departmentId: decoded.departmentId,
         profileImageUrl: decoded.profileImageUrl,
+        storeId: decoded.storeId ? parseInt(decoded.storeId) : undefined,
         roles: [decoded.role]
       };
       this.currentUserSubject.next(user);
@@ -105,10 +106,12 @@ export class AuthService {
       .pipe(map(res => {
         const loginData = res.result;
         this.setAuth(loginData.token, loginData.user);
-        // Force a fresh pick of the default store on every login so a stale
-        // cached copy (e.g. one saved before a store field like MinewStoreId
-        // was added to the API response) never lingers across sessions.
-        this.settingsService.clearDefaultStore();
+        // The store is chosen at registration, so the API returns it with the
+        // login payload. Overwriting the cache on every login keeps a stale
+        // copy (saved before a store field was added) from lingering.
+        if (loginData.user.store) {
+          this.settingsService.setDefaultStore(loginData.user.store);
+        }
         return res;
       }));
   }
@@ -167,6 +170,7 @@ export class AuthService {
     }
     this.tokenSubject.next(null);
     this.currentUserSubject.next(null);
+    this.settingsService.clearDefaultStore();
   }
 
   getToken(): string | null { return this.tokenSubject.value; }

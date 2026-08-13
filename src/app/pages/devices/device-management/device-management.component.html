@@ -2466,13 +2466,27 @@
               <label for="macAddress" class="form-label"
                 >MAC Address <span class="required">*</span></label
               >
-              <input
-                id="macAddress"
-                pInputText
-                formControlName="macAddress"
-                placeholder="e.g., e1000005e79d or 00:1A:2B:3C:4D:5E"
-                class="form-input"
-              />
+              <div class="flex gap-2">
+                <input
+                  id="macAddress"
+                  pInputText
+                  formControlName="macAddress"
+                  placeholder="e.g., e1000005e79d or 00:1A:2B:3C:4D:5E"
+                  class="form-input flex-1"
+                />
+                <button
+                  type="button"
+                  (click)="scanMacAddress()"
+                  class="inline-flex items-center gap-2 px-3 py-2 border border-emerald-600 text-emerald-700 rounded-md hover:bg-emerald-50 transition-colors cursor-pointer whitespace-nowrap"
+                  title="Scan the device's barcode sticker with your camera"
+                >
+                  <i class="pi pi-qrcode"></i>
+                  <span class="hidden sm:inline">Scan</span>
+                </button>
+              </div>
+              <small class="text-gray-500 mt-1 block">
+                Use Scan to read the MAC from the device's barcode sticker.
+              </small>
             </div>
           </div>
         </div>

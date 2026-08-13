@@ -5,6 +5,7 @@ import { routes } from './app.routes';
 import { provideClientHydration, withEventReplay } from '@angular/platform-browser';
 import { provideHttpClient, withFetch, withInterceptors } from '@angular/common/http';
 import { authInterceptor } from './core/interceptors/auth.interceptor';
+import { storeInterceptor } from './core/interceptors/store.interceptor';
 import { provideAnimations, provideNoopAnimations } from '@angular/platform-browser/animations';
 import { providePrimeNG } from 'primeng/config';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
@@ -15,7 +16,7 @@ export const appConfig: ApplicationConfig = {
     providers: [provideZoneChangeDetection({ eventCoalescing: true }),
     provideRouter(routes),
     provideClientHydration(withEventReplay()),
-    provideHttpClient(withFetch(), withInterceptors([authInterceptor])),
+    provideHttpClient(withFetch(), withInterceptors([authInterceptor, storeInterceptor])),
     provideNoopAnimations(), // Add this line for no animations
     provideAnimations(),
     providePrimeNG({

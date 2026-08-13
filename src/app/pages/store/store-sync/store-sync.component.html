@@ -29,30 +29,6 @@
           Sync Options
         </h3>
         
-        <!-- Sync From Cloud Option -->
-        <div class="p-4 border rounded-lg bg-gray-50 hover:bg-gray-100 transition-colors">
-          <label class="flex items-center cursor-pointer">
-            <input
-              type="checkbox"
-              formControlName="syncFromCloud"
-              class="h-4 w-4 text-emerald-700 rounded border-gray-300 focus:ring-emerald-600">
-            <div class="ml-3 flex-1">
-              <div class="flex items-center justify-between">
-                <div>
-                  <span class="text-sm font-medium text-gray-900">Sync from Minew Cloud</span>
-                  <p class="text-xs text-gray-500 mt-1">
-                    Import stores from Minew cloud to local database
-                  </p>
-                </div>
-                <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-emerald-100 text-emerald-800">
-                  <i class="fas fa-cloud-download-alt mr-1"></i>
-                  Import
-                </span>
-              </div>
-            </div>
-          </label>
-        </div>
-
         <!-- Sync To Cloud Option -->
         <div class="p-4 border rounded-lg bg-gray-50 hover:bg-gray-100 transition-colors">
           <label class="flex items-center cursor-pointer">
@@ -269,15 +245,7 @@
           Sync Preview
         </h3>
         
-        <div class="grid grid-cols-3 gap-4 text-center">
-          <!-- Stores to Import -->
-          <div *ngIf="syncForm.get('syncFromCloud')?.value" 
-               class="p-4 border rounded-lg bg-emerald-50">
-            <div class="text-2xl font-bold text-emerald-700">{{ syncPreview.storesToImport || 0 }}</div>
-            <div class="text-sm font-medium text-emerald-800">Stores to Import</div>
-            <div class="text-xs text-emerald-700 mt-1">From Cloud</div>
-          </div>
-
+        <div class="grid grid-cols-2 gap-4 text-center">
           <!-- Stores to Export -->
           <div *ngIf="syncForm.get('syncToCloud')?.value" 
                class="p-4 border rounded-lg bg-emerald-50">

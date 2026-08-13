@@ -1,0 +1,100 @@
+<div class="scanner">
+  <div class="scanner-header">
+    <div class="flex items-center gap-2">
+      <i class="pi pi-qrcode text-emerald-600"></i>
+      <h2 class="scanner-title">
+        {{ multiple ? 'Scan device barcodes' : 'Scan device barcode' }}
+      </h2>
+    </div>
+    <button type="button" class="scanner-close" (click)="cancel()" aria-label="Close">
+      <i class="pi pi-times"></i>
+    </button>
+  </div>
+
+  <div class="scanner-body">
+    <!-- Camera failed / unavailable -->
+    <div *ngIf="error()" class="scanner-error">
+      <i class="pi pi-exclamation-triangle"></i>
+      <p>{{ error() }}</p>
+    </div>
+
+    <!-- Always rendered, never inside an *ngIf: a static ViewChild cannot
+         resolve an element in an embedded view, and the video ref has to exist
+         before ngOnInit starts the camera. Hidden rather than removed on error. -->
+    <div class="scanner-stage" [class.scanner-hidden]="error()">
+      <video #preview class="scanner-video" muted playsinline autoplay></video>
+      <div class="scanner-reticle"></div>
+
+      <div *ngIf="starting()" class="scanner-loading">
+        <i class="pi pi-spin pi-spinner"></i>
+        <span>Starting camera…</span>
+      </div>
+    </div>
+
+    <ng-container *ngIf="!error()">
+      <p class="scanner-hint">
+        Hold the device's barcode sticker inside the frame.
+        <ng-container *ngIf="multiple">
+          Keep going — scanning continues until you press Done.
+        </ng-container>
+      </p>
+
+      <p *ngIf="lastRejected()" class="scanner-rejected">
+        Read "{{ lastRejected() }}" — not a MAC address, still scanning…
+      </p>
+
+      <p *ngIf="multiple && duplicate()" class="scanner-duplicate">
+        {{ duplicate() }} is already in the list.
+      </p>
+
+      <!-- Running tally in continuous mode -->
+      <div *ngIf="multiple" class="scanner-collected">
+        <div class="scanner-collected-head">
+          <span>Scanned</span>
+          <span class="scanner-count">{{ collected().length }}</span>
+        </div>
+
+        <p *ngIf="collected().length === 0" class="scanner-collected-empty">
+          No devices scanned yet.
+        </p>
+
+        <ul *ngIf="collected().length" class="scanner-collected-list">
+          <li *ngFor="let mac of collected()">
+            <span class="scanner-mac">{{ mac }}</span>
+            <button
+              type="button"
+              class="scanner-remove"
+              (click)="removeCollected(mac)"
+              [attr.aria-label]="'Remove ' + mac">
+              <i class="pi pi-times"></i>
+            </button>
+          </li>
+        </ul>
+      </div>
+
+      <div *ngIf="cameras().length > 1" class="scanner-camera-picker">
+        <label for="cameraSelect">Camera</label>
+        <select
+          id="cameraSelect"
+          [value]="selectedCameraId()"
+          (change)="onCameraChange($any($event.target).value)">
+          <option *ngFor="let cam of cameras(); let i = index" [value]="cam.deviceId">
+            {{ cam.label || 'Camera ' + (i + 1) }}
+          </option>
+        </select>
+      </div>
+    </ng-container>
+  </div>
+
+  <div class="scanner-footer">
+    <button type="button" class="scanner-cancel" (click)="cancel()">Cancel</button>
+    <button
+      *ngIf="multiple"
+      type="button"
+      class="scanner-done"
+      [disabled]="collected().length === 0"
+      (click)="finish()">
+      Add {{ collected().length }} device{{ collected().length === 1 ? '' : 's' }}
+    </button>
+  </div>
+</div>

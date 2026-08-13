@@ -20,15 +20,22 @@ export interface Store {
   deviceCount: number;
 }
 
+export interface StoreLookup {
+  id: number;
+  storeName: string;
+  storeCode?: string;
+}
+
 export interface StoreDto {
   id?: number;
   storeName: string;
-  storeCode?: string;
-  address?: string;
+  // Minew rejects a blank number or address on store/add, and every store is
+  // published to Minew, so these are mandatory.
+  storeCode: string;
+  address: string;
   phone?: string;
   email?: string;
   contactPerson?: string;
-  storeType: 'local' | 'minew';
   minewStoreId?: string;
   minewTemplateId?: string;
   latitude?: number;
@@ -52,7 +59,7 @@ export interface StoreFilterParams {
 }
 
 export interface StoreSyncRequest {
-  syncFromCloud: boolean;
+  // Push-only: local stores are published to Minew, never pulled down.
   syncToCloud: boolean;
   storeIds?: number[];
 }

@@ -755,24 +755,6 @@ export class DeviceManagementComponent implements OnInit, OnDestroy {
   }
   //#endregion
 
-  loadStores(): void {
-    this.deviceService.getStores().subscribe({
-      next: (stores) => {
-        this.stores = stores;
-        this.storeOptions = [
-          { label: 'All Stores', value: '' },
-          ...stores.map(store => ({
-            label: store.storeName,
-            value: store.storeId
-          }))
-        ];
-      },
-      error: (error) => {
-        this.showError('Failed to load stores');
-      }
-    });
-  }
-
   loadScreenOptions(): void {
     this.screenLoading = true;
 
@@ -2377,6 +2359,31 @@ export class DeviceManagementComponent implements OnInit, OnDestroy {
         this.showError('Could not read the local device list');
       },
     });
+  }
+
+  /**
+   * Reads the MAC off the device's barcode sticker with the camera - webcam on
+   * a laptop, rear camera when the page is open on a phone - and drops it into
+   * the form. The dialog only returns normalised 12-hex-char MACs.
+   */
+  scanMacAddress(): void {
+    import('../../../shared/components/barcode-scanner/barcode-scanner.component')
+      .then(({ BarcodeScannerComponent }) => {
+        const ref = this.dialog.open(BarcodeScannerComponent, {
+          panelClass: 'barcode-scanner-dialog',
+          autoFocus: false,
+          restoreFocus: true
+        });
+
+        ref.afterClosed().subscribe((macs?: string[]) => {
+          const mac = macs?.[0];
+          if (!mac) return;
+          this.deviceForm.patchValue({ macAddress: mac });
+          this.deviceForm.get('macAddress')?.markAsDirty();
+          this.showSuccess(`Scanned MAC ${mac}`);
+        });
+      })
+      .catch(() => this.showError('Could not load the barcode scanner'));
   }
 
   private syncFromCloud(): void {

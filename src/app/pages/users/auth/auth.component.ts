@@ -8,6 +8,8 @@ import { RegisterRequest } from '../../../core/interfaces/auth.interface';
 import { SnackbarData, CustomSnackbarComponent } from '../../../shared/components/alert/custom-snackbar.component';
 import { MessageService } from 'primeng/api';
 import { ImportsModule } from '../../../imports/imports';
+import { StoreService } from '../../../core/services/store.service';
+import { StoreLookup } from '../../../core/interfaces/store.interface';
 
 @Component({
   selector: 'app-auth',
@@ -25,12 +27,16 @@ export class AuthComponent implements OnInit {
 
   signInForm: FormGroup;
   signUpForm: FormGroup;
+
+  stores: StoreLookup[] = [];
+  storesLoading = signal(false);
   // #endregion
 
   // #region Constructor
   constructor(
     private fb: FormBuilder,
     private authService: AuthService,
+    private storeService: StoreService,
     private messageService: MessageService,
     private router: Router,
     private snackBar: MatSnackBar
@@ -50,6 +56,7 @@ export class AuthComponent implements OnInit {
         address2: [''],
         address3: [''],
         department: [''],
+        storeId: [null, Validators.required],
         password: ['', [Validators.required, Validators.minLength(8)]],
         confirmPassword: ['', Validators.required],
         agreeToTerms: [false, Validators.requiredTrue]
@@ -62,6 +69,21 @@ export class AuthComponent implements OnInit {
   // #region Lifecycle Hooks
   ngOnInit(): void {
     // this.loadRememberedCredentials();
+    this.loadStores();
+  }
+
+  private loadStores(): void {
+    this.storesLoading.set(true);
+    this.storeService.getStoreLookup().subscribe({
+      next: (stores) => {
+        this.stores = stores;
+        this.storesLoading.set(false);
+      },
+      error: () => {
+        this.storesLoading.set(false);
+        this.showError('Failed to load stores. Please refresh and try again.');
+      }
+    });
   }
   // #endregion
 
@@ -209,6 +231,7 @@ export class AuthComponent implements OnInit {
         email: formValue.email,
         password: formValue.password,
         department: 0,
+        storeId: formValue.storeId,
         address1: formValue.address1,
         address2: formValue.address2,
         address3: formValue.address3

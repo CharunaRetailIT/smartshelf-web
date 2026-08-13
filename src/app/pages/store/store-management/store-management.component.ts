@@ -31,7 +31,7 @@ export class StoreManagementComponent implements OnInit {
   // Data
   stores: Store[] = [];
   dataSource = new MatTableDataSource<Store>([]);
-  displayedColumns: string[] = ['store', 'type', 'status', 'devices', 'contact', 'created', 'actions'];
+  displayedColumns: string[] = ['store', 'status', 'devices', 'contact', 'created', 'actions'];
 
   // Loading states
   loading = false;
@@ -43,18 +43,11 @@ export class StoreManagementComponent implements OnInit {
 
   // Filters
   searchTerm = '';
-  storeTypeFilter = '';
   statusFilter = '';
   syncStatusFilter = '';
   createdFrom?: Date;
   createdTo?: Date;
   showAdvancedFilters = false;
-
-  // Store type options
-  storeTypes = [
-    { label: 'Local Store', value: 'local' },
-    { label: 'Minew Cloud Store', value: 'minew' }
-  ];
 
   // Forms
   filterForm!: FormGroup;
@@ -106,7 +99,6 @@ export class StoreManagementComponent implements OnInit {
   initForms(): void {
     this.filterForm = this.fb.group({
       searchTerm: [''],
-      storeType: [''],
       status: [''],
       syncStatus: [''],
       createdFrom: [null],
@@ -121,7 +113,6 @@ export class StoreManagementComponent implements OnInit {
       pageNumber: this.pageIndex,
       pageSize: this.pageSize,
       searchTerm: this.searchTerm,
-      storeType: this.storeTypeFilter,
       isActive: this.statusFilter ? JSON.parse(this.statusFilter) : undefined,
       isSynced: this.syncStatusFilter ? JSON.parse(this.syncStatusFilter) : undefined,
       createdFrom: this.createdFrom,
@@ -175,7 +166,6 @@ export class StoreManagementComponent implements OnInit {
 
   resetFilters(): void {
     this.searchTerm = '';
-    this.storeTypeFilter = '';
     this.statusFilter = '';
     this.syncStatusFilter = '';
     this.createdFrom = undefined;
@@ -226,9 +216,7 @@ export class StoreManagementComponent implements OnInit {
 
   // Open sync dialog
   openSyncModal(): void {
-    const pendingSyncStores = this.stores.filter(s =>
-      s.storeType === 'minew' && !s.isSynced
-    );
+    const pendingSyncStores = this.stores.filter(s => !s.isSynced);
 
     const dialogRef = this.dialog.open(StoreSyncComponent, {
       // width: '800px',
@@ -268,7 +256,6 @@ export class StoreManagementComponent implements OnInit {
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
         const syncRequest: StoreSyncRequest = {
-          syncFromCloud: false,
           syncToCloud: true,
           storeIds: [store.id]
         };
@@ -419,24 +406,6 @@ export class StoreManagementComponent implements OnInit {
       return (words[0].charAt(0) + words[1].charAt(0)).toUpperCase();
     }
     return storeName.substring(0, 2).toUpperCase();
-  }
-
-  getStoreTypeColor(type: string): string {
-    return type === 'minew' ? 'bg-purple-500' : 'bg-blue-500';
-  }
-
-  getStoreTypeLabel(type: string): string {
-    return type === 'minew' ? 'Minew Cloud' : 'Local Store';
-  }
-
-  getStoreTypeIcon(type: string): string {
-    return type === 'minew' ? 'fa-cloud text-purple-400' : 'fa-store text-blue-400';
-  }
-
-  getStoreTypeBadgeClass(type: string): string {
-    return type === 'minew'
-      ? 'border-purple-200 text-purple-800 bg-purple-50'
-      : 'border-blue-200 text-blue-800 bg-blue-50';
   }
 
   getStatusColor(isActive: boolean): string {

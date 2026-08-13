@@ -33,8 +33,7 @@ export class StoreSyncComponent implements OnInit {
 
   // Default settings
   readonly defaultSettings = {
-    syncFromCloud: true,
-    syncToCloud: false,
+    syncToCloud: true,
     syncMode: 'all',
     retryAttempts: 3,
     syncTimeout: 60,
@@ -52,7 +51,6 @@ export class StoreSyncComponent implements OnInit {
     @Inject(MAT_DIALOG_DATA) public data: { stores?: Store[] }
   ) {
     this.syncForm = this.fb.group({
-      syncFromCloud: [this.defaultSettings.syncFromCloud],
       syncToCloud: [this.defaultSettings.syncToCloud],
       syncMode: [this.defaultSettings.syncMode],
       retryAttempts: [this.defaultSettings.retryAttempts, [Validators.min(0), Validators.max(5)]],
@@ -89,7 +87,6 @@ export class StoreSyncComponent implements OnInit {
     const filters = {
       pageNumber: 1,
       pageSize: 100,
-      storeType: 'minew',
       isActive: true
     };
 
@@ -174,8 +171,7 @@ export class StoreSyncComponent implements OnInit {
 
   //#region Preview Methods
   canPreview(): boolean {
-    const formValue = this.syncForm.value;
-    return formValue.syncFromCloud || formValue.syncToCloud;
+    return this.syncForm.value.syncToCloud;
   }
 
   previewSync(): void {
@@ -188,12 +184,9 @@ export class StoreSyncComponent implements OnInit {
     const storesToExport = formValue.syncToCloud ?
       (formValue.syncMode === 'all' ? this.storesForSync.length : this.selectedStoreIds.length) : 0;
 
-    const storesToImport = formValue.syncFromCloud ? 10 : 0; // Placeholder - would come from API
-
     this.syncPreview = {
-      storesToImport,
       storesToExport,
-      estimatedTime: Math.ceil((storesToImport + storesToExport) * 2) // 2 seconds per store
+      estimatedTime: Math.ceil(storesToExport * 2) // 2 seconds per store
     };
 
     setTimeout(() => {
@@ -210,7 +203,6 @@ export class StoreSyncComponent implements OnInit {
 
     const formValue = this.syncForm.value;
     const syncRequest: StoreSyncRequest = {
-      syncFromCloud: formValue.syncFromCloud,
       syncToCloud: formValue.syncToCloud,
       storeIds: formValue.syncToCloud && formValue.syncMode === 'selected' ?
         this.selectedStoreIds : undefined

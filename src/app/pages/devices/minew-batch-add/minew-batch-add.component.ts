@@ -13,6 +13,7 @@ import { FormsModule } from '@angular/forms';
 import { MessageService } from 'primeng/api';
 
 import { DeviceService } from '../../../core/services/device.service';
+import { StoreService } from '../../../core/services/store.service';
 import { SettingsService } from '../../../core/services/settings.service';
 import { MinewStore } from '../../../core/interfaces/minew.interface';
 import {
@@ -88,6 +89,7 @@ export class MinewBatchAddComponent implements OnInit {
 
   constructor(
     private deviceService: DeviceService,
+    private storeService: StoreService,
     private settingsService: SettingsService,
     private messageService: MessageService
   ) { }
@@ -97,15 +99,36 @@ export class MinewBatchAddComponent implements OnInit {
     this.loadDefaultStore();
   }
 
+  // Sourced from the local store list, not Minew's. This page still needs the
+  // *cloud* id though - batch-add-minew hands StoreId straight to Minew - so
+  // map each local store onto its MinewStoreId. Stores that have never synced
+  // have no cloud id and cannot take a batch add, so they are left out.
   loadStores(): void {
-    this.deviceService.getActiveStores().subscribe({
-      next: (stores) => {
-        this.stores = stores;
-        if (stores.length > 0) {
-          this.selectedStore = stores[0].storeId;
+    this.storeService.getStores({ pageNumber: 1, pageSize: 200, isActive: true }).subscribe({
+      next: (response) => {
+        this.stores = response.items
+          .filter(store => !!store.minewStoreId)
+          .map(store => ({
+            storeId: store.minewStoreId!,
+            storeName: store.storeName,
+            address: store.address,
+            active: store.isActive ? 1 : 0
+          }));
+
+        if (this.stores.length === 0) {
+          this.showWarning(
+            'No store is synced with Minew yet. Sync a store before adding devices.');
+          return;
         }
+
+        // Preselect the user's own store when it has a cloud id.
+        const currentStore = this.settingsService.getCurrentDefaultStore();
+        const match = currentStore
+          ? this.stores.find(s => s.storeId === currentStore.minewStoreId)
+          : null;
+        this.selectedStore = (match ?? this.stores[0]).storeId;
       },
-      error: (error) => {
+      error: () => {
         this.showError('Failed to load stores');
       }
     });
@@ -155,12 +178,45 @@ export class MinewBatchAddComponent implements OnInit {
 
   // Manual input handling
   validateManualInput(): void {
-    const lines = this.macAddressesInput
+    this.generatePreview(this.currentMacLines());
+  }
+
+  private currentMacLines(): string[] {
+    return this.macAddressesInput
       .split('\n')
       .map(line => line.trim())
       .filter(line => line.length > 0);
+  }
 
-    this.generatePreview(lines);
+  /**
+   * Scans device barcode stickers with the camera and appends each MAC to the
+   * textarea. Stays open between reads so a whole box of labels can be worked
+   * through in one pass.
+   */
+  scanMacAddresses(): void {
+    import('../../../shared/components/barcode-scanner/barcode-scanner.component')
+      .then(({ BarcodeScannerComponent }) => {
+        const ref = this.dialog.open(BarcodeScannerComponent, {
+          panelClass: 'barcode-scanner-dialog',
+          autoFocus: false,
+          restoreFocus: true,
+          data: { multiple: true, existing: this.currentMacLines() }
+        });
+
+        ref.afterClosed().subscribe((macs?: string[]) => {
+          if (!macs?.length) return;
+
+          // The scanner already excludes anything passed in as existing, so
+          // these are all new - just append and re-run the usual validation.
+          const existing = this.currentMacLines();
+          this.macAddressesInput = [...existing, ...macs].join('\n');
+          this.validateManualInput();
+
+          this.showSuccess(
+            `Added ${macs.length} scanned device${macs.length === 1 ? '' : 's'}`);
+        });
+      })
+      .catch(() => this.showError('Could not load the barcode scanner'));
   }
 
   // File upload handling
