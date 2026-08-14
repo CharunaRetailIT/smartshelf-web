@@ -36,6 +36,23 @@ body {
   font-size: 18px;
 } */
 
+/* Create Message - screen size picker.
+   The dropdown uses appendTo="body", so its panel is a child of <body> and
+   component-scoped rules cannot reach it. Targeted here via panelStyleClass. */
+.screen-size-panel {
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.screen-size-panel .p-dropdown-item {
+  padding: 0.5rem 1rem;
+}
+
+.screen-size-panel .p-dropdown-header,
+.screen-size-panel .p-dropdown-footer {
+  padding: 0.75rem;
+}
+
 /* PrimeNg pagination dropdown open upwards */
 .p-paginator .p-select-overlay {
   bottom: 100% !important;

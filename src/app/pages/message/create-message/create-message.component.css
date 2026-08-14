@@ -20,22 +20,9 @@ canvas {
   width: 100%;
 }
 
-:host ::ng-deep .p-dropdown-panel {
-  max-height: 400px;
-  overflow-y: auto;
-}
-
-:host ::ng-deep .p-dropdown-item {
-  padding: 0.5rem 1rem;
-}
-
-:host ::ng-deep .p-dropdown-header {
-  padding: 0.75rem;
-}
-
-:host ::ng-deep .p-dropdown-footer {
-  padding: 0.75rem;
-}
+/* Panel styling lives in styles.css under .screen-size-panel: the dropdown uses
+   appendTo="body", so the panel is rendered outside this component and a
+   :host ::ng-deep rule never reaches it. */
 
 /* Add this to your global styles or component CSS */
 input:focus,
