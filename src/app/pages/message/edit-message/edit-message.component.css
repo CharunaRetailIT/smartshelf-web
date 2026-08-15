@@ -227,7 +227,6 @@ button:disabled {
 :host ::ng-deep .p-dropdown {
   width: 100%;
   border: 1px solid #e5e7eb;
-  border-radius: 0.5rem;
   background: white;
 }
 
@@ -258,10 +257,7 @@ button:disabled {
 }
 
 :host ::ng-deep .p-dropdown-item {
-  padding: 0.5rem 1rem;
-  border-radius: 0.375rem;
   margin: 0.125rem;
-  font-size: 0.875rem;
 }
 
 :host ::ng-deep .p-dropdown-item.p-highlight {
@@ -275,20 +271,13 @@ button:disabled {
 }
 
 :host ::ng-deep .p-dropdown-header {
-  padding: 0.75rem;
   background: #f9fafb;
   border-bottom: 1px solid #e5e7eb;
 }
 
 :host ::ng-deep .p-dropdown-footer {
-  padding: 0.75rem;
   background: #f9fafb;
   border-top: 1px solid #e5e7eb;
-}
-
-:host ::ng-deep .p-dropdown .p-dropdown-label {
-  padding: 0.5rem 0.75rem;
-  font-size: 0.875rem;
 }
 
 :host ::ng-deep .p-dropdown .p-dropdown-trigger {
@@ -304,11 +293,8 @@ button:disabled {
 /* Search input inside dropdown */
 :host ::ng-deep .p-dropdown-filter {
   width: 100%;
-  padding: 0.5rem 0.75rem;
   border: 1px solid #e5e7eb;
-  border-radius: 0.375rem;
   margin: 0.5rem;
-  font-size: 0.875rem;
 }
 
 :host ::ng-deep .p-dropdown-filter:focus {

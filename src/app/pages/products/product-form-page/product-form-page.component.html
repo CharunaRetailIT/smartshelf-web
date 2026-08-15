@@ -1,38 +1,48 @@
-<div class="min-h-screen bg-slate-50 pb-28">
+<div class="min-h-screen bg-slate-50 pb-28 ds-page-shell">
   <!-- Header -->
   <div class="px-6 pt-6 pb-4">
-    <div
-      class="mb-2 flex items-center gap-2 text-sm font-semibold text-slate-500"
-    >
-      <span>Dashboard</span>
-      <i class="pi pi-angle-right text-xs"></i>
-      <span>Products</span>
-      <i class="pi pi-angle-right text-xs"></i>
-      <span class="text-emerald-700">
+    <!-- Breadcrumb: the first two crumbs are real links, the last is the
+         current page and stays plain text. -->
+    <nav class="ds-breadcrumb" aria-label="Breadcrumb">
+      <a class="ds-breadcrumb__link" [routerLink]="['/dashboard']">Dashboard</a>
+      <i class="pi pi-angle-right ds-breadcrumb__sep"></i>
+      <a
+        class="ds-breadcrumb__link"
+        [routerLink]="['/product-management']"
+        [queryParams]="{ tab: 'products' }"
+        >Products</a
+      >
+      <i class="pi pi-angle-right ds-breadcrumb__sep"></i>
+      <span class="ds-breadcrumb__current" aria-current="page">
         {{ isEditMode ? "Edit Product" : "Create New Product" }}
       </span>
-    </div>
+    </nav>
 
     <div
       class="flex flex-col gap-3 md:flex-row md:items-center md:justify-between"
     >
-      <div>
-        <h1 class="text-4xl font-bold tracking-tight text-slate-900">
-          {{ isEditMode ? "Edit Product" : "Create New Product" }}
-        </h1>
-        <p class="mt-1 text-sm text-slate-500">
-          Manage product information, inventory, and ESL display assignments.
-        </p>
-      </div>
+      <div class="flex items-center gap-3">
+        <!-- Back sits before the title, as an icon only -->
+        <button
+          type="button"
+          class="ds-btn-icon ds-back-btn"
+          (click)="cancel()"
+          pTooltip="Back to Products"
+          tooltipPosition="bottom"
+          aria-label="Back to Products"
+        >
+          <i class="pi pi-arrow-left"></i>
+        </button>
 
-      <button
-        pButton
-        type="button"
-        icon="pi pi-arrow-left"
-        label="Back to Products"
-        class="p-button-outlined"
-        (click)="cancel()"
-      ></button>
+        <div>
+          <h1 class="tracking-tight text-slate-900">
+            {{ isEditMode ? "Edit Product" : "Create New Product" }}
+          </h1>
+          <p class="mt-1 text-sm text-slate-500">
+            Manage product information, inventory, and ESL display assignments.
+          </p>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -526,7 +536,8 @@
                           <div
                             class="field"
                             *ngIf="
-                              showDeviceMessageCombos || !brandSupportsTemplate(i)
+                              showDeviceMessageCombos ||
+                              !brandSupportsTemplate(i)
                             "
                           >
                             <label>

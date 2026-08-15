@@ -16,12 +16,7 @@ import { ProductService } from '../../../core/services/product.service';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { CategoryService } from '../../../core/services/category.service';
-import {
-  MatPaginator,
-  MatPaginatorModule,
-  PageEvent,
-} from '@angular/material/paginator';
-import { MatTableDataSource, MatTableModule } from '@angular/material/table';
+import { TableModule, TableLazyLoadEvent } from 'primeng/table';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { debounceTime, distinctUntilChanged, forkJoin, Subject } from 'rxjs';
 import { CategoryModalComponent } from '../category-modal/category-modal.component';
@@ -55,8 +50,7 @@ import { DeviceAssignmentDto } from '../../../core/interfaces/device.interface';
   imports: [
     CommonModule,
     FormsModule,
-    MatPaginatorModule,
-    MatTableModule,
+    TableModule,
     MatProgressSpinnerModule,
     MatDialogModule,
     ReactiveFormsModule,
@@ -69,15 +63,20 @@ import { DeviceAssignmentDto } from '../../../core/interfaces/device.interface';
 export class ProductManagementComponent implements OnInit {
   private messageService = inject(MessageService);
 
-  @ViewChild('categoryPaginator') categoryPaginator!: MatPaginator;
-  @ViewChild('subCategoryPaginator') subCategoryPaginator!: MatPaginator;
-  @ViewChild('productPaginator') productPaginator!: MatPaginator;
+  /**
+   * Each grid is lazy, and PrimeNG emits one onLazyLoad as it initialises.
+   * `loadAllData()` already fetches the first page of all three tabs on init,
+   * so that very first event is swallowed rather than repeating the request.
+   */
+  private categoryGridReady = false;
+  private subCategoryGridReady = false;
+  private productGridReady = false;
 
   activeTab: 'categories' | 'subcategories' | 'products' = 'categories';
 
   // Categories - Server-side pagination
   categories: ProductCategory[] = [];
-  categoryDataSource = new MatTableDataSource<ProductCategory>();
+  categoryDataSource: ProductCategory[] = [];
   categoryDisplayedColumns = [
     'name',
     'code',
@@ -97,7 +96,7 @@ export class ProductManagementComponent implements OnInit {
 
   // SubCategories - Server-side pagination
   subCategories: ProductSubCategory[] = [];
-  subCategoryDataSource = new MatTableDataSource<ProductSubCategory>();
+  subCategoryDataSource: ProductSubCategory[] = [];
   subCategoryDisplayedColumns = [
     'name',
     'category',
@@ -117,7 +116,7 @@ export class ProductManagementComponent implements OnInit {
 
   // Products - Server-side pagination
   products: Product[] = [];
-  productDataSource = new MatTableDataSource<Product>();
+  productDataSource: Product[] = [];
   productDisplayedColumns = [
     'name',
     'code',
@@ -246,7 +245,7 @@ export class ProductManagementComponent implements OnInit {
     this.categoryService.getCategoriesPaged(searchParams).subscribe({
       next: (pagedResult) => {
         this.categories = pagedResult.items;
-        this.categoryDataSource.data = this.categories;
+        this.categoryDataSource = this.categories;
         this.categoryTotalCount = pagedResult.totalCount;
         this.hasCategoryResults = pagedResult.totalCount > 0;
 
@@ -269,7 +268,7 @@ export class ProductManagementComponent implements OnInit {
 
         if (error.message.includes('No categories found')) {
           this.categories = [];
-          this.categoryDataSource.data = [];
+          this.categoryDataSource = [];
           this.categoryTotalCount = 0;
           this.hasCategoryResults = false;
           this.categorySearchMessage = error.message;
@@ -283,9 +282,14 @@ export class ProductManagementComponent implements OnInit {
     });
   }
 
-  onCategoryPageChange(event: PageEvent): void {
-    this.categoryCurrentPage = event.pageIndex;
-    this.categoryPageSize = event.pageSize;
+  onCategoryLazyLoad(event: TableLazyLoadEvent): void {
+    const rows = event.rows ?? this.categoryPageSize;
+    this.categoryPageSize = rows;
+    this.categoryCurrentPage = Math.floor((event.first ?? 0) / rows);
+    if (!this.categoryGridReady) {
+      this.categoryGridReady = true;
+      return;
+    }
     this.loadCategories();
   }
 
@@ -295,18 +299,12 @@ export class ProductManagementComponent implements OnInit {
 
   searchCategories(): void {
     this.categoryCurrentPage = 0;
-    if (this.categoryPaginator) {
-      this.categoryPaginator.firstPage();
-    }
     this.loadCategories();
   }
 
   clearCategorySearch(): void {
     this.categorySearchTerm = '';
     this.categoryCurrentPage = 0;
-    if (this.categoryPaginator) {
-      this.categoryPaginator.firstPage();
-    }
     this.loadCategories();
   }
 
@@ -411,7 +409,7 @@ export class ProductManagementComponent implements OnInit {
     this.categoryService.getSubCategoriesPaged(searchParams).subscribe({
       next: (pagedResult) => {
         this.subCategories = pagedResult.items;
-        this.subCategoryDataSource.data = this.subCategories;
+        this.subCategoryDataSource = this.subCategories;
         this.subCategoryTotalCount = pagedResult.totalCount;
         this.hasSubCategoryResults = pagedResult.totalCount > 0;
 
@@ -433,7 +431,7 @@ export class ProductManagementComponent implements OnInit {
 
         if (error.message.includes('No subcategories found')) {
           this.subCategories = [];
-          this.subCategoryDataSource.data = [];
+          this.subCategoryDataSource = [];
           this.subCategoryTotalCount = 0;
           this.hasSubCategoryResults = false;
           this.subCategorySearchMessage = error.message;
@@ -447,9 +445,14 @@ export class ProductManagementComponent implements OnInit {
     });
   }
 
-  onSubCategoryPageChange(event: PageEvent): void {
-    this.subCategoryCurrentPage = event.pageIndex;
-    this.subCategoryPageSize = event.pageSize;
+  onSubCategoryLazyLoad(event: TableLazyLoadEvent): void {
+    const rows = event.rows ?? this.subCategoryPageSize;
+    this.subCategoryPageSize = rows;
+    this.subCategoryCurrentPage = Math.floor((event.first ?? 0) / rows);
+    if (!this.subCategoryGridReady) {
+      this.subCategoryGridReady = true;
+      return;
+    }
     this.loadSubCategories();
   }
 
@@ -459,18 +462,12 @@ export class ProductManagementComponent implements OnInit {
 
   searchSubCategories(): void {
     this.subCategoryCurrentPage = 0;
-    if (this.subCategoryPaginator) {
-      this.subCategoryPaginator.firstPage();
-    }
     this.loadSubCategories();
   }
 
   clearSubCategorySearch(): void {
     this.subCategorySearchTerm = '';
     this.subCategoryCurrentPage = 0;
-    if (this.subCategoryPaginator) {
-      this.subCategoryPaginator.firstPage();
-    }
     this.loadSubCategories();
   }
 
@@ -557,7 +554,7 @@ export class ProductManagementComponent implements OnInit {
       next: (pagedResult) => {
         this.products = pagedResult.items;
         console.log('products', this.products);
-        this.productDataSource.data = this.products;
+        this.productDataSource = this.products;
         this.productTotalCount = pagedResult.totalCount;
         this.hasProductResults = pagedResult.totalCount > 0;
         console.log('products', this.products);
@@ -579,7 +576,7 @@ export class ProductManagementComponent implements OnInit {
 
         if (error.message.includes('No products found')) {
           this.products = [];
-          this.productDataSource.data = [];
+          this.productDataSource = [];
           this.productTotalCount = 0;
           this.hasProductResults = false;
           this.productSearchMessage = error.message;
@@ -593,9 +590,14 @@ export class ProductManagementComponent implements OnInit {
     });
   }
 
-  onProductPageChange(event: PageEvent): void {
-    this.productCurrentPage = event.pageIndex;
-    this.productPageSize = event.pageSize;
+  onProductLazyLoad(event: TableLazyLoadEvent): void {
+    const rows = event.rows ?? this.productPageSize;
+    this.productPageSize = rows;
+    this.productCurrentPage = Math.floor((event.first ?? 0) / rows);
+    if (!this.productGridReady) {
+      this.productGridReady = true;
+      return;
+    }
     this.loadProducts();
   }
 
@@ -605,18 +607,12 @@ export class ProductManagementComponent implements OnInit {
 
   searchProducts(): void {
     this.productCurrentPage = 0;
-    if (this.productPaginator) {
-      this.productPaginator.firstPage();
-    }
     this.loadProducts();
   }
 
   clearProductSearch(): void {
     this.productSearchTerm = '';
     this.productCurrentPage = 0;
-    if (this.productPaginator) {
-      this.productPaginator.firstPage();
-    }
     this.loadProducts();
   }
 
@@ -693,8 +689,7 @@ export class ProductManagementComponent implements OnInit {
           error: (error) => {
             this.bindingProductId = null;
             console.error(error);
-            const detail =
-              typeof error === 'string' ? error : error?.message;
+            const detail = typeof error === 'string' ? error : error?.message;
             this.showError(detail || 'Failed to bind ESL devices to Minew');
           },
         });

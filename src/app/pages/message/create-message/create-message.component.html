@@ -1,5 +1,5 @@
 <!-- Complete message-creator.component.html - Single Unified File -->
-<div class="min-h-screen bg-gray-50 p-4">
+<div class="min-h-screen bg-gray-50 p-4 ds-page-shell">
   <!-- Header Section -->
   <div class="max-w-7xl mx-auto mb-6">
     <div
@@ -20,7 +20,7 @@
       <button
         type="button"
         (click)="resetForm()"
-        class="px-4 py-2 text-gray-600 hover:text-gray-800 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
+        class="px-4 py-2 text-gray-600 hover:text-gray-800 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors ds-btn ds-btn--secondary"
       >
         <i class="fas fa-undo mr-2"></i>Reset
       </button>
@@ -39,7 +39,9 @@
         </h3>
         <div
           class="grid grid-cols-1 sm:grid-cols-2 gap-3"
-          [ngClass]="showGeneralAndVideoTypes ? 'lg:grid-cols-4' : 'lg:grid-cols-2'"
+          [ngClass]="
+            showGeneralAndVideoTypes ? 'lg:grid-cols-4' : 'lg:grid-cols-2'
+          "
         >
           <button
             *ngIf="showGeneralAndVideoTypes"
@@ -50,23 +52,21 @@
                 ? 'bg-blue-50 border-blue-300 shadow-sm'
                 : 'bg-white border-gray-200 hover:border-gray-300 hover:shadow-sm'
             "
-            class="p-4 rounded-xl border-2 transition-all duration-200 group"
+            class="p-4 rounded-xl border-2 transition-all duration-200 group ds-choice-card"
           >
-            <div class="flex flex-col items-center space-y-3">
-              <div
-                [class]="
-                  selectedMessageType === 'general'
-                    ? 'bg-blue-100 text-blue-600'
-                    : 'bg-gray-100 text-gray-600 group-hover:bg-gray-200'
-                "
-                class="w-12 h-12 rounded-xl flex items-center justify-center transition-colors"
-              >
-                <i class="fas fa-align-left text-lg"></i>
-              </div>
-              <div class="text-center">
-                <h4 class="font-medium text-gray-900">General Message</h4>
-                <p class="text-xs text-gray-500">Text-based content</p>
-              </div>
+            <div
+              [class]="
+                selectedMessageType === 'general'
+                  ? 'bg-blue-100 text-blue-600'
+                  : 'bg-gray-100 text-gray-600 group-hover:bg-gray-200'
+              "
+              class="w-12 h-12 rounded-xl flex items-center justify-center transition-colors"
+            >
+              <i class="fas fa-align-left text-lg"></i>
+            </div>
+            <div>
+              <h4 class="ds-choice-card__title">General Message</h4>
+              <p class="ds-choice-card__desc">Text-based content</p>
             </div>
           </button>
 
@@ -78,23 +78,21 @@
                 ? 'bg-blue-50 border-blue-300 shadow-sm'
                 : 'bg-white border-gray-200 hover:border-gray-300 hover:shadow-sm'
             "
-            class="p-4 rounded-xl border-2 transition-all duration-200 group"
+            class="p-4 rounded-xl border-2 transition-all duration-200 group ds-choice-card"
           >
-            <div class="flex flex-col items-center space-y-3">
-              <div
-                [class]="
-                  selectedMessageType === 'image'
-                    ? 'bg-green-100 text-green-600'
-                    : 'bg-gray-100 text-gray-600 group-hover:bg-gray-200'
-                "
-                class="w-12 h-12 rounded-xl flex items-center justify-center transition-colors"
-              >
-                <i class="fas fa-image text-lg"></i>
-              </div>
-              <div class="text-center">
-                <h4 class="font-medium text-gray-900">Image Upload</h4>
-                <p class="text-xs text-gray-500">Upload image files</p>
-              </div>
+            <div
+              [class]="
+                selectedMessageType === 'image'
+                  ? 'bg-green-100 text-green-600'
+                  : 'bg-gray-100 text-gray-600 group-hover:bg-gray-200'
+              "
+              class="w-12 h-12 rounded-xl flex items-center justify-center transition-colors"
+            >
+              <i class="fas fa-image text-lg"></i>
+            </div>
+            <div>
+              <h4 class="ds-choice-card__title">Image Upload</h4>
+              <p class="ds-choice-card__desc">Upload image files</p>
             </div>
           </button>
 
@@ -107,23 +105,21 @@
                 ? 'bg-blue-50 border-blue-300 shadow-sm'
                 : 'bg-white border-gray-200 hover:border-gray-300 hover:shadow-sm'
             "
-            class="p-4 rounded-xl border-2 transition-all duration-200 group"
+            class="p-4 rounded-xl border-2 transition-all duration-200 group ds-choice-card"
           >
-            <div class="flex flex-col items-center space-y-3">
-              <div
-                [class]="
-                  selectedMessageType === 'video'
-                    ? 'bg-purple-100 text-purple-600'
-                    : 'bg-gray-100 text-gray-600 group-hover:bg-gray-200'
-                "
-                class="w-12 h-12 rounded-xl flex items-center justify-center transition-colors"
-              >
-                <i class="fas fa-video text-lg"></i>
-              </div>
-              <div class="text-center">
-                <h4 class="font-medium text-gray-900">Video Upload</h4>
-                <p class="text-xs text-gray-500">Upload video files</p>
-              </div>
+            <div
+              [class]="
+                selectedMessageType === 'video'
+                  ? 'bg-purple-100 text-purple-600'
+                  : 'bg-gray-100 text-gray-600 group-hover:bg-gray-200'
+              "
+              class="w-12 h-12 rounded-xl flex items-center justify-center transition-colors"
+            >
+              <i class="fas fa-video text-lg"></i>
+            </div>
+            <div>
+              <h4 class="ds-choice-card__title">Video Upload</h4>
+              <p class="ds-choice-card__desc">Upload video files</p>
             </div>
           </button>
 
@@ -135,23 +131,21 @@
                 ? 'bg-blue-50 border-blue-300 shadow-sm'
                 : 'bg-white border-gray-200 hover:border-gray-300 hover:shadow-sm'
             "
-            class="p-4 rounded-xl border-2 transition-all duration-200 group"
+            class="p-4 rounded-xl border-2 transition-all duration-200 group ds-choice-card"
           >
-            <div class="flex flex-col items-center space-y-3">
-              <div
-                [class]="
-                  selectedMessageType === 'custom_image'
-                    ? 'bg-orange-100 text-orange-600'
-                    : 'bg-gray-100 text-gray-600 group-hover:bg-gray-200'
-                "
-                class="w-12 h-12 rounded-xl flex items-center justify-center transition-colors"
-              >
-                <i class="fas fa-paint-brush text-lg"></i>
-              </div>
-              <div class="text-center">
-                <h4 class="font-medium text-gray-900">Custom Design</h4>
-                <p class="text-xs text-gray-500">Create custom graphics</p>
-              </div>
+            <div
+              [class]="
+                selectedMessageType === 'custom_image'
+                  ? 'bg-orange-100 text-orange-600'
+                  : 'bg-gray-100 text-gray-600 group-hover:bg-gray-200'
+              "
+              class="w-12 h-12 rounded-xl flex items-center justify-center transition-colors"
+            >
+              <i class="fas fa-paint-brush text-lg"></i>
+            </div>
+            <div>
+              <h4 class="ds-choice-card__title">Custom Design</h4>
+              <p class="ds-choice-card__desc">Create custom graphics</p>
             </div>
           </button>
         </div>
@@ -208,7 +202,7 @@
                         <button
                           type="button"
                           (click)="loadPreviousScreenSizes()"
-                          class="px-3 py-1 text-xs bg-gray-100 hover:bg-gray-200 rounded transition-colors"
+                          class="px-3 py-1 text-xs bg-gray-100 hover:bg-gray-200 rounded transition-colors ds-btn ds-btn--secondary"
                         >
                           <i class="fas fa-arrow-up mr-1"></i>Load Previous
                         </button>
@@ -240,7 +234,7 @@
                       <button
                         type="button"
                         (click)="loadMoreScreenSizes()"
-                        class="w-full px-3 py-2 text-sm bg-blue-50 hover:bg-blue-100 text-blue-600 rounded transition-colors flex items-center justify-center"
+                        class="w-full px-3 py-2 text-sm bg-blue-50 hover:bg-blue-100 text-blue-600 rounded transition-colors flex items-center justify-center ds-btn ds-btn--secondary"
                       >
                         <i class="fas fa-arrow-down mr-2"></i>Load More ({{
                           screenSizePageSize
@@ -479,7 +473,7 @@
                       <button
                         type="button"
                         (click)="fileInput.click()"
-                        class="inline-flex items-center px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors"
+                        class="inline-flex items-center px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors ds-btn ds-btn--primary"
                       >
                         <i class="fas fa-sync-alt mr-2"></i>Change File
                       </button>
@@ -503,7 +497,7 @@
                         : 'bg-gray-200 text-gray-700'
                     "
                     (click)="setActiveToolCategory('shapes')"
-                    class="px-4 py-2 rounded-lg transition-colors"
+                    class="px-4 py-2 rounded-lg transition-colors ds-btn ds-btn--tertiary"
                   >
                     <i class="fas fa-shapes mr-2"></i>Shapes
                   </button>
@@ -515,7 +509,7 @@
                         : 'bg-gray-200 text-gray-700'
                     "
                     (click)="setActiveToolCategory('text')"
-                    class="px-4 py-2 rounded-lg transition-colors"
+                    class="px-4 py-2 rounded-lg transition-colors ds-btn ds-btn--tertiary"
                   >
                     <i class="fas fa-font mr-2"></i>Text
                   </button>
@@ -527,7 +521,7 @@
                         : 'bg-gray-200 text-gray-700'
                     "
                     (click)="setActiveToolCategory('colors')"
-                    class="px-4 py-2 rounded-lg transition-colors"
+                    class="px-4 py-2 rounded-lg transition-colors ds-btn ds-btn--tertiary"
                   >
                     <i class="fas fa-palette mr-2"></i>Colors
                   </button>
@@ -539,7 +533,7 @@
                         : 'bg-gray-200 text-gray-700'
                     "
                     (click)="setActiveToolCategory('layout')"
-                    class="px-4 py-2 rounded-lg transition-colors"
+                    class="px-4 py-2 rounded-lg transition-colors ds-btn ds-btn--tertiary"
                   >
                     <i class="fas fa-layer-group mr-2"></i>Layout
                   </button>
@@ -555,7 +549,7 @@
                       <button
                         type="button"
                         (click)="addText()"
-                        class="flex flex-col items-center px-4 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
+                        class="flex flex-col items-center px-4 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors ds-btn ds-btn--stacked"
                       >
                         <i class="fas fa-font text-lg mb-1"></i>
                         <span class="text-xs">Text</span>
@@ -563,7 +557,7 @@
                       <button
                         type="button"
                         (click)="addRectangle()"
-                        class="flex flex-col items-center px-4 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+                        class="flex flex-col items-center px-4 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors ds-btn ds-btn--stacked"
                       >
                         <i class="fas fa-square text-lg mb-1"></i>
                         <span class="text-xs">Rectangle</span>
@@ -571,7 +565,7 @@
                       <button
                         type="button"
                         (click)="addCircle()"
-                        class="flex flex-col items-center px-4 py-3 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 transition-colors"
+                        class="flex flex-col items-center px-4 py-3 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 transition-colors ds-btn ds-btn--stacked"
                       >
                         <i class="fas fa-circle text-lg mb-1"></i>
                         <span class="text-xs">Circle</span>
@@ -579,7 +573,7 @@
                       <button
                         type="button"
                         (click)="uploadImage()"
-                        class="flex flex-col items-center px-4 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors"
+                        class="flex flex-col items-center px-4 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors ds-btn ds-btn--stacked"
                       >
                         <i class="fas fa-image text-lg mb-1"></i>
                         <span class="text-xs">Image</span>
@@ -638,28 +632,28 @@
                         <button
                           type="button"
                           (click)="setBorderStyle([])"
-                          class="px-3 py-2 border-2 border-gray-300 rounded text-xs hover:bg-gray-50"
+                          class="px-3 py-2 border-2 border-gray-300 rounded text-xs hover:bg-gray-50 ds-btn ds-btn--secondary"
                         >
                           Solid
                         </button>
                         <button
                           type="button"
                           (click)="setBorderStyle([5, 5])"
-                          class="px-3 py-2 border-2 border-dashed border-gray-300 rounded text-xs hover:bg-gray-50"
+                          class="px-3 py-2 border-2 border-dashed border-gray-300 rounded text-xs hover:bg-gray-50 ds-btn ds-btn--secondary"
                         >
                           Dashed
                         </button>
                         <button
                           type="button"
                           (click)="setBorderStyle([2, 2])"
-                          class="px-3 py-2 border-2 border-dotted border-gray-300 rounded text-xs hover:bg-gray-50"
+                          class="px-3 py-2 border-2 border-dotted border-gray-300 rounded text-xs hover:bg-gray-50 ds-btn ds-btn--secondary"
                         >
                           Dotted
                         </button>
                         <button
                           type="button"
                           (click)="setBorderStyle([10, 5, 2, 5])"
-                          class="px-3 py-2 border-2 border-gray-300 rounded text-xs hover:bg-gray-50"
+                          class="px-3 py-2 border-2 border-gray-300 rounded text-xs hover:bg-gray-50 ds-btn ds-btn--secondary"
                         >
                           Mixed
                         </button>
@@ -730,7 +724,7 @@
                         (click)="
                           toggleTextStyle('fontWeight', 'bold', 'normal')
                         "
-                        class="px-3 py-2 rounded-lg transition-colors"
+                        class="px-3 py-2 rounded-lg transition-colors ds-btn-icon"
                       >
                         <i class="fas fa-bold"></i>
                       </button>
@@ -744,7 +738,7 @@
                         (click)="
                           toggleTextStyle('fontStyle', 'italic', 'normal')
                         "
-                        class="px-3 py-2 rounded-lg transition-colors"
+                        class="px-3 py-2 rounded-lg transition-colors ds-btn-icon"
                       >
                         <i class="fas fa-italic"></i>
                       </button>
@@ -756,7 +750,7 @@
                             : 'bg-gray-200 text-gray-700'
                         "
                         (click)="toggleTextStyle('underline', true, false)"
-                        class="px-3 py-2 rounded-lg transition-colors"
+                        class="px-3 py-2 rounded-lg transition-colors ds-btn-icon"
                       >
                         <i class="fas fa-underline"></i>
                       </button>
@@ -768,7 +762,7 @@
                             : 'bg-gray-200 text-gray-700'
                         "
                         (click)="toggleTextStyle('linethrough', true, false)"
-                        class="px-3 py-2 rounded-lg transition-colors"
+                        class="px-3 py-2 rounded-lg transition-colors ds-btn-icon"
                       >
                         <i class="fas fa-strikethrough"></i>
                       </button>
@@ -788,7 +782,7 @@
                               : 'bg-gray-200 text-gray-700'
                           "
                           (click)="updateTextStyle('textAlign', 'left')"
-                          class="px-3 py-2 rounded-lg transition-colors"
+                          class="px-3 py-2 rounded-lg transition-colors ds-btn-icon"
                         >
                           <i class="fas fa-align-left"></i>
                         </button>
@@ -800,7 +794,7 @@
                               : 'bg-gray-200 text-gray-700'
                           "
                           (click)="updateTextStyle('textAlign', 'center')"
-                          class="px-3 py-2 rounded-lg transition-colors"
+                          class="px-3 py-2 rounded-lg transition-colors ds-btn-icon"
                         >
                           <i class="fas fa-align-center"></i>
                         </button>
@@ -812,7 +806,7 @@
                               : 'bg-gray-200 text-gray-700'
                           "
                           (click)="updateTextStyle('textAlign', 'right')"
-                          class="px-3 py-2 rounded-lg transition-colors"
+                          class="px-3 py-2 rounded-lg transition-colors ds-btn-icon"
                         >
                           <i class="fas fa-align-right"></i>
                         </button>
@@ -948,7 +942,7 @@
                         <button
                           type="button"
                           (click)="clearCanvasBackground()"
-                          class="px-3 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors text-sm"
+                          class="px-3 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors text-sm ds-btn ds-btn--secondary"
                         >
                           Clear Background
                         </button>
@@ -975,7 +969,7 @@
                       <button
                         type="button"
                         (click)="selectAll()"
-                        class="px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm"
+                        class="px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm ds-btn ds-btn--primary"
                       >
                         <i class="fas fa-select-all mr-1"></i>Select All
                       </button>
@@ -983,14 +977,14 @@
                         type="button"
                         (click)="copySelected()"
                         [disabled]="!hasSelection"
-                        class="px-3 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-sm"
+                        class="px-3 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-sm ds-btn ds-btn--primary"
                       >
                         <i class="fas fa-copy mr-1"></i>Copy
                       </button>
                       <button
                         type="button"
                         (click)="paste()"
-                        class="px-3 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors text-sm"
+                        class="px-3 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors text-sm ds-btn ds-btn--primary"
                       >
                         <i class="fas fa-paste mr-1"></i>Paste
                       </button>
@@ -998,7 +992,7 @@
                         type="button"
                         (click)="duplicateSelected()"
                         [disabled]="!hasSelection"
-                        class="px-3 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-sm"
+                        class="px-3 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-sm ds-btn ds-btn--primary"
                       >
                         <i class="fas fa-clone mr-1"></i>Duplicate
                       </button>
@@ -1014,21 +1008,21 @@
                       <button
                         type="button"
                         (click)="alignLeft()"
-                        class="px-3 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors text-sm"
+                        class="px-3 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors text-sm ds-btn ds-btn--primary"
                       >
                         <i class="fas fa-align-left mr-1"></i>Left
                       </button>
                       <button
                         type="button"
                         (click)="alignCenter()"
-                        class="px-3 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors text-sm"
+                        class="px-3 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors text-sm ds-btn ds-btn--primary"
                       >
                         <i class="fas fa-align-center mr-1"></i>Center
                       </button>
                       <button
                         type="button"
                         (click)="alignRight()"
-                        class="px-3 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors text-sm"
+                        class="px-3 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors text-sm ds-btn ds-btn--primary"
                       >
                         <i class="fas fa-align-right mr-1"></i>Right
                       </button>
@@ -1037,21 +1031,21 @@
                       <button
                         type="button"
                         (click)="alignTop()"
-                        class="px-3 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors text-sm"
+                        class="px-3 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors text-sm ds-btn ds-btn--primary"
                       >
                         <i class="fas fa-arrow-up mr-1"></i>Top
                       </button>
                       <button
                         type="button"
                         (click)="alignMiddle()"
-                        class="px-3 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors text-sm"
+                        class="px-3 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors text-sm ds-btn ds-btn--primary"
                       >
                         <i class="fas fa-minus mr-1"></i>Middle
                       </button>
                       <button
                         type="button"
                         (click)="alignBottom()"
-                        class="px-3 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors text-sm"
+                        class="px-3 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors text-sm ds-btn ds-btn--primary"
                       >
                         <i class="fas fa-arrow-down mr-1"></i>Bottom
                       </button>
@@ -1067,28 +1061,28 @@
                       <button
                         type="button"
                         (click)="bringToFront()"
-                        class="px-3 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-colors text-sm"
+                        class="px-3 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-colors text-sm ds-btn ds-btn--primary"
                       >
                         <i class="fas fa-arrow-to-top mr-1"></i>To Front
                       </button>
                       <button
                         type="button"
                         (click)="bringForward()"
-                        class="px-3 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-colors text-sm"
+                        class="px-3 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-colors text-sm ds-btn ds-btn--primary"
                       >
                         <i class="fas fa-arrow-up mr-1"></i>Forward
                       </button>
                       <button
                         type="button"
                         (click)="sendBackward()"
-                        class="px-3 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-colors text-sm"
+                        class="px-3 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-colors text-sm ds-btn ds-btn--primary"
                       >
                         <i class="fas fa-arrow-down mr-1"></i>Backward
                       </button>
                       <button
                         type="button"
                         (click)="sendToBack()"
-                        class="px-3 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-colors text-sm"
+                        class="px-3 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-colors text-sm ds-btn ds-btn--primary"
                       >
                         <i class="fas fa-arrow-to-bottom mr-1"></i>To Back
                       </button>
@@ -1104,28 +1098,28 @@
                       <button
                         type="button"
                         (click)="flipHorizontal()"
-                        class="px-3 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors text-sm"
+                        class="px-3 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors text-sm ds-btn ds-btn--primary"
                       >
                         <i class="fas fa-arrows-alt-h mr-1"></i>Flip H
                       </button>
                       <button
                         type="button"
                         (click)="flipVertical()"
-                        class="px-3 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors text-sm"
+                        class="px-3 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors text-sm ds-btn ds-btn--primary"
                       >
                         <i class="fas fa-arrows-alt-v mr-1"></i>Flip V
                       </button>
                       <button
                         type="button"
                         (click)="rotateSelected(-90)"
-                        class="px-3 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors text-sm"
+                        class="px-3 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors text-sm ds-btn ds-btn--primary"
                       >
                         <i class="fas fa-undo mr-1"></i>-90°
                       </button>
                       <button
                         type="button"
                         (click)="rotateSelected(90)"
-                        class="px-3 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors text-sm"
+                        class="px-3 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors text-sm ds-btn ds-btn--primary"
                       >
                         <i class="fas fa-redo mr-1"></i>+90°
                       </button>
@@ -1163,14 +1157,14 @@
                       <button
                         type="button"
                         (click)="groupSelected()"
-                        class="px-3 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition-colors text-sm"
+                        class="px-3 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition-colors text-sm ds-btn ds-btn--primary"
                       >
                         <i class="fas fa-object-group mr-1"></i>Group
                       </button>
                       <button
                         type="button"
                         (click)="ungroupSelected()"
-                        class="px-3 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition-colors text-sm"
+                        class="px-3 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition-colors text-sm ds-btn ds-btn--primary"
                       >
                         <i class="fas fa-object-ungroup mr-1"></i>Ungroup
                       </button>
@@ -1194,21 +1188,21 @@
                       type="button"
                       (click)="deleteSelected()"
                       [disabled]="!hasSelection"
-                      class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                      class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors ds-btn ds-btn--primary"
                     >
                       <i class="fas fa-trash mr-2"></i>Delete Selected
                     </button>
                     <button
                       type="button"
                       (click)="clearCanvas()"
-                      class="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors"
+                      class="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors ds-btn ds-btn--primary"
                     >
                       <i class="fas fa-eraser mr-2"></i>Clear All
                     </button>
                     <button
                       type="button"
                       (click)="downloadCanvas()"
-                      class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+                      class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors ds-btn ds-btn--primary"
                     >
                       <i class="fas fa-download mr-2"></i>Download
                     </button>
@@ -1398,14 +1392,14 @@
             <button
               type="button"
               (click)="resetForm()"
-              class="px-6 py-3 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 hover:border-gray-400 transition-colors"
+              class="px-6 py-3 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 hover:border-gray-400 transition-colors ds-btn ds-btn--secondary"
             >
               <i class="fas fa-times mr-2"></i>Cancel
             </button>
             <button
               type="submit"
               [disabled]="messageForm.invalid || isLoading"
-              class="px-8 py-3 bg-primary text-white rounded-lg hover:bg-primary-light disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow-sm"
+              class="px-8 py-3 bg-primary text-white rounded-lg hover:bg-primary-light disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow-sm ds-btn ds-btn--primary"
             >
               <span *ngIf="isLoading" class="inline-flex items-center">
                 <svg
@@ -1440,3 +1434,46 @@
     </div>
   </div>
 </div>
+
+<!-- Add Text - replaces the browser prompt() -->
+<p-dialog
+  header="Add Text"
+  [(visible)]="showAddTextDialog"
+  [modal]="true"
+  [draggable]="false"
+  [resizable]="false"
+  [dismissableMask]="true"
+  [focusOnShow]="false"
+  [style]="{ width: '26rem' }"
+>
+  <div class="ds-field">
+    <label class="ds-label" for="addTextValue">Text</label>
+    <input
+      id="addTextValue"
+      pInputText
+      [(ngModel)]="newTextValue"
+      [ngModelOptions]="{ standalone: true }"
+      placeholder="Enter text to add to the canvas"
+      (keyup.enter)="confirmAddText()"
+      class="w-full"
+    />
+  </div>
+
+  <ng-template pTemplate="footer">
+    <button
+      type="button"
+      pButton
+      label="Cancel"
+      class="p-button-text p-button-secondary"
+      (click)="cancelAddText()"
+    ></button>
+    <button
+      type="button"
+      pButton
+      label="Add Text"
+      icon="pi pi-plus"
+      [disabled]="!newTextValue.trim()"
+      (click)="confirmAddText()"
+    ></button>
+  </ng-template>
+</p-dialog>

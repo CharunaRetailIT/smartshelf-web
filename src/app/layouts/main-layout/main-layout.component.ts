@@ -18,11 +18,19 @@ import { filter } from 'rxjs';
 import { SidebarComponent } from '../../shared/components/sidebar/sidebar.component';
 import { HeaderComponent } from '../../shared/components/header/header.component';
 import { ToastModule } from 'primeng/toast';
+import { ConfirmDialogModule } from 'primeng/confirmdialog';
 
 @Component({
   selector: 'app-main-layout',
   standalone: true,
-  imports: [CommonModule, RouterOutlet, SidebarComponent, HeaderComponent, ToastModule],
+  imports: [
+    CommonModule,
+    RouterOutlet,
+    SidebarComponent,
+    HeaderComponent,
+    ToastModule,
+    ConfirmDialogModule,
+  ],
   templateUrl: './main-layout.component.html',
   styleUrls: ['./main-layout.component.css'],
 })
@@ -34,8 +42,8 @@ export class MainLayoutComponent implements OnInit {
   constructor(
     @Inject(PLATFORM_ID) private platformId: Object,
     private router: Router,
-    private route: ActivatedRoute
-  ) { }
+    private route: ActivatedRoute,
+  ) {}
 
   @HostListener('window:resize')
   onResize() {
@@ -74,5 +82,4 @@ export class MainLayoutComponent implements OnInit {
   changeIsLeftSidebarCollapsed(isLeftSidebarCollapsed: boolean): void {
     this.isSidebarCollapsed.set(isLeftSidebarCollapsed);
   }
-
 }

@@ -8,16 +8,23 @@ import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-minew-integration',
-  imports: [CommonModule,MinewLoginComponent,MinewStoresComponent,MinewProductsComponent],
+  imports: [
+    CommonModule,
+    MinewLoginComponent,
+    MinewStoresComponent,
+    MinewProductsComponent,
+  ],
   templateUrl: './minew-integration.component.html',
-  styleUrl: './minew-integration.component.css'
+  styleUrl: './minew-integration.component.css',
 })
 export class MinewIntegrationComponent {
-  
-selectedStore: MinewStore | null = null;
+  selectedStore: MinewStore | null = null;
   isAuthenticated$: any;
 
-  constructor(private minewService: MinewService, private renderer: Renderer2) {
+  constructor(
+    private minewService: MinewService,
+    private renderer: Renderer2,
+  ) {
     this.isAuthenticated$ = this.minewService.token$;
   }
 

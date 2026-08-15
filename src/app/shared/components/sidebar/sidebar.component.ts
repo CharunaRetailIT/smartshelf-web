@@ -7,8 +7,10 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatButtonModule } from '@angular/material/button';
 import { AuthService } from '../../../core/services/auth.service';
+import { SettingsService } from '../../../core/services/settings.service';
 import { Observable } from 'rxjs';
 import { User } from '../../../core/interfaces/auth.interface';
+import { Store } from '../../../core/interfaces/store.interface';
 
 interface SidebarItem {
   routeLink: string;
@@ -39,11 +41,17 @@ export class SidebarComponent {
   items: SidebarItem[] = [];
 
   currentUser$!: Observable<User | null>;
+  /** Store the app is scoped to, shown under the brand name. */
+  defaultStore$!: Observable<Store | null>;
 
-  constructor(public auth: AuthService) {}
+  constructor(
+    public auth: AuthService,
+    private settingsService: SettingsService,
+  ) {}
 
   ngOnInit() {
     this.currentUser$ = this.auth.currentUser$;
+    this.defaultStore$ = this.settingsService.getDefaultStore();
     const allItems: SidebarItem[] = [
       {
         routeLink: 'dashboard',
@@ -97,6 +105,12 @@ export class SidebarComponent {
         routeLink: 'store-management',
         icon: 'pi pi-building',
         label: 'Store Management',
+        roles: ['Viewer', 'Admin', 'Manager', 'Operator'],
+      },
+      {
+        routeLink: 'settings',
+        icon: 'pi pi-cog',
+        label: 'Settings',
         roles: ['Viewer', 'Admin', 'Manager', 'Operator'],
       },
     ];

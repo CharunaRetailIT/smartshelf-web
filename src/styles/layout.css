@@ -1,0 +1,628 @@
+/* =============================================================================
+   Page layout, typography, cards and forms
+   =============================================================================
+
+   Two things live here:
+
+   1. A small type scale applied to the heading elements themselves, so a title
+      is the same size on every page instead of ranging from `text-lg` to
+      `text-4xl` depending on who wrote the screen.
+
+   2. Reusable structural classes (`ds-page`, `ds-toolbar`, `ds-card`,
+      `ds-form-grid`, ...) so a new screen inherits the layout instead of
+      re-deriving it from Tailwind utilities. Existing screens keep their own
+      markup; they are migrated onto these classes page by page.
+
+   No colours beyond the neutral text/border tokens are set, and every one of
+   those is a value the application already used.
+   ========================================================================== */
+
+/* -----------------------------------------------------------------------------
+   1. Type scale
+   -------------------------------------------------------------------------- */
+
+/* Applied to the elements rather than to a class, because the inconsistency
+   being fixed lives in per-page utilities (`text-2xl` here, `text-4xl` there).
+   `ds-display` opts a heading out when a screen genuinely needs a larger
+   treatment. */
+h1:not(.ds-display) {
+  font-size: var(--ds-font-page-title);
+  font-weight: var(--ds-weight-title);
+  line-height: 1.3;
+  letter-spacing: -0.01em;
+}
+
+h2:not(.ds-display) {
+  font-size: 1rem;
+  font-weight: var(--ds-weight-title);
+  line-height: 1.35;
+}
+
+h3:not(.ds-display) {
+  font-size: var(--ds-font-section-title);
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+h4:not(.ds-display) {
+  font-size: var(--ds-font-sm);
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+/* -----------------------------------------------------------------------------
+   2. Page shell
+   -------------------------------------------------------------------------- */
+
+/* --- App shell -------------------------------------------------------------
+
+   The viewport itself never scrolls. `.main-content` (the sidenav content
+   pane) is a fixed-height column; these rules pass that height down through
+   the layout wrapper and the routed component's host element so a page can
+   decide where its own scroll lives.
+
+   These live here rather than in main-layout.component.css because the routed
+   component's host is not reachable from that component's scoped styles. */
+.main-content > .body {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+}
+
+/* This region scrolls by default. A page does not have to opt in: anything
+   taller than the viewport scrolls here, which is what the shell used to do
+   before it became a fixed-height column.
+
+   Pages that manage their own scrolling are unaffected - `.ds-page-shell` is
+   `height: 100%` with its own `overflow-y: auto`, and `--fixed` pages are
+   `height: 100%` with `overflow: hidden`. Neither can exceed this box, so this
+   scrollbar never appears for them and there is no nested-scroll double-up. */
+.main-content > .body > .page-content {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+/* Overlay hosts sit in this column as siblings of the routed component but are
+   not page content: they render into overlays and should occupy no space.
+   Without this they are stretched by the rule below and push the page down -
+   `<p-confirmDialog>` did exactly that, leaving a band of blank space above
+   every page. Any new overlay host added to MainLayout belongs here too. */
+.main-content > .body > .page-content > p-toast,
+.main-content > .body > .page-content > p-confirmdialog {
+  flex: 0 0 auto;
+}
+
+/* The routed component itself. */
+.main-content
+  > .body
+  > .page-content
+  > *:not(p-toast):not(p-confirmdialog):not(router-outlet) {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: block;
+}
+
+.ds-page {
+  padding: var(--ds-page-padding);
+  display: flex;
+  flex-direction: column;
+  gap: var(--ds-section-gap);
+}
+
+@media (max-width: 768px) {
+  .ds-page {
+    padding: var(--ds-space-4);
+    gap: var(--ds-space-4);
+  }
+}
+
+.ds-page-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: var(--ds-space-3);
+}
+
+.ds-page-header__text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.ds-page-title {
+  font-size: var(--ds-font-page-title);
+  font-weight: var(--ds-weight-title);
+  line-height: 1.3;
+  letter-spacing: -0.01em;
+  margin: 0;
+}
+
+.ds-page-subtitle {
+  font-size: var(--ds-font-sm);
+  color: var(--ds-text-muted);
+  margin: 0;
+}
+
+/* Page-level actions sit at the end of the header, never pushed there with a
+   hand-tuned margin. */
+.ds-page-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--ds-space-2);
+  flex-wrap: wrap;
+  margin-inline-start: auto;
+}
+
+/* --- Breadcrumb + back ------------------------------------------------------
+
+   Crumbs are links, so they have to look and behave like links: a pointer, a
+   hover colour and an underline, and a visible focus ring. The last crumb is
+   the current page and stays inert text. */
+.ds-breadcrumb {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--ds-space-2);
+  margin-bottom: var(--ds-space-2);
+  font-size: var(--ds-font-sm);
+  font-weight: 600;
+  color: var(--ds-text-muted);
+}
+
+.ds-breadcrumb__link {
+  color: var(--ds-text-muted);
+  text-decoration: none;
+  border-radius: var(--ds-radius-xs);
+  cursor: pointer;
+  transition:
+    color var(--ds-transition),
+    text-decoration-color var(--ds-transition);
+}
+
+.ds-breadcrumb__link:hover {
+  color: var(--ds-primary);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.ds-breadcrumb__link:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px var(--ds-focus-ring);
+}
+
+.ds-breadcrumb__sep {
+  font-size: var(--ds-font-xs);
+  color: var(--ds-text-subtle);
+}
+
+.ds-breadcrumb__current {
+  color: var(--ds-text);
+}
+
+/* Icon-only back control that sits before a page title. */
+.ds-back-btn {
+  flex-shrink: 0;
+  color: var(--ds-text-muted);
+  border: var(--ds-border-width) solid var(--ds-border);
+  background: var(--ds-surface);
+}
+
+.ds-back-btn:hover {
+  color: var(--ds-primary);
+  border-color: var(--ds-primary);
+  background: var(--ds-surface-muted);
+}
+
+/* -----------------------------------------------------------------------------
+   3. Toolbar - search, filters, actions
+   -------------------------------------------------------------------------- */
+
+.ds-toolbar {
+  display: flex;
+  align-items: flex-end;
+  flex-wrap: wrap;
+  gap: var(--ds-toolbar-gap);
+  padding: var(--ds-space-4) var(--ds-card-padding);
+  border-bottom: var(--ds-border-width) solid var(--ds-border);
+}
+
+.ds-toolbar__filters {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: var(--ds-toolbar-gap);
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.ds-toolbar__actions {
+  display: flex;
+  align-items: center;
+  gap: var(--ds-space-2);
+  margin-inline-start: auto;
+}
+
+.ds-toolbar__search {
+  flex: 1 1 240px;
+  min-width: 0;
+  max-width: 26rem;
+}
+
+/* PrimeNG toolbars: the filter groups are single-line flex rows, so once the
+   controls no longer fit they are squeezed until the labels are unreadable
+   ("St…" instead of "Status") rather than moving to a second line. Wrapping
+   keeps every filter at the width its template asked for. The row gap only
+   applies once they actually wrap. */
+.p-toolbar-group-start,
+.p-toolbar-group-center,
+.p-toolbar-group-end {
+  flex-wrap: wrap;
+  row-gap: var(--ds-space-2);
+}
+
+/* -----------------------------------------------------------------------------
+   4. Cards and sections
+   -------------------------------------------------------------------------- */
+
+.ds-card {
+  background: var(--ds-surface);
+  border: var(--ds-border-width) solid var(--ds-border);
+  border-radius: var(--ds-radius-xl);
+  box-shadow: var(--ds-shadow-sm);
+  overflow: hidden;
+}
+
+/* An ERP screen should not look like floating boxes: a card nested inside a
+   card drops its shadow and its own border radius softens. */
+.ds-card .ds-card {
+  box-shadow: none;
+  border-radius: var(--ds-radius-lg);
+}
+
+/* Existing screens build this same surface out of utilities and then pick a
+   padding at random - `p-4` on one page, `p-6` on the next. Marking them
+   `ds-card` brings the border, radius and shadow onto the system; these two
+   rules finish the job by settling on one internal padding. A deliberately
+   generous empty state (`p-12`) is left alone. */
+.ds-card.p-4,
+.ds-card.p-5,
+.ds-card.p-6 {
+  padding: var(--ds-card-padding);
+}
+
+.ds-card.mb-6 {
+  margin-bottom: var(--ds-section-gap);
+}
+
+/* The full-page wrapper every screen opens with. Since the shell above no
+   longer scrolls, this is where a normal (form-style) page scrolls instead. */
+.ds-page-shell {
+  padding: var(--ds-page-padding);
+  height: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+/* Several pages still carry `min-h-screen` from before the shell became a
+   fixed-height column. A viewport-height floor inside a shorter container just
+   forces a permanent scrollbar the length of everything above it, so cap it to
+   the space actually available. */
+.ds-page-shell.min-h-screen {
+  min-height: 100%;
+}
+
+/* One screen reserves extra room for a sticky action bar; keep that clearance
+   rather than cropping it to the standard page padding. */
+.ds-page-shell.pb-28 {
+  padding-bottom: 7rem;
+}
+
+/* --- Fixed table page ------------------------------------------------------
+
+   Opted into by list screens. The page fills the viewport exactly and does not
+   scroll: the header and toolbar stay pinned, and the only thing that moves is
+   the grid body, whose column headers and paginator stay visible with it.
+
+   `min-height: 0` on every level is what makes this work - without it a flex
+   child refuses to shrink below its content and the overflow escapes upward to
+   the window. */
+.ds-page-shell--fixed {
+  height: 100%;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: var(--ds-section-gap);
+}
+
+/* The centring wrapper several pages put between the shell and their content. */
+.ds-page-shell--fixed > .mx-auto,
+.ds-page-shell--fixed > .ds-page-body {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--ds-section-gap);
+  width: 100%;
+}
+
+/* The card holding the grid takes the remaining height; everything above it
+   (page header, filter card) keeps its natural size. */
+/* The column's `gap` already spaces the stack; the per-card bottom margins the
+   old markup used would double it. */
+.ds-page-shell--fixed .ds-card.mb-6,
+.ds-page-shell--fixed > .mx-auto > .mb-6 {
+  margin-bottom: 0;
+}
+
+/* Everything above the grid keeps its natural height. Without this the page
+   header and filter card are flex items that shrink to make room, and their
+   content gets clipped. */
+.ds-page-shell--fixed > .mx-auto > *:not(.ds-table-panel):not(.ds-tab-panel),
+.ds-tab-panel > *:not(.ds-table-panel) {
+  flex: 0 0 auto;
+}
+
+/* A tab body between the shell and the grid - it has to pass the height on
+   rather than absorb it. */
+.ds-tab-panel {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.ds-table-panel {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.ds-table-panel > p-table,
+.ds-table-panel > .p-datatable {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+@media (max-width: 768px) {
+  .ds-page-shell {
+    padding: var(--ds-space-4);
+  }
+
+  .ds-page-shell.pb-28 {
+    padding-bottom: 7rem;
+  }
+
+  /* On a phone a pinned grid is more cramped than useful - let the page scroll
+     normally and give the table its natural height back. */
+  .ds-page-shell--fixed {
+    height: auto;
+    overflow-y: auto;
+  }
+
+  .ds-table-panel {
+    flex: 0 0 auto;
+  }
+}
+
+.ds-card__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--ds-space-3);
+  padding: var(--ds-space-4) var(--ds-card-padding);
+  border-bottom: var(--ds-border-width) solid var(--ds-border);
+}
+
+.ds-card__title {
+  font-size: var(--ds-font-section-title);
+  font-weight: 600;
+  color: var(--ds-text);
+  margin: 0;
+}
+
+.ds-card__subtitle {
+  font-size: var(--ds-font-sm);
+  color: var(--ds-text-muted);
+  margin: 0;
+}
+
+.ds-card__actions {
+  display: flex;
+  align-items: center;
+  gap: var(--ds-space-2);
+  margin-inline-start: auto;
+}
+
+.ds-card__body {
+  padding: var(--ds-card-padding);
+}
+
+/* A table fills its card edge to edge - no padding ring around a data grid. */
+.ds-card__body--flush {
+  padding: 0;
+}
+
+.ds-card__footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--ds-space-2);
+  padding: var(--ds-space-3) var(--ds-card-padding);
+  border-top: var(--ds-border-width) solid var(--ds-border);
+  background: var(--ds-surface-muted);
+}
+
+/* Section heading inside a card body, for long forms. */
+.ds-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ds-space-4);
+}
+
+.ds-section + .ds-section {
+  margin-top: var(--ds-space-6);
+  padding-top: var(--ds-space-6);
+  border-top: var(--ds-border-width) solid var(--ds-border);
+}
+
+.ds-section__title {
+  font-size: var(--ds-font-overline);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--ds-text-subtle);
+  margin: 0;
+}
+
+/* -----------------------------------------------------------------------------
+   5. Forms
+   -------------------------------------------------------------------------- */
+
+/* Label above control, predictable column widths, one vertical rhythm. */
+.ds-form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: var(--ds-field-gap);
+  align-items: start;
+}
+
+.ds-form-grid--2 {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.ds-form-grid--3 {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+@media (max-width: 900px) {
+  .ds-form-grid--2,
+  .ds-form-grid--3 {
+    grid-template-columns: 1fr;
+  }
+}
+
+.ds-field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ds-label-gap);
+  min-width: 0;
+}
+
+.ds-field--span-2 {
+  grid-column: span 2;
+}
+
+.ds-label {
+  font-size: var(--ds-font-label);
+  font-weight: var(--ds-weight-label);
+  color: var(--ds-text-label);
+  line-height: 1.3;
+}
+
+.ds-label--required::after,
+.ds-required::after {
+  content: "*";
+  margin-inline-start: 2px;
+  color: var(--ds-danger);
+}
+
+.ds-help {
+  font-size: var(--ds-font-xs);
+  color: var(--ds-text-muted);
+  line-height: 1.4;
+}
+
+/* Validation text reserves its line so a form does not jump when a message
+   appears or clears. */
+.ds-error {
+  display: block;
+  min-height: 1rem;
+  font-size: var(--ds-font-xs);
+  line-height: 1rem;
+  color: var(--ds-danger);
+}
+
+.ds-form-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--ds-space-2);
+  padding-top: var(--ds-space-4);
+  margin-top: var(--ds-space-4);
+  border-top: var(--ds-border-width) solid var(--ds-border);
+}
+
+/* -----------------------------------------------------------------------------
+   6. Icons
+   -------------------------------------------------------------------------- */
+
+/* Font Awesome, PrimeIcons and Material icons all remain in use - swapping
+   glyphs risks changing meaning. What is normalised is how they sit: the same
+   optical size and the same baseline alignment wherever they appear next to
+   text. */
+.pi,
+.fa,
+.fas,
+.far,
+.fab,
+.fa-solid,
+.fa-regular,
+.fa-brands {
+  line-height: 1;
+  vertical-align: -0.075em;
+}
+
+.ds-icon-sm {
+  font-size: var(--ds-font-xs);
+}
+
+.ds-icon {
+  font-size: var(--ds-button-icon-size);
+}
+
+.ds-icon-lg {
+  font-size: 1.125rem;
+}
+
+/* -----------------------------------------------------------------------------
+   7. Status pills
+   -------------------------------------------------------------------------- */
+
+/* The templates already build status chips out of utilities; this gives them a
+   single geometry while leaving each one's colour utilities untouched. */
+.ds-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--ds-space-1);
+  height: 1.375rem;
+  padding-inline: var(--ds-space-2);
+  border-radius: var(--ds-radius-xs);
+  font-size: var(--ds-font-overline);
+  font-weight: 600;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.ds-pill.hidden {
+  display: none;
+}
+
+/* -----------------------------------------------------------------------------
+   8. Responsive guards
+   -------------------------------------------------------------------------- */
+
+/* Nothing in the application should be able to scroll the page sideways.
+   (Overlay width is capped in controls.css, next to the other popup rules.) */
+body {
+  overflow-x: hidden;
+}

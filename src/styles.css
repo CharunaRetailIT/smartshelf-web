@@ -1,6 +1,25 @@
 /* You can add global styles to this file, and also import other style files */
 @import "tailwindcss";
 @import "primeicons/primeicons.css";
+
+/* ---------------------------------------------------------------------------
+   Design system
+   ---------------------------------------------------------------------------
+   One visual language for an application built from several UI libraries.
+   Order matters: tokens first, then the layers that consume them, then the
+   dialog rules that were already extracted here.
+
+   `design-tokens.css` holds the measurements. The PrimeNG half of the system
+   is configured as theme tokens in `src/app/theme/smart-esl-preset.ts` rather
+   than as CSS overrides, which is why these files stay small and need almost
+   no `!important`.
+   --------------------------------------------------------------------------- */
+@import "./styles/design-tokens.css";
+@import "./styles/controls.css";
+@import "./styles/buttons.css";
+@import "./styles/tables.css";
+@import "./styles/layout.css";
+
 /* Shared look for every dialog, PrimeNG and Angular Material alike. Dialogs
    render in an overlay outside their component, so this has to be global. */
 @import "./styles/dialogs.css";

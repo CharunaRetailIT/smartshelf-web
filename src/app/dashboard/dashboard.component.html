@@ -55,7 +55,7 @@
         <span class="font-medium">{{ errorMessage }}</span>
         <button
           (click)="loadDashboardData()"
-          class="ml-auto text-blue-600 hover:text-blue-800 text-sm font-medium"
+          class="ml-auto text-blue-600 hover:text-blue-800 text-sm font-medium ds-btn ds-btn--tertiary"
         >
           Retry
         </button>
@@ -70,7 +70,7 @@
         </h1>
         <button
           (click)="refreshDashboard()"
-          class="btn btn-primary flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition hover-scale"
+          class="btn btn-primary flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition hover-scale ds-btn ds-btn--primary"
           [class.btn-loading]="isLoading"
         >
           <i class="fas fa-sync-alt" [class.animate-spin]="isLoading"></i>
@@ -208,53 +208,36 @@
               dashboardData.recentShelves &&
               dashboardData.recentShelves.length > 0
             "
-            class="overflow-x-auto custom-scrollbar"
           >
-            <table
-              class="table w-full border-collapse bg-white rounded-lg overflow-hidden shadow responsive-table"
+            <p-table
+              [value]="dashboardData.recentShelves"
+              [scrollable]="true"
+              scrollHeight="320px"
             >
-              <thead>
+              <ng-template pTemplate="header">
                 <tr>
-                  <th
-                    class="bg-[#34495e] text-white px-4 py-3 text-left font-semibold"
-                  >
-                    Shelf ID
-                  </th>
-                  <th
-                    class="bg-[#34495e] text-white px-4 py-3 text-left font-semibold"
-                  >
-                    Name
-                  </th>
-                  <th
-                    class="bg-[#34495e] text-white px-4 py-3 text-left font-semibold"
-                  >
-                    Location
-                  </th>
-                  <th
-                    class="bg-[#34495e] text-white px-4 py-3 text-left font-semibold"
-                  >
-                    Status
-                  </th>
+                  <th>Shelf ID</th>
+                  <th>Name</th>
+                  <th>Location</th>
+                  <th>Status</th>
                 </tr>
-              </thead>
-              <tbody>
-                <tr
-                  *ngFor="let shelf of dashboardData.recentShelves"
-                  class="table-row-hover border-b border-gray-100 last:border-0"
-                >
-                  <td class="px-4 py-3 font-medium text-gray-800">
+              </ng-template>
+
+              <ng-template pTemplate="body" let-shelf>
+                <tr>
+                  <td class="font-medium text-gray-800">
                     {{ shelf.shelfId || "N/A" }}
                   </td>
-                  <td class="px-4 py-3 text-gray-700">
+                  <td class="text-gray-700">
                     {{ shelf.name || "Unnamed Shelf" }}
                   </td>
-                  <td class="px-4 py-3 text-gray-600">
+                  <td class="text-gray-600">
                     {{ shelf.location || "No Location" }}
                   </td>
-                  <td class="px-4 py-3">
+                  <td>
                     <span
                       [ngClass]="
-                        'status-badge px-3 py-1 rounded-full text-xs font-medium ' +
+                        'ds-pill status-badge ' +
                         getStatusBadgeClass(shelf.status)
                       "
                     >
@@ -262,8 +245,8 @@
                     </span>
                   </td>
                 </tr>
-              </tbody>
-            </table>
+              </ng-template>
+            </p-table>
           </div>
 
           <!-- View All Link -->
@@ -399,7 +382,7 @@
             </div>
           </div>
           <button
-            class="mt-4 w-full btn-outline border border-blue-600 text-blue-600 hover:bg-blue-50 py-2 rounded-lg transition quick-action-btn"
+            class="mt-4 w-full btn-outline border border-blue-600 text-blue-600 hover:bg-blue-50 py-2 rounded-lg transition quick-action-btn ds-btn ds-btn--secondary"
           >
             View Profile
           </button>
@@ -449,25 +432,25 @@
           </h4>
           <div class="grid grid-cols-2 gap-3">
             <button
-              class="quick-action-btn bg-blue-50 text-blue-700 hover:bg-blue-100 py-3 rounded-lg transition flex flex-col items-center justify-center gap-1"
+              class="quick-action-btn bg-blue-50 text-blue-700 hover:bg-blue-100 py-3 rounded-lg transition flex flex-col items-center justify-center gap-1 ds-btn ds-btn--stacked"
             >
               <i class="fas fa-plus text-lg"></i>
               <span class="text-xs font-medium">Add Shelf</span>
             </button>
             <button
-              class="quick-action-btn bg-green-50 text-green-700 hover:bg-green-100 py-3 rounded-lg transition flex flex-col items-center justify-center gap-1"
+              class="quick-action-btn bg-green-50 text-green-700 hover:bg-green-100 py-3 rounded-lg transition flex flex-col items-center justify-center gap-1 ds-btn ds-btn--stacked"
             >
               <i class="fas fa-box text-lg"></i>
               <span class="text-xs font-medium">Add Product</span>
             </button>
             <button
-              class="quick-action-btn bg-purple-50 text-purple-700 hover:bg-purple-100 py-3 rounded-lg transition flex flex-col items-center justify-center gap-1"
+              class="quick-action-btn bg-purple-50 text-purple-700 hover:bg-purple-100 py-3 rounded-lg transition flex flex-col items-center justify-center gap-1 ds-btn ds-btn--stacked"
             >
               <i class="fas fa-tv text-lg"></i>
               <span class="text-xs font-medium">Update Display</span>
             </button>
             <button
-              class="quick-action-btn bg-orange-50 text-orange-700 hover:bg-orange-100 py-3 rounded-lg transition flex flex-col items-center justify-center gap-1"
+              class="quick-action-btn bg-orange-50 text-orange-700 hover:bg-orange-100 py-3 rounded-lg transition flex flex-col items-center justify-center gap-1 ds-btn ds-btn--stacked"
             >
               <i class="fas fa-file-alt text-lg"></i>
               <span class="text-xs font-medium">Generate Report</span>
@@ -482,7 +465,7 @@
         Data last updated: {{ getCurrentTimeAgo() }}
         <button
           (click)="refreshDashboard()"
-          class="ml-3 text-blue-600 hover:text-blue-800 font-medium"
+          class="ml-3 text-blue-600 hover:text-blue-800 font-medium ds-btn ds-btn--tertiary"
         >
           <i class="fas fa-redo-alt mr-1"></i>
           Refresh Now
@@ -504,7 +487,7 @@
       </p>
       <button
         (click)="loadDashboardData()"
-        class="btn btn-primary bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg transition"
+        class="btn btn-primary bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg transition ds-btn ds-btn--primary"
       >
         <i class="fas fa-redo-alt mr-2"></i>
         Try Again

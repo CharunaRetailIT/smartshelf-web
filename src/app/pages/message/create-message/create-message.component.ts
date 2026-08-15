@@ -1,18 +1,33 @@
-import { Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { FormGroup, FormBuilder, Validators, ReactiveFormsModule, FormsModule } from '@angular/forms';
+import {
+  Component,
+  ElementRef,
+  OnDestroy,
+  OnInit,
+  ViewChild,
+} from '@angular/core';
+import {
+  FormGroup,
+  FormBuilder,
+  Validators,
+  ReactiveFormsModule,
+  FormsModule,
+} from '@angular/forms';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Message } from '../../../core/interfaces/message.interface';
 import { FabricCanvasService } from '../../../core/services/fabric-canvas.service';
 import { QueueService } from '../../../core/services/queue.service';
 import 'fabric';
 import { Canvas } from 'fabric';
-import { MatInputModule } from "@angular/material/input";
+import { MatInputModule } from '@angular/material/input';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../../../core/services/auth.service';
-import { CustomSnackbarComponent, SnackbarData } from '../../../shared/components/alert/custom-snackbar.component';
+import {
+  CustomSnackbarComponent,
+  SnackbarData,
+} from '../../../shared/components/alert/custom-snackbar.component';
 import { CustomMessageService } from '../../../core/services/message.service';
 import { SettingsService } from '../../../core/services/settings.service';
-import { MessageService } from 'primeng/api';
+import { ConfirmationService, MessageService } from 'primeng/api';
 import { Dropdown } from 'primeng/dropdown';
 import { DeviceScreenDto } from '../../../core/interfaces/device.interface';
 import { DeviceService } from '../../../core/services/device.service';
@@ -30,9 +45,15 @@ interface ScreenSize {
 
 @Component({
   selector: 'app-create-message',
-  imports: [CommonModule, ReactiveFormsModule, FormsModule, MatInputModule, ImportsModule],
+  imports: [
+    CommonModule,
+    ReactiveFormsModule,
+    FormsModule,
+    MatInputModule,
+    ImportsModule,
+  ],
   templateUrl: './create-message.component.html',
-  styleUrl: './create-message.component.css'
+  styleUrl: './create-message.component.css',
 })
 export class CreateMessageComponent implements OnInit, OnDestroy {
   @ViewChild('fabricCanvas') fabricCanvasRef!: ElementRef<HTMLCanvasElement>;
@@ -44,6 +65,10 @@ export class CreateMessageComponent implements OnInit, OnDestroy {
   // them back - the cards, content sections, previews and submit paths for both
   // are all still in place.
   showGeneralAndVideoTypes = false;
+
+  /** Add-text dialog, replacing the browser's prompt(). */
+  showAddTextDialog = false;
+  newTextValue = '';
 
   // Must default to a type that is actually offered, or the page opens on a
   // hidden type with no card selected and no matching content section.
@@ -62,9 +87,30 @@ export class CreateMessageComponent implements OnInit, OnDestroy {
 
   // Preset colors for quick selection
   presetColors: string[] = [
-    '#000000', '#FFFFFF', '#FF0000', '#00FF00', '#0000FF', '#FFFF00', '#FF00FF', '#00FFFF',
-    '#800000', '#808000', '#008000', '#800080', '#008080', '#000080', '#C0C0C0', '#808080',
-    '#FF9999', '#FFCC99', '#FFFF99', '#CCFF99', '#99FFCC', '#99CCFF', '#CC99FF', '#FF99CC'
+    '#000000',
+    '#FFFFFF',
+    '#FF0000',
+    '#00FF00',
+    '#0000FF',
+    '#FFFF00',
+    '#FF00FF',
+    '#00FFFF',
+    '#800000',
+    '#808000',
+    '#008000',
+    '#800080',
+    '#008080',
+    '#000080',
+    '#C0C0C0',
+    '#808080',
+    '#FF9999',
+    '#FFCC99',
+    '#FFFF99',
+    '#CCFF99',
+    '#99FFCC',
+    '#99CCFF',
+    '#CC99FF',
+    '#FF99CC',
   ];
 
   // Preview data
@@ -113,13 +159,17 @@ export class CreateMessageComponent implements OnInit, OnDestroy {
     private primemessageService: MessageService,
     private deviceService: DeviceService,
     private fabricService: FabricCanvasService,
-    private snackBar: MatSnackBar
+    private snackBar: MatSnackBar,
+    private confirmationService: ConfirmationService,
   ) {
     this.messageForm = this.fb.group({
       title: ['', [Validators.required, Validators.maxLength(255)]],
       content_data: [''],
-      duration: [5, [Validators.required, Validators.min(1), Validators.max(300)]],
-      screenSize: ['', Validators.required]
+      duration: [
+        5,
+        [Validators.required, Validators.min(1), Validators.max(300)],
+      ],
+      screenSize: ['', Validators.required],
     });
   }
 
@@ -132,11 +182,13 @@ export class CreateMessageComponent implements OnInit, OnDestroy {
     }, 100);
 
     // Subscribe to current user
-    this.auth.currentUser$.subscribe(user => {
+    this.auth.currentUser$.subscribe((user) => {
       if (user) {
         this.currentUserId = user.id;
       } else {
-        this.snackBar.open(' User not authenticated', 'Close', { duration: 3000 });
+        this.snackBar.open(' User not authenticated', 'Close', {
+          duration: 3000,
+        });
       }
     });
     this.setDefaultStore();
@@ -168,7 +220,7 @@ export class CreateMessageComponent implements OnInit, OnDestroy {
     }
   }
 
-  // Load screen sizes 
+  // Load screen sizes
   loadScreenSizes(params?: SearchParams): void {
     this.screenSizeLoading = true;
 
@@ -176,7 +228,7 @@ export class CreateMessageComponent implements OnInit, OnDestroy {
       pageNumber: this.screenSizePageNumber,
       pageSize: this.screenSizePageSize,
       searchTerm: this.screenSizeSearchTerm,
-      isActive: true
+      isActive: true,
     };
 
     this.deviceService.getDeviceScreensPaged(searchParams).subscribe({
@@ -186,7 +238,7 @@ export class CreateMessageComponent implements OnInit, OnDestroy {
           name: screen.name,
           width: screen.width,
           height: screen.height,
-          label: `${screen.name} - ${screen.width}x${screen.height}px`
+          label: `${screen.name} - ${screen.width}x${screen.height}px`,
         }));
 
         if (this.screenSizePageNumber === 1) {
@@ -213,7 +265,7 @@ export class CreateMessageComponent implements OnInit, OnDestroy {
         console.error('Error loading screen sizes:', error);
         this.screenSizeLoading = false;
         this.showError('Failed to load screen sizes');
-      }
+      },
     });
   }
 
@@ -248,14 +300,20 @@ export class CreateMessageComponent implements OnInit, OnDestroy {
 
   // Handle screen size selection
   onScreenSizeSelected(event: any): void {
-    const selectedSize = this.screenSizeOptions.find(s => s.id === event.value);
+    const selectedSize = this.screenSizeOptions.find(
+      (s) => s.id === event.value,
+    );
     if (selectedSize) {
       this.selectedScreenSize = selectedSize;
       this.selectedScreenSizeOption = selectedSize;
       this.updateCanvasDimensions(selectedSize);
 
       // Re-validate existing image file if dimensions changed
-      if (this.selectedFile && this.selectedMessageType === 'image' && this.imagePreview) {
+      if (
+        this.selectedFile &&
+        this.selectedMessageType === 'image' &&
+        this.imagePreview
+      ) {
         this.validateSelectedImage(selectedSize);
       }
     }
@@ -277,7 +335,9 @@ export class CreateMessageComponent implements OnInit, OnDestroy {
     const img = new Image();
     img.onload = () => {
       if (img.width > screenSize.width || img.height > screenSize.height) {
-        this.showError(`Current image (${img.width}x${img.height}) exceeds new screen size (${screenSize.width}x${screenSize.height}). Please select a new image.`);
+        this.showError(
+          `Current image (${img.width}x${img.height}) exceeds new screen size (${screenSize.width}x${screenSize.height}). Please select a new image.`,
+        );
         this.selectedFile = null;
         this.imagePreview = null;
         if (this.fileInput) {
@@ -288,11 +348,10 @@ export class CreateMessageComponent implements OnInit, OnDestroy {
     img.src = this.imagePreview!;
   }
 
-
   // Handle screen size selection
   onScreenSizeChange(): void {
     const selectedLabel = this.messageForm.get('screenSize')?.value;
-    const size = this.screenSizes.find(s => s.label === selectedLabel);
+    const size = this.screenSizes.find((s) => s.label === selectedLabel);
 
     if (size) {
       this.selectedScreenSize = size;
@@ -305,11 +364,17 @@ export class CreateMessageComponent implements OnInit, OnDestroy {
       }
 
       // Re-validate existing image file if dimensions changed
-      if (this.selectedFile && this.selectedMessageType === 'image' && this.imagePreview) {
+      if (
+        this.selectedFile &&
+        this.selectedMessageType === 'image' &&
+        this.imagePreview
+      ) {
         const img = new Image();
         img.onload = () => {
           if (img.width > size.width || img.height > size.height) {
-            this.showError(`Current image (${img.width}x${img.height}) exceeds new screen size (${size.width}x${size.height}). Please select a new image.`);
+            this.showError(
+              `Current image (${img.width}x${img.height}) exceeds new screen size (${size.width}x${size.height}). Please select a new image.`,
+            );
             this.selectedFile = null;
             this.imagePreview = null;
             if (this.fileInput) {
@@ -345,7 +410,7 @@ export class CreateMessageComponent implements OnInit, OnDestroy {
     if (this.canvas) {
       this.canvas.setDimensions({
         width: width,
-        height: height
+        height: height,
       });
       this.canvas.calcOffset();
       this.canvas.renderAll();
@@ -362,8 +427,13 @@ export class CreateMessageComponent implements OnInit, OnDestroy {
     reader.onload = (e: any) => {
       const img = new Image();
       img.onload = () => {
-        if (img.width > this.selectedScreenSize!.width || img.height > this.selectedScreenSize!.height) {
-          this.showError(`Image dimensions (${img.width}x${img.height}) exceed selected screen size (${this.selectedScreenSize!.width}x${this.selectedScreenSize!.height}). Please select a new image or choose a larger screen size.`);
+        if (
+          img.width > this.selectedScreenSize!.width ||
+          img.height > this.selectedScreenSize!.height
+        ) {
+          this.showError(
+            `Image dimensions (${img.width}x${img.height}) exceed selected screen size (${this.selectedScreenSize!.width}x${this.selectedScreenSize!.height}). Please select a new image or choose a larger screen size.`,
+          );
 
           // Clear the file input
           if (this.fileInput) {
@@ -409,7 +479,7 @@ export class CreateMessageComponent implements OnInit, OnDestroy {
       this.canvas = this.fabricService.initCanvas(
         this.fabricCanvasRef.nativeElement,
         width,
-        height
+        height,
       );
       this.updateSelectionState();
 
@@ -437,7 +507,6 @@ export class CreateMessageComponent implements OnInit, OnDestroy {
   //   }
   // }
 
-
   // initFabricCanvas(): void {
   //   if (this.fabricCanvasRef?.nativeElement) {
   //     this.canvas = this.fabricService.initCanvas(this.fabricCanvasRef.nativeElement);
@@ -456,8 +525,9 @@ export class CreateMessageComponent implements OnInit, OnDestroy {
 
     // Check if any selected object is text
     const selectedObjects = this.fabricService.getSelectedObjects();
-    this.hasSelectedText = selectedObjects.some(obj =>
-      obj.type === 'text' || obj.type === 'i-text' || obj.type === 'textbox'
+    this.hasSelectedText = selectedObjects.some(
+      (obj) =>
+        obj.type === 'text' || obj.type === 'i-text' || obj.type === 'textbox',
     );
   }
 
@@ -491,15 +561,34 @@ export class CreateMessageComponent implements OnInit, OnDestroy {
     if (!file) return;
 
     // Validate file type
-    const validImageTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/bmp', 'image/webp'];
-    const validVideoTypes = ['video/mp4', 'video/avi', 'video/mov', 'video/webm'];
+    const validImageTypes = [
+      'image/jpeg',
+      'image/png',
+      'image/gif',
+      'image/bmp',
+      'image/webp',
+    ];
+    const validVideoTypes = [
+      'video/mp4',
+      'video/avi',
+      'video/mov',
+      'video/webm',
+    ];
 
-    if (this.selectedMessageType === 'image' && !validImageTypes.includes(file.type)) {
-      this.showError('Please select a valid image file (JPEG, PNG, GIF, BMP, WebP)');
+    if (
+      this.selectedMessageType === 'image' &&
+      !validImageTypes.includes(file.type)
+    ) {
+      this.showError(
+        'Please select a valid image file (JPEG, PNG, GIF, BMP, WebP)',
+      );
       return;
     }
 
-    if (this.selectedMessageType === 'video' && !validVideoTypes.includes(file.type)) {
+    if (
+      this.selectedMessageType === 'video' &&
+      !validVideoTypes.includes(file.type)
+    ) {
       this.showError('Please select a valid video file (MP4, AVI, MOV, WebM)');
       return;
     }
@@ -524,8 +613,13 @@ export class CreateMessageComponent implements OnInit, OnDestroy {
       reader.onload = (e: any) => {
         const img = new Image();
         img.onload = () => {
-          if (img.width > this.selectedScreenSize!.width || img.height > this.selectedScreenSize!.height) {
-            this.showError(`Image dimensions (${img.width}x${img.height}) exceed selected screen size (${this.selectedScreenSize!.width}x${this.selectedScreenSize!.height}). Please select a smaller image or choose a larger screen size.`);
+          if (
+            img.width > this.selectedScreenSize!.width ||
+            img.height > this.selectedScreenSize!.height
+          ) {
+            this.showError(
+              `Image dimensions (${img.width}x${img.height}) exceed selected screen size (${this.selectedScreenSize!.width}x${this.selectedScreenSize!.height}). Please select a smaller image or choose a larger screen size.`,
+            );
 
             // Clear the file input
             if (this.fileInput) {
@@ -604,12 +698,51 @@ export class CreateMessageComponent implements OnInit, OnDestroy {
   //   reader.readAsDataURL(file);
   // }
 
-
   // Canvas Operations - delegating to service
+  /**
+   * Opens the add-text dialog. Cancelling now adds nothing - the old
+   * `prompt()` fell through to 'Sample Text' when dismissed, so cancelling
+   * still dropped a text object onto the canvas.
+   */
   addText(): void {
-    const text = prompt('Enter text:') || 'Sample Text';
+    this.newTextValue = '';
+    this.showAddTextDialog = true;
+    this.focusAddTextInput();
+  }
+
+  confirmAddText(): void {
+    const text = this.newTextValue.trim();
+    if (!text) return;
+
     this.fabricService.addText(text);
     this.updateSelectionState();
+    this.showAddTextDialog = false;
+  }
+
+  cancelAddText(): void {
+    this.showAddTextDialog = false;
+  }
+
+  /**
+   * Focus the field once the dialog has rendered.
+   *
+   * Two PrimeNG behaviours are worked around here. Its own `focusOnShow`
+   * prefers the dialog *footer*, so it lands on Cancel - hence
+   * [focusOnShow]="false". And its (onShow) event never fires in this app,
+   * because it is emitted from an animation callback and app.config registers
+   * both provideNoopAnimations() and provideAnimations(); so this is driven
+   * from addText() on a timer rather than from the event.
+   *
+   * The input is looked up by id because it is projected into the dialog's
+   * own view, where a @ViewChild on the host does not resolve it.
+   */
+  focusAddTextInput(): void {
+    setTimeout(() => {
+      const input = document.getElementById(
+        'addTextValue',
+      ) as HTMLInputElement | null;
+      input?.focus();
+    }, 150);
   }
 
   addRectangle(): void {
@@ -651,10 +784,18 @@ export class CreateMessageComponent implements OnInit, OnDestroy {
         reader.onload = (e: any) => {
           const img = new Image();
           img.onload = () => {
-            if (img.width > this.canvasWidth || img.height > this.canvasHeight) {
-              this.showError(`Image dimensions (${img.width}x${img.height}) exceed canvas size (${this.canvasWidth}x${this.canvasHeight}). The image will be scaled down.`);
+            if (
+              img.width > this.canvasWidth ||
+              img.height > this.canvasHeight
+            ) {
+              this.showError(
+                `Image dimensions (${img.width}x${img.height}) exceed canvas size (${this.canvasWidth}x${this.canvasHeight}). The image will be scaled down.`,
+              );
               // Scale image to fit canvas
-              const scale = Math.min(this.canvasWidth / img.width, this.canvasHeight / img.height);
+              const scale = Math.min(
+                this.canvasWidth / img.width,
+                this.canvasHeight / img.height,
+              );
               this.fabricService.addImage(e.target.result, scale);
             } else {
               this.fabricService.addImage(e.target.result);
@@ -668,7 +809,6 @@ export class CreateMessageComponent implements OnInit, OnDestroy {
     };
     input.click();
   }
-
 
   // Selection Operations
   selectAll(): void {
@@ -696,10 +836,17 @@ export class CreateMessageComponent implements OnInit, OnDestroy {
   }
 
   clearCanvas(): void {
-    if (confirm('Are you sure you want to clear the canvas?')) {
-      this.fabricService.clearCanvas();
-      this.updateSelectionState();
-    }
+    this.confirmationService.confirm({
+      message: 'Are you sure you want to clear the canvas?',
+      header: 'Clear Canvas',
+      icon: 'pi pi-exclamation-triangle',
+      acceptLabel: 'Clear',
+      rejectLabel: 'Cancel',
+      accept: () => {
+        this.fabricService.clearCanvas();
+        this.updateSelectionState();
+      },
+    });
   }
 
   // Color Operations
@@ -721,7 +868,7 @@ export class CreateMessageComponent implements OnInit, OnDestroy {
 
   changeOpacity(opacity: string): void {
     const selectedObjects = this.fabricService.getSelectedObjects();
-    selectedObjects.forEach(obj => {
+    selectedObjects.forEach((obj) => {
       obj.set('opacity', parseFloat(opacity));
     });
     this.canvas?.requestRenderAll();
@@ -749,7 +896,11 @@ export class CreateMessageComponent implements OnInit, OnDestroy {
     this.updateSelectionState();
   }
 
-  toggleTextStyle(property: string, activeValue: any, inactiveValue: any): void {
+  toggleTextStyle(
+    property: string,
+    activeValue: any,
+    inactiveValue: any,
+  ): void {
     const currentValue = this.selectedProperties?.[property];
     const newValue = currentValue === activeValue ? inactiveValue : activeValue;
     this.fabricService.updateTextStyle(property, newValue);
@@ -826,7 +977,7 @@ export class CreateMessageComponent implements OnInit, OnDestroy {
 
   setRotation(angle: string): void {
     const selectedObjects = this.fabricService.getSelectedObjects();
-    selectedObjects.forEach(obj => {
+    selectedObjects.forEach((obj) => {
       obj.set('angle', parseInt(angle));
     });
     this.canvas?.requestRenderAll();
@@ -873,7 +1024,11 @@ export class CreateMessageComponent implements OnInit, OnDestroy {
     }
 
     // Validate file exists for image/video types
-    if ((this.selectedMessageType === 'image' || this.selectedMessageType === 'video') && !this.selectedFile) {
+    if (
+      (this.selectedMessageType === 'image' ||
+        this.selectedMessageType === 'video') &&
+      !this.selectedFile
+    ) {
       this.showError(`Please select a ${this.selectedMessageType} file`);
       return;
     }
@@ -904,7 +1059,7 @@ export class CreateMessageComponent implements OnInit, OnDestroy {
       duration: formData.duration,
       createdBy: this.currentUserId,
       storeId: this.storeId,
-      ScreenSizeId: formData.screenSize
+      ScreenSizeId: formData.screenSize,
     };
     this.messageService.createGeneralMessage(payload).subscribe({
       next: (message: Message) => {
@@ -914,9 +1069,11 @@ export class CreateMessageComponent implements OnInit, OnDestroy {
       },
       error: (error) => {
         console.error(error); // log full error
-        this.showError('Failed to create message: ' + (error.message || error.statusText));
+        this.showError(
+          'Failed to create message: ' + (error.message || error.statusText),
+        );
         this.isLoading = false;
-      }
+      },
     });
   }
 
@@ -932,7 +1089,7 @@ export class CreateMessageComponent implements OnInit, OnDestroy {
     uploadData.append('title', formData.title);
     uploadData.append('duration', formData.duration.toString());
     uploadData.append('createdBy', this.currentUserId.toString());
-    uploadData.append('storeId', this.storeId.toString())
+    uploadData.append('storeId', this.storeId.toString());
     uploadData.append('screenSizeId', formData.screenSize.toString());
     this.messageService.uploadImageMessage(uploadData).subscribe({
       next: (message: Message) => {
@@ -943,7 +1100,7 @@ export class CreateMessageComponent implements OnInit, OnDestroy {
       error: (error) => {
         this.showError('Failed to create image message: ' + error.message);
         this.isLoading = false;
-      }
+      },
     });
   }
 
@@ -959,7 +1116,7 @@ export class CreateMessageComponent implements OnInit, OnDestroy {
     uploadData.append('title', formData.title);
     uploadData.append('duration', formData.duration.toString());
     uploadData.append('createdBy', this.currentUserId.toString());
-    uploadData.append('storeId', this.storeId.toString())
+    uploadData.append('storeId', this.storeId.toString());
     uploadData.append('screenSizeId', formData.screenSize.toString());
     this.messageService.uploadVideoMessage(uploadData).subscribe({
       next: (message: Message) => {
@@ -970,7 +1127,7 @@ export class CreateMessageComponent implements OnInit, OnDestroy {
       error: (error) => {
         this.showError('Failed to create video message: ' + error.message);
         this.isLoading = false;
-      }
+      },
     });
   }
 
@@ -991,7 +1148,7 @@ export class CreateMessageComponent implements OnInit, OnDestroy {
       duration: formData.duration,
       createdBy: this.currentUserId,
       storeId: this.storeId,
-      screenSizeId: formData.screenSize
+      screenSizeId: formData.screenSize,
     };
     console.log('Custom Image Message Data:', messageData);
     this.messageService.createCustomImageMessage(messageData).subscribe({
@@ -1001,12 +1158,13 @@ export class CreateMessageComponent implements OnInit, OnDestroy {
         this.isLoading = false;
       },
       error: (error) => {
-        this.showError('Failed to create custom image message: ' + error.message);
+        this.showError(
+          'Failed to create custom image message: ' + error.message,
+        );
         this.isLoading = false;
-      }
+      },
     });
   }
-
 
   // private createCustomImageMessage(formData: any): void {
   //   if (!this.canvas) {
@@ -1064,7 +1222,7 @@ export class CreateMessageComponent implements OnInit, OnDestroy {
   public resetForm(): void {
     this.messageForm.reset({
       duration: 5,
-      screenSize: this.selectedScreenSize?.id || ''
+      screenSize: this.selectedScreenSize?.id || '',
     });
     this.selectedFile = null;
     this.imagePreview = null;
@@ -1084,7 +1242,7 @@ export class CreateMessageComponent implements OnInit, OnDestroy {
     }
   }
   private markFormGroupTouched(): void {
-    Object.keys(this.messageForm.controls).forEach(key => {
+    Object.keys(this.messageForm.controls).forEach((key) => {
       this.messageForm.get(key)?.markAsTouched();
     });
   }
@@ -1094,7 +1252,7 @@ export class CreateMessageComponent implements OnInit, OnDestroy {
       severity: 'success',
       summary: 'Success',
       detail: message,
-      life: 5000
+      life: 5000,
     });
   }
 
@@ -1103,7 +1261,7 @@ export class CreateMessageComponent implements OnInit, OnDestroy {
       severity: 'error',
       summary: 'Error',
       detail: message,
-      life: 5000
+      life: 5000,
     });
   }
 
@@ -1112,7 +1270,7 @@ export class CreateMessageComponent implements OnInit, OnDestroy {
       severity: 'warn',
       summary: 'Warning',
       detail: message,
-      life: 5000
+      life: 5000,
     });
   }
 
@@ -1121,7 +1279,7 @@ export class CreateMessageComponent implements OnInit, OnDestroy {
       severity: 'info',
       summary: 'Info',
       detail: message,
-      life: 5000
+      life: 5000,
     });
   }
   // private showSuccess(message: string): void {

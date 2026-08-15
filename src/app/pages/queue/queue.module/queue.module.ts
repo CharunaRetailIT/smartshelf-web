@@ -8,8 +8,6 @@ import { QueueListComponent } from '../queue-list/queue-list.component';
 import { CreateQueueComponent } from '../create-queue/create-queue.component';
 import { ConfirmationService, MessageService } from 'primeng/api';
 
-
-
 @NgModule({
   declarations: [],
   imports: [
@@ -20,12 +18,9 @@ import { ConfirmationService, MessageService } from 'primeng/api';
     RouterModule.forChild([
       { path: '', component: QueueListComponent },
       { path: 'create', component: CreateQueueComponent },
-      { path: ':id', component: QueueDetailsComponent }
-    ])
+      { path: ':id', component: QueueDetailsComponent },
+    ]),
   ],
-  providers: [
-    ConfirmationService,
-    MessageService
-  ]
+  providers: [ConfirmationService, MessageService],
 })
-export class QueueModule { }
+export class QueueModule {}

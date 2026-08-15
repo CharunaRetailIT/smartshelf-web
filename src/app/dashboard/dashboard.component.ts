@@ -1,17 +1,24 @@
 // dashboard.component.ts
 import { Component, OnInit } from '@angular/core';
-import { DashboardService, DashboardData, UserDashboard, RecentShelf, RecentActivity } from '../core/services/dashboard.service';
+import {
+  DashboardService,
+  DashboardData,
+  UserDashboard,
+  RecentShelf,
+  RecentActivity,
+} from '../core/services/dashboard.service';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
+import { TableModule } from 'primeng/table';
 import { AuthService } from '../core/services/auth.service';
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule, FormsModule,RouterModule],
+  imports: [CommonModule, FormsModule, RouterModule, TableModule],
   templateUrl: './dashboard.component.html',
-  styleUrls: ['./dashboard.component.css']
+  styleUrls: ['./dashboard.component.css'],
 })
 export class DashboardComponent implements OnInit {
   dashboardData: DashboardData | null = null;
@@ -24,8 +31,8 @@ export class DashboardComponent implements OnInit {
 
   constructor(
     private dashboardService: DashboardService,
-    public auth:AuthService
-  ) { }
+    public auth: AuthService,
+  ) {}
 
   ngOnInit(): void {
     this.currentUser();
@@ -37,12 +44,13 @@ export class DashboardComponent implements OnInit {
       console.log('User not authenticated');
       return;
     }
-    this.currentUserId = user.id;  }
+    this.currentUserId = user.id;
+  }
 
   loadDashboardData(): void {
     this.isLoading = true;
     this.errorMessage = '';
-    
+
     this.dashboardService.getDashboardData().subscribe({
       next: (data) => {
         this.dashboardData = data;
@@ -52,10 +60,10 @@ export class DashboardComponent implements OnInit {
         console.error('Error loading dashboard:', error);
         this.errorMessage = error.message || 'Failed to load dashboard data';
         this.isLoading = false;
-        
+
         // Try to load public data as fallback
         this.loadPublicDashboardData();
-      }
+      },
     });
   }
 
@@ -66,17 +74,22 @@ export class DashboardComponent implements OnInit {
         this.dashboardData = {
           summary: summary,
           recentShelves: [],
-          recentActivities: []
+          recentActivities: [],
         };
       },
       error: () => {
         // Even public data failed, show empty state
         this.dashboardData = {
-          summary: { totalUsers: 0, activeShelves: 0, totalProducts: 0, activeDisplays: 0 },
+          summary: {
+            totalUsers: 0,
+            activeShelves: 0,
+            totalProducts: 0,
+            activeDisplays: 0,
+          },
           recentShelves: [],
-          recentActivities: []
+          recentActivities: [],
         };
-      }
+      },
     });
   }
 
@@ -92,7 +105,7 @@ export class DashboardComponent implements OnInit {
         console.error('Error loading user dashboard:', error);
         this.errorMessage = 'Failed to load user dashboard';
         this.isLoading = false;
-      }
+      },
     });
   }
 
@@ -123,7 +136,7 @@ export class DashboardComponent implements OnInit {
     return date.toLocaleDateString('en-US', {
       year: 'numeric',
       month: 'short',
-      day: 'numeric'
+      day: 'numeric',
     });
   }
 
@@ -132,7 +145,7 @@ export class DashboardComponent implements OnInit {
     const now = new Date();
     const diffMs = now.getTime() - date.getTime();
     const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
-    
+
     if (diffHours < 1) {
       return 'Just now';
     } else if (diffHours < 24) {
@@ -173,7 +186,7 @@ export class DashboardComponent implements OnInit {
     }
   }
 
-    // Helper method to update current time
+  // Helper method to update current time
   updateCurrentTime(): void {
     this.currentDate = new Date().toISOString();
   }

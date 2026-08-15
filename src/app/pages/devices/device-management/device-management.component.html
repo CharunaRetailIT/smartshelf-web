@@ -1,5 +1,7 @@
-<div class="min-h-screen bg-gray-50 p-4">
-  <div class="bg-white rounded-lg shadow-sm border border-gray-200 mb-6 p-6">
+<div class="min-h-screen bg-gray-50 p-4 ds-page-shell">
+  <div
+    class="bg-white rounded-lg shadow-sm border border-gray-200 mb-6 p-6 ds-card"
+  >
     <div class="flex items-center justify-between">
       <!-- Left content -->
       <div class="flex items-center space-x-3">
@@ -109,7 +111,7 @@
   </div>
 
   <!-- Main Content -->
-  <div class="bg-white rounded-lg shadow-sm border border-gray-200">
+  <div class="bg-white rounded-lg shadow-sm border border-gray-200 ds-card">
     <!-- Tab Navigation -->
     <p-tabView
       [(activeIndex)]="activeTabIndex"
@@ -2374,12 +2376,14 @@
   >
   </app-minew-batch-add>
 
-<ng-template #displayDeviceDialogTpl>
-  <div class="dlg-shell">
-    <div class="dlg-header">
-      <div>
-        <h2 class="dlg-title">{{ isEditMode ? 'Edit Device' : 'Add New Device' }}</h2>
-      </div>
+  <ng-template #displayDeviceDialogTpl>
+    <div class="dlg-shell">
+      <div class="dlg-header">
+        <div>
+          <h2 class="dlg-title">
+            {{ isEditMode ? "Edit Device" : "Add New Device" }}
+          </h2>
+        </div>
         <button
           type="button"
           (click)="closeTplDialog('displayDeviceDialog')"
@@ -2400,349 +2404,354 @@
             ></path>
           </svg>
         </button>
-    </div>
+      </div>
 
-    <div class="dlg-body">
-    <!-- Main Form Container -->
-    <form
-      [formGroup]="deviceForm"
-      (ngSubmit)="saveDevice()"
-      class="device-modal-form"
-    >
-      <!-- Scrollable Content Area -->
-      <div class="modal-scrollable-content">
-        <!-- Device Type Selection -->
-        <div class="form-section mb-6" *ngIf="showDeviceTypeSelector">
-          <label for="deviceType" class="form-label"
-            >Device Type <span class="required">*</span></label
-          >
-          <div class="device-type-selector">
-            <p-selectButton
-              id="deviceType"
-              formControlName="deviceType"
-              [options]="deviceTypeOptions"
-              optionLabel="label"
-              optionValue="value"
-              class="w-full device-type-buttons"
-            >
-            </p-selectButton>
-          </div>
-        </div>
-
-        <!-- Basic Information Section -->
-        <div class="form-section mb-6">
-          <h4 class="form-section-title">Basic Information</h4>
-          <div class="grid grid-cols-2 gap-4">
-            <!-- Device Name -->
-            <div class="field">
-              <label for="deviceName" class="form-label"
-                >Device Name <span class="required">*</span></label
+      <div class="dlg-body">
+        <!-- Main Form Container -->
+        <form
+          [formGroup]="deviceForm"
+          (ngSubmit)="saveDevice()"
+          class="device-modal-form"
+        >
+          <!-- Scrollable Content Area -->
+          <div class="modal-scrollable-content">
+            <!-- Device Type Selection -->
+            <div class="form-section mb-6" *ngIf="showDeviceTypeSelector">
+              <label for="deviceType" class="form-label"
+                >Device Type <span class="required">*</span></label
               >
-              <input
-                id="deviceName"
-                pInputText
-                formControlName="deviceName"
-                placeholder="e.g., ESL-001"
-                class="form-input"
-                [ngClass]="{
-                  'input-error':
-                    deviceForm.get('deviceName')?.invalid &&
-                    deviceForm.get('deviceName')?.touched,
-                }"
-              />
-              <small
-                *ngIf="
-                  deviceForm.get('deviceName')?.invalid &&
-                  deviceForm.get('deviceName')?.touched
-                "
-                class="error-message"
-              >
-                Device name is required
-              </small>
-            </div>
-
-            <!-- MAC Address -->
-            <div class="field">
-              <label for="macAddress" class="form-label"
-                >MAC Address <span class="required">*</span></label
-              >
-              <div class="flex gap-2">
-                <input
-                  id="macAddress"
-                  pInputText
-                  formControlName="macAddress"
-                  placeholder="e.g., e1000005e79d or 00:1A:2B:3C:4D:5E"
-                  class="form-input flex-1"
-                />
-                <button
-                  type="button"
-                  (click)="scanMacAddress()"
-                  class="inline-flex items-center gap-2 px-3 py-2 border border-emerald-600 text-emerald-700 rounded-md hover:bg-emerald-50 transition-colors cursor-pointer whitespace-nowrap"
-                  title="Scan the device's barcode sticker with your camera"
+              <div class="device-type-selector">
+                <p-selectButton
+                  id="deviceType"
+                  formControlName="deviceType"
+                  [options]="deviceTypeOptions"
+                  optionLabel="label"
+                  optionValue="value"
+                  class="w-full device-type-buttons"
                 >
-                  <i class="pi pi-qrcode"></i>
-                  <span class="hidden sm:inline">Scan</span>
-                </button>
+                </p-selectButton>
               </div>
-              <small class="text-gray-500 mt-1 block">
-                Use Scan to read the MAC from the device's barcode sticker.
-              </small>
             </div>
-          </div>
-        </div>
 
-        <!-- Store and Screen Section -->
-        <div class="form-section mb-6">
-          <h4 class="form-section-title">Store & Screen</h4>
+            <!-- Basic Information Section -->
+            <div class="form-section mb-6">
+              <h4 class="form-section-title">Basic Information</h4>
+              <div class="grid grid-cols-2 gap-4">
+                <!-- Device Name -->
+                <div class="field">
+                  <label for="deviceName" class="form-label"
+                    >Device Name <span class="required">*</span></label
+                  >
+                  <input
+                    id="deviceName"
+                    pInputText
+                    formControlName="deviceName"
+                    placeholder="e.g., ESL-001"
+                    class="form-input"
+                    [ngClass]="{
+                      'input-error':
+                        deviceForm.get('deviceName')?.invalid &&
+                        deviceForm.get('deviceName')?.touched,
+                    }"
+                  />
+                  <small
+                    *ngIf="
+                      deviceForm.get('deviceName')?.invalid &&
+                      deviceForm.get('deviceName')?.touched
+                    "
+                    class="error-message"
+                  >
+                    Device name is required
+                  </small>
+                </div>
 
-          <!-- Store Selection -->
-          <div class="field mb-4">
-            <label for="storeId" class="font-medium block mb-2">
-              Store <span class="text-red-500">*</span>
-              <span *ngIf="storeLoading" class="ml-2 text-xs text-emerald-600">
-                <i class="pi pi-spin pi-spinner mr-1"></i> Loading...
-              </span>
-            </label>
-            <p-dropdown
-              appendTo="body"
-              id="storeId"
-              formControlName="storeId"
-              [options]="storeOptions"
-              optionLabel="label"
-              optionValue="value"
-              [showClear]="true"
-              [lazy]="true"
-              (onLazyLoad)="loadStoresLazy($event)"
-              [filter]="true"
-              filterBy="label"
-              placeholder="Select Store"
-              class="w-full"
-              [ngClass]="{
-                'p-invalid':
-                  deviceForm.get('storeId')?.invalid &&
-                  deviceForm.get('storeId')?.touched,
-              }"
-            >
-              <ng-template pTemplate="header">
-                <div class="p-2 border-b">
-                  <div class="font-medium text-gray-700">Select Store</div>
-                  <small class="text-gray-500"
-                    >Scroll to load more stores</small
+                <!-- MAC Address -->
+                <div class="field">
+                  <label for="macAddress" class="form-label"
+                    >MAC Address <span class="required">*</span></label
+                  >
+                  <div class="flex gap-2">
+                    <input
+                      id="macAddress"
+                      pInputText
+                      formControlName="macAddress"
+                      placeholder="e.g., e1000005e79d or 00:1A:2B:3C:4D:5E"
+                      class="form-input flex-1"
+                    />
+                    <button
+                      type="button"
+                      (click)="scanMacAddress()"
+                      class="inline-flex items-center gap-2 px-3 py-2 border border-emerald-600 text-emerald-700 rounded-md hover:bg-emerald-50 transition-colors cursor-pointer whitespace-nowrap ds-btn ds-btn--secondary"
+                      title="Scan the device's barcode sticker with your camera"
+                    >
+                      <i class="pi pi-qrcode"></i>
+                      <span class="hidden sm:inline">Scan</span>
+                    </button>
+                  </div>
+                  <small class="text-gray-500 mt-1 block">
+                    Use Scan to read the MAC from the device's barcode sticker.
+                  </small>
+                </div>
+              </div>
+            </div>
+
+            <!-- Store and Screen Section -->
+            <div class="form-section mb-6">
+              <h4 class="form-section-title">Store & Screen</h4>
+
+              <!-- Store Selection -->
+              <div class="field mb-4">
+                <label for="storeId" class="font-medium block mb-2">
+                  Store <span class="text-red-500">*</span>
+                  <span
+                    *ngIf="storeLoading"
+                    class="ml-2 text-xs text-emerald-600"
+                  >
+                    <i class="pi pi-spin pi-spinner mr-1"></i> Loading...
+                  </span>
+                </label>
+                <p-dropdown
+                  appendTo="body"
+                  id="storeId"
+                  formControlName="storeId"
+                  [options]="storeOptions"
+                  optionLabel="label"
+                  optionValue="value"
+                  [showClear]="true"
+                  [lazy]="true"
+                  (onLazyLoad)="loadStoresLazy($event)"
+                  [filter]="true"
+                  filterBy="label"
+                  placeholder="Select Store"
+                  class="w-full"
+                  [ngClass]="{
+                    'p-invalid':
+                      deviceForm.get('storeId')?.invalid &&
+                      deviceForm.get('storeId')?.touched,
+                  }"
+                >
+                  <ng-template pTemplate="header">
+                    <div class="p-2 border-b">
+                      <div class="font-medium text-gray-700">Select Store</div>
+                      <small class="text-gray-500"
+                        >Scroll to load more stores</small
+                      >
+                    </div>
+                  </ng-template>
+
+                  <ng-template let-store pTemplate="item">
+                    <div class="flex flex-col p-2">
+                      <div class="font-medium">{{ store.storeName }}</div>
+                      <div class="text-sm text-gray-500">
+                        {{ store.storeCode || "No Code" }}
+                        <span *ngIf="store.address" class="ml-2"
+                          >• {{ store.address }}</span
+                        >
+                      </div>
+                    </div>
+                  </ng-template>
+
+                  <ng-template pTemplate="empty">
+                    <div class="p-3 text-center text-gray-500">
+                      <i class="pi pi-building text-2xl mb-2 block"></i>
+                      <p>No stores found</p>
+                    </div>
+                  </ng-template>
+
+                  <ng-template pTemplate="selectedItem">
+                    <div
+                      *ngIf="deviceForm.get('storeId')?.value"
+                      class="flex items-center"
+                    >
+                      <i class="pi pi-building mr-2 text-emerald-600"></i>
+                      <span>{{ getSelectedStoreName() }}</span>
+                    </div>
+                  </ng-template>
+                </p-dropdown>
+
+                <small
+                  *ngIf="
+                    deviceForm.get('storeId')?.invalid &&
+                    deviceForm.get('storeId')?.touched
+                  "
+                  class="p-error block mt-1"
+                >
+                  Store is required
+                </small>
+
+                <!-- Show current default store as hint -->
+                <small *ngIf="storeName" class="text-gray-500 block mt-1">
+                  Current default store:
+                  <span class="font-medium">{{ storeName }}</span>
+                </small>
+              </div>
+
+              <!-- Screen Properties -->
+              <div class="field">
+                <label for="screenId" class="form-label"
+                  >Screen Properties</label
+                >
+                <p-dropdown
+                  appendTo="body"
+                  id="screenId"
+                  formControlName="screenId"
+                  [options]="screenOptions"
+                  optionLabel="name"
+                  optionValue="id"
+                  [filter]="true"
+                  filterBy="name,aspectRatio"
+                  [showClear]="true"
+                  placeholder="Select Screen"
+                  class="form-dropdown"
+                >
+                  <ng-template pTemplate="selectedItem">
+                    <div *ngIf="deviceForm.get('screenId')?.value">
+                      <span>{{
+                        getScreenDisplay(deviceForm.get("screenId")?.value)
+                      }}</span>
+                    </div>
+                  </ng-template>
+                  <ng-template let-screen pTemplate="item">
+                    <div class="flex items-center">
+                      <div class="mr-3">
+                        <i class="pi pi-desktop text-emerald-600"></i>
+                      </div>
+                      <div>
+                        <div class="font-medium">{{ screen.name }}</div>
+                        <div class="text-sm text-gray-500">
+                          {{ screen.width }}x{{ screen.height }} |
+                          {{ screen.inch }}" | {{ screen.aspectRatio }}
+                        </div>
+                      </div>
+                    </div>
+                  </ng-template>
+                </p-dropdown>
+                <small class="form-hint"
+                  >Select from predefined screen dimensions</small
+                >
+              </div>
+            </div>
+
+            <!-- Network Settings (Standard Devices Only) -->
+            <div *ngIf="!isMinewDevice()" class="form-section mb-6">
+              <h4 class="form-section-title">Network Settings</h4>
+
+              <!-- IP Address -->
+              <div class="field mb-4">
+                <label for="ipAddress" class="form-label">IP Address</label>
+                <input
+                  id="ipAddress"
+                  pInputText
+                  formControlName="ipAddress"
+                  placeholder="e.g., 192.168.1.100"
+                  class="form-input"
+                  [ngClass]="{
+                    'input-error':
+                      deviceForm.get('ipAddress')?.invalid &&
+                      deviceForm.get('ipAddress')?.touched,
+                  }"
+                />
+                <small
+                  *ngIf="
+                    deviceForm.get('ipAddress')?.invalid &&
+                    deviceForm.get('ipAddress')?.touched
+                  "
+                  class="error-message"
+                >
+                  Valid IP address required for Standard devices
+                </small>
+              </div>
+
+              <!-- Network Name -->
+              <div class="field">
+                <label for="networkName" class="form-label">Network Name</label>
+                <input
+                  id="networkName"
+                  pInputText
+                  formControlName="networkName"
+                  placeholder="e.g., Store-Network"
+                  class="form-input"
+                />
+              </div>
+            </div>
+
+            <!-- Device Status Section -->
+            <div class="form-section mb-6">
+              <h4 class="form-section-title">Device Status</h4>
+              <div class="grid grid-cols-2 gap-4">
+                <!-- Status -->
+                <div class="field">
+                  <label for="statusId" class="form-label">Status</label>
+                  <p-dropdown
+                    appendTo="body"
+                    id="statusId"
+                    formControlName="statusId"
+                    [options]="[
+                      { label: 'Active', value: 1 },
+                      { label: 'Inactive', value: 2 },
+                      { label: 'Maintenance', value: 3 },
+                    ]"
+                    optionLabel="label"
+                    optionValue="value"
+                    placeholder="Select Status"
+                    class="form-dropdown"
+                  >
+                  </p-dropdown>
+                </div>
+              </div>
+
+              <!-- Active Checkbox -->
+              <div class="field-checkbox mt-4">
+                <div class="flex items-center">
+                  <p-checkbox
+                    formControlName="isActive"
+                    [binary]="true"
+                    inputId="isActive"
+                    class="mr-2"
+                  >
+                  </p-checkbox>
+                  <label for="isActive" class="form-label mb-0"
+                    >Device is Active</label
                   >
                 </div>
-              </ng-template>
-
-              <ng-template let-store pTemplate="item">
-                <div class="flex flex-col p-2">
-                  <div class="font-medium">{{ store.storeName }}</div>
-                  <div class="text-sm text-gray-500">
-                    {{ store.storeCode || "No Code" }}
-                    <span *ngIf="store.address" class="ml-2"
-                      >• {{ store.address }}</span
-                    >
-                  </div>
-                </div>
-              </ng-template>
-
-              <ng-template pTemplate="empty">
-                <div class="p-3 text-center text-gray-500">
-                  <i class="pi pi-building text-2xl mb-2 block"></i>
-                  <p>No stores found</p>
-                </div>
-              </ng-template>
-
-              <ng-template pTemplate="selectedItem">
-                <div
-                  *ngIf="deviceForm.get('storeId')?.value"
-                  class="flex items-center"
-                >
-                  <i class="pi pi-building mr-2 text-emerald-600"></i>
-                  <span>{{ getSelectedStoreName() }}</span>
-                </div>
-              </ng-template>
-            </p-dropdown>
-
-            <small
-              *ngIf="
-                deviceForm.get('storeId')?.invalid &&
-                deviceForm.get('storeId')?.touched
-              "
-              class="p-error block mt-1"
-            >
-              Store is required
-            </small>
-
-            <!-- Show current default store as hint -->
-            <small *ngIf="storeName" class="text-gray-500 block mt-1">
-              Current default store:
-              <span class="font-medium">{{ storeName }}</span>
-            </small>
-          </div>
-
-          <!-- Screen Properties -->
-          <div class="field">
-            <label for="screenId" class="form-label">Screen Properties</label>
-            <p-dropdown
-              appendTo="body"
-              id="screenId"
-              formControlName="screenId"
-              [options]="screenOptions"
-              optionLabel="name"
-              optionValue="id"
-              [filter]="true"
-              filterBy="name,aspectRatio"
-              [showClear]="true"
-              placeholder="Select Screen"
-              class="form-dropdown"
-            >
-              <ng-template pTemplate="selectedItem">
-                <div *ngIf="deviceForm.get('screenId')?.value">
-                  <span>{{
-                    getScreenDisplay(deviceForm.get("screenId")?.value)
-                  }}</span>
-                </div>
-              </ng-template>
-              <ng-template let-screen pTemplate="item">
-                <div class="flex items-center">
-                  <div class="mr-3">
-                    <i class="pi pi-desktop text-emerald-600"></i>
-                  </div>
-                  <div>
-                    <div class="font-medium">{{ screen.name }}</div>
-                    <div class="text-sm text-gray-500">
-                      {{ screen.width }}x{{ screen.height }} |
-                      {{ screen.inch }}" | {{ screen.aspectRatio }}
-                    </div>
-                  </div>
-                </div>
-              </ng-template>
-            </p-dropdown>
-            <small class="form-hint"
-              >Select from predefined screen dimensions</small
-            >
-          </div>
-        </div>
-
-        <!-- Network Settings (Standard Devices Only) -->
-        <div *ngIf="!isMinewDevice()" class="form-section mb-6">
-          <h4 class="form-section-title">Network Settings</h4>
-
-          <!-- IP Address -->
-          <div class="field mb-4">
-            <label for="ipAddress" class="form-label">IP Address</label>
-            <input
-              id="ipAddress"
-              pInputText
-              formControlName="ipAddress"
-              placeholder="e.g., 192.168.1.100"
-              class="form-input"
-              [ngClass]="{
-                'input-error':
-                  deviceForm.get('ipAddress')?.invalid &&
-                  deviceForm.get('ipAddress')?.touched,
-              }"
-            />
-            <small
-              *ngIf="
-                deviceForm.get('ipAddress')?.invalid &&
-                deviceForm.get('ipAddress')?.touched
-              "
-              class="error-message"
-            >
-              Valid IP address required for Standard devices
-            </small>
-          </div>
-
-          <!-- Network Name -->
-          <div class="field">
-            <label for="networkName" class="form-label">Network Name</label>
-            <input
-              id="networkName"
-              pInputText
-              formControlName="networkName"
-              placeholder="e.g., Store-Network"
-              class="form-input"
-            />
-          </div>
-        </div>
-
-        <!-- Device Status Section -->
-        <div class="form-section mb-6">
-          <h4 class="form-section-title">Device Status</h4>
-          <div class="grid grid-cols-2 gap-4">
-            <!-- Status -->
-            <div class="field">
-              <label for="statusId" class="form-label">Status</label>
-              <p-dropdown
-                appendTo="body"
-                id="statusId"
-                formControlName="statusId"
-                [options]="[
-                  { label: 'Active', value: 1 },
-                  { label: 'Inactive', value: 2 },
-                  { label: 'Maintenance', value: 3 },
-                ]"
-                optionLabel="label"
-                optionValue="value"
-                placeholder="Select Status"
-                class="form-dropdown"
-              >
-              </p-dropdown>
+              </div>
             </div>
           </div>
+          <!-- End of scrollable content -->
+        </form>
 
-          <!-- Active Checkbox -->
-          <div class="field-checkbox mt-4">
-            <div class="flex items-center">
-              <p-checkbox
-                formControlName="isActive"
-                [binary]="true"
-                inputId="isActive"
-                class="mr-2"
-              >
-              </p-checkbox>
-              <label for="isActive" class="form-label mb-0"
-                >Device is Active</label
-              >
-            </div>
-          </div>
+        <!-- Fixed Footer with Action Buttons -->
+        <!-- <ng-template pTemplate="footer"> -->
+        <div class="dialog-footer">
+          <button
+            type="button"
+            class="dialog-btn dialog-btn-secondary"
+            (click)="closeTplDialog('displayDeviceDialog')"
+          >
+            <span>Cancel</span>
+          </button>
+          <button
+            type="button"
+            class="dialog-btn dialog-btn-primary"
+            [disabled]="deviceForm.invalid || loading"
+            (click)="saveDevice()"
+          >
+            <span>{{ isEditMode ? "Update Device" : "Create Device" }}</span>
+            <i *ngIf="loading" class="pi pi-spin pi-spinner ml-2"></i>
+          </button>
         </div>
+        <!-- </ng-template> -->
       </div>
-      <!-- End of scrollable content -->
-    </form>
-
-    <!-- Fixed Footer with Action Buttons -->
-    <!-- <ng-template pTemplate="footer"> -->
-    <div class="dialog-footer">
-      <button
-        type="button"
-        class="dialog-btn dialog-btn-secondary"
-        (click)="closeTplDialog('displayDeviceDialog')"
-      >
-        <span>Cancel</span>
-      </button>
-      <button
-        type="button"
-        class="dialog-btn dialog-btn-primary"
-        [disabled]="deviceForm.invalid || loading"
-        (click)="saveDevice()"
-      >
-        <span>{{ isEditMode ? "Update Device" : "Create Device" }}</span>
-        <i *ngIf="loading" class="pi pi-spin pi-spinner ml-2"></i>
-      </button>
     </div>
-    <!-- </ng-template> -->
-    </div>
-  </div>
-</ng-template>
+  </ng-template>
 
   <!-- Screen Dimension Dialog -->
-<ng-template #displayScreenDimensionDialogTpl>
-  <div class="dlg-shell">
-    <div class="dlg-header">
-      <div>
-        <h2 class="dlg-title">Device Screen Dimensions</h2>
-      </div>
+  <ng-template #displayScreenDimensionDialogTpl>
+    <div class="dlg-shell">
+      <div class="dlg-header">
+        <div>
+          <h2 class="dlg-title">Device Screen Dimensions</h2>
+        </div>
         <button
           type="button"
           (click)="closeTplDialog('displayScreenDimensionDialog')"
@@ -2763,175 +2772,185 @@
             ></path>
           </svg>
         </button>
-    </div>
+      </div>
 
-    <div class="dlg-body">
-    <div *ngIf="selectedDevice" class="mb-4">
-      <p-card>
-        <div class="flex items-center space-x-3">
-          <i class="pi pi-tablet text-2xl text-emerald-600"></i>
-          <div>
-            <h4 class="font-semibold">{{ selectedDevice.deviceName }}</h4>
-            <p class="text-sm text-gray-500">{{ selectedDevice.mac }}</p>
+      <div class="dlg-body">
+        <div *ngIf="selectedDevice" class="mb-4">
+          <p-card>
+            <div class="flex items-center space-x-3">
+              <i class="pi pi-tablet text-2xl text-emerald-600"></i>
+              <div>
+                <h4 class="font-semibold">{{ selectedDevice.deviceName }}</h4>
+                <p class="text-sm text-gray-500">{{ selectedDevice.mac }}</p>
+              </div>
+            </div>
+          </p-card>
+        </div>
+
+        <!-- Existing Dimensions -->
+        <div *ngIf="screenDimensions.length > 0" class="mb-6">
+          <h5 class="font-medium text-gray-700 mb-3">
+            Existing Screen Dimensions
+          </h5>
+          <div class="space-y-2">
+            <div
+              *ngFor="let dimension of screenDimensions"
+              class="p-3 border border-gray-200 rounded-lg hover:bg-gray-50"
+            >
+              <div class="flex justify-between items-center">
+                <div>
+                  <span class="font-medium">{{ dimension.screenSize }}</span>
+                  <span class="text-sm text-gray-500 ml-2"
+                    >({{ dimension.aspectRatio }})</span
+                  >
+                </div>
+                <div class="flex space-x-2">
+                  <p-tag
+                    [value]="dimension.orientation"
+                    severity="info"
+                    styleClass="text-xs"
+                  >
+                  </p-tag>
+                  <button
+                    pButton
+                    icon="pi pi-trash"
+                    class="p-button-rounded p-button-text p-button-danger p-button-sm"
+                    (click)="deleteScreenDimension(dimension)"
+                  ></button>
+                </div>
+              </div>
+              <div class="grid grid-cols-3 gap-2 mt-2 text-xs text-gray-600">
+                <div>Refresh: {{ dimension.refreshRate }}Hz</div>
+                <div>Color: {{ dimension.colorDepth }}-bit</div>
+                <div>DPI: {{ dimension.pixelDensity }}</div>
+              </div>
+            </div>
           </div>
         </div>
-      </p-card>
-    </div>
 
-    <!-- Existing Dimensions -->
-    <div *ngIf="screenDimensions.length > 0" class="mb-6">
-      <h5 class="font-medium text-gray-700 mb-3">Existing Screen Dimensions</h5>
-      <div class="space-y-2">
-        <div
-          *ngFor="let dimension of screenDimensions"
-          class="p-3 border border-gray-200 rounded-lg hover:bg-gray-50"
+        <!-- Add New Dimension Form -->
+        <h5 class="font-medium text-gray-700 mb-3">Add New Screen Dimension</h5>
+        <form
+          [formGroup]="screenDimensionForm"
+          (ngSubmit)="saveScreenDimension()"
+          class="p-fluid"
         >
-          <div class="flex justify-between items-center">
-            <div>
-              <span class="font-medium">{{ dimension.screenSize }}</span>
-              <span class="text-sm text-gray-500 ml-2"
-                >({{ dimension.aspectRatio }})</span
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="field">
+              <label for="screenWidth" class="font-medium"
+                >Screen Width *</label
               >
+              <p-inputNumber
+                id="screenWidth"
+                formControlName="screenWidth"
+                mode="decimal"
+                [min]="1"
+                class="w-full"
+              >
+              </p-inputNumber>
             </div>
-            <div class="flex space-x-2">
-              <p-tag
-                [value]="dimension.orientation"
-                severity="info"
-                styleClass="text-xs"
+
+            <div class="field">
+              <label for="screenHeight" class="font-medium"
+                >Screen Height *</label
               >
-              </p-tag>
-              <button
-                pButton
-                icon="pi pi-trash"
-                class="p-button-rounded p-button-text p-button-danger p-button-sm"
-                (click)="deleteScreenDimension(dimension)"
-              ></button>
+              <p-inputNumber
+                id="screenHeight"
+                formControlName="screenHeight"
+                mode="decimal"
+                [min]="1"
+                class="w-full"
+              >
+              </p-inputNumber>
+            </div>
+
+            <div class="field">
+              <label for="orientation" class="font-medium">Orientation *</label>
+              <p-dropdown
+                appendTo="body"
+                id="orientation"
+                formControlName="orientation"
+                [options]="orientationOptions"
+                placeholder="Select Orientation"
+                class="w-full"
+              >
+              </p-dropdown>
+            </div>
+
+            <div class="field">
+              <label for="refreshRate" class="font-medium"
+                >Refresh Rate (Hz)</label
+              >
+              <p-inputNumber
+                id="refreshRate"
+                formControlName="refreshRate"
+                mode="decimal"
+                [min]="1"
+                [max]="240"
+                class="w-full"
+              >
+              </p-inputNumber>
+            </div>
+
+            <div class="field">
+              <label for="colorDepth" class="font-medium"
+                >Color Depth (bits)</label
+              >
+              <p-inputNumber
+                id="colorDepth"
+                formControlName="colorDepth"
+                mode="decimal"
+                [min]="1"
+                [max]="32"
+                class="w-full"
+              >
+              </p-inputNumber>
+            </div>
+
+            <div class="field">
+              <label for="pixelDensity" class="font-medium"
+                >Pixel Density (DPI)</label
+              >
+              <p-inputNumber
+                id="pixelDensity"
+                formControlName="pixelDensity"
+                mode="decimal"
+                [min]="1"
+                class="w-full"
+              >
+              </p-inputNumber>
             </div>
           </div>
-          <div class="grid grid-cols-3 gap-2 mt-2 text-xs text-gray-600">
-            <div>Refresh: {{ dimension.refreshRate }}Hz</div>
-            <div>Color: {{ dimension.colorDepth }}-bit</div>
-            <div>DPI: {{ dimension.pixelDensity }}</div>
+
+          <!-- Form Actions -->
+          <div class="flex justify-end gap-2 mt-6">
+            <button
+              pButton
+              type="button"
+              label="Cancel"
+              class="p-button-text"
+              (click)="closeTplDialog('displayScreenDimensionDialog')"
+            ></button>
+            <button
+              pButton
+              type="submit"
+              label="Add Dimension"
+              class="p-button-primary"
+              [disabled]="screenDimensionForm.invalid"
+            ></button>
           </div>
-        </div>
+        </form>
       </div>
     </div>
-
-    <!-- Add New Dimension Form -->
-    <h5 class="font-medium text-gray-700 mb-3">Add New Screen Dimension</h5>
-    <form
-      [formGroup]="screenDimensionForm"
-      (ngSubmit)="saveScreenDimension()"
-      class="p-fluid"
-    >
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div class="field">
-          <label for="screenWidth" class="font-medium">Screen Width *</label>
-          <p-inputNumber
-            id="screenWidth"
-            formControlName="screenWidth"
-            mode="decimal"
-            [min]="1"
-            class="w-full"
-          >
-          </p-inputNumber>
-        </div>
-
-        <div class="field">
-          <label for="screenHeight" class="font-medium">Screen Height *</label>
-          <p-inputNumber
-            id="screenHeight"
-            formControlName="screenHeight"
-            mode="decimal"
-            [min]="1"
-            class="w-full"
-          >
-          </p-inputNumber>
-        </div>
-
-        <div class="field">
-          <label for="orientation" class="font-medium">Orientation *</label>
-          <p-dropdown
-            appendTo="body"
-            id="orientation"
-            formControlName="orientation"
-            [options]="orientationOptions"
-            placeholder="Select Orientation"
-            class="w-full"
-          >
-          </p-dropdown>
-        </div>
-
-        <div class="field">
-          <label for="refreshRate" class="font-medium">Refresh Rate (Hz)</label>
-          <p-inputNumber
-            id="refreshRate"
-            formControlName="refreshRate"
-            mode="decimal"
-            [min]="1"
-            [max]="240"
-            class="w-full"
-          >
-          </p-inputNumber>
-        </div>
-
-        <div class="field">
-          <label for="colorDepth" class="font-medium">Color Depth (bits)</label>
-          <p-inputNumber
-            id="colorDepth"
-            formControlName="colorDepth"
-            mode="decimal"
-            [min]="1"
-            [max]="32"
-            class="w-full"
-          >
-          </p-inputNumber>
-        </div>
-
-        <div class="field">
-          <label for="pixelDensity" class="font-medium"
-            >Pixel Density (DPI)</label
-          >
-          <p-inputNumber
-            id="pixelDensity"
-            formControlName="pixelDensity"
-            mode="decimal"
-            [min]="1"
-            class="w-full"
-          >
-          </p-inputNumber>
-        </div>
-      </div>
-
-      <!-- Form Actions -->
-      <div class="flex justify-end gap-2 mt-6">
-        <button
-          pButton
-          type="button"
-          label="Cancel"
-          class="p-button-text"
-          (click)="closeTplDialog('displayScreenDimensionDialog')"
-        ></button>
-        <button
-          pButton
-          type="submit"
-          label="Add Dimension"
-          class="p-button-primary"
-          [disabled]="screenDimensionForm.invalid"
-        ></button>
-      </div>
-    </form>
-    </div>
-  </div>
-</ng-template>
+  </ng-template>
 
   <!-- Sync Dialog -->
-<ng-template #displayDeviceSyncDialogTpl>
-  <div class="dlg-shell">
-    <div class="dlg-header">
-      <div>
-        <h2 class="dlg-title">Sync Devices</h2>
-      </div>
+  <ng-template #displayDeviceSyncDialogTpl>
+    <div class="dlg-shell">
+      <div class="dlg-header">
+        <div>
+          <h2 class="dlg-title">Sync Devices</h2>
+        </div>
         <button
           type="button"
           (click)="closeTplDialog('displayDeviceSyncDialog')"
@@ -2952,86 +2971,87 @@
             ></path>
           </svg>
         </button>
-    </div>
-
-    <div class="dlg-body">
-    <!-- Remove the form tag and use a regular div -->
-    <div class="space-y-4">
-      <!-- Sync Type -->
-      <div>
-        <label class="block text-sm font-medium text-gray-700 mb-1">
-          Sync Type *
-        </label>
-        <p-dropdown
-          appendTo="body"
-          [(ngModel)]="selectedSyncType"
-          [options]="syncOptions"
-          placeholder="Select Sync Type"
-          class="w-full"
-        >
-        </p-dropdown>
-        <small
-          *ngIf="selectedSyncType === 'localToCloud'"
-          class="text-gray-500 block mt-1"
-        >
-          Create devices locally first, then synchronize to Minew cloud
-        </small>
-        <small
-          *ngIf="selectedSyncType === 'cloudToLocal'"
-          class="text-gray-500 block mt-1"
-        >
-          Import devices from Minew cloud to local database
-        </small>
       </div>
 
-      <!-- Store Selection -->
-      <div>
-        <label class="block text-sm font-medium text-gray-700 mb-1">
-          Store *
-        </label>
-        <div class="bg-emerald-50 border border-emerald-200 rounded-lg p-4 mb-4">
-          <div class="flex items-start">
-            <i class="pi pi-info-circle text-emerald-600 mt-1 mr-2"></i>
-            <div>
-              <h5 class="font-medium text-emerald-800">Current Store</h5>
-              <p class="text-emerald-700">{{ getStoreName() }}</p>
+      <div class="dlg-body">
+        <!-- Remove the form tag and use a regular div -->
+        <div class="space-y-4">
+          <!-- Sync Type -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">
+              Sync Type *
+            </label>
+            <p-dropdown
+              appendTo="body"
+              [(ngModel)]="selectedSyncType"
+              [options]="syncOptions"
+              placeholder="Select Sync Type"
+              class="w-full"
+            >
+            </p-dropdown>
+            <small
+              *ngIf="selectedSyncType === 'localToCloud'"
+              class="text-gray-500 block mt-1"
+            >
+              Create devices locally first, then synchronize to Minew cloud
+            </small>
+            <small
+              *ngIf="selectedSyncType === 'cloudToLocal'"
+              class="text-gray-500 block mt-1"
+            >
+              Import devices from Minew cloud to local database
+            </small>
+          </div>
+
+          <!-- Store Selection -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">
+              Store *
+            </label>
+            <div
+              class="bg-emerald-50 border border-emerald-200 rounded-lg p-4 mb-4"
+            >
+              <div class="flex items-start">
+                <i class="pi pi-info-circle text-emerald-600 mt-1 mr-2"></i>
+                <div>
+                  <h5 class="font-medium text-emerald-800">Current Store</h5>
+                  <p class="text-emerald-700">{{ getStoreName() }}</p>
+                </div>
+              </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
 
+      <div class="dlg-footer">
+        <button
+          pButton
+          type="button"
+          label="Cancel"
+          class="p-button-text"
+          (click)="closeTplDialog('displayDeviceSyncDialog')"
+        ></button>
+        <button
+          pButton
+          type="button"
+          class="p-button-primary"
+          (click)="confirmDeviceSync()"
+          [disabled]="loading || !selectedSyncType"
+        >
+          <i *ngIf="loading" class="pi pi-spin pi-spinner mr-2"></i>
+          {{ loading ? "Syncing..." : "Start Sync" }}
+        </button>
+      </div>
     </div>
-
-    <div class="dlg-footer">
-      <button
-        pButton
-        type="button"
-        label="Cancel"
-        class="p-button-text"
-        (click)="closeTplDialog('displayDeviceSyncDialog')"
-      ></button>
-      <button
-        pButton
-        type="button"
-        class="p-button-primary"
-        (click)="confirmDeviceSync()"
-        [disabled]="loading || !selectedSyncType"
-      >
-        <i *ngIf="loading" class="pi pi-spin pi-spinner mr-2"></i>
-        {{ loading ? "Syncing..." : "Start Sync" }}
-      </button>
-    </div>
-  </div>
-</ng-template>
+  </ng-template>
 
   <!-- Template Sync Dialog -->
-<ng-template #displayTemplateSyncDialogTpl>
-  <div class="dlg-shell">
-    <div class="dlg-header">
-      <div>
-        <h2 class="dlg-title">Sync Templates</h2>
-      </div>
+  <ng-template #displayTemplateSyncDialogTpl>
+    <div class="dlg-shell">
+      <div class="dlg-header">
+        <div>
+          <h2 class="dlg-title">Sync Templates</h2>
+        </div>
         <button
           type="button"
           (click)="closeTplDialog('displayTemplateSyncDialog')"
@@ -3052,57 +3072,60 @@
             ></path>
           </svg>
         </button>
-    </div>
+      </div>
 
-    <div class="dlg-body">
-    <div class="p-4">
-      <p class="text-gray-600 mb-4">
-        This will sync templates from the cloud for the current store. Existing
-        templates will be updated and new templates will be added.
-      </p>
+      <div class="dlg-body">
+        <div class="p-4">
+          <p class="text-gray-600 mb-4">
+            This will sync templates from the cloud for the current store.
+            Existing templates will be updated and new templates will be added.
+          </p>
 
-      <div class="bg-emerald-50 border border-emerald-200 rounded-lg p-4 mb-4">
-        <div class="flex items-start">
-          <i class="pi pi-info-circle text-emerald-600 mt-1 mr-2"></i>
-          <div>
-            <h5 class="font-medium text-emerald-800">Current Store</h5>
-            <p class="text-emerald-700">{{ getStoreName() }}</p>
+          <div
+            class="bg-emerald-50 border border-emerald-200 rounded-lg p-4 mb-4"
+          >
+            <div class="flex items-start">
+              <i class="pi pi-info-circle text-emerald-600 mt-1 mr-2"></i>
+              <div>
+                <h5 class="font-medium text-emerald-800">Current Store</h5>
+                <p class="text-emerald-700">{{ getStoreName() }}</p>
+              </div>
+            </div>
           </div>
         </div>
       </div>
-    </div>
 
+      <div class="dlg-footer">
+        <button
+          pButton
+          type="button"
+          label="Cancel"
+          class="p-button-text"
+          (click)="closeTplDialog('displayTemplateSyncDialog')"
+        ></button>
+        <button
+          pButton
+          type="button"
+          class="p-button-primary"
+          (click)="confirmTemplateSync()"
+          [disabled]="syncingTemplates"
+        >
+          <i *ngIf="syncingTemplates" class="pi pi-spin pi-spinner mr-2"></i>
+          {{ syncingTemplates ? "Syncing..." : "Sync Templates" }}
+        </button>
+      </div>
     </div>
-
-    <div class="dlg-footer">
-      <button
-        pButton
-        type="button"
-        label="Cancel"
-        class="p-button-text"
-        (click)="closeTplDialog('displayTemplateSyncDialog')"
-      ></button>
-      <button
-        pButton
-        type="button"
-        class="p-button-primary"
-        (click)="confirmTemplateSync()"
-        [disabled]="syncingTemplates"
-      >
-        <i *ngIf="syncingTemplates" class="pi pi-spin pi-spinner mr-2"></i>
-        {{ syncingTemplates ? "Syncing..." : "Sync Templates" }}
-      </button>
-    </div>
-  </div>
-</ng-template>
+  </ng-template>
 
   <!-- Template Dialog -->
-<ng-template #displayTemplateDialogTpl>
-  <div class="dlg-shell">
-    <div class="dlg-header">
-      <div>
-        <h2 class="dlg-title">{{ isEditMode ? 'Edit Template' : 'Add New Template' }}</h2>
-      </div>
+  <ng-template #displayTemplateDialogTpl>
+    <div class="dlg-shell">
+      <div class="dlg-header">
+        <div>
+          <h2 class="dlg-title">
+            {{ isEditMode ? "Edit Template" : "Add New Template" }}
+          </h2>
+        </div>
         <button
           type="button"
           (click)="closeTplDialog('displayTemplateDialog')"
@@ -3123,167 +3146,169 @@
             ></path>
           </svg>
         </button>
-    </div>
-
-    <div class="dlg-body">
-    <form
-      [formGroup]="templateForm"
-      (ngSubmit)="saveTemplate()"
-      class="p-fluid"
-    >
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div class="space-y-4">
-          <div class="field">
-            <label for="name" class="font-medium">Template Name *</label>
-            <input
-              id="name"
-              pInputText
-              formControlName="name"
-              placeholder="e.g., Price Template"
-              class="w-full"
-              [ngClass]="{
-                'p-invalid':
-                  templateForm.get('name')?.invalid &&
-                  templateForm.get('name')?.touched,
-              }"
-            />
-            <small
-              *ngIf="
-                templateForm.get('name')?.invalid &&
-                templateForm.get('name')?.touched
-              "
-              class="p-error"
-            >
-              Template name is required
-            </small>
-          </div>
-
-          <div class="field">
-            <label for="description" class="font-medium">Description</label>
-            <textarea
-              id="description"
-              pInputTextarea
-              formControlName="description"
-              rows="3"
-              placeholder="Template description..."
-              class="w-full"
-            >
-            </textarea>
-          </div>
-
-          <div class="field">
-            <label for="storeId" class="font-medium">Store ID</label>
-            <input
-              id="storeId"
-              pInputText
-              formControlName="storeId"
-              placeholder="e.g., 1"
-              class="w-full"
-            />
-          </div>
-        </div>
-
-        <div class="space-y-4">
-          <div class="grid grid-cols-2 gap-3">
-            <div class="field">
-              <label for="screenWidth" class="font-medium">Screen Width</label>
-              <p-inputNumber
-                id="screenWidth"
-                formControlName="screenWidth"
-                mode="decimal"
-                [min]="0"
-                class="w-full"
-              >
-              </p-inputNumber>
-            </div>
-
-            <div class="field">
-              <label for="screenHeight" class="font-medium"
-                >Screen Height</label
-              >
-              <p-inputNumber
-                id="screenHeight"
-                formControlName="screenHeight"
-                mode="decimal"
-                [min]="0"
-                class="w-full"
-              >
-              </p-inputNumber>
-            </div>
-          </div>
-
-          <div class="field">
-            <label for="color" class="font-medium">Color</label>
-            <input
-              id="color"
-              pInputText
-              formControlName="color"
-              placeholder="e.g., red, bwry"
-              class="w-full"
-            />
-          </div>
-
-          <div class="field">
-            <label for="orientation" class="font-medium">Orientation</label>
-            <p-inputNumber
-              id="orientation"
-              formControlName="orientation"
-              mode="decimal"
-              [min]="0"
-              [max]="1"
-              class="w-full"
-            >
-              <ng-template pTemplate="suffix"
-                >(0=Portrait, 1=Landscape)</ng-template
-              >
-            </p-inputNumber>
-          </div>
-
-          <div class="field">
-            <div class="flex items-center">
-              <p-checkbox
-                formControlName="isActive"
-                [binary]="true"
-                inputId="templateIsActive"
-              >
-              </p-checkbox>
-              <label for="templateIsActive" class="ml-2 font-medium"
-                >Template is Active</label
-              >
-            </div>
-          </div>
-        </div>
       </div>
 
-      <!-- Form Actions -->
-      <div class="flex justify-end gap-2 mt-6">
-        <button
-          pButton
-          type="button"
-          label="Cancel"
-          class="p-button-text"
-          (click)="closeTplDialog('displayTemplateDialog')"
-        ></button>
-        <button
-          pButton
-          type="submit"
-          [label]="isEditMode ? 'Update Template' : 'Create Template'"
-          class="p-button-primary"
-          [disabled]="templateForm.invalid"
-        ></button>
+      <div class="dlg-body">
+        <form
+          [formGroup]="templateForm"
+          (ngSubmit)="saveTemplate()"
+          class="p-fluid"
+        >
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="space-y-4">
+              <div class="field">
+                <label for="name" class="font-medium">Template Name *</label>
+                <input
+                  id="name"
+                  pInputText
+                  formControlName="name"
+                  placeholder="e.g., Price Template"
+                  class="w-full"
+                  [ngClass]="{
+                    'p-invalid':
+                      templateForm.get('name')?.invalid &&
+                      templateForm.get('name')?.touched,
+                  }"
+                />
+                <small
+                  *ngIf="
+                    templateForm.get('name')?.invalid &&
+                    templateForm.get('name')?.touched
+                  "
+                  class="p-error"
+                >
+                  Template name is required
+                </small>
+              </div>
+
+              <div class="field">
+                <label for="description" class="font-medium">Description</label>
+                <textarea
+                  id="description"
+                  pInputTextarea
+                  formControlName="description"
+                  rows="3"
+                  placeholder="Template description..."
+                  class="w-full"
+                >
+                </textarea>
+              </div>
+
+              <div class="field">
+                <label for="storeId" class="font-medium">Store ID</label>
+                <input
+                  id="storeId"
+                  pInputText
+                  formControlName="storeId"
+                  placeholder="e.g., 1"
+                  class="w-full"
+                />
+              </div>
+            </div>
+
+            <div class="space-y-4">
+              <div class="grid grid-cols-2 gap-3">
+                <div class="field">
+                  <label for="screenWidth" class="font-medium"
+                    >Screen Width</label
+                  >
+                  <p-inputNumber
+                    id="screenWidth"
+                    formControlName="screenWidth"
+                    mode="decimal"
+                    [min]="0"
+                    class="w-full"
+                  >
+                  </p-inputNumber>
+                </div>
+
+                <div class="field">
+                  <label for="screenHeight" class="font-medium"
+                    >Screen Height</label
+                  >
+                  <p-inputNumber
+                    id="screenHeight"
+                    formControlName="screenHeight"
+                    mode="decimal"
+                    [min]="0"
+                    class="w-full"
+                  >
+                  </p-inputNumber>
+                </div>
+              </div>
+
+              <div class="field">
+                <label for="color" class="font-medium">Color</label>
+                <input
+                  id="color"
+                  pInputText
+                  formControlName="color"
+                  placeholder="e.g., red, bwry"
+                  class="w-full"
+                />
+              </div>
+
+              <div class="field">
+                <label for="orientation" class="font-medium">Orientation</label>
+                <p-inputNumber
+                  id="orientation"
+                  formControlName="orientation"
+                  mode="decimal"
+                  [min]="0"
+                  [max]="1"
+                  class="w-full"
+                >
+                  <ng-template pTemplate="suffix"
+                    >(0=Portrait, 1=Landscape)</ng-template
+                  >
+                </p-inputNumber>
+              </div>
+
+              <div class="field">
+                <div class="flex items-center">
+                  <p-checkbox
+                    formControlName="isActive"
+                    [binary]="true"
+                    inputId="templateIsActive"
+                  >
+                  </p-checkbox>
+                  <label for="templateIsActive" class="ml-2 font-medium"
+                    >Template is Active</label
+                  >
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Form Actions -->
+          <div class="flex justify-end gap-2 mt-6">
+            <button
+              pButton
+              type="button"
+              label="Cancel"
+              class="p-button-text"
+              (click)="closeTplDialog('displayTemplateDialog')"
+            ></button>
+            <button
+              pButton
+              type="submit"
+              [label]="isEditMode ? 'Update Template' : 'Create Template'"
+              class="p-button-primary"
+              [disabled]="templateForm.invalid"
+            ></button>
+          </div>
+        </form>
       </div>
-    </form>
     </div>
-  </div>
-</ng-template>
+  </ng-template>
 
   <!-- Combo Dialog -->
-<ng-template #displayComboDialogTpl>
-  <div class="dlg-shell">
-    <div class="dlg-header">
-      <div>
-        <h2 class="dlg-title">Create Device-Template Combo</h2>
-      </div>
+  <ng-template #displayComboDialogTpl>
+    <div class="dlg-shell">
+      <div class="dlg-header">
+        <div>
+          <h2 class="dlg-title">Create Device-Template Combo</h2>
+        </div>
         <button
           type="button"
           (click)="closeTplDialog('displayComboDialog')"
@@ -3304,112 +3329,113 @@
             ></path>
           </svg>
         </button>
-    </div>
+      </div>
 
-    <div class="dlg-body">
-    <form [formGroup]="comboForm" (ngSubmit)="saveCombo()" class="p-fluid">
-      <div class="space-y-4">
-        <div class="field">
-          <label for="deviceId" class="font-medium">Device *</label>
-          <p-dropdown
-            appendTo="body"
-            id="deviceId"
-            formControlName="deviceId"
-            [options]="deviceOptions"
-            placeholder="Select Device"
-            class="w-full"
-            [ngClass]="{
-              'p-invalid':
-                comboForm.get('deviceId')?.invalid &&
-                comboForm.get('deviceId')?.touched,
-            }"
-          >
-          </p-dropdown>
-          <small
-            *ngIf="
-              comboForm.get('deviceId')?.invalid &&
-              comboForm.get('deviceId')?.touched
-            "
-            class="p-error"
-          >
-            Device is required
-          </small>
-        </div>
+      <div class="dlg-body">
+        <form [formGroup]="comboForm" (ngSubmit)="saveCombo()" class="p-fluid">
+          <div class="space-y-4">
+            <div class="field">
+              <label for="deviceId" class="font-medium">Device *</label>
+              <p-dropdown
+                appendTo="body"
+                id="deviceId"
+                formControlName="deviceId"
+                [options]="deviceOptions"
+                placeholder="Select Device"
+                class="w-full"
+                [ngClass]="{
+                  'p-invalid':
+                    comboForm.get('deviceId')?.invalid &&
+                    comboForm.get('deviceId')?.touched,
+                }"
+              >
+              </p-dropdown>
+              <small
+                *ngIf="
+                  comboForm.get('deviceId')?.invalid &&
+                  comboForm.get('deviceId')?.touched
+                "
+                class="p-error"
+              >
+                Device is required
+              </small>
+            </div>
 
-        <div class="field">
-          <label for="templateId" class="font-medium">Template *</label>
-          <p-dropdown
-            appendTo="body"
-            id="templateId"
-            formControlName="templateId"
-            [options]="templateOptions"
-            placeholder="Select Template"
-            class="w-full"
-            [ngClass]="{
-              'p-invalid':
-                comboForm.get('templateId')?.invalid &&
-                comboForm.get('templateId')?.touched,
-            }"
-          >
-          </p-dropdown>
-          <small
-            *ngIf="
-              comboForm.get('templateId')?.invalid &&
-              comboForm.get('templateId')?.touched
-            "
-            class="p-error"
-          >
-            Template is required
-          </small>
-        </div>
+            <div class="field">
+              <label for="templateId" class="font-medium">Template *</label>
+              <p-dropdown
+                appendTo="body"
+                id="templateId"
+                formControlName="templateId"
+                [options]="templateOptions"
+                placeholder="Select Template"
+                class="w-full"
+                [ngClass]="{
+                  'p-invalid':
+                    comboForm.get('templateId')?.invalid &&
+                    comboForm.get('templateId')?.touched,
+                }"
+              >
+              </p-dropdown>
+              <small
+                *ngIf="
+                  comboForm.get('templateId')?.invalid &&
+                  comboForm.get('templateId')?.touched
+                "
+                class="p-error"
+              >
+                Template is required
+              </small>
+            </div>
 
-        <div class="field">
-          <div class="flex items-center">
-            <p-checkbox
-              formControlName="isDefault"
-              [binary]="true"
-              inputId="isDefault"
-            >
-            </p-checkbox>
-            <label for="isDefault" class="ml-2 font-medium"
-              >Set as default combo</label
-            >
+            <div class="field">
+              <div class="flex items-center">
+                <p-checkbox
+                  formControlName="isDefault"
+                  [binary]="true"
+                  inputId="isDefault"
+                >
+                </p-checkbox>
+                <label for="isDefault" class="ml-2 font-medium"
+                  >Set as default combo</label
+                >
+              </div>
+              <small class="text-gray-500"
+                >Default combos are used when no specific combo is
+                assigned</small
+              >
+            </div>
           </div>
-          <small class="text-gray-500"
-            >Default combos are used when no specific combo is assigned</small
-          >
-        </div>
-      </div>
 
-      <!-- Form Actions -->
-      <div class="flex justify-end gap-2 mt-6">
-        <button
-          pButton
-          type="button"
-          label="Cancel"
-          class="p-button-text"
-          (click)="closeTplDialog('displayComboDialog')"
-        ></button>
-        <button
-          pButton
-          type="submit"
-          label="Create Combo"
-          class="p-button-primary"
-          [disabled]="comboForm.invalid"
-        ></button>
+          <!-- Form Actions -->
+          <div class="flex justify-end gap-2 mt-6">
+            <button
+              pButton
+              type="button"
+              label="Cancel"
+              class="p-button-text"
+              (click)="closeTplDialog('displayComboDialog')"
+            ></button>
+            <button
+              pButton
+              type="submit"
+              label="Create Combo"
+              class="p-button-primary"
+              [disabled]="comboForm.invalid"
+            ></button>
+          </div>
+        </form>
       </div>
-    </form>
     </div>
-  </div>
-</ng-template>
+  </ng-template>
 
   <!-- Assignment Dialog -->
-<ng-template #displayAssignmentDialogTpl>
-  <div class="dlg-shell">
-    <div class="dlg-header">
-      <div>
-        <h2 class="dlg-title">Create Assignment</h2>
-      </div>
+  <ng-template #displayAssignmentDialogTpl>
+    <div class="dlg-shell">
+      <div class="dlg-header">
+        <div>
+          <h2 class="dlg-title">Create Assignment</h2>
+        </div>
         <button
           type="button"
           (click)="closeTplDialog('displayAssignmentDialog')"
@@ -3430,162 +3456,168 @@
             ></path>
           </svg>
         </button>
-    </div>
+      </div>
 
-    <div class="dlg-body">
-    <form
-      [formGroup]="assignmentForm"
-      (ngSubmit)="saveAssignment()"
-      class="p-fluid"
-    >
-      <div class="space-y-4">
-        <div class="field">
-          <label for="comboId" class="font-medium">Combo *</label>
-          <p-dropdown
-            appendTo="body"
-            id="comboId"
-            formControlName="comboId"
-            [options]="comboOptions"
-            placeholder="Select Combo"
-            class="w-full"
-            [ngClass]="{
-              'p-invalid':
-                assignmentForm.get('comboId')?.invalid &&
-                assignmentForm.get('comboId')?.touched,
-            }"
-          >
-          </p-dropdown>
-          <small
-            *ngIf="
-              assignmentForm.get('comboId')?.invalid &&
-              assignmentForm.get('comboId')?.touched
-            "
-            class="p-error"
-          >
-            Combo is required
-          </small>
-        </div>
-
-        <!-- Location Type -->
-        <div>
-          <label for="locationType" class="font-medium">Location Type *</label>
-          <p-dropdown
-            appendTo="body"
-            id="locationType"
-            formControlName="locationType"
-            [options]="locationTypeOptions"
-            placeholder="Select Location Type"
-            class="w-full"
-            (onChange)="onLocationTypeChange()"
-            [ngClass]="{
-              'p-invalid':
-                assignmentForm.get('locationType')?.invalid &&
-                assignmentForm.get('locationType')?.touched,
-            }"
-          >
-          </p-dropdown>
-          <small
-            *ngIf="
-              assignmentForm.get('locationType')?.invalid &&
-              assignmentForm.get('locationType')?.touched
-            "
-            class="p-error"
-          >
-            Location type is required
-          </small>
-        </div>
-
-        <!-- Location Selection (Product or Shelf) -->
-        <div
-          *ngIf="
-            assignmentForm.get('locationType')?.value &&
-            assignmentForm.get('locationType')?.value !== 'Store'
-          "
+      <div class="dlg-body">
+        <form
+          [formGroup]="assignmentForm"
+          (ngSubmit)="saveAssignment()"
+          class="p-fluid"
         >
-          <label class="block text-sm font-medium text-gray-700 mb-2">
-            <i
-              class="pi pi-box mr-2"
-              *ngIf="assignmentForm.get('locationType')?.value === 'Product'"
-            ></i>
-            <i
-              class="pi pi-shelf mr-2"
-              *ngIf="assignmentForm.get('locationType')?.value === 'Shelf'"
-            ></i>
-            {{ getLocationLabel() }} *
-          </label>
-          <!-- Product Dropdown -->
-          <div *ngIf="assignmentForm.get('locationType')?.value === 'Product'">
-            <p-dropdown
-              appendTo="body"
-              formControlName="locationId"
-              [options]="products"
-              optionLabel="productName"
-              optionValue="id"
-              placeholder="Select a product"
-              [showClear]="true"
-              [loading]="loadingProducts"
-              [virtualScroll]="true"
-              [virtualScrollItemSize]="52"
-              filterBy="productName,productCode"
-              (onFilter)="onProductSearch($event)"
-              (onShow)="loadProducts()"
-              styleClass="w-full"
-              [ngClass]="{
-                'p-invalid':
-                  assignmentForm.get('locationId')?.invalid &&
-                  assignmentForm.get('locationId')?.touched,
-              }"
+          <div class="space-y-4">
+            <div class="field">
+              <label for="comboId" class="font-medium">Combo *</label>
+              <p-dropdown
+                appendTo="body"
+                id="comboId"
+                formControlName="comboId"
+                [options]="comboOptions"
+                placeholder="Select Combo"
+                class="w-full"
+                [ngClass]="{
+                  'p-invalid':
+                    assignmentForm.get('comboId')?.invalid &&
+                    assignmentForm.get('comboId')?.touched,
+                }"
+              >
+              </p-dropdown>
+              <small
+                *ngIf="
+                  assignmentForm.get('comboId')?.invalid &&
+                  assignmentForm.get('comboId')?.touched
+                "
+                class="p-error"
+              >
+                Combo is required
+              </small>
+            </div>
+
+            <!-- Location Type -->
+            <div>
+              <label for="locationType" class="font-medium"
+                >Location Type *</label
+              >
+              <p-dropdown
+                appendTo="body"
+                id="locationType"
+                formControlName="locationType"
+                [options]="locationTypeOptions"
+                placeholder="Select Location Type"
+                class="w-full"
+                (onChange)="onLocationTypeChange()"
+                [ngClass]="{
+                  'p-invalid':
+                    assignmentForm.get('locationType')?.invalid &&
+                    assignmentForm.get('locationType')?.touched,
+                }"
+              >
+              </p-dropdown>
+              <small
+                *ngIf="
+                  assignmentForm.get('locationType')?.invalid &&
+                  assignmentForm.get('locationType')?.touched
+                "
+                class="p-error"
+              >
+                Location type is required
+              </small>
+            </div>
+
+            <!-- Location Selection (Product or Shelf) -->
+            <div
+              *ngIf="
+                assignmentForm.get('locationType')?.value &&
+                assignmentForm.get('locationType')?.value !== 'Store'
+              "
             >
-              <ng-template pTemplate="header">
-                <div class="p-3 border-b">
-                  <div class="flex justify-between items-center">
-                    <div class="text-sm font-semibold text-gray-700">
-                      Products
-                      <span class="text-gray-500 text-xs ml-2">
-                        ({{ products.length }} loaded)
-                      </span>
+              <label class="block text-sm font-medium text-gray-700 mb-2">
+                <i
+                  class="pi pi-box mr-2"
+                  *ngIf="
+                    assignmentForm.get('locationType')?.value === 'Product'
+                  "
+                ></i>
+                <i
+                  class="pi pi-shelf mr-2"
+                  *ngIf="assignmentForm.get('locationType')?.value === 'Shelf'"
+                ></i>
+                {{ getLocationLabel() }} *
+              </label>
+              <!-- Product Dropdown -->
+              <div
+                *ngIf="assignmentForm.get('locationType')?.value === 'Product'"
+              >
+                <p-dropdown
+                  appendTo="body"
+                  formControlName="locationId"
+                  [options]="products"
+                  optionLabel="productName"
+                  optionValue="id"
+                  placeholder="Select a product"
+                  [showClear]="true"
+                  [loading]="loadingProducts"
+                  [virtualScroll]="true"
+                  [virtualScrollItemSize]="52"
+                  filterBy="productName,productCode"
+                  (onFilter)="onProductSearch($event)"
+                  (onShow)="loadProducts()"
+                  styleClass="w-full"
+                  [ngClass]="{
+                    'p-invalid':
+                      assignmentForm.get('locationId')?.invalid &&
+                      assignmentForm.get('locationId')?.touched,
+                  }"
+                >
+                  <ng-template pTemplate="header">
+                    <div class="p-3 border-b">
+                      <div class="flex justify-between items-center">
+                        <div class="text-sm font-semibold text-gray-700">
+                          Products
+                          <span class="text-gray-500 text-xs ml-2">
+                            ({{ products.length }} loaded)
+                          </span>
+                        </div>
+                        <div class="flex gap-2">
+                          <p-button
+                            icon="pi pi-arrow-left"
+                            size="small"
+                            [text]="true"
+                            [disabled]="productCurrentPage === 1"
+                            (onClick)="loadPreviousProducts()"
+                            pTooltip="Previous"
+                          ></p-button>
+                          <p-button
+                            icon="pi pi-arrow-right"
+                            size="small"
+                            [text]="true"
+                            [disabled]="!hasMoreProducts"
+                            (onClick)="loadMoreProducts()"
+                            pTooltip="Next"
+                          ></p-button>
+                        </div>
+                      </div>
                     </div>
-                    <div class="flex gap-2">
-                      <p-button
-                        icon="pi pi-arrow-left"
-                        size="small"
-                        [text]="true"
-                        [disabled]="productCurrentPage === 1"
-                        (onClick)="loadPreviousProducts()"
-                        pTooltip="Previous"
-                      ></p-button>
-                      <p-button
-                        icon="pi pi-arrow-right"
-                        size="small"
-                        [text]="true"
-                        [disabled]="!hasMoreProducts"
-                        (onClick)="loadMoreProducts()"
-                        pTooltip="Next"
-                      ></p-button>
-                    </div>
-                  </div>
-                </div>
-              </ng-template>
+                  </ng-template>
 
-              <ng-template pTemplate="item" let-product>
-                <div class="flex items-center p-2 hover:bg-gray-50">
-                  <div
-                    class="w-8 h-8 bg-emerald-100 rounded flex items-center justify-center mr-3"
-                  >
-                    <i class="pi pi-box text-emerald-700"></i>
-                  </div>
-                  <div class="flex-1 min-w-0">
-                    <div class="font-medium truncate">
-                      {{ product.productName }}
+                  <ng-template pTemplate="item" let-product>
+                    <div class="flex items-center p-2 hover:bg-gray-50">
+                      <div
+                        class="w-8 h-8 bg-emerald-100 rounded flex items-center justify-center mr-3"
+                      >
+                        <i class="pi pi-box text-emerald-700"></i>
+                      </div>
+                      <div class="flex-1 min-w-0">
+                        <div class="font-medium truncate">
+                          {{ product.productName }}
+                        </div>
+                        <div class="text-xs text-gray-500 truncate">
+                          {{ product.productCode }} • {{ product.categoryName }}
+                        </div>
+                      </div>
                     </div>
-                    <div class="text-xs text-gray-500 truncate">
-                      {{ product.productCode }} • {{ product.categoryName }}
-                    </div>
-                  </div>
-                </div>
-              </ng-template>
+                  </ng-template>
 
-              <!-- <ng-template pTemplate="emptymessage">
+                  <!-- <ng-template pTemplate="emptymessage">
                 <div class="text-center py-4">
                   <i class="pi pi-search text-gray-300 text-2xl mb-2"></i>
                   <p class="text-gray-500">No products found</p>
@@ -3595,110 +3627,112 @@
                 </div>
               </ng-template> -->
 
-              <ng-template pTemplate="footer">
-                <div class="p-3 border-t">
-                  <div class="flex justify-between items-center">
-                    <span class="text-xs text-gray-500">
-                      Page {{ productCurrentPage }} •
-                      {{ products.length }} products
-                    </span>
-                    <div class="flex gap-2">
-                      <p-button
-                        *ngIf="productCurrentPage > 1"
-                        label="Previous"
-                        icon="pi pi-arrow-left"
-                        size="small"
-                        [text]="true"
-                        (onClick)="loadPreviousProducts()"
-                      ></p-button>
-                      <p-button
-                        *ngIf="hasMoreProducts"
-                        label="Load More"
-                        icon="pi pi-arrow-down"
-                        size="small"
-                        [text]="true"
-                        [loading]="loadingMoreProducts"
-                        (onClick)="loadMoreProducts()"
-                      ></p-button>
+                  <ng-template pTemplate="footer">
+                    <div class="p-3 border-t">
+                      <div class="flex justify-between items-center">
+                        <span class="text-xs text-gray-500">
+                          Page {{ productCurrentPage }} •
+                          {{ products.length }} products
+                        </span>
+                        <div class="flex gap-2">
+                          <p-button
+                            *ngIf="productCurrentPage > 1"
+                            label="Previous"
+                            icon="pi pi-arrow-left"
+                            size="small"
+                            [text]="true"
+                            (onClick)="loadPreviousProducts()"
+                          ></p-button>
+                          <p-button
+                            *ngIf="hasMoreProducts"
+                            label="Load More"
+                            icon="pi pi-arrow-down"
+                            size="small"
+                            [text]="true"
+                            [loading]="loadingMoreProducts"
+                            (onClick)="loadMoreProducts()"
+                          ></p-button>
+                        </div>
+                      </div>
                     </div>
-                  </div>
-                </div>
-              </ng-template>
-            </p-dropdown>
-          </div>
+                  </ng-template>
+                </p-dropdown>
+              </div>
 
-          <!-- Shelf Dropdown -->
-          <div *ngIf="assignmentForm.get('locationType')?.value === 'Shelf'">
-            <p-dropdown
-              appendTo="body"
-              formControlName="locationId"
-              [options]="shelves"
-              optionLabel="name"
-              optionValue="id"
-              placeholder="Select a shelf"
-              [showClear]="true"
-              [loading]="loadingShelves"
-              [virtualScroll]="true"
-              [virtualScrollItemSize]="52"
-              filterBy="name,location"
-              (onFilter)="onShelfSearch($event)"
-              (onShow)="loadShelves()"
-              styleClass="w-full"
-              [ngClass]="{
-                'p-invalid':
-                  assignmentForm.get('locationId')?.invalid &&
-                  assignmentForm.get('locationId')?.touched,
-              }"
-            >
-              <ng-template pTemplate="header">
-                <div class="p-3 border-b">
-                  <div class="flex justify-between items-center">
-                    <div class="text-sm font-semibold text-gray-700">
-                      Shelves
-                      <span class="text-gray-500 text-xs ml-2">
-                        ({{ shelves.length }} loaded)
-                      </span>
+              <!-- Shelf Dropdown -->
+              <div
+                *ngIf="assignmentForm.get('locationType')?.value === 'Shelf'"
+              >
+                <p-dropdown
+                  appendTo="body"
+                  formControlName="locationId"
+                  [options]="shelves"
+                  optionLabel="name"
+                  optionValue="id"
+                  placeholder="Select a shelf"
+                  [showClear]="true"
+                  [loading]="loadingShelves"
+                  [virtualScroll]="true"
+                  [virtualScrollItemSize]="52"
+                  filterBy="name,location"
+                  (onFilter)="onShelfSearch($event)"
+                  (onShow)="loadShelves()"
+                  styleClass="w-full"
+                  [ngClass]="{
+                    'p-invalid':
+                      assignmentForm.get('locationId')?.invalid &&
+                      assignmentForm.get('locationId')?.touched,
+                  }"
+                >
+                  <ng-template pTemplate="header">
+                    <div class="p-3 border-b">
+                      <div class="flex justify-between items-center">
+                        <div class="text-sm font-semibold text-gray-700">
+                          Shelves
+                          <span class="text-gray-500 text-xs ml-2">
+                            ({{ shelves.length }} loaded)
+                          </span>
+                        </div>
+                        <div class="flex gap-2">
+                          <p-button
+                            icon="pi pi-arrow-left"
+                            size="small"
+                            [text]="true"
+                            [disabled]="shelfCurrentPage === 1"
+                            (onClick)="loadPreviousShelves()"
+                            pTooltip="Previous"
+                          ></p-button>
+                          <p-button
+                            icon="pi pi-arrow-right"
+                            size="small"
+                            [text]="true"
+                            [disabled]="!hasMoreShelves"
+                            (onClick)="loadMoreShelves()"
+                            pTooltip="Next"
+                          ></p-button>
+                        </div>
+                      </div>
                     </div>
-                    <div class="flex gap-2">
-                      <p-button
-                        icon="pi pi-arrow-left"
-                        size="small"
-                        [text]="true"
-                        [disabled]="shelfCurrentPage === 1"
-                        (onClick)="loadPreviousShelves()"
-                        pTooltip="Previous"
-                      ></p-button>
-                      <p-button
-                        icon="pi pi-arrow-right"
-                        size="small"
-                        [text]="true"
-                        [disabled]="!hasMoreShelves"
-                        (onClick)="loadMoreShelves()"
-                        pTooltip="Next"
-                      ></p-button>
-                    </div>
-                  </div>
-                </div>
-              </ng-template>
+                  </ng-template>
 
-              <ng-template pTemplate="item" let-shelf>
-                <div class="flex items-center p-2 hover:bg-gray-50">
-                  <div
-                    class="w-8 h-8 bg-green-100 rounded flex items-center justify-center mr-3"
-                  >
-                    <i class="pi pi-shelf text-green-600"></i>
-                  </div>
-                  <div class="flex-1 min-w-0">
-                    <div class="font-medium truncate">{{ shelf.name }}</div>
-                    <div class="text-xs text-gray-500 truncate">
-                      {{ shelf.location }} • Aisle:
-                      {{ shelf.aisleName || "N/A" }}
+                  <ng-template pTemplate="item" let-shelf>
+                    <div class="flex items-center p-2 hover:bg-gray-50">
+                      <div
+                        class="w-8 h-8 bg-green-100 rounded flex items-center justify-center mr-3"
+                      >
+                        <i class="pi pi-shelf text-green-600"></i>
+                      </div>
+                      <div class="flex-1 min-w-0">
+                        <div class="font-medium truncate">{{ shelf.name }}</div>
+                        <div class="text-xs text-gray-500 truncate">
+                          {{ shelf.location }} • Aisle:
+                          {{ shelf.aisleName || "N/A" }}
+                        </div>
+                      </div>
                     </div>
-                  </div>
-                </div>
-              </ng-template>
+                  </ng-template>
 
-              <!-- <ng-template pTemplate="emptymessage">
+                  <!-- <ng-template pTemplate="emptymessage">
                 <div class="text-center py-4">
                   <i class="pi pi-search text-gray-300 text-2xl mb-2"></i>
                   <p class="text-gray-500">No shelves found</p>
@@ -3708,39 +3742,40 @@
                 </div>
               </ng-template> -->
 
-              <ng-template pTemplate="footer">
-                <div class="p-3 border-t">
-                  <div class="flex justify-between items-center">
-                    <span class="text-xs text-gray-500">
-                      Page {{ shelfCurrentPage }} • {{ shelves.length }} shelves
-                    </span>
-                    <div class="flex gap-2">
-                      <p-button
-                        *ngIf="shelfCurrentPage > 1"
-                        label="Previous"
-                        icon="pi pi-arrow-left"
-                        size="small"
-                        [text]="true"
-                        (onClick)="loadPreviousShelves()"
-                      ></p-button>
-                      <p-button
-                        *ngIf="hasMoreShelves"
-                        label="Load More"
-                        icon="pi pi-arrow-down"
-                        size="small"
-                        [text]="true"
-                        [loading]="loadingMoreShelves"
-                        (onClick)="loadMoreShelves()"
-                      ></p-button>
+                  <ng-template pTemplate="footer">
+                    <div class="p-3 border-t">
+                      <div class="flex justify-between items-center">
+                        <span class="text-xs text-gray-500">
+                          Page {{ shelfCurrentPage }} •
+                          {{ shelves.length }} shelves
+                        </span>
+                        <div class="flex gap-2">
+                          <p-button
+                            *ngIf="shelfCurrentPage > 1"
+                            label="Previous"
+                            icon="pi pi-arrow-left"
+                            size="small"
+                            [text]="true"
+                            (onClick)="loadPreviousShelves()"
+                          ></p-button>
+                          <p-button
+                            *ngIf="hasMoreShelves"
+                            label="Load More"
+                            icon="pi pi-arrow-down"
+                            size="small"
+                            [text]="true"
+                            [loading]="loadingMoreShelves"
+                            (onClick)="loadMoreShelves()"
+                          ></p-button>
+                        </div>
+                      </div>
                     </div>
-                  </div>
-                </div>
-              </ng-template>
-            </p-dropdown>
-          </div>
-        </div>
+                  </ng-template>
+                </p-dropdown>
+              </div>
+            </div>
 
-        <!-- <div class="field">
+            <!-- <div class="field">
           <label for="locationId" class="font-medium">Location ID *</label>
           <p-inputNumber
             id="locationId"
@@ -3769,65 +3804,67 @@
           >
         </div> -->
 
-        <div class="field">
-          <label for="displayOrder" class="font-medium">Display Order</label>
-          <p-inputNumber
-            id="displayOrder"
-            formControlName="displayOrder"
-            mode="decimal"
-            [min]="0"
-            class="w-full"
-          >
-          </p-inputNumber>
-          <small class="text-gray-500"
-            >Order in which assignments are displayed (0 = first)</small
-          >
-        </div>
+            <div class="field">
+              <label for="displayOrder" class="font-medium"
+                >Display Order</label
+              >
+              <p-inputNumber
+                id="displayOrder"
+                formControlName="displayOrder"
+                mode="decimal"
+                [min]="0"
+                class="w-full"
+              >
+              </p-inputNumber>
+              <small class="text-gray-500"
+                >Order in which assignments are displayed (0 = first)</small
+              >
+            </div>
 
-        <div class="field">
-          <div class="flex items-center">
-            <p-checkbox
-              formControlName="isActive"
-              [binary]="true"
-              inputId="assignmentIsActive"
-            >
-            </p-checkbox>
-            <label for="assignmentIsActive" class="ml-2 font-medium"
-              >Assignment is Active</label
-            >
+            <div class="field">
+              <div class="flex items-center">
+                <p-checkbox
+                  formControlName="isActive"
+                  [binary]="true"
+                  inputId="assignmentIsActive"
+                >
+                </p-checkbox>
+                <label for="assignmentIsActive" class="ml-2 font-medium"
+                  >Assignment is Active</label
+                >
+              </div>
+            </div>
           </div>
-        </div>
-      </div>
 
-      <!-- Form Actions -->
-      <div class="flex justify-end gap-2 mt-6">
-        <button
-          pButton
-          type="button"
-          label="Cancel"
-          class="p-button-text"
-          (click)="closeTplDialog('displayAssignmentDialog')"
-        ></button>
-        <button
-          pButton
-          type="submit"
-          label="Create Assignment"
-          class="p-button-primary"
-          [disabled]="assignmentForm.invalid"
-        ></button>
+          <!-- Form Actions -->
+          <div class="flex justify-end gap-2 mt-6">
+            <button
+              pButton
+              type="button"
+              label="Cancel"
+              class="p-button-text"
+              (click)="closeTplDialog('displayAssignmentDialog')"
+            ></button>
+            <button
+              pButton
+              type="submit"
+              label="Create Assignment"
+              class="p-button-primary"
+              [disabled]="assignmentForm.invalid"
+            ></button>
+          </div>
+        </form>
       </div>
-    </form>
     </div>
-  </div>
-</ng-template>
+  </ng-template>
 
   <!-- Template Preview Dialog -->
-<ng-template #displayTemplatePreviewDialogTpl>
-  <div class="dlg-shell">
-    <div class="dlg-header">
-      <div>
-        <h2 class="dlg-title">Template Preview</h2>
-      </div>
+  <ng-template #displayTemplatePreviewDialogTpl>
+    <div class="dlg-shell">
+      <div class="dlg-header">
+        <div>
+          <h2 class="dlg-title">Template Preview</h2>
+        </div>
         <button
           type="button"
           (click)="closeTemplatePreview()"
@@ -3848,127 +3885,135 @@
             ></path>
           </svg>
         </button>
-    </div>
-
-    <div class="dlg-body">
-    <div *ngIf="selectedTemplateForPreview" class="space-y-4">
-      <!-- Template Information -->
-      <div class="bg-emerald-50 border border-emerald-200 rounded-lg p-4">
-        <div class="flex justify-between items-start">
-          <div>
-            <h4 class="font-semibold text-lg text-gray-900">
-              {{ selectedTemplateForPreview.name }}
-            </h4>
-            <p class="text-sm text-gray-600 mt-1">
-              {{ selectedTemplateForPreview.description || "No description" }}
-            </p>
-          </div>
-          <p-tag
-            [value]="
-              selectedTemplateForPreview.isActive ? 'Active' : 'Inactive'
-            "
-            [severity]="
-              selectedTemplateForPreview.isActive ? 'success' : 'danger'
-            "
-            [rounded]="true"
-          >
-          </p-tag>
-        </div>
-
-        <div class="grid grid-cols-2 gap-2 mt-3 text-sm">
-          <div class="flex items-center">
-            <i class="pi pi-desktop mr-2 text-emerald-600"></i>
-            <span class="text-gray-700"
-              >Screen: {{ getTemplateInfo(selectedTemplateForPreview) }}</span
-            >
-          </div>
-          <div class="flex items-center">
-            <i class="pi pi-store mr-2 text-emerald-600"></i>
-            <span class="text-gray-700">Store: {{ getStoreName() }}</span>
-          </div>
-        </div>
       </div>
 
-      <!-- Preview Area -->
-      <div class="border border-gray-300 rounded-lg p-6 bg-gray-50">
-        <div class="text-center">
-          <!-- Loading State -->
-          <div *ngIf="isLoadingPreview" class="py-12">
-            <p-progressSpinner
-              styleClass="w-8 h-8"
-              strokeWidth="4"
-              animationDuration=".5s"
-            >
-            </p-progressSpinner>
-            <p class="text-gray-600 mt-3">Loading preview...</p>
-          </div>
-
-          <!-- Preview Image -->
-          <div
-            *ngIf="!isLoadingPreview && templatePreviewImage"
-            class="space-y-4"
-          >
-            <div
-              class="inline-block p-4 bg-white rounded-lg shadow-sm border border-gray-200"
-            >
-              <img
-                [src]="'data:image/png;base64,' + templatePreviewImage"
-                [alt]="selectedTemplateForPreview.name + ' preview'"
-                class="max-w-full h-auto rounded border border-gray-300"
-                style="max-height: 400px"
-              />
+      <div class="dlg-body">
+        <div *ngIf="selectedTemplateForPreview" class="space-y-4">
+          <!-- Template Information -->
+          <div class="bg-emerald-50 border border-emerald-200 rounded-lg p-4">
+            <div class="flex justify-between items-start">
+              <div>
+                <h4 class="font-semibold text-lg text-gray-900">
+                  {{ selectedTemplateForPreview.name }}
+                </h4>
+                <p class="text-sm text-gray-600 mt-1">
+                  {{
+                    selectedTemplateForPreview.description || "No description"
+                  }}
+                </p>
+              </div>
+              <p-tag
+                [value]="
+                  selectedTemplateForPreview.isActive ? 'Active' : 'Inactive'
+                "
+                [severity]="
+                  selectedTemplateForPreview.isActive ? 'success' : 'danger'
+                "
+                [rounded]="true"
+              >
+              </p-tag>
             </div>
-            <p class="text-sm text-gray-500">
-              Template preview generated from design
-            </p>
+
+            <div class="grid grid-cols-2 gap-2 mt-3 text-sm">
+              <div class="flex items-center">
+                <i class="pi pi-desktop mr-2 text-emerald-600"></i>
+                <span class="text-gray-700"
+                  >Screen:
+                  {{ getTemplateInfo(selectedTemplateForPreview) }}</span
+                >
+              </div>
+              <div class="flex items-center">
+                <i class="pi pi-store mr-2 text-emerald-600"></i>
+                <span class="text-gray-700">Store: {{ getStoreName() }}</span>
+              </div>
+            </div>
           </div>
 
-          <!-- No Preview Available -->
-          <div *ngIf="!isLoadingPreview && !templatePreviewImage" class="py-12">
-            <i class="pi pi-image text-5xl text-gray-300 mb-3"></i>
-            <h5 class="text-lg font-medium text-gray-600 mb-2">
-              No Preview Available
-            </h5>
-            <p class="text-gray-500">
-              This template doesn't have a preview image yet.
-            </p>
-            <p class="text-sm text-gray-400 mt-2">
-              Try syncing templates from cloud or contact administrator.
-            </p>
+          <!-- Preview Area -->
+          <div class="border border-gray-300 rounded-lg p-6 bg-gray-50">
+            <div class="text-center">
+              <!-- Loading State -->
+              <div *ngIf="isLoadingPreview" class="py-12">
+                <p-progressSpinner
+                  styleClass="w-8 h-8"
+                  strokeWidth="4"
+                  animationDuration=".5s"
+                >
+                </p-progressSpinner>
+                <p class="text-gray-600 mt-3">Loading preview...</p>
+              </div>
+
+              <!-- Preview Image -->
+              <div
+                *ngIf="!isLoadingPreview && templatePreviewImage"
+                class="space-y-4"
+              >
+                <div
+                  class="inline-block p-4 bg-white rounded-lg shadow-sm border border-gray-200 ds-card"
+                >
+                  <img
+                    [src]="'data:image/png;base64,' + templatePreviewImage"
+                    [alt]="selectedTemplateForPreview.name + ' preview'"
+                    class="max-w-full h-auto rounded border border-gray-300"
+                    style="max-height: 400px"
+                  />
+                </div>
+                <p class="text-sm text-gray-500">
+                  Template preview generated from design
+                </p>
+              </div>
+
+              <!-- No Preview Available -->
+              <div
+                *ngIf="!isLoadingPreview && !templatePreviewImage"
+                class="py-12"
+              >
+                <i class="pi pi-image text-5xl text-gray-300 mb-3"></i>
+                <h5 class="text-lg font-medium text-gray-600 mb-2">
+                  No Preview Available
+                </h5>
+                <p class="text-gray-500">
+                  This template doesn't have a preview image yet.
+                </p>
+                <p class="text-sm text-gray-400 mt-2">
+                  Try syncing templates from cloud or contact administrator.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Action Buttons -->
+          <div
+            class="flex justify-between items-center pt-4 border-t border-gray-200"
+          >
+            <div class="text-sm text-gray-500">
+              <i class="pi pi-info-circle mr-1"></i>
+              Preview shows how this template will appear on ESL devices
+            </div>
+            <div class="flex space-x-2">
+              <button
+                pButton
+                icon="pi pi-times"
+                label="Close"
+                class="p-button-text"
+                (click)="closeTemplatePreview()"
+              ></button>
+            </div>
           </div>
         </div>
       </div>
-
-      <!-- Action Buttons -->
-      <div
-        class="flex justify-between items-center pt-4 border-t border-gray-200"
-      >
-        <div class="text-sm text-gray-500">
-          <i class="pi pi-info-circle mr-1"></i>
-          Preview shows how this template will appear on ESL devices
-        </div>
-        <div class="flex space-x-2">
-          <button
-            pButton
-            icon="pi pi-times"
-            label="Close"
-            class="p-button-text"
-            (click)="closeTemplatePreview()"
-          ></button>
-        </div>
-      </div>
     </div>
-    </div>
-  </div>
-</ng-template>
+  </ng-template>
 
   <!-- Gateway Dialog -->
-<ng-template #displayGatewayDialogTpl>
-  <div class="dlg-shell">
-    <div class="dlg-header">
-      <div>
-        <h2 class="dlg-title">{{ isEditMode ? 'Edit Gateway' : 'Add New Gateway' }}</h2>
-      </div>
+  <ng-template #displayGatewayDialogTpl>
+    <div class="dlg-shell">
+      <div class="dlg-header">
+        <div>
+          <h2 class="dlg-title">
+            {{ isEditMode ? "Edit Gateway" : "Add New Gateway" }}
+          </h2>
+        </div>
         <button
           type="button"
           (click)="closeTplDialog('displayGatewayDialog')"
@@ -3989,182 +4034,190 @@
             ></path>
           </svg>
         </button>
-    </div>
-
-    <div class="dlg-body">
-    <form [formGroup]="gatewayForm" (ngSubmit)="saveGateway()" class="p-fluid">
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div class="space-y-4">
-          <div class="field">
-            <label for="name" class="font-medium">Gateway Name *</label>
-            <input
-              id="name"
-              pInputText
-              formControlName="name"
-              placeholder="e.g., Store Gateway"
-              class="w-full"
-              [ngClass]="{
-                'p-invalid':
-                  gatewayForm.get('name')?.invalid &&
-                  gatewayForm.get('name')?.touched,
-              }"
-            />
-            <small
-              *ngIf="
-                gatewayForm.get('name')?.invalid &&
-                gatewayForm.get('name')?.touched
-              "
-              class="p-error"
-            >
-              Gateway name is required
-            </small>
-          </div>
-
-          <div class="field">
-            <label for="macAddress" class="font-medium">MAC Address *</label>
-            <input
-              id="macAddress"
-              pInputText
-              formControlName="macAddress"
-              placeholder="e.g., e1000005e79d or 00:1A:2B:3C:4D:5E"
-              class="w-full"
-              [ngClass]="{
-                'p-invalid':
-                  gatewayForm.get('macAddress')?.invalid &&
-                  gatewayForm.get('macAddress')?.touched,
-              }"
-            />
-            <small
-              *ngIf="
-                gatewayForm.get('macAddress')?.invalid &&
-                gatewayForm.get('macAddress')?.touched
-              "
-              class="p-error"
-            >
-              Valid MAC address is required
-            </small>
-          </div>
-
-          <div class="field">
-            <label for="storeId" class="font-medium">Store *</label>
-            <p-dropdown
-              appendTo="body"
-              id="storeId"
-              formControlName="storeId"
-              [options]="storeOptions"
-              optionLabel="label"
-              optionValue="value"
-              placeholder="Select Store"
-              class="w-full"
-              [ngClass]="{
-                'p-invalid':
-                  gatewayForm.get('storeId')?.invalid &&
-                  gatewayForm.get('storeId')?.touched,
-              }"
-            >
-            </p-dropdown>
-            <small
-              *ngIf="
-                gatewayForm.get('storeId')?.invalid &&
-                gatewayForm.get('storeId')?.touched
-              "
-              class="p-error"
-            >
-              Store is required
-            </small>
-          </div>
-
-          <div class="field">
-            <label for="gatewayType" class="font-medium">Gateway Type</label>
-            <p-dropdown
-              appendTo="body"
-              id="gatewayType"
-              formControlName="gatewayType"
-              [options]="gatewayTypeOptions"
-              placeholder="Select Type"
-              class="w-full"
-            >
-            </p-dropdown>
-          </div>
-        </div>
-
-        <div class="space-y-4">
-          <div class="field">
-            <label for="description" class="font-medium">Description</label>
-            <textarea
-              id="description"
-              pInputTextarea
-              formControlName="description"
-              rows="3"
-              placeholder="Gateway description..."
-              class="w-full"
-            >
-            </textarea>
-          </div>
-
-          <div class="grid grid-cols-2 gap-3">
-            <div class="field">
-              <label for="hardwareVersion" class="font-medium"
-                >Hardware Version</label
-              >
-              <input
-                id="hardwareVersion"
-                pInputText
-                formControlName="hardwareVersion"
-                placeholder="e.g., v1.0"
-                class="w-full"
-              />
-            </div>
-
-            <div class="field">
-              <label for="firmwareVersion" class="font-medium"
-                >Firmware Version</label
-              >
-              <input
-                id="firmwareVersion"
-                pInputText
-                formControlName="firmwareVersion"
-                placeholder="e.g., v2.1"
-                class="w-full"
-              />
-            </div>
-          </div>
-
-          <div class="field">
-            <div class="flex items-center">
-              <p-checkbox
-                formControlName="isActive"
-                [binary]="true"
-                inputId="gatewayIsActive"
-              >
-              </p-checkbox>
-              <label for="gatewayIsActive" class="ml-2 font-medium"
-                >Gateway is Active</label
-              >
-            </div>
-          </div>
-        </div>
       </div>
 
-      <!-- Form Actions -->
-      <div class="flex justify-end gap-2 mt-6">
-        <button
-          pButton
-          type="button"
-          label="Cancel"
-          class="p-button-text"
-          (click)="closeTplDialog('displayGatewayDialog')"
-        ></button>
-        <button
-          pButton
-          type="submit"
-          [label]="isEditMode ? 'Update Gateway' : 'Create Gateway'"
-          class="p-button-primary"
-          [disabled]="gatewayForm.invalid"
-        ></button>
+      <div class="dlg-body">
+        <form
+          [formGroup]="gatewayForm"
+          (ngSubmit)="saveGateway()"
+          class="p-fluid"
+        >
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="space-y-4">
+              <div class="field">
+                <label for="name" class="font-medium">Gateway Name *</label>
+                <input
+                  id="name"
+                  pInputText
+                  formControlName="name"
+                  placeholder="e.g., Store Gateway"
+                  class="w-full"
+                  [ngClass]="{
+                    'p-invalid':
+                      gatewayForm.get('name')?.invalid &&
+                      gatewayForm.get('name')?.touched,
+                  }"
+                />
+                <small
+                  *ngIf="
+                    gatewayForm.get('name')?.invalid &&
+                    gatewayForm.get('name')?.touched
+                  "
+                  class="p-error"
+                >
+                  Gateway name is required
+                </small>
+              </div>
+
+              <div class="field">
+                <label for="macAddress" class="font-medium"
+                  >MAC Address *</label
+                >
+                <input
+                  id="macAddress"
+                  pInputText
+                  formControlName="macAddress"
+                  placeholder="e.g., e1000005e79d or 00:1A:2B:3C:4D:5E"
+                  class="w-full"
+                  [ngClass]="{
+                    'p-invalid':
+                      gatewayForm.get('macAddress')?.invalid &&
+                      gatewayForm.get('macAddress')?.touched,
+                  }"
+                />
+                <small
+                  *ngIf="
+                    gatewayForm.get('macAddress')?.invalid &&
+                    gatewayForm.get('macAddress')?.touched
+                  "
+                  class="p-error"
+                >
+                  Valid MAC address is required
+                </small>
+              </div>
+
+              <div class="field">
+                <label for="storeId" class="font-medium">Store *</label>
+                <p-dropdown
+                  appendTo="body"
+                  id="storeId"
+                  formControlName="storeId"
+                  [options]="storeOptions"
+                  optionLabel="label"
+                  optionValue="value"
+                  placeholder="Select Store"
+                  class="w-full"
+                  [ngClass]="{
+                    'p-invalid':
+                      gatewayForm.get('storeId')?.invalid &&
+                      gatewayForm.get('storeId')?.touched,
+                  }"
+                >
+                </p-dropdown>
+                <small
+                  *ngIf="
+                    gatewayForm.get('storeId')?.invalid &&
+                    gatewayForm.get('storeId')?.touched
+                  "
+                  class="p-error"
+                >
+                  Store is required
+                </small>
+              </div>
+
+              <div class="field">
+                <label for="gatewayType" class="font-medium"
+                  >Gateway Type</label
+                >
+                <p-dropdown
+                  appendTo="body"
+                  id="gatewayType"
+                  formControlName="gatewayType"
+                  [options]="gatewayTypeOptions"
+                  placeholder="Select Type"
+                  class="w-full"
+                >
+                </p-dropdown>
+              </div>
+            </div>
+
+            <div class="space-y-4">
+              <div class="field">
+                <label for="description" class="font-medium">Description</label>
+                <textarea
+                  id="description"
+                  pInputTextarea
+                  formControlName="description"
+                  rows="3"
+                  placeholder="Gateway description..."
+                  class="w-full"
+                >
+                </textarea>
+              </div>
+
+              <div class="grid grid-cols-2 gap-3">
+                <div class="field">
+                  <label for="hardwareVersion" class="font-medium"
+                    >Hardware Version</label
+                  >
+                  <input
+                    id="hardwareVersion"
+                    pInputText
+                    formControlName="hardwareVersion"
+                    placeholder="e.g., v1.0"
+                    class="w-full"
+                  />
+                </div>
+
+                <div class="field">
+                  <label for="firmwareVersion" class="font-medium"
+                    >Firmware Version</label
+                  >
+                  <input
+                    id="firmwareVersion"
+                    pInputText
+                    formControlName="firmwareVersion"
+                    placeholder="e.g., v2.1"
+                    class="w-full"
+                  />
+                </div>
+              </div>
+
+              <div class="field">
+                <div class="flex items-center">
+                  <p-checkbox
+                    formControlName="isActive"
+                    [binary]="true"
+                    inputId="gatewayIsActive"
+                  >
+                  </p-checkbox>
+                  <label for="gatewayIsActive" class="ml-2 font-medium"
+                    >Gateway is Active</label
+                  >
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Form Actions -->
+          <div class="flex justify-end gap-2 mt-6">
+            <button
+              pButton
+              type="button"
+              label="Cancel"
+              class="p-button-text"
+              (click)="closeTplDialog('displayGatewayDialog')"
+            ></button>
+            <button
+              pButton
+              type="submit"
+              [label]="isEditMode ? 'Update Gateway' : 'Create Gateway'"
+              class="p-button-primary"
+              [disabled]="gatewayForm.invalid"
+            ></button>
+          </div>
+        </form>
       </div>
-    </form>
     </div>
-  </div>
-</ng-template>
+  </ng-template>
 </div>

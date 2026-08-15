@@ -1,5 +1,7 @@
 <div class="p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto">
-  <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
+  <div
+    class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4"
+  >
     <h2 class="text-xl sm:text-2xl font-semibold text-[var(--color-secondary)]">
       Products for {{ store.storeName }}
     </h2>
@@ -9,16 +11,16 @@
         color="primary"
         (click)="syncToCloud()"
         [disabled]="isSyncing"
-        class="flex items-center gap-2 w-full sm:w-auto justify-center"
+        class="flex items-center gap-2 w-full sm:w-auto justify-center ds-btn ds-btn--tertiary"
       >
         <i class="fas fa-sync" [class.fa-spin]="isSyncing"></i>
-        {{ isSyncing ? 'Syncing...' : 'Sync to Cloud' }}
+        {{ isSyncing ? "Syncing..." : "Sync to Cloud" }}
       </button>
       <button
         mat-raised-button
         color="warn"
         (click)="onLogout()"
-        class="w-full sm:w-auto"
+        class="w-full sm:w-auto ds-btn ds-btn--tertiary"
       >
         Logout
       </button>
@@ -31,74 +33,78 @@
     <p class="mt-2 text-gray-600">Loading products...</p>
   </div>
 
-  <div *ngIf="errorMessage" class="mat-mdc-card mdc-card p-4 mb-4 bg-red-50 border border-red-200 rounded-lg">
+  <div
+    *ngIf="errorMessage"
+    class="mat-mdc-card mdc-card p-4 mb-4 bg-red-50 border border-red-200 rounded-lg"
+  >
     <p class="text-red-700 flex items-center gap-2">
       <i class="fas fa-exclamation-triangle"></i>
       {{ errorMessage }}
     </p>
   </div>
 
-  <div *ngIf="!isLoading && items.length === 0 && !errorMessage" class="text-center py-12 text-gray-500">
-    <i class="fas fa-inbox text-4xl mb-2"></i>
-    <p>No products found</p>
-  </div>
+  <!-- Products grid -->
+  <div class="ds-card ds-table-panel">
+    <p-table
+      [value]="dataSource"
+      [lazy]="true"
+      (onLazyLoad)="handlePageEvent($event)"
+      [paginator]="true"
+      [rows]="pageSize"
+      [first]="pageIndex * pageSize"
+      [totalRecords]="totalItems"
+      [loading]="isLoading"
+      [rowsPerPageOptions]="[5, 10, 25, 50]"
+      [showFirstLastIcon]="true"
+      [scrollable]="true"
+      scrollHeight="55vh"
+      dataKey="id"
+    >
+      <ng-template pTemplate="header">
+        <tr>
+          <th>ID</th>
+          <th>Specification</th>
+          <th>Price</th>
+          <th>Discount</th>
+          <th>Unit</th>
+        </tr>
+      </ng-template>
 
-  <!-- Material Table -->
-  <div *ngIf="items.length > 0" class="mat-elevation-z2 overflow-x-auto rounded-lg border border-[var(--color-primary-light)]">
-    <table mat-table [dataSource]="dataSource" class="w-full">
+      <ng-template pTemplate="body" let-product>
+        <tr>
+          <td>{{ product.id }}</td>
+          <td class="max-w-xs truncate">{{ product.specification }}</td>
+          <td>
+            <span *ngIf="product.price !== undefined && product.price !== null"
+              >${{ product.price }}</span
+            >
+            <span *ngIf="!product.price" class="text-gray-400 italic">—</span>
+          </td>
+          <td>
+            <span
+              *ngIf="product.discount !== undefined"
+              class="text-green-600 font-medium"
+              >${{ product.discount }}</span
+            >
+            <span *ngIf="!product.discount" class="text-gray-400 italic"
+              >—</span
+            >
+          </td>
+          <td>{{ product.unit || "—" }}</td>
+        </tr>
+      </ng-template>
 
-      <!-- ID Column -->
-      <ng-container matColumnDef="id">
-        <th mat-header-cell *matHeaderCellDef class="font-semibold text-[var(--color-secondary-dark)]">ID</th>
-        <td mat-cell *matCellDef="let product" class="text-sm">{{ product.id }}</td>
-      </ng-container>
-
-      <!-- Specification Column -->
-      <ng-container matColumnDef="specification">
-        <th mat-header-cell *matHeaderCellDef class="font-semibold text-[var(--color-secondary-dark)]">Specification</th>
-        <td mat-cell *matCellDef="let product" class="text-sm max-w-xs truncate">{{ product.specification }}</td>
-      </ng-container>
-
-      <!-- Price Column -->
-      <ng-container matColumnDef="price">
-        <th mat-header-cell *matHeaderCellDef class="font-semibold text-[var(--color-secondary-dark)]">Price</th>
-        <td mat-cell *matCellDef="let product" class="text-sm">
-          <span *ngIf="product.price !== undefined && product.price !== null">${{ product.price }}</span>
-          <span *ngIf="!product.price" class="text-gray-400 italic">—</span>
-        </td>
-      </ng-container>
-
-      <!-- Discount Column -->
-      <ng-container matColumnDef="discount">
-        <th mat-header-cell *matHeaderCellDef class="font-semibold text-[var(--color-secondary-dark)]">Discount</th>
-        <td mat-cell *matCellDef="let product" class="text-sm">
-          <span *ngIf="product.discount !== undefined" class="text-green-600 font-medium">${{ product.discount }}</span>
-          <span *ngIf="!product.discount" class="text-gray-400 italic">—</span>
-        </td>
-      </ng-container>
-
-      <!-- Unit Column -->
-      <ng-container matColumnDef="unit">
-        <th mat-header-cell *matHeaderCellDef class="font-semibold text-[var(--color-secondary-dark)]">Unit</th>
-        <td mat-cell *matCellDef="let product" class="text-sm">
-          {{ product.unit || '—' }}
-        </td>
-      </ng-container>
-
-      <!-- Header & Row Definitions -->
-      <tr mat-header-row *matHeaderRowDef="displayedColumns" class="bg-[var(--color-primary-light)] bg-opacity-20"></tr>
-      <tr mat-row *matRowDef="let row; columns: displayedColumns;" class="hover:bg-[var(--color-background)] transition-colors"></tr>
-    </table>
-
-    <!-- Paginator -->
-    <mat-paginator
-      [length]="totalItems"
-      [pageSize]="pageSize"
-      [pageSizeOptions]="[5, 10, 25, 50]"
-      (page)="handlePageEvent($event)"
-      showFirstLastButtons
-      class="bg-white border-t border-[var(--color-primary-light)]"
-    ></mat-paginator>
+      <ng-template pTemplate="emptymessage">
+        <tr>
+          <td colspan="5">
+            <div class="ds-table-empty" *ngIf="!errorMessage">
+              <i class="fas fa-inbox ds-table-empty__icon"></i>
+              <p class="ds-table-empty__title">No products found</p>
+            </div>
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
   </div>
 
   <!-- Summary -->

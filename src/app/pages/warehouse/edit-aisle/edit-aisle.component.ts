@@ -1,8 +1,20 @@
 import { Component, Inject, OnInit } from '@angular/core';
-import { FormGroup, FormBuilder, Validators, ReactiveFormsModule } from '@angular/forms';
-import { MatDialogRef, MAT_DIALOG_DATA, MatDialogModule } from '@angular/material/dialog';
+import {
+  FormGroup,
+  FormBuilder,
+  Validators,
+  ReactiveFormsModule,
+} from '@angular/forms';
+import {
+  MatDialogRef,
+  MAT_DIALOG_DATA,
+  MatDialogModule,
+} from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { AisleMaster, ShelvesSummary } from '../../../core/interfaces/aisle.interface';
+import {
+  AisleMaster,
+  ShelvesSummary,
+} from '../../../core/interfaces/aisle.interface';
 import { AisleService } from '../../../core/services/aisle.service';
 import { CommonModule } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
@@ -11,7 +23,10 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
-import { SnackbarData, CustomSnackbarComponent } from '../../../shared/components/alert/custom-snackbar.component';
+import {
+  SnackbarData,
+  CustomSnackbarComponent,
+} from '../../../shared/components/alert/custom-snackbar.component';
 import { MessageService } from 'primeng/api';
 
 @Component({
@@ -26,13 +41,12 @@ import { MessageService } from 'primeng/api';
     MatButtonModule,
     MatSelectModule,
     MatSlideToggleModule,
-    MatIconModule
+    MatIconModule,
   ],
   templateUrl: './edit-aisle.component.html',
-  styleUrls: ['./edit-aisle.component.css']
+  styleUrls: ['./edit-aisle.component.css'],
 })
 export class EditAisleComponent implements OnInit {
-
   //#region Form & State
   aisleForm!: FormGroup;
   isSubmitting = false;
@@ -40,7 +54,7 @@ export class EditAisleComponent implements OnInit {
     total: 0,
     active: 0,
     inactive: 0,
-    lastUpdated: new Date()
+    lastUpdated: new Date(),
   };
   //#endregion
 
@@ -51,7 +65,8 @@ export class EditAisleComponent implements OnInit {
     private snackBar: MatSnackBar,
     private aisleService: AisleService,
     private messageService: MessageService,
-    @Inject(MAT_DIALOG_DATA) public data: { aisle: AisleMaster, currentUserId: number }
+    @Inject(MAT_DIALOG_DATA)
+    public data: { aisle: AisleMaster; currentUserId: number },
   ) {
     this.aisleForm = this.createForm();
   }
@@ -59,7 +74,7 @@ export class EditAisleComponent implements OnInit {
 
   //#region Lifecycle
   ngOnInit(): void {
-    console.log(this.data.aisle)
+    console.log(this.data.aisle);
     if (this.data?.aisle) {
       this.populateForm();
       this.loadShelvesSummary();
@@ -80,7 +95,7 @@ export class EditAisleComponent implements OnInit {
       location: ['', [Validators.required, Validators.maxLength(75)]],
       coordinates: ['', [Validators.maxLength(75)]],
       deviceName: ['', [Validators.maxLength(50)]],
-      isActive: [true]
+      isActive: [true],
     });
   }
 
@@ -92,12 +107,12 @@ export class EditAisleComponent implements OnInit {
       description: aisle.description,
       location: aisle.location,
       coordinates: aisle.coordinates,
-      isActive: aisle.isActive
+      isActive: aisle.isActive,
     });
   }
 
   private markFormGroupTouched(): void {
-    Object.keys(this.aisleForm.controls).forEach(key => {
+    Object.keys(this.aisleForm.controls).forEach((key) => {
       const control = this.aisleForm.get(key);
       control?.markAsTouched();
     });
@@ -121,7 +136,7 @@ export class EditAisleComponent implements OnInit {
       total: 8,
       active: 6,
       inactive: 2,
-      lastUpdated: new Date()
+      lastUpdated: new Date(),
     };
   }
   //#endregion
@@ -140,21 +155,23 @@ export class EditAisleComponent implements OnInit {
       ...formValue,
       storeId: this.data.aisle.storeId,
       updatedUser: this.data.currentUserId,
-      updatedDate: new Date()
+      updatedDate: new Date(),
     };
 
-    this.aisleService.updateAisle(Number(updatedAisle.id), updatedAisle).subscribe({
-      next: (res) => {
-        this.isSubmitting = false;
-        this.showSuccess('Aisle updated successfully!')
-        this.dialogRef.close(res);
-      },
-      error: (err) => {
-        this.isSubmitting = false;
-        console.error(err);
-        this.showError('Failed to update aisle.');
-      }
-    });
+    this.aisleService
+      .updateAisle(Number(updatedAisle.id), updatedAisle)
+      .subscribe({
+        next: (res) => {
+          this.isSubmitting = false;
+          this.showSuccess('Aisle updated successfully!');
+          this.dialogRef.close(res);
+        },
+        error: (err) => {
+          this.isSubmitting = false;
+          console.error(err);
+          this.showError('Failed to update aisle.');
+        },
+      });
   }
 
   onCancel(): void {
@@ -168,7 +185,7 @@ export class EditAisleComponent implements OnInit {
       severity: 'success',
       summary: 'Success',
       detail: message,
-      life: 5000
+      life: 5000,
     });
   }
 
@@ -177,7 +194,7 @@ export class EditAisleComponent implements OnInit {
       severity: 'error',
       summary: 'Error',
       detail: message,
-      life: 5000
+      life: 5000,
     });
   }
 
@@ -186,7 +203,7 @@ export class EditAisleComponent implements OnInit {
       severity: 'warn',
       summary: 'Warning',
       detail: message,
-      life: 5000
+      life: 5000,
     });
   }
 
@@ -195,7 +212,7 @@ export class EditAisleComponent implements OnInit {
       severity: 'info',
       summary: 'Info',
       detail: message,
-      life: 5000
+      life: 5000,
     });
   }
   // private showSuccess(message: string): void {

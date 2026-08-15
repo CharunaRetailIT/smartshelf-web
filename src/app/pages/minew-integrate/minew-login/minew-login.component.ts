@@ -6,12 +6,12 @@ import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-minew-login',
-  imports: [CommonModule,FormsModule],
+  imports: [CommonModule, FormsModule],
   templateUrl: './minew-login.component.html',
-  styleUrl: './minew-login.component.css'
+  styleUrl: './minew-login.component.css',
 })
 export class MinewLoginComponent {
-loginRequest: MinewLoginRequest = { username: '', password: '' };
+  loginRequest: MinewLoginRequest = { username: '', password: '' };
   errorMessage: string | null = null;
   isLoading = false;
 
@@ -20,14 +20,16 @@ loginRequest: MinewLoginRequest = { username: '', password: '' };
   onSubmit() {
     this.isLoading = true;
     this.errorMessage = null;
-    this.minewService.login(this.loginRequest.username, this.loginRequest.password).subscribe({
-      next: () => {
-        this.isLoading = false;
-      },
-      error: (err) => {
-        this.isLoading = false;
-        this.errorMessage = 'Invalid username or password';
-      },
-    });
+    this.minewService
+      .login(this.loginRequest.username, this.loginRequest.password)
+      .subscribe({
+        next: () => {
+          this.isLoading = false;
+        },
+        error: (err) => {
+          this.isLoading = false;
+          this.errorMessage = 'Invalid username or password';
+        },
+      });
   }
 }

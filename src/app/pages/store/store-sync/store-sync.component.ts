@@ -1,19 +1,32 @@
 import { Component, Inject, OnInit, signal } from '@angular/core';
-import { FormGroup, FormBuilder, Validators, FormsModule, ReactiveFormsModule } from '@angular/forms';
+import {
+  FormGroup,
+  FormBuilder,
+  Validators,
+  FormsModule,
+  ReactiveFormsModule,
+} from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { Store, StoreSyncResult, StoreSyncRequest } from '../../../core/interfaces/store.interface';
+import {
+  Store,
+  StoreSyncResult,
+  StoreSyncRequest,
+} from '../../../core/interfaces/store.interface';
 import { StoreService } from '../../../core/services/store.service';
-import { SnackbarData, CustomSnackbarComponent } from '../../../shared/components/alert/custom-snackbar.component';
+import {
+  SnackbarData,
+  CustomSnackbarComponent,
+} from '../../../shared/components/alert/custom-snackbar.component';
 import { CommonModule } from '@angular/common';
-import { MessageService } from 'primeng/api';
+import { ConfirmationService, MessageService } from 'primeng/api';
 
 @Component({
   selector: 'app-store-sync',
   standalone: true,
   imports: [CommonModule, FormsModule, ReactiveFormsModule],
   templateUrl: './store-sync.component.html',
-  styleUrl: './store-sync.component.css'
+  styleUrl: './store-sync.component.css',
 })
 export class StoreSyncComponent implements OnInit {
   //#region Properties
@@ -25,11 +38,8 @@ export class StoreSyncComponent implements OnInit {
 
   // Signals
   isSubmitting = signal(false);
-  isPreviewing = signal(false);
 
   // Sync data
-  syncPreview: any = null;
-  lastSyncResult?: StoreSyncResult;
 
   // Default settings
   readonly defaultSettings = {
@@ -37,7 +47,7 @@ export class StoreSyncComponent implements OnInit {
     syncMode: 'all',
     retryAttempts: 3,
     syncTimeout: 60,
-    forceSync: false
+    forceSync: false,
   };
   //#endregion
 
@@ -48,14 +58,21 @@ export class StoreSyncComponent implements OnInit {
     private messageService: MessageService,
     private snackBar: MatSnackBar,
     public dialogRef: MatDialogRef<StoreSyncComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: { stores?: Store[] }
+    @Inject(MAT_DIALOG_DATA) public data: { stores?: Store[] },
+    private confirmationService: ConfirmationService,
   ) {
     this.syncForm = this.fb.group({
       syncToCloud: [this.defaultSettings.syncToCloud],
       syncMode: [this.defaultSettings.syncMode],
-      retryAttempts: [this.defaultSettings.retryAttempts, [Validators.min(0), Validators.max(5)]],
-      syncTimeout: [this.defaultSettings.syncTimeout, [Validators.min(30), Validators.max(300)]],
-      forceSync: [this.defaultSettings.forceSync]
+      retryAttempts: [
+        this.defaultSettings.retryAttempts,
+        [Validators.min(0), Validators.max(5)],
+      ],
+      syncTimeout: [
+        this.defaultSettings.syncTimeout,
+        [Validators.min(30), Validators.max(300)],
+      ],
+      forceSync: [this.defaultSettings.forceSync],
     });
   }
   //#endregion
@@ -63,10 +80,9 @@ export class StoreSyncComponent implements OnInit {
   //#region Lifecycle
   ngOnInit(): void {
     this.loadStoresForSync();
-    this.loadLastSyncResult();
 
     // Watch for sync mode changes
-    this.syncForm.get('syncToCloud')?.valueChanges.subscribe(value => {
+    this.syncForm.get('syncToCloud')?.valueChanges.subscribe((value) => {
       if (value) {
         this.loadStoresForSync();
       } else {
@@ -74,7 +90,7 @@ export class StoreSyncComponent implements OnInit {
       }
     });
 
-    this.syncForm.get('syncMode')?.valueChanges.subscribe(mode => {
+    this.syncForm.get('syncMode')?.valueChanges.subscribe((mode) => {
       if (mode === 'all') {
         this.selectAllStores();
       }
@@ -87,7 +103,7 @@ export class StoreSyncComponent implements OnInit {
     const filters = {
       pageNumber: 1,
       pageSize: 100,
-      isActive: true
+      isActive: true,
     };
 
     this.storeService.getStores(filters).subscribe({
@@ -103,21 +119,10 @@ export class StoreSyncComponent implements OnInit {
       error: (error) => {
         console.error('Error loading stores for sync:', error);
         this.showError('Failed to load stores for sync');
-      }
+      },
     });
   }
 
-  private loadLastSyncResult(): void {
-    // In a real app, you might load this from a service
-    // This is a placeholder for demonstration
-    this.lastSyncResult = {
-      syncedCount: 5,
-      failedCount: 1,
-      messages: ['Sync completed with some errors'],
-      details: [],
-      timestamp: new Date(Date.now() - 3600000) // 1 hour ago
-    };
-  }
   //#endregion
 
   //#region Store Filtering and Selection
@@ -128,10 +133,11 @@ export class StoreSyncComponent implements OnInit {
     }
 
     const searchTerm = this.storeSearchTerm.toLowerCase();
-    this.filteredStores = this.storesForSync.filter(store =>
-      store.storeName.toLowerCase().includes(searchTerm) ||
-      store.storeCode?.toLowerCase().includes(searchTerm) ||
-      store.address?.toLowerCase().includes(searchTerm)
+    this.filteredStores = this.storesForSync.filter(
+      (store) =>
+        store.storeName.toLowerCase().includes(searchTerm) ||
+        store.storeCode?.toLowerCase().includes(searchTerm) ||
+        store.address?.toLowerCase().includes(searchTerm),
     );
   }
 
@@ -153,7 +159,7 @@ export class StoreSyncComponent implements OnInit {
   }
 
   selectAllStores(): void {
-    this.selectedStoreIds = this.storesForSync.map(store => store.id);
+    this.selectedStoreIds = this.storesForSync.map((store) => store.id);
   }
 
   isStoreSelected(storeId: number): boolean {
@@ -161,37 +167,14 @@ export class StoreSyncComponent implements OnInit {
   }
 
   isAllSelected(): boolean {
-    return this.selectedStoreIds.length === this.storesForSync.length && this.storesForSync.length > 0;
+    return (
+      this.selectedStoreIds.length === this.storesForSync.length &&
+      this.storesForSync.length > 0
+    );
   }
 
   getPendingSyncCount(): number {
-    return this.storesForSync.filter(store => !store.isSynced).length;
-  }
-  //#endregion
-
-  //#region Preview Methods
-  canPreview(): boolean {
-    return this.syncForm.value.syncToCloud;
-  }
-
-  previewSync(): void {
-    if (!this.canPreview()) return;
-
-    this.isPreviewing.set(true);
-
-    // Calculate preview
-    const formValue = this.syncForm.value;
-    const storesToExport = formValue.syncToCloud ?
-      (formValue.syncMode === 'all' ? this.storesForSync.length : this.selectedStoreIds.length) : 0;
-
-    this.syncPreview = {
-      storesToExport,
-      estimatedTime: Math.ceil(storesToExport * 2) // 2 seconds per store
-    };
-
-    setTimeout(() => {
-      this.isPreviewing.set(false);
-    }, 1000);
+    return this.storesForSync.filter((store) => !store.isSynced).length;
   }
   //#endregion
 
@@ -204,8 +187,10 @@ export class StoreSyncComponent implements OnInit {
     const formValue = this.syncForm.value;
     const syncRequest: StoreSyncRequest = {
       syncToCloud: formValue.syncToCloud,
-      storeIds: formValue.syncToCloud && formValue.syncMode === 'selected' ?
-        this.selectedStoreIds : undefined
+      storeIds:
+        formValue.syncToCloud && formValue.syncMode === 'selected'
+          ? this.selectedStoreIds
+          : undefined,
     };
 
     // Add additional parameters
@@ -213,20 +198,26 @@ export class StoreSyncComponent implements OnInit {
       ...syncRequest,
       retryAttempts: formValue.retryAttempts,
       syncTimeout: formValue.syncTimeout,
-      forceSync: formValue.forceSync
+      forceSync: formValue.forceSync,
     };
 
     this.storeService.syncStores(syncParams).subscribe({
       next: (result) => this.handleSyncSuccess(result),
-      error: (error) => this.handleSyncError(error)
+      error: (error) => this.handleSyncError(error),
     });
   }
 
   onCancel(): void {
     if (this.syncForm.dirty && !this.isSubmitting()) {
-      if (confirm('Sync operation is in progress. Are you sure you want to cancel?')) {
-        this.dialogRef.close({ success: false });
-      }
+      this.confirmationService.confirm({
+        message:
+          'Sync operation is in progress. Are you sure you want to cancel?',
+        header: 'Cancel Sync',
+        icon: 'pi pi-exclamation-triangle',
+        acceptLabel: 'Yes, cancel',
+        rejectLabel: 'Keep syncing',
+        accept: () => this.dialogRef.close({ success: false }),
+      });
     } else {
       this.dialogRef.close({ success: false });
     }
@@ -236,7 +227,6 @@ export class StoreSyncComponent implements OnInit {
   //#region Sync Handlers
   private handleSyncSuccess(result: StoreSyncResult): void {
     this.isSubmitting.set(false);
-    this.lastSyncResult = result;
 
     if (result.failedCount === 0) {
       this.showSuccess('Sync completed successfully!');
@@ -249,7 +239,7 @@ export class StoreSyncComponent implements OnInit {
     this.dialogRef.close({
       success: true,
       data: result,
-      hasErrors: result.failedCount > 0
+      hasErrors: result.failedCount > 0,
     });
   }
 
@@ -273,10 +263,14 @@ export class StoreSyncComponent implements OnInit {
     if (!store.isSynced) return 'bg-yellow-100 text-yellow-800';
 
     switch (store.syncStatus) {
-      case 'success': return 'bg-green-100 text-green-800';
-      case 'failed': return 'bg-red-100 text-red-800';
-      case 'pending': return 'bg-yellow-100 text-yellow-800';
-      default: return 'bg-gray-100 text-gray-800';
+      case 'success':
+        return 'bg-green-100 text-green-800';
+      case 'failed':
+        return 'bg-red-100 text-red-800';
+      case 'pending':
+        return 'bg-yellow-100 text-yellow-800';
+      default:
+        return 'bg-gray-100 text-gray-800';
     }
   }
 
@@ -284,10 +278,14 @@ export class StoreSyncComponent implements OnInit {
     if (!store.isSynced) return 'fa-clock text-yellow-600';
 
     switch (store.syncStatus) {
-      case 'success': return 'fa-check-circle text-green-600';
-      case 'failed': return 'fa-times-circle text-red-600';
-      case 'pending': return 'fa-clock text-yellow-600';
-      default: return 'fa-question-circle text-gray-600';
+      case 'success':
+        return 'fa-check-circle text-green-600';
+      case 'failed':
+        return 'fa-times-circle text-red-600';
+      case 'pending':
+        return 'fa-clock text-yellow-600';
+      default:
+        return 'fa-question-circle text-gray-600';
     }
   }
 
@@ -295,32 +293,17 @@ export class StoreSyncComponent implements OnInit {
     if (!store.isSynced) return 'Pending';
 
     switch (store.syncStatus) {
-      case 'success': return 'Synced';
-      case 'failed': return 'Failed';
-      case 'pending': return 'Pending';
-      default: return 'Unknown';
+      case 'success':
+        return 'Synced';
+      case 'failed':
+        return 'Failed';
+      case 'pending':
+        return 'Pending';
+      default:
+        return 'Unknown';
     }
   }
 
-  getResultStatusClass(result: StoreSyncResult): string {
-    if (result.failedCount === 0) {
-      return 'bg-green-100 text-green-800';
-    } else if (result.failedCount < result.syncedCount) {
-      return 'bg-yellow-100 text-yellow-800';
-    } else {
-      return 'bg-red-100 text-red-800';
-    }
-  }
-
-  getResultStatusLabel(result: StoreSyncResult): string {
-    if (result.failedCount === 0) {
-      return 'Success';
-    } else if (result.failedCount < result.syncedCount) {
-      return 'Partial Success';
-    } else {
-      return 'Failed';
-    }
-  }
   //#endregion
 
   //#region Snackbar Methods
@@ -329,7 +312,7 @@ export class StoreSyncComponent implements OnInit {
       severity: 'success',
       summary: 'Success',
       detail: message,
-      life: 5000
+      life: 5000,
     });
   }
 
@@ -338,7 +321,7 @@ export class StoreSyncComponent implements OnInit {
       severity: 'error',
       summary: 'Error',
       detail: message,
-      life: 5000
+      life: 5000,
     });
   }
 
@@ -347,7 +330,7 @@ export class StoreSyncComponent implements OnInit {
       severity: 'warn',
       summary: 'Warning',
       detail: message,
-      life: 5000
+      life: 5000,
     });
   }
 
@@ -356,7 +339,7 @@ export class StoreSyncComponent implements OnInit {
       severity: 'info',
       summary: 'Info',
       detail: message,
-      life: 5000
+      life: 5000,
     });
   }
   // private showSuccess(message: string): void {

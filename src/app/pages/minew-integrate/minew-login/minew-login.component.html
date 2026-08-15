@@ -1,8 +1,16 @@
 <div class="bg-white p-6 sm:p-8 rounded-lg shadow-md max-w-md mx-auto">
-  <h2 class="text-xl sm:text-2xl font-semibold text-[var(--color-secondary)] mb-4">Login to Minew</h2>
+  <h2
+    class="text-xl sm:text-2xl font-semibold text-[var(--color-secondary)] mb-4"
+  >
+    Login to Minew
+  </h2>
   <form (ngSubmit)="onSubmit()" class="space-y-4">
     <div>
-      <label for="username" class="block text-sm font-medium text-[var(--color-secondary-dark)]">Username</label>
+      <label
+        for="username"
+        class="block text-sm font-medium text-[var(--color-secondary-dark)]"
+        >Username</label
+      >
       <input
         id="username"
         type="text"
@@ -13,7 +21,11 @@
       />
     </div>
     <div>
-      <label for="password" class="block text-sm font-medium text-[var(--color-secondary-dark)]">Password</label>
+      <label
+        for="password"
+        class="block text-sm font-medium text-[var(--color-secondary-dark)]"
+        >Password</label
+      >
       <input
         id="password"
         type="password"
@@ -23,13 +35,15 @@
         required
       />
     </div>
-    <div *ngIf="errorMessage" class="text-red-500 text-sm">{{ errorMessage }}</div>
+    <div *ngIf="errorMessage" class="text-red-500 text-sm">
+      {{ errorMessage }}
+    </div>
     <button
       type="submit"
       [disabled]="isLoading"
-      class="w-full bg-[var(--color-primary)] text-white py-2 rounded-md hover:bg-[var(--color-primary-dark)] disabled:opacity-50"
+      class="w-full bg-[var(--color-primary)] text-white py-2 rounded-md hover:bg-[var(--color-primary-dark)] disabled:opacity-50 ds-btn ds-btn--primary"
     >
-      {{ isLoading ? 'Logging in...' : 'Login' }}
+      {{ isLoading ? "Logging in..." : "Login" }}
     </button>
   </form>
 </div>

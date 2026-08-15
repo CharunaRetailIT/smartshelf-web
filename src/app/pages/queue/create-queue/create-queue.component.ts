@@ -31,7 +31,7 @@ import { SearchParams } from '../../../core/interfaces/pagination-result.interfa
   selector: 'app-create-queue',
   imports: [ImportsModule],
   templateUrl: './create-queue.component.html',
-  styleUrl: './create-queue.component.css'
+  styleUrl: './create-queue.component.css',
 })
 export class CreateQueueComponent implements OnInit {
   @Input() inDialog: boolean = false;
@@ -40,8 +40,12 @@ export class CreateQueueComponent implements OnInit {
 
   queueForm!: FormGroup;
   sourceOptions: any[] = [
-    { label: 'From Existing Assignment', value: 'assignment', icon: 'pi pi-copy' },
-    { label: 'Direct Creation', value: 'direct', icon: 'pi pi-plus' }
+    {
+      label: 'From Existing Assignment',
+      value: 'assignment',
+      icon: 'pi pi-copy',
+    },
+    { label: 'Direct Creation', value: 'direct', icon: 'pi pi-plus' },
   ];
 
   locationTypes: any[] = [
@@ -55,7 +59,7 @@ export class CreateQueueComponent implements OnInit {
     { label: 'Daily', value: 'DAILY' },
     { label: 'Weekly', value: 'WEEKLY' },
     { label: 'Monthly', value: 'MONTHLY' },
-    { label: 'Yearly', value: 'YEARLY' }
+    { label: 'Yearly', value: 'YEARLY' },
   ];
 
   // Dropdown data
@@ -107,8 +111,8 @@ export class CreateQueueComponent implements OnInit {
     private messageService: CustomMessageService,
     private settingsService: SettingsService,
     private auth: AuthService,
-    private toastService: MessageService
-  ) { }
+    private toastService: MessageService,
+  ) {}
 
   ngOnInit() {
     this.initForm();
@@ -153,15 +157,15 @@ export class CreateQueueComponent implements OnInit {
 
       // Recurrence
       isRecurring: [false],
-      recurrencePattern: [null]
+      recurrencePattern: [null],
     });
 
     // Watch for changes
-    this.queueForm.get('sourceType')?.valueChanges.subscribe(val => {
+    this.queueForm.get('sourceType')?.valueChanges.subscribe((val) => {
       this.onSourceTypeChange(val);
     });
 
-    this.queueForm.get('locationType')?.valueChanges.subscribe(val => {
+    this.queueForm.get('locationType')?.valueChanges.subscribe((val) => {
       this.queueForm.patchValue({ locationId: null }, { emitEvent: false });
       this.loadLocationData(val);
     });
@@ -211,12 +215,12 @@ export class CreateQueueComponent implements OnInit {
   }
 
   private brandCode(brandId: number): string {
-    const brand = this.eslBrandOptions.find(b => b.id === brandId);
+    const brand = this.eslBrandOptions.find((b) => b.id === brandId);
     return (brand?.code || '').toLowerCase();
   }
 
   getBrandName(id: number | null): string {
-    return this.eslBrandOptions.find(x => x.id === id)?.name || 'No Brand';
+    return this.eslBrandOptions.find((x) => x.id === id)?.name || 'No Brand';
   }
 
   loadBrands() {
@@ -224,7 +228,7 @@ export class CreateQueueComponent implements OnInit {
       next: (brands) => {
         this.eslBrandOptions = brands || [];
       },
-      error: () => this.showError('Failed to load ESL brands')
+      error: () => this.showError('Failed to load ESL brands'),
     });
   }
 
@@ -234,7 +238,7 @@ export class CreateQueueComponent implements OnInit {
       templateId: null,
       messageId: null,
       deviceTemplateComboId: null,
-      deviceMessageComboId: null
+      deviceMessageComboId: null,
     });
 
     this.devices = [];
@@ -267,7 +271,7 @@ export class CreateQueueComponent implements OnInit {
       templateId: null,
       messageId: null,
       deviceTemplateComboId: null,
-      deviceMessageComboId: null
+      deviceMessageComboId: null,
     });
 
     this.existingComboPreview = null;
@@ -297,36 +301,42 @@ export class CreateQueueComponent implements OnInit {
   }
 
   loadExistingTemplateCombos(search?: string) {
-    this.deviceService.getCombosPaged({
-      pageNumber: 1,
-      pageSize: 10,
-      searchTerm: search,
-      isActive: true
-    }).subscribe({
-      next: (res: any) => {
-        this.existingCombos = res?.result?.items || [];
-      },
-      error: () => this.showError('Failed to load existing device+template combos')
-    });
+    this.deviceService
+      .getCombosPaged({
+        pageNumber: 1,
+        pageSize: 10,
+        searchTerm: search,
+        isActive: true,
+      })
+      .subscribe({
+        next: (res: any) => {
+          this.existingCombos = res?.result?.items || [];
+        },
+        error: () =>
+          this.showError('Failed to load existing device+template combos'),
+      });
   }
 
   loadExistingMessageCombos(search?: string) {
-    this.deviceService.getDeviceMessageCombosPagedByParams({
-      pageNumber: 1,
-      pageSize: 10,
-      searchTerm: search,
-      isActive: true
-    }).subscribe({
-      next: (res) => {
-        this.existingMessageCombos = res?.items || [];
-      },
-      error: () => this.showError('Failed to load existing device+message combos')
-    });
+    this.deviceService
+      .getDeviceMessageCombosPagedByParams({
+        pageNumber: 1,
+        pageSize: 10,
+        searchTerm: search,
+        isActive: true,
+      })
+      .subscribe({
+        next: (res) => {
+          this.existingMessageCombos = res?.items || [];
+        },
+        error: () =>
+          this.showError('Failed to load existing device+message combos'),
+      });
   }
 
   onExistingComboSelected() {
     const comboId = this.queueForm.get('deviceTemplateComboId')?.value;
-    const combo = this.existingCombos.find(c => c.id === comboId);
+    const combo = this.existingCombos.find((c) => c.id === comboId);
 
     if (!combo) {
       this.existingComboPreview = null;
@@ -336,17 +346,17 @@ export class CreateQueueComponent implements OnInit {
 
     this.queueForm.patchValue({
       deviceId: Number(combo.deviceId),
-      templateId: combo.templateId
+      templateId: combo.templateId,
     });
     this.existingComboPreview = {
       device: combo.deviceName || 'Unknown device',
-      binding: combo.templateName || 'Unknown template'
+      binding: combo.templateName || 'Unknown template',
     };
   }
 
   onExistingMessageComboSelected() {
     const comboId = this.queueForm.get('deviceMessageComboId')?.value;
-    const combo = this.existingMessageCombos.find(c => c.id === comboId);
+    const combo = this.existingMessageCombos.find((c) => c.id === comboId);
 
     if (!combo) {
       this.existingComboPreview = null;
@@ -356,11 +366,11 @@ export class CreateQueueComponent implements OnInit {
 
     this.queueForm.patchValue({
       deviceId: Number(combo.deviceId),
-      messageId: combo.messageId
+      messageId: combo.messageId,
     });
     this.existingComboPreview = {
       device: combo.deviceName || 'Unknown device',
-      binding: combo.messageTitle || 'Unknown message'
+      binding: combo.messageTitle || 'Unknown message',
     };
   }
 
@@ -446,7 +456,7 @@ export class CreateQueueComponent implements OnInit {
       return;
     }
 
-    this.selectedDevice = this.devices.find(d => d.id === deviceId) || null;
+    this.selectedDevice = this.devices.find((d) => d.id === deviceId) || null;
 
     if (this.brandSupportsTemplate()) {
       this.loadTemplates();
@@ -459,9 +469,9 @@ export class CreateQueueComponent implements OnInit {
       next: (res: any) => {
         this.assignments = (res.items || []).map((a: DeviceAssignmentDto) => ({
           ...a,
-          displayName: `${a.deviceDisplay} - ${a.comboName || a.messageTitle} [${a.assignmentType}]`
+          displayName: `${a.deviceDisplay} - ${a.comboName || a.messageTitle} [${a.assignmentType}]`,
         }));
-      }
+      },
     });
   }
 
@@ -473,38 +483,42 @@ export class CreateQueueComponent implements OnInit {
       pageSize: 10,
       searchTerm: event?.filter || event?.query || '',
       storeId: this.storeId || undefined,
-      brandId: brandId || undefined
+      brandId: brandId || undefined,
     } as SearchParams;
 
     this.deviceService.getLocalDevicesPaged(request).subscribe({
       next: (res: any) => {
         this.devices = res?.result?.items || [];
       },
-      error: () => this.showError('Failed to load devices')
+      error: () => this.showError('Failed to load devices'),
     });
   }
 
   loadTemplates(search?: string) {
-    this.deviceService.getLocalTemplatesPaged({
-      searchTerm: search,
-      pageNumber: 1,
-      pageSize: 10,
-      storeId: this.storeId || undefined
-    } as SearchParams).subscribe({
-      next: (res: any) => {
-        this.templates = res?.result?.items || [];
-      },
-      error: () => this.showError('Failed to load templates')
-    });
+    this.deviceService
+      .getLocalTemplatesPaged({
+        searchTerm: search,
+        pageNumber: 1,
+        pageSize: 10,
+        storeId: this.storeId || undefined,
+      } as SearchParams)
+      .subscribe({
+        next: (res: any) => {
+          this.templates = res?.result?.items || [];
+        },
+        error: () => this.showError('Failed to load templates'),
+      });
   }
 
   loadMessages(search?: string) {
-    this.messageService.getMessagesPaged({ searchTerm: search, pageSize: 10 }).subscribe({
-      next: (res: any) => {
-        this.messages = res?.result?.items || [];
-      },
-      error: () => this.showError('Failed to load messages')
-    });
+    this.messageService
+      .getMessagesPaged({ searchTerm: search, pageSize: 10 })
+      .subscribe({
+        next: (res: any) => {
+          this.messages = res?.result?.items || [];
+        },
+        error: () => this.showError('Failed to load messages'),
+      });
   }
 
   loadLocationData(locationType: string) {
@@ -516,18 +530,20 @@ export class CreateQueueComponent implements OnInit {
   }
 
   loadProducts(search?: string) {
-    this.productService.getProductsPaged({ searchTerm: search, pageSize: 10 }).subscribe({
-      next: (res: any) => {
-        this.products = res.items || [];
-      }
-    });
+    this.productService
+      .getProductsPaged({ searchTerm: search, pageSize: 10 })
+      .subscribe({
+        next: (res: any) => {
+          this.products = res.items || [];
+        },
+      });
   }
 
   loadShelves(search?: string) {
     this.shelfService.getAllShelves(this.storeId || 2).subscribe({
       next: (res: any) => {
         this.shelves = res || [];
-      }
+      },
     });
   }
 
@@ -535,7 +551,7 @@ export class CreateQueueComponent implements OnInit {
     this.queueService.getPriorityTypes().subscribe({
       next: (res: any) => {
         this.priorityOptions = res.result || [];
-      }
+      },
     });
   }
 
@@ -550,7 +566,7 @@ export class CreateQueueComponent implements OnInit {
       templateId: assignment.templateId,
       messageId: assignment.messageId,
       locationType: assignment.locationType,
-      locationId: assignment.locationId
+      locationId: assignment.locationId,
     });
   }
 
@@ -573,12 +589,12 @@ export class CreateQueueComponent implements OnInit {
         displayOrder: formValue.displayOrder,
         isRecurring: formValue.isRecurring,
         recurrencePattern: formValue.recurrencePattern,
-        userId: this.currentUserId
+        userId: this.currentUserId,
       };
 
       this.queueService.createQueueFromAssignment(request).subscribe({
         next: this.handleSuccess.bind(this),
-        error: this.handleError.bind(this)
+        error: this.handleError.bind(this),
       });
     } else {
       const queueType: 'TEMPLATE_QUEUE' | 'MESSAGE_QUEUE' =
@@ -596,12 +612,12 @@ export class CreateQueueComponent implements OnInit {
         isRecurring: formValue.isRecurring,
         recurrencePattern: formValue.recurrencePattern,
         queueType,
-        userId: this.currentUserId
+        userId: this.currentUserId,
       };
 
       this.queueService.createDirectQueue(request).subscribe({
         next: this.handleSuccess.bind(this),
-        error: this.handleError.bind(this)
+        error: this.handleError.bind(this),
       });
     }
   }
@@ -610,7 +626,7 @@ export class CreateQueueComponent implements OnInit {
     this.toastService.add({
       severity: 'success',
       summary: 'Success',
-      detail: 'Queue created successfully'
+      detail: 'Queue created successfully',
     });
     this.loading = false;
 
@@ -625,7 +641,9 @@ export class CreateQueueComponent implements OnInit {
   }
 
   handleError(err: any) {
-    this.showError(err.error?.message || err.message || 'Failed to create queue');
+    this.showError(
+      err.error?.message || err.message || 'Failed to create queue',
+    );
     this.loading = false;
   }
 

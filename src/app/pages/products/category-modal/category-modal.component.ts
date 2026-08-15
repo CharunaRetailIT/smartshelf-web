@@ -1,12 +1,24 @@
 import { Component, inject, Inject, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
-import { MatDialogRef, MAT_DIALOG_DATA, MatDialogModule } from '@angular/material/dialog';
+import {
+  FormBuilder,
+  FormGroup,
+  Validators,
+  ReactiveFormsModule,
+} from '@angular/forms';
+import {
+  MatDialogRef,
+  MAT_DIALOG_DATA,
+  MatDialogModule,
+} from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { CommonModule } from '@angular/common';
 import { ProductCategory } from '../../../core/interfaces/product.interface';
 import { CategoryService } from '../../../core/services/category.service';
 import { AuthService } from '../../../core/services/auth.service';
-import { CustomSnackbarComponent, SnackbarData } from '../../../shared/components/alert/custom-snackbar.component';
+import {
+  CustomSnackbarComponent,
+  SnackbarData,
+} from '../../../shared/components/alert/custom-snackbar.component';
 import { MatButtonModule } from '@angular/material/button';
 import { MatInputModule } from '@angular/material/input';
 import { MatCardModule } from '@angular/material/card';
@@ -35,7 +47,7 @@ export interface CategoryModalData {
     MatDividerModule,
     MatIconModule,
     MatSelectModule,
-    ImportsModule
+    ImportsModule,
   ],
   templateUrl: './category-modal.component.html',
   styleUrls: ['./category-modal.component.css'],
@@ -57,7 +69,7 @@ export class CategoryModalComponent implements OnInit {
     public auth: AuthService,
     private settingsService: SettingsService,
     public dialogRef: MatDialogRef<CategoryModalComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: CategoryModalData
+    @Inject(MAT_DIALOG_DATA) public data: CategoryModalData,
   ) {
     this.categoryForm = this.createForm();
   }
@@ -87,7 +99,6 @@ export class CategoryModalComponent implements OnInit {
       ? 'Update existing category information'
       : 'View category details';
   }
-
 
   ngOnInit(): void {
     console.log('Modal Data Received:', this.data);
@@ -137,7 +148,7 @@ export class CategoryModalComponent implements OnInit {
       // Meta Fields (hidden in form but needed for API)
       id: [0],
       createdUser: [0],
-      updatedUser: [0]
+      updatedUser: [0],
     });
   }
 
@@ -149,12 +160,14 @@ export class CategoryModalComponent implements OnInit {
       categoryDescription: category.categoryDescription || '',
       isActive: category.isActive !== undefined ? category.isActive : true,
       createdUser: category.createdUser || 0,
-      updatedUser: category.updatedUser || 0
+      updatedUser: category.updatedUser || 0,
     });
   }
 
   get canSubmit(): boolean {
-    return this.categoryForm.valid && !this.isSubmitting && !!this.currentUserId;
+    return (
+      this.categoryForm.valid && !this.isSubmitting && !!this.currentUserId
+    );
   }
 
   // Add this getter to access form controls in template
@@ -179,9 +192,11 @@ export class CategoryModalComponent implements OnInit {
         categoryCode: formValue.categoryCode,
         categoryDescription: formValue.categoryDescription,
         isActive: formValue.isActive,
-        createdUser: this.isEditMode ? formValue.createdUser : this.currentUserId,
+        createdUser: this.isEditMode
+          ? formValue.createdUser
+          : this.currentUserId,
         updatedUser: this.currentUserId,
-        storeId: this.storeId
+        storeId: this.storeId,
       };
 
       console.log('Submitting Category Data:', categoryData);
@@ -206,7 +221,7 @@ export class CategoryModalComponent implements OnInit {
             : 'Failed to create category.';
           this.showError(message);
           console.error('Error saving category:', err);
-        }
+        },
       });
     } else {
       this.markFormGroupTouched();
@@ -218,7 +233,7 @@ export class CategoryModalComponent implements OnInit {
   }
 
   private markFormGroupTouched(): void {
-    Object.keys(this.categoryForm.controls).forEach(key => {
+    Object.keys(this.categoryForm.controls).forEach((key) => {
       const control = this.categoryForm.get(key);
       control?.markAsTouched();
     });
@@ -243,7 +258,7 @@ export class CategoryModalComponent implements OnInit {
     const labels: { [key: string]: string } = {
       categoryName: 'Category Name',
       categoryCode: 'Category Code',
-      categoryDescription: 'Description'
+      categoryDescription: 'Description',
     };
     return labels[fieldName] || fieldName;
   }
@@ -254,7 +269,7 @@ export class CategoryModalComponent implements OnInit {
       severity: 'success',
       summary: 'Success',
       detail: message,
-      life: 5000
+      life: 5000,
     });
   }
 
@@ -263,7 +278,7 @@ export class CategoryModalComponent implements OnInit {
       severity: 'error',
       summary: 'Error',
       detail: message,
-      life: 5000
+      life: 5000,
     });
   }
 
@@ -272,7 +287,7 @@ export class CategoryModalComponent implements OnInit {
       severity: 'warn',
       summary: 'Warning',
       detail: message,
-      life: 5000
+      life: 5000,
     });
   }
 
@@ -281,7 +296,7 @@ export class CategoryModalComponent implements OnInit {
       severity: 'info',
       summary: 'Info',
       detail: message,
-      life: 5000
+      life: 5000,
     });
   }
   // private showSuccess(message: string): void {

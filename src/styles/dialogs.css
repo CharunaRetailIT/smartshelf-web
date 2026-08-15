@@ -42,17 +42,18 @@
   --dlg-text-muted: #64748b;
   --dlg-text-label: #334155;
 
-  /* Shape */
-  --dlg-radius: 16px;
-  --dlg-radius-control: 11px;
-  --dlg-shadow: 0 24px 48px -12px rgba(15, 23, 42, 0.22),
-    0 0 0 1px rgba(15, 23, 42, 0.04);
+  /* Shape. These now defer to the application-wide tokens in
+     design-tokens.css: a field inside a dialog is the same height and the
+     same corner as the identical field on the page behind it. */
+  --dlg-radius: var(--ds-radius-xl);
+  --dlg-radius-control: var(--ds-radius);
+  --dlg-shadow: var(--ds-shadow-overlay);
 
   /* Rhythm - one scale so every dialog breathes the same way */
-  --dlg-pad-x: 24px;
-  --dlg-pad-y: 20px;
-  --dlg-gap: 16px;
-  --dlg-control-h: 44px;
+  --dlg-pad-x: var(--ds-space-6);
+  --dlg-pad-y: var(--ds-space-5);
+  --dlg-gap: var(--ds-space-4);
+  --dlg-control-h: var(--ds-control-height);
 }
 
 /* -----------------------------------------------------------------------------
@@ -96,7 +97,7 @@
   margin: 0;
   background: var(--dlg-surface);
   border-bottom: 1px solid var(--dlg-border);
-  font-size: 1.0625rem;
+  font-size: 1rem;
   font-weight: 700;
   line-height: 1.4;
   letter-spacing: -0.01em;
@@ -132,8 +133,8 @@
   justify-content: center;
   flex-shrink: 0;
   box-sizing: border-box;
-  width: 34px;
-  height: 34px;
+  width: var(--ds-icon-button-size);
+  height: var(--ds-icon-button-size);
   /* PrimeNG's .p-button base rule sets padding-block on this button and its
      icon-only rule only zeroes padding-inline, not padding-block - left
      alone that vertical padding stacks on top of the fixed height above
@@ -141,11 +142,13 @@
      oval. Zero all padding here so width/height fully own the box. */
   padding: 0;
   margin: 0;
-  border-radius: 9px;
+  border-radius: var(--ds-radius);
   color: var(--dlg-text-muted);
   background: transparent;
   border: none;
-  transition: background-color 0.15s ease, color 0.15s ease;
+  transition:
+    background-color 0.15s ease,
+    color 0.15s ease;
 }
 
 .p-dialog .p-dialog-close-button:hover,
@@ -163,7 +166,7 @@
   padding: var(--dlg-pad-y) var(--dlg-pad-x);
   background: var(--dlg-surface);
   color: var(--dlg-text);
-  font-size: 0.9375rem;
+  font-size: var(--ds-control-font);
   line-height: 1.55;
   max-height: unset;
 }
@@ -212,8 +215,10 @@
   border: 1px solid var(--dlg-border-strong);
   background: var(--dlg-surface);
   color: var(--dlg-text);
-  font-size: 0.9375rem;
-  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  font-size: var(--ds-control-font);
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
 }
 
 /* Trigger-style controls (select/dropdown/multiselect) size themselves from
@@ -333,14 +338,19 @@
   min-height: var(--dlg-control-h);
   padding: 0 18px;
   border-radius: var(--dlg-radius-control);
-  font-size: 0.9375rem;
+  font-size: var(--ds-control-font);
   font-weight: 600;
-  transition: background-color 0.15s ease, border-color 0.15s ease,
+  transition:
+    background-color 0.15s ease,
+    border-color 0.15s ease,
     box-shadow 0.15s ease;
 }
 
 /* Primary */
-.p-dialog .p-button:not(.p-button-text):not(.p-button-outlined):not(.p-button-secondary):not(.p-button-danger),
+.p-dialog
+  .p-button:not(.p-button-text):not(.p-button-outlined):not(
+    .p-button-secondary
+  ):not(.p-button-danger),
 .p-dialog .p-button-success,
 .mat-mdc-dialog-container .p-button-success {
   background: var(--dlg-primary);
@@ -348,7 +358,10 @@
   color: #ffffff;
 }
 
-.p-dialog .p-button:not(.p-button-text):not(.p-button-outlined):not(.p-button-secondary):not(.p-button-danger):enabled:hover,
+.p-dialog
+  .p-button:not(.p-button-text):not(.p-button-outlined):not(
+    .p-button-secondary
+  ):not(.p-button-danger):enabled:hover,
 .p-dialog .p-button-success:enabled:hover,
 .mat-mdc-dialog-container .p-button-success:enabled:hover {
   background: var(--dlg-primary-hover);
@@ -508,7 +521,7 @@
   :root {
     --dlg-pad-x: 16px;
     --dlg-pad-y: 16px;
-    --dlg-control-h: 42px;
+    --dlg-control-h: var(--ds-control-height);
   }
 
   .p-dialog,
@@ -602,7 +615,9 @@
   background: transparent;
   color: var(--dlg-text-muted);
   cursor: pointer;
-  transition: background-color 0.15s ease, color 0.15s ease;
+  transition:
+    background-color 0.15s ease,
+    color 0.15s ease;
 }
 
 .dlg-close:hover {
@@ -706,9 +721,11 @@
   border-radius: var(--dlg-radius-control);
   background: var(--dlg-surface);
   color: var(--dlg-text);
-  font-size: 0.9375rem;
+  font-size: var(--ds-control-font);
   font-family: inherit;
-  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
 }
 
 .dlg-textarea {
@@ -771,7 +788,7 @@
   background: var(--dlg-surface-muted);
 }
 
-.dlg-check-row input[type='checkbox'] {
+.dlg-check-row input[type="checkbox"] {
   width: 18px;
   height: 18px;
   accent-color: var(--dlg-primary);
@@ -910,10 +927,10 @@
 
 /* ---- Small inline buttons ---- */
 .dlg-btn-sm {
-  min-height: 34px;
+  min-height: var(--ds-icon-button-size);
   padding: 0 12px;
   font-size: 0.8125rem;
-  border-radius: 9px;
+  border-radius: var(--ds-radius);
 }
 
 /* Icon-only destructive action (remove a row). */
@@ -932,7 +949,9 @@
   font-size: 0.75rem;
   font-weight: 600;
   cursor: pointer;
-  transition: background-color 0.15s ease, color 0.15s ease;
+  transition:
+    background-color 0.15s ease,
+    color 0.15s ease;
 }
 
 .dlg-icon-btn:hover:not(:disabled) {
@@ -1037,7 +1056,7 @@
 .dlg-confirm-title {
   margin: 0;
   padding-top: 2px;
-  font-size: 1.0625rem;
+  font-size: 1rem;
   font-weight: 700;
   line-height: 1.4;
   letter-spacing: -0.01em;
@@ -1102,7 +1121,9 @@
   font-family: inherit;
   cursor: pointer;
   white-space: nowrap;
-  transition: background-color 0.15s ease, border-color 0.15s ease,
+  transition:
+    background-color 0.15s ease,
+    border-color 0.15s ease,
     color 0.15s ease;
 }
 

@@ -1,13 +1,31 @@
-import { Component, OnInit, ViewChild, OnDestroy, viewChild, EventEmitter, Input, Output, TemplateRef } from '@angular/core';
-import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
+import {
+  Component,
+  OnInit,
+  ViewChild,
+  OnDestroy,
+  viewChild,
+  EventEmitter,
+  Input,
+  Output,
+  TemplateRef,
+} from '@angular/core';
+import {
+  FormBuilder,
+  FormGroup,
+  Validators,
+  ReactiveFormsModule,
+} from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { firstValueFrom, Subject } from 'rxjs';
 import { debounceTime, distinctUntilChanged, takeUntil } from 'rxjs/operators';
 
 // PrimeNG Components
 import { Table, TableModule } from 'primeng/table';
-import { ConfirmationService, MenuItem, MessageService as PrimeMessageService } from 'primeng/api';
-
+import {
+  ConfirmationService,
+  MenuItem,
+  MessageService as PrimeMessageService,
+} from 'primeng/api';
 
 // Models
 import {
@@ -18,9 +36,14 @@ import {
   DeviceAssignmentDto,
   DeviceScreenDto,
   DeviceMessageComboDto,
-  DeviceMessageComboPagedRequest
+  DeviceMessageComboPagedRequest,
 } from '../../../core/interfaces/device.interface';
-import { AssignmentSearchParams, ComboSearchParams, PagedResult, SearchParams } from '../../../core/interfaces/pagination-result.interface';
+import {
+  AssignmentSearchParams,
+  ComboSearchParams,
+  PagedResult,
+  SearchParams,
+} from '../../../core/interfaces/pagination-result.interface';
 
 // Services
 import { DeviceService } from '../../../core/services/device.service';
@@ -32,18 +55,30 @@ import { ImportsModule } from '../../../imports/imports';
 import { MinewStore } from '../../../core/interfaces/minew.interface';
 import { ConfirmationDialogComponent } from '../../../shared/components/dialog/confirmation-dialog/confirmation-dialog.component';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
-import { CreateDeviceScreenDimensionRequest, DeviceScreenDimensionResponse } from '../../../core/interfaces/device-screen-dimension.interface';
+import {
+  CreateDeviceScreenDimensionRequest,
+  DeviceScreenDimensionResponse,
+} from '../../../core/interfaces/device-screen-dimension.interface';
 import { DeleteConfirmationComponent } from '../../../shared/components/dialog/delete-confirmation/delete-confirmation.component';
-import { MinewBatchAddComponent } from "../minew-batch-add/minew-batch-add.component";
+import { MinewBatchAddComponent } from '../minew-batch-add/minew-batch-add.component';
 import { TabsModule } from 'primeng/tabs';
 import { AuthService } from '../../../core/services/auth.service';
 import { StoreService } from '../../../core/services/store.service';
+import { ActivatedRoute } from '@angular/router';
 import { StoreFilterParams } from '../../../core/interfaces/store.interface';
-import { CustomSnackbarComponent, SnackbarData } from '../../../shared/components/alert/custom-snackbar.component';
+import {
+  CustomSnackbarComponent,
+  SnackbarData,
+} from '../../../shared/components/alert/custom-snackbar.component';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { CustomMessageService } from '../../../core/services/message.service';
 import { MessagePagedRequest } from '../../../core/interfaces/message.interface';
-import { CreateGatewayRequest, GatewayDto, GatewayPagedRequest, UpdateGatewayRequest } from '../../../core/interfaces/gateway.interface';
+import {
+  CreateGatewayRequest,
+  GatewayDto,
+  GatewayPagedRequest,
+  UpdateGatewayRequest,
+} from '../../../core/interfaces/gateway.interface';
 import { GatewayService } from '../../../core/services/gateway.service';
 import { ProductService } from '../../../core/services/product.service';
 import { ShelfService } from '../../../core/services/shelf.service';
@@ -62,11 +97,11 @@ interface LayoutOption {
     ReactiveFormsModule,
     // PrimeNG Modules
     ImportsModule,
-    MinewBatchAddComponent
+    MinewBatchAddComponent,
   ],
   providers: [ConfirmationService],
   templateUrl: './device-management.component.html',
-  styleUrls: ['./device-management.component.css']
+  styleUrls: ['./device-management.component.css'],
 })
 export class DeviceManagementComponent implements OnInit, OnDestroy {
   @ViewChild('devicesTable') devicesTable!: Table;
@@ -95,7 +130,7 @@ export class DeviceManagementComponent implements OnInit, OnDestroy {
     deviceId: null,
     locationType: null,
     locationId: null,
-    isActive: true
+    isActive: true,
   };
 
   // Products
@@ -120,8 +155,6 @@ export class DeviceManagementComponent implements OnInit, OnDestroy {
 
   saving: boolean = false;
 
-
-
   // For dropdowns in forms
   deviceOptions: any[] = [];
   templateOptions: any[] = [];
@@ -145,7 +178,6 @@ export class DeviceManagementComponent implements OnInit, OnDestroy {
   gatewaysRows: number = 10;
   messageCombosRows: number = 10;
 
-
   // Loading states
   devicesLoading: boolean = false;
   templatesLoading: boolean = false;
@@ -154,11 +186,9 @@ export class DeviceManagementComponent implements OnInit, OnDestroy {
   messageCombosLoading: boolean = false;
   gatewaysLoading: boolean = false;
 
-
   //Sync Properties
   syncingTemplates = false;
   selectedSyncType: string = 'localToCloud';
-
 
   // Search terms
   deviceSearchTerm: string = '';
@@ -167,7 +197,6 @@ export class DeviceManagementComponent implements OnInit, OnDestroy {
   assignmentSearchTerm: string = '';
   messageComboSearchTerm: string = '';
   gatewaySearchTerm: string = '';
-
 
   // Filters
   deviceStatusFilter: string = '';
@@ -209,15 +238,24 @@ export class DeviceManagementComponent implements OnInit, OnDestroy {
   // Every popup on this page is a Material dialog rendered from a TemplateRef
   // below, so all the state and handlers stay on this component. The boolean
   // flags are kept because other logic still reads them.
-  @ViewChild('displayDeviceDialogTpl') displayDeviceDialogTpl!: TemplateRef<unknown>;
-  @ViewChild('displayTemplateDialogTpl') displayTemplateDialogTpl!: TemplateRef<unknown>;
-  @ViewChild('displayComboDialogTpl') displayComboDialogTpl!: TemplateRef<unknown>;
-  @ViewChild('displayAssignmentDialogTpl') displayAssignmentDialogTpl!: TemplateRef<unknown>;
-  @ViewChild('displayScreenDimensionDialogTpl') displayScreenDimensionDialogTpl!: TemplateRef<unknown>;
-  @ViewChild('displayDeviceSyncDialogTpl') displayDeviceSyncDialogTpl!: TemplateRef<unknown>;
-  @ViewChild('displayTemplateSyncDialogTpl') displayTemplateSyncDialogTpl!: TemplateRef<unknown>;
-  @ViewChild('displayGatewayDialogTpl') displayGatewayDialogTpl!: TemplateRef<unknown>;
-  @ViewChild('displayTemplatePreviewDialogTpl') displayTemplatePreviewDialogTpl!: TemplateRef<unknown>;
+  @ViewChild('displayDeviceDialogTpl')
+  displayDeviceDialogTpl!: TemplateRef<unknown>;
+  @ViewChild('displayTemplateDialogTpl')
+  displayTemplateDialogTpl!: TemplateRef<unknown>;
+  @ViewChild('displayComboDialogTpl')
+  displayComboDialogTpl!: TemplateRef<unknown>;
+  @ViewChild('displayAssignmentDialogTpl')
+  displayAssignmentDialogTpl!: TemplateRef<unknown>;
+  @ViewChild('displayScreenDimensionDialogTpl')
+  displayScreenDimensionDialogTpl!: TemplateRef<unknown>;
+  @ViewChild('displayDeviceSyncDialogTpl')
+  displayDeviceSyncDialogTpl!: TemplateRef<unknown>;
+  @ViewChild('displayTemplateSyncDialogTpl')
+  displayTemplateSyncDialogTpl!: TemplateRef<unknown>;
+  @ViewChild('displayGatewayDialogTpl')
+  displayGatewayDialogTpl!: TemplateRef<unknown>;
+  @ViewChild('displayTemplatePreviewDialogTpl')
+  displayTemplatePreviewDialogTpl!: TemplateRef<unknown>;
   private tplDialogRefs = new Map<string, MatDialogRef<unknown>>();
 
   displayDeviceDialog: boolean = false;
@@ -253,7 +291,7 @@ export class DeviceManagementComponent implements OnInit, OnDestroy {
   // Layout options
   layoutOptions: LayoutOption[] = [
     { label: 'List View', value: 'list', icon: 'pi pi-list' },
-    { label: 'Grid View', value: 'grid', icon: 'pi pi-th-large' }
+    { label: 'Grid View', value: 'grid', icon: 'pi pi-th-large' },
   ];
 
   selectedDevicesLayout: 'list' | 'grid' = 'list';
@@ -294,7 +332,7 @@ export class DeviceManagementComponent implements OnInit, OnDestroy {
     { label: 'Active', value: 'active' },
     { label: 'Inactive', value: 'inactive' },
     { label: 'Online', value: 'online' },
-    { label: 'Offline', value: 'offline' }
+    { label: 'Offline', value: 'offline' },
   ];
 
   // Every device is Minew for now, so the picker is hidden and the form's
@@ -309,13 +347,13 @@ export class DeviceManagementComponent implements OnInit, OnDestroy {
 
   locationTypeOptions = [
     { label: 'Shelf', value: 'Shelf' },
-    { label: 'Product', value: 'Product' }
+    { label: 'Product', value: 'Product' },
   ];
 
   activeFilterOptions = [
     { label: 'All', value: null },
     { label: 'Active', value: true },
-    { label: 'Inactive', value: false }
+    { label: 'Inactive', value: false },
   ];
 
   // Store Options
@@ -323,26 +361,34 @@ export class DeviceManagementComponent implements OnInit, OnDestroy {
 
   // Store Type Options
   storeTypeOptions = [
-    { label: 'Local Store', value: 'local', description: 'Store managed locally only' },
-    { label: 'Minew Cloud Store', value: 'cloud', description: 'Store synchronized with Minew cloud' }
+    {
+      label: 'Local Store',
+      value: 'local',
+      description: 'Store managed locally only',
+    },
+    {
+      label: 'Minew Cloud Store',
+      value: 'cloud',
+      description: 'Store synchronized with Minew cloud',
+    },
   ];
 
   // Sync Options
   syncOptions = [
     { label: 'Create Locally then Sync to Minew', value: 'localToCloud' },
-    { label: 'Sync from Minew Cloud', value: 'cloudToLocal' }
+    { label: 'Sync from Minew Cloud', value: 'cloudToLocal' },
   ];
 
   // Screen Orientation Options
   orientationOptions = [
     { label: 'Portrait', value: 'portrait' },
-    { label: 'Landscape', value: 'landscape' }
+    { label: 'Landscape', value: 'landscape' },
   ];
 
   comboTypeOptions = [
     { label: 'All', value: '' },
     { label: 'Template Assignment', value: 'TEMPLATE' },
-    { label: 'Message Assignment', value: 'MESSAGE' }
+    { label: 'Message Assignment', value: 'MESSAGE' },
   ];
 
   // Add gateway type options
@@ -350,7 +396,6 @@ export class DeviceManagementComponent implements OnInit, OnDestroy {
     { label: 'Minew Gateway', value: 'Minew' },
     { label: 'Standard Gateway', value: 'Standard' },
   ];
-
 
   //Template preview
   displayTemplatePreviewDialog: boolean = false;
@@ -379,6 +424,7 @@ export class DeviceManagementComponent implements OnInit, OnDestroy {
     private shelfService: ShelfService,
     private snackBar: MatSnackBar,
     private dialog: MatDialog,
+    private route: ActivatedRoute,
   ) {
     // Initialize forms
     this.deviceForm = this.fb.group({
@@ -397,9 +443,8 @@ export class DeviceManagementComponent implements OnInit, OnDestroy {
       battery: [100, [Validators.min(0), Validators.max(100)]],
       statusId: [1], // Default to Active
       isActive: [true],
-      isOnline: [false]
+      isOnline: [false],
     });
-
 
     this.templateForm = this.fb.group({
       id: [''],
@@ -411,13 +456,13 @@ export class DeviceManagementComponent implements OnInit, OnDestroy {
       color: [''],
       orientation: [0],
       storeId: [''],
-      isActive: [true]
+      isActive: [true],
     });
 
     this.comboForm = this.fb.group({
       deviceId: ['', Validators.required],
       templateId: ['', Validators.required],
-      isDefault: [false]
+      isDefault: [false],
     });
 
     this.assignmentForm = this.fb.group({
@@ -425,7 +470,7 @@ export class DeviceManagementComponent implements OnInit, OnDestroy {
       locationType: ['', Validators.required],
       locationId: [null, Validators.required],
       displayOrder: [0],
-      isActive: [true]
+      isActive: [true],
     });
 
     this.screenDimensionForm = this.fb.group({
@@ -434,7 +479,7 @@ export class DeviceManagementComponent implements OnInit, OnDestroy {
       orientation: ['portrait', Validators.required],
       refreshRate: [60],
       colorDepth: [8],
-      pixelDensity: [96]
+      pixelDensity: [96],
     });
 
     // Sync Form
@@ -445,7 +490,7 @@ export class DeviceManagementComponent implements OnInit, OnDestroy {
     this.searchForm = this.fb.group({
       searchTerm: [''],
       status: [''],
-      storeId: ['']
+      storeId: [''],
     });
 
     // Message combo form
@@ -453,13 +498,19 @@ export class DeviceManagementComponent implements OnInit, OnDestroy {
       deviceId: ['', Validators.required],
       messageId: ['', Validators.required],
       displayOrder: [0],
-      isActive: [true]
+      isActive: [true],
     });
 
     //gateway form
     this.gatewayForm = this.fb.group({
       id: [''],
-      macAddress: ['', [Validators.required, Validators.pattern(/^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$/)]],
+      macAddress: [
+        '',
+        [
+          Validators.required,
+          Validators.pattern(/^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$/),
+        ],
+      ],
       name: ['', Validators.required],
       description: [''],
       storeId: [0, Validators.required],
@@ -468,14 +519,45 @@ export class DeviceManagementComponent implements OnInit, OnDestroy {
       firmwareVersion: [''],
       battery: [100, [Validators.min(0), Validators.max(100)]],
       statusId: [1],
-      isActive: [true]
+      isActive: [true],
     });
   }
 
   ngOnInit(): void {
     this.initCurrentUser();
+
+    // Store Management links here with ?storeId=. When that is present the
+    // page scopes to that store instead of the user's default one; the store
+    // is fetched rather than having its id patched in, because storeName and
+    // especially minewStoreId are used for cloud binds and must belong to the
+    // same store as the id.
+    const requestedStoreId = Number(
+      this.route.snapshot.queryParamMap.get('storeId'),
+    );
+
+    if (requestedStoreId) {
+      this.storeService.getStore(requestedStoreId).subscribe({
+        next: (store) => {
+          this.storeId = store.id;
+          this.storeName = store.storeName;
+          this.minewStoreId = store.minewStoreId ?? '';
+          this.loadInitialData();
+        },
+        error: () => {
+          // Fall back to the default store rather than loading nothing.
+          this.loadDefaultStore();
+          this.loadInitialData();
+        },
+      });
+      return;
+    }
+
     this.loadDefaultStore();
-    // this.loadStoresLazy();
+    this.loadInitialData();
+  }
+
+  /** Everything that needs `storeId` to be resolved first. */
+  private loadInitialData(): void {
     this.setupDebouncedSearch();
     // Load initial data for first tab (Devices)
     this.loadDevicesLazy({ first: 0, rows: this.devicesRows });
@@ -485,8 +567,6 @@ export class DeviceManagementComponent implements OnInit, OnDestroy {
     this.loadMessageOptions();
     this.initializeAddDeviceOptions();
   }
-
-
 
   ngOnDestroy(): void {
     this.destroy$.next();
@@ -520,10 +600,14 @@ export class DeviceManagementComponent implements OnInit, OnDestroy {
   getLocationLabel(): string {
     const locationType = this.assignmentForm.get('locationType')?.value;
     switch (locationType) {
-      case 'Product': return 'Product';
-      case 'Shelf': return 'Shelf';
-      case 'Store': return 'Store';
-      default: return 'Location';
+      case 'Product':
+        return 'Product';
+      case 'Shelf':
+        return 'Shelf';
+      case 'Store':
+        return 'Store';
+      default:
+        return 'Location';
     }
   }
 
@@ -537,7 +621,11 @@ export class DeviceManagementComponent implements OnInit, OnDestroy {
 
     // Location ID validation based on location type
     let hasValidLocationId = false;
-    if (locationType === 'Product' || locationType === 'Shelf' || locationType === 'Store') {
+    if (
+      locationType === 'Product' ||
+      locationType === 'Shelf' ||
+      locationType === 'Store'
+    ) {
       hasValidLocationId = !!locationId;
     }
 
@@ -550,7 +638,7 @@ export class DeviceManagementComponent implements OnInit, OnDestroy {
       displayOrder: 0,
       isActive: true,
       locationId: null,
-      locationType: null
+      locationType: null,
     });
 
     // Reset pagination
@@ -616,11 +704,11 @@ export class DeviceManagementComponent implements OnInit, OnDestroy {
         pageSize: this.productPageSize,
         searchTerm: this.productSearchTerm || undefined,
         storeId: this.storeId,
-        isActive: true
+        isActive: true,
       };
 
       const pagedResult = await firstValueFrom(
-        this.productService.getProductsPaged(requestParams)
+        this.productService.getProductsPaged(requestParams),
       );
 
       const newProducts = pagedResult.items || [];
@@ -634,8 +722,9 @@ export class DeviceManagementComponent implements OnInit, OnDestroy {
       this.productTotalRecords = pagedResult.totalCount || 0;
       this.hasMoreProducts = this.productCurrentPage < pagedResult.totalPages;
 
-      console.log(`Loaded ${newProducts.length} products. Total: ${this.products.length}, Has more: ${this.hasMoreProducts}`);
-
+      console.log(
+        `Loaded ${newProducts.length} products. Total: ${this.products.length}, Has more: ${this.hasMoreProducts}`,
+      );
     } catch (error: any) {
       console.error('Error loading products:', error);
       this.showError('Failed to load products');
@@ -690,7 +779,7 @@ export class DeviceManagementComponent implements OnInit, OnDestroy {
 
     try {
       const shelves = await firstValueFrom(
-        this.shelfService.getAllShelves(this.storeId)
+        this.shelfService.getAllShelves(this.storeId),
       );
 
       // Apply search filter if any
@@ -698,9 +787,11 @@ export class DeviceManagementComponent implements OnInit, OnDestroy {
 
       if (this.shelfSearchTerm) {
         const term = this.shelfSearchTerm.toLowerCase();
-        filteredShelves = filteredShelves.filter(shelf =>
-          shelf.name?.toLowerCase().includes(term) ||
-          shelf.location?.toLowerCase().includes(term));
+        filteredShelves = filteredShelves.filter(
+          (shelf) =>
+            shelf.name?.toLowerCase().includes(term) ||
+            shelf.location?.toLowerCase().includes(term),
+        );
       }
 
       // Apply pagination
@@ -718,8 +809,9 @@ export class DeviceManagementComponent implements OnInit, OnDestroy {
 
       this.hasMoreShelves = endIndex < filteredShelves.length;
 
-      console.log(`Loaded ${newShelves.length} shelves. Total: ${this.shelves.length}, Has more: ${this.hasMoreShelves}`);
-
+      console.log(
+        `Loaded ${newShelves.length} shelves. Total: ${this.shelves.length}, Has more: ${this.hasMoreShelves}`,
+      );
     } catch (error: any) {
       console.error('Error loading shelves:', error);
       this.showError('Failed to load shelves');
@@ -766,7 +858,7 @@ export class DeviceManagementComponent implements OnInit, OnDestroy {
       error: (error) => {
         console.error('Failed to load screen options:', error);
         this.screenLoading = false;
-      }
+      },
     });
   }
 
@@ -775,60 +867,59 @@ export class DeviceManagementComponent implements OnInit, OnDestroy {
     this.loadStoresLazy({
       first: 0,
       rows: this.storeRows,
-      filter: this.storeSearchTerm
+      filter: this.storeSearchTerm,
     });
   }
   // ============ DEBOUNCED SEARCH SETUP ============
 
   private setupDebouncedSearch(): void {
     // Device search debouncing (500ms)
-    this.deviceSearchSubject$.pipe(
-      takeUntil(this.destroy$),
-      debounceTime(500),
-      distinctUntilChanged()
-    ).subscribe(() => {
-      this.onDeviceSearch();
-    });
+    this.deviceSearchSubject$
+      .pipe(takeUntil(this.destroy$), debounceTime(500), distinctUntilChanged())
+      .subscribe(() => {
+        this.onDeviceSearch();
+      });
 
     // Template search debouncing
-    this.templateSearchSubject$.pipe(
-      takeUntil(this.destroy$),
-      debounceTime(500),
-      distinctUntilChanged()
-    ).subscribe(() => {
-      console.log('Template search triggered with term:', this.templateSearchTerm);
-      this.onTemplateSearch();
-    });
+    this.templateSearchSubject$
+      .pipe(takeUntil(this.destroy$), debounceTime(500), distinctUntilChanged())
+      .subscribe(() => {
+        console.log(
+          'Template search triggered with term:',
+          this.templateSearchTerm,
+        );
+        this.onTemplateSearch();
+      });
 
     // Combo search debouncing
-    this.comboSearchSubject$.pipe(
-      takeUntil(this.destroy$),
-      debounceTime(500),
-      distinctUntilChanged()
-    ).subscribe(() => {
-      console.log('Combo search triggered with term:', this.comboSearchTerm);
-      this.onComboSearch();
-    });
+    this.comboSearchSubject$
+      .pipe(takeUntil(this.destroy$), debounceTime(500), distinctUntilChanged())
+      .subscribe(() => {
+        console.log('Combo search triggered with term:', this.comboSearchTerm);
+        this.onComboSearch();
+      });
 
     // Assignment search debouncing
-    this.assignmentSearchSubject$.pipe(
-      takeUntil(this.destroy$),
-      debounceTime(500),
-      distinctUntilChanged()
-    ).subscribe(() => {
-      console.log('Assignment search triggered with term:', this.assignmentSearchTerm);
-      this.onAssignmentSearch();
-    });
+    this.assignmentSearchSubject$
+      .pipe(takeUntil(this.destroy$), debounceTime(500), distinctUntilChanged())
+      .subscribe(() => {
+        console.log(
+          'Assignment search triggered with term:',
+          this.assignmentSearchTerm,
+        );
+        this.onAssignmentSearch();
+      });
 
     // Message combo search debouncing
-    this.messageComboSearchSubject$.pipe(
-      takeUntil(this.destroy$),
-      debounceTime(500),
-      distinctUntilChanged()
-    ).subscribe(() => {
-      console.log('Message Combo search triggered with term:', this.messageComboSearchTerm);
-      this.onMessageComboSearch();
-    });
+    this.messageComboSearchSubject$
+      .pipe(takeUntil(this.destroy$), debounceTime(500), distinctUntilChanged())
+      .subscribe(() => {
+        console.log(
+          'Message Combo search triggered with term:',
+          this.messageComboSearchTerm,
+        );
+        this.onMessageComboSearch();
+      });
   }
 
   loadScreenDimensions(deviceId: number): void {
@@ -840,10 +931,9 @@ export class DeviceManagementComponent implements OnInit, OnDestroy {
       },
       error: (error) => {
         this.showError('Failed to load screen dimensions');
-      }
+      },
     });
   }
-
 
   // ============ DROPDOWN DATA LOADING ============
 
@@ -855,8 +945,8 @@ export class DeviceManagementComponent implements OnInit, OnDestroy {
         command: () => this.openDeviceDialog(),
         tooltipOptions: {
           tooltipLabel: 'Add a single device manually',
-          tooltipPosition: 'right'
-        }
+          tooltipPosition: 'right',
+        },
       },
       {
         label: 'Batch Add Minew Devices',
@@ -864,30 +954,32 @@ export class DeviceManagementComponent implements OnInit, OnDestroy {
         command: () => this.openMinewBatchDialog(),
         tooltipOptions: {
           tooltipLabel: 'Add multiple Minew devices from cloud',
-          tooltipPosition: 'right'
-        }
+          tooltipPosition: 'right',
+        },
       },
     ];
   }
 
   loadDeviceOptions(): void {
     // Load devices for combo dropdown
-    this.deviceService.getLocalDevicesPagedbyStore(
-      this.storeId,
-      1,
-      100, // Load more for dropdown
-      ''
-    ).subscribe({
-      next: (result) => {
-        this.deviceOptions = result.items.map(device => ({
-          label: `${device.deviceName} (${device.mac})`,
-          value: device.id
-        }));
-      },
-      error: (error) => {
-        console.error('Failed to load device options:', error);
-      }
-    });
+    this.deviceService
+      .getLocalDevicesPagedbyStore(
+        this.storeId,
+        1,
+        100, // Load more for dropdown
+        '',
+      )
+      .subscribe({
+        next: (result) => {
+          this.deviceOptions = result.items.map((device) => ({
+            label: `${device.deviceName} (${device.mac})`,
+            value: device.id,
+          }));
+        },
+        error: (error) => {
+          console.error('Failed to load device options:', error);
+        },
+      });
   }
 
   loadTemplateOptions(): void {
@@ -895,21 +987,21 @@ export class DeviceManagementComponent implements OnInit, OnDestroy {
     const searchParams: SearchParams = {
       pageNumber: 1,
       pageSize: 100, // Load more for dropdown
-      storeId: this.storeId
+      storeId: this.storeId,
     };
 
     this.deviceService.getLocalTemplatesPaged(searchParams).subscribe({
       next: (response) => {
         if (response.success && response.result) {
-          this.templateOptions = response.result.items.map(template => ({
+          this.templateOptions = response.result.items.map((template) => ({
             label: `${template.name} (${template.screenWidth}x${template.screenHeight})`,
-            value: template.id
+            value: template.id,
           }));
         }
       },
       error: (error) => {
         console.error('Failed to load template options:', error);
-      }
+      },
     });
   }
 
@@ -917,23 +1009,23 @@ export class DeviceManagementComponent implements OnInit, OnDestroy {
     // Load combos for assignment dropdown
     const searchParams: SearchParams = {
       pageNumber: 1,
-      pageSize: 100 // Load more for dropdown
+      pageSize: 100, // Load more for dropdown
     };
 
     this.deviceService.getCombosPaged(searchParams).subscribe({
       next: (response) => {
-        console.log("comOpt", response.result)
+        console.log('comOpt', response.result);
         if (response.success && response.result) {
-          this.comboOptions = response.result.items.map(combo => ({
+          this.comboOptions = response.result.items.map((combo) => ({
             label: `${combo.deviceName} - ${combo.templateName}`,
             value: combo.id,
-            type: 'TEMPLATE'
+            type: 'TEMPLATE',
           }));
         }
       },
       error: (error) => {
         console.error('Failed to load combo options:', error);
-      }
+      },
     });
   }
 
@@ -944,28 +1036,30 @@ export class DeviceManagementComponent implements OnInit, OnDestroy {
       pageSize: 100,
       isActive: true, // Only load active messages
       sortBy: 'title',
-      sortDescending: false
+      sortDescending: false,
     };
 
     this.messageService.getMessagesPaged(request).subscribe({
       next: (response) => {
         if (response.success && response.result) {
-          this.messageOptions = response.result.items.map(message => ({
+          this.messageOptions = response.result.items.map((message) => ({
             label: `${message.title} (${this.getContentTypeDisplay(message.contentType)})`,
             value: message.id,
             contentType: message.contentType,
             messageTitle: message.title,
-            type: 'MESSAGE'
+            type: 'MESSAGE',
           }));
         } else {
           this.messageOptions = [];
-          console.warn('No messages found or API returned unsuccessful response');
+          console.warn(
+            'No messages found or API returned unsuccessful response',
+          );
         }
       },
       error: (error) => {
         console.error('Failed to load message options:', error);
         this.showError('Failed to load messages');
-      }
+      },
     });
   }
 
@@ -973,36 +1067,37 @@ export class DeviceManagementComponent implements OnInit, OnDestroy {
     // Load message combos for assignment dropdown
     const searchParams: SearchParams = {
       pageNumber: 1,
-      pageSize: 100
+      pageSize: 100,
     };
 
     this.deviceService.getDeviceMessageCombosPaged(searchParams).subscribe({
       next: (response) => {
         if (response.success && response.result) {
-          this.messageComboOptions = response.result.items.map(combo => ({
+          this.messageComboOptions = response.result.items.map((combo) => ({
             label: `${combo.deviceName} - ${combo.messageTitle}`,
             value: combo.id,
-            type: 'MESSAGE'
+            type: 'MESSAGE',
           }));
         }
       },
       error: (error) => {
         console.error('Failed to load message combo options:', error);
-      }
+      },
     });
   }
 
   // ============ SERVER-SIDE PAGINATION METHODS ============
 
   loadStoresLazy(event: any): void {
-    console.log("Store Lazy Called")
+    console.log('Store Lazy Called');
     if (this.storeLoading) {
       return;
     }
 
     this.storeLoading = true;
 
-    const pageNumber = Math.floor((event.first || 0) / (event.rows || this.storeRows)) + 1;
+    const pageNumber =
+      Math.floor((event.first || 0) / (event.rows || this.storeRows)) + 1;
     const pageSize = event.rows || this.storeRows;
     const searchTerm = event.filter || '';
 
@@ -1012,32 +1107,31 @@ export class DeviceManagementComponent implements OnInit, OnDestroy {
       searchTerm,
       isActive: true,
       sortBy: 'storeName',
-      sortDirection: 'asc'
+      sortDirection: 'asc',
     };
 
     this.storeService.getStoresLazy(params).subscribe({
       next: (result) => {
-        this.storeOptions = result.items.map(store => ({
+        this.storeOptions = result.items.map((store) => ({
           label: `${store.storeName} (${store.storeCode || store.id})`,
           value: store.id,
           storeName: store.storeName,
           storeCode: store.storeCode,
           address: store.address,
-          isActive: store.isActive
+          isActive: store.isActive,
         }));
         this.storeTotalRecords = result.totalCount;
         this.storeLoading = false;
-        console.log("store lzy", this.storeOptions)
+        console.log('store lzy', this.storeOptions);
       },
       error: (error) => {
         console.error('Failed to load stores:', error);
         this.storeOptions = [];
         this.storeTotalRecords = 0;
         this.storeLoading = false;
-      }
+      },
     });
   }
-
 
   // Devices - Server-side pagination with lazy loading
   // loadDevicesLazy(event: TableLazyLoadEvent): void {
@@ -1085,14 +1179,17 @@ export class DeviceManagementComponent implements OnInit, OnDestroy {
 
     this.devicesLoading = true;
 
-    const pageNumber = Math.floor((event.first || 0) / (event.rows || this.devicesRows)) + 1;
+    const pageNumber =
+      Math.floor((event.first || 0) / (event.rows || this.devicesRows)) + 1;
     const pageSize = event.rows || this.devicesRows;
 
     // Get sort parameters
     let sortBy = '';
     let sortDescending = false;
     if (event.sortField) {
-      sortBy = Array.isArray(event.sortField) ? event.sortField[0] : event.sortField;
+      sortBy = Array.isArray(event.sortField)
+        ? event.sortField[0]
+        : event.sortField;
       sortDescending = event.sortOrder === -1;
     }
 
@@ -1104,25 +1201,27 @@ export class DeviceManagementComponent implements OnInit, OnDestroy {
       filters.Status = this.deviceStatusFilter;
     }
 
-    this.deviceService.getLocalDevicesPagedbyStore(
-      this.storeId,
-      pageNumber,
-      pageSize,
-      this.deviceSearchTerm,
-      sortBy,
-      sortDescending,
-      filters
-    ).subscribe({
-      next: (result: PagedResult<LocalDeviceDto>) => {
-        this.devices = result.items;
-        this.devicesTotalRecords = result.totalCount;
-        this.devicesLoading = false;
-      },
-      error: (error) => {
-        this.showError('Failed to load devices');
-        this.devicesLoading = false;
-      }
-    });
+    this.deviceService
+      .getLocalDevicesPagedbyStore(
+        this.storeId,
+        pageNumber,
+        pageSize,
+        this.deviceSearchTerm,
+        sortBy,
+        sortDescending,
+        filters,
+      )
+      .subscribe({
+        next: (result: PagedResult<LocalDeviceDto>) => {
+          this.devices = result.items;
+          this.devicesTotalRecords = result.totalCount;
+          this.devicesLoading = false;
+        },
+        error: (error) => {
+          this.showError('Failed to load devices');
+          this.devicesLoading = false;
+        },
+      });
   }
 
   // Templates - Server-side pagination with lazy loading
@@ -1145,10 +1244,10 @@ export class DeviceManagementComponent implements OnInit, OnDestroy {
         storeId,
         pageNumber,
         pageSize,
-        this.templateSearchTerm
+        this.templateSearchTerm,
       )
       .subscribe({
-        next: result => {
+        next: (result) => {
           this.templates = result.items;
           this.templatesTotalRecords = result.totalCount;
           this.templatesLoading = false;
@@ -1156,13 +1255,11 @@ export class DeviceManagementComponent implements OnInit, OnDestroy {
         error: () => {
           this.showError('Failed to load templates');
           this.templatesLoading = false;
-        }
+        },
       });
   }
 
-
-
-  // Combos - Server-side pagination with lazy loading 
+  // Combos - Server-side pagination with lazy loading
   loadCombosLazy(event: TableLazyLoadEvent): void {
     if (this.combosLoading) {
       return;
@@ -1170,14 +1267,17 @@ export class DeviceManagementComponent implements OnInit, OnDestroy {
 
     this.combosLoading = true;
 
-    const pageNumber = Math.floor((event.first || 0) / (event.rows || this.combosRows)) + 1;
+    const pageNumber =
+      Math.floor((event.first || 0) / (event.rows || this.combosRows)) + 1;
     const pageSize = event.rows || this.combosRows;
 
     let sortBy = '';
     let sortDescending = false;
 
     if (event.sortField) {
-      sortBy = Array.isArray(event.sortField) ? event.sortField[0] : event.sortField;
+      sortBy = Array.isArray(event.sortField)
+        ? event.sortField[0]
+        : event.sortField;
       sortDescending = event.sortOrder === -1;
     }
 
@@ -1187,7 +1287,7 @@ export class DeviceManagementComponent implements OnInit, OnDestroy {
       pageSize,
       searchTerm: this.comboSearchTerm,
       sortBy,
-      sortDescending
+      sortDescending,
     };
 
     // Add filters using the extended interface properties
@@ -1202,10 +1302,10 @@ export class DeviceManagementComponent implements OnInit, OnDestroy {
     }
 
     this.deviceService.getCombosPaged(searchParams).subscribe({
-      next: response => {
+      next: (response) => {
         if (response.success && response.result) {
           this.combos = response.result.items;
-          console.log("Loaded combos:", this.combos);
+          console.log('Loaded combos:', this.combos);
           this.combosTotalRecords = response.result.totalCount;
         } else {
           this.combos = [];
@@ -1217,7 +1317,7 @@ export class DeviceManagementComponent implements OnInit, OnDestroy {
         console.error('Error loading combos:', error);
         this.showError('Failed to load combos');
         this.combosLoading = false;
-      }
+      },
     });
   }
   // In the loadAssignmentsLazy method
@@ -1282,13 +1382,16 @@ export class DeviceManagementComponent implements OnInit, OnDestroy {
 
     this.assignmentsLoading = true;
 
-    const pageNumber = Math.floor((event.first || 0) / (event.rows || this.assignmentsRows)) + 1;
+    const pageNumber =
+      Math.floor((event.first || 0) / (event.rows || this.assignmentsRows)) + 1;
     const pageSize = event.rows || this.assignmentsRows;
     let sortBy = '';
     let sortDescending = false;
 
     if (event.sortField) {
-      sortBy = Array.isArray(event.sortField) ? event.sortField[0] : event.sortField;
+      sortBy = Array.isArray(event.sortField)
+        ? event.sortField[0]
+        : event.sortField;
       sortDescending = event.sortOrder === -1;
     }
 
@@ -1298,8 +1401,11 @@ export class DeviceManagementComponent implements OnInit, OnDestroy {
       searchTerm: this.assignmentSearchTerm,
       sortBy,
       sortDescending,
-      assignmentType: this.assignmentTypeFilter as 'TEMPLATE' | 'MESSAGE' | undefined,
-      storeId: this.storeId
+      assignmentType: this.assignmentTypeFilter as
+        | 'TEMPLATE'
+        | 'MESSAGE'
+        | undefined,
+      storeId: this.storeId,
     };
 
     if (this.assignmentLocationTypeFilter) {
@@ -1307,17 +1413,29 @@ export class DeviceManagementComponent implements OnInit, OnDestroy {
     }
 
     if (this.assignmentComboFilter) {
-      const selectedOption = this.comboOptions.find(opt => opt.value == this.assignmentComboFilter);
+      const selectedOption = this.comboOptions.find(
+        (opt) => opt.value == this.assignmentComboFilter,
+      );
       console.log('Selected combo option:', selectedOption);
       console.log('All combo options:', this.comboOptions);
 
       if (selectedOption) {
         if (selectedOption.type === 'TEMPLATE') {
-          searchParams.deviceTemplateComboId = parseInt(this.assignmentComboFilter);
-          console.log('Setting deviceTemplateComboId:', searchParams.deviceTemplateComboId);
+          searchParams.deviceTemplateComboId = parseInt(
+            this.assignmentComboFilter,
+          );
+          console.log(
+            'Setting deviceTemplateComboId:',
+            searchParams.deviceTemplateComboId,
+          );
         } else if (selectedOption.type === 'MESSAGE') {
-          searchParams.deviceMessageComboId = parseInt(this.assignmentComboFilter);
-          console.log('Setting deviceMessageComboId:', searchParams.deviceMessageComboId);
+          searchParams.deviceMessageComboId = parseInt(
+            this.assignmentComboFilter,
+          );
+          console.log(
+            'Setting deviceMessageComboId:',
+            searchParams.deviceMessageComboId,
+          );
         }
       } else {
         console.warn('Selected combo option not found in comboOptions');
@@ -1337,7 +1455,7 @@ export class DeviceManagementComponent implements OnInit, OnDestroy {
         console.error('Error loading assignments:', error);
         this.showError('Failed to load assignments');
         this.assignmentsLoading = false;
-      }
+      },
     });
   }
 
@@ -1348,14 +1466,18 @@ export class DeviceManagementComponent implements OnInit, OnDestroy {
 
     this.messageCombosLoading = true;
 
-    const pageNumber = Math.floor((event.first || 0) / (event.rows || this.messageCombosRows)) + 1;
+    const pageNumber =
+      Math.floor((event.first || 0) / (event.rows || this.messageCombosRows)) +
+      1;
     const pageSize = event.rows || this.messageCombosRows;
 
     let sortBy = '';
     let sortDescending = false;
 
     if (event.sortField) {
-      sortBy = Array.isArray(event.sortField) ? event.sortField[0] : event.sortField;
+      sortBy = Array.isArray(event.sortField)
+        ? event.sortField[0]
+        : event.sortField;
       sortDescending = event.sortOrder === -1;
     }
 
@@ -1366,14 +1488,16 @@ export class DeviceManagementComponent implements OnInit, OnDestroy {
       sortBy,
       sortDescending,
       deviceId: this.messageComboDeviceFilter || undefined,
-      messageId: this.messageComboMessageFilter ? parseInt(this.messageComboMessageFilter) : undefined
+      messageId: this.messageComboMessageFilter
+        ? parseInt(this.messageComboMessageFilter)
+        : undefined,
     };
 
     this.deviceService.getDeviceMessageCombosPaged(searchParams).subscribe({
       next: (response) => {
         if (response.success && response.result) {
           this.messageCombos = response.result.items;
-          console.log("messagecombos", this.messageCombos)
+          console.log('messagecombos', this.messageCombos);
           this.messageCombosTotalRecords = response.result.totalCount;
         } else {
           this.messageCombos = [];
@@ -1384,7 +1508,7 @@ export class DeviceManagementComponent implements OnInit, OnDestroy {
       error: (error) => {
         this.showError('Failed to load message combos');
         this.messageCombosLoading = false;
-      }
+      },
     });
   }
 
@@ -1395,14 +1519,17 @@ export class DeviceManagementComponent implements OnInit, OnDestroy {
 
     this.gatewaysLoading = true;
 
-    const pageNumber = Math.floor((event.first || 0) / (event.rows || this.gatewaysRows)) + 1;
+    const pageNumber =
+      Math.floor((event.first || 0) / (event.rows || this.gatewaysRows)) + 1;
     const pageSize = event.rows || this.gatewaysRows;
 
     let sortBy = '';
     let sortDescending = false;
 
     if (event.sortField) {
-      sortBy = Array.isArray(event.sortField) ? event.sortField[0] : event.sortField;
+      sortBy = Array.isArray(event.sortField)
+        ? event.sortField[0]
+        : event.sortField;
       sortDescending = event.sortOrder === -1;
     }
 
@@ -1412,7 +1539,7 @@ export class DeviceManagementComponent implements OnInit, OnDestroy {
       searchTerm: this.gatewaySearchTerm,
       sortBy,
       sortDescending,
-      storeId: this.storeId
+      storeId: this.storeId,
     };
 
     this.gatewayService.getGatewaysPaged(searchParams).subscribe({
@@ -1429,7 +1556,7 @@ export class DeviceManagementComponent implements OnInit, OnDestroy {
       error: (error) => {
         this.showError('Failed to load gateways');
         this.gatewaysLoading = false;
-      }
+      },
     });
   }
 
@@ -1470,9 +1597,15 @@ export class DeviceManagementComponent implements OnInit, OnDestroy {
   }
 
   onMessageComboSearchInput(event?: any): void {
-    console.log('Message Combo search input changed:', this.messageComboSearchTerm);
+    console.log(
+      'Message Combo search input changed:',
+      this.messageComboSearchTerm,
+    );
     // If search term becomes empty, trigger immediate search
-    if (!this.messageComboSearchTerm || this.messageComboSearchTerm.trim() === '') {
+    if (
+      !this.messageComboSearchTerm ||
+      this.messageComboSearchTerm.trim() === ''
+    ) {
       this.onMessageComboSearch();
     } else {
       this.messageComboSearchSubject$.next();
@@ -1508,7 +1641,7 @@ export class DeviceManagementComponent implements OnInit, OnDestroy {
       first: event.first,
       rows: event.rows,
       sortField: this.devicesTable?.sortField,
-      sortOrder: this.devicesTable?.sortOrder
+      sortOrder: this.devicesTable?.sortOrder,
     });
   }
 
@@ -1518,7 +1651,7 @@ export class DeviceManagementComponent implements OnInit, OnDestroy {
       first: event.first,
       rows: event.rows,
       sortField: this.templatesTable?.sortField,
-      sortOrder: this.templatesTable?.sortOrder
+      sortOrder: this.templatesTable?.sortOrder,
     });
   }
 
@@ -1528,7 +1661,7 @@ export class DeviceManagementComponent implements OnInit, OnDestroy {
       first: event.first,
       rows: event.rows,
       sortField: this.templatesTable?.sortField,
-      sortOrder: this.templatesTable?.sortOrder
+      sortOrder: this.templatesTable?.sortOrder,
     });
   }
   onMessageCombosPageChange(event: any): void {
@@ -1537,7 +1670,7 @@ export class DeviceManagementComponent implements OnInit, OnDestroy {
       first: event.first,
       rows: event.rows,
       sortField: this.templatesTable?.sortField,
-      sortOrder: this.templatesTable?.sortOrder
+      sortOrder: this.templatesTable?.sortOrder,
     });
   }
   onAssignmentsPageChange(event: any): void {
@@ -1546,7 +1679,7 @@ export class DeviceManagementComponent implements OnInit, OnDestroy {
       first: event.first,
       rows: event.rows,
       sortField: this.templatesTable?.sortField,
-      sortOrder: this.templatesTable?.sortOrder
+      sortOrder: this.templatesTable?.sortOrder,
     });
   }
   // ============ SEARCH EXECUTION METHODS ============
@@ -1565,7 +1698,7 @@ export class DeviceManagementComponent implements OnInit, OnDestroy {
         first: 0,
         rows: this.devicesRows,
         sortField: this.devicesTable.sortField,
-        sortOrder: this.devicesTable.sortOrder
+        sortOrder: this.devicesTable.sortOrder,
       });
     }
   }
@@ -1595,7 +1728,10 @@ export class DeviceManagementComponent implements OnInit, OnDestroy {
   }
 
   public onAssignmentSearch(): void {
-    console.log('Executing assignment search for term:', this.assignmentSearchTerm);
+    console.log(
+      'Executing assignment search for term:',
+      this.assignmentSearchTerm,
+    );
     if (this.assignmentsTable) {
       // Reset to first page
       this.assignmentsTable.first = 0;
@@ -1607,7 +1743,10 @@ export class DeviceManagementComponent implements OnInit, OnDestroy {
   }
 
   public onMessageComboSearch(): void {
-    console.log('Executing message combo search for term:', this.messageComboSearchTerm);
+    console.log(
+      'Executing message combo search for term:',
+      this.messageComboSearchTerm,
+    );
     if (this.messageCombosTable) {
       // Reset to first page
       this.messageCombosTable.first = 0;
@@ -1680,7 +1819,10 @@ export class DeviceManagementComponent implements OnInit, OnDestroy {
         break;
       case 'messageCombos':
         if (this.messageCombos.length === 0) {
-          this.loadMessageCombosLazy({ first: 0, rows: this.messageCombosRows });
+          this.loadMessageCombosLazy({
+            first: 0,
+            rows: this.messageCombosRows,
+          });
         }
         // Load message combo options for assignment dialog
         this.loadMessageComboOptions();
@@ -1699,7 +1841,6 @@ export class DeviceManagementComponent implements OnInit, OnDestroy {
         break;
     }
   }
-
 
   onDeviceStatusFilterChange(): void {
     this.onDeviceSearch();
@@ -1760,7 +1901,6 @@ export class DeviceManagementComponent implements OnInit, OnDestroy {
     }
   }
 
-
   // ============ DIALOG METHODS ============
 
   openDeviceDialog(device?: LocalDeviceDto): void {
@@ -1784,7 +1924,7 @@ export class DeviceManagementComponent implements OnInit, OnDestroy {
         battery: device.battery || 100,
         statusId: device.statusId || 1,
         isActive: device.isActive || true,
-        isOnline: device.isOnline || false
+        isOnline: device.isOnline || false,
       });
     } else {
       this.isEditMode = false;
@@ -1795,7 +1935,7 @@ export class DeviceManagementComponent implements OnInit, OnDestroy {
         battery: 100,
         statusId: 1,
         isActive: true,
-        isOnline: false
+        isOnline: false,
       });
     }
 
@@ -1803,7 +1943,11 @@ export class DeviceManagementComponent implements OnInit, OnDestroy {
     this.loadInitialStores();
     this.loadScreenOptions();
     this.displayDeviceDialog = true;
-    this.openTplDialog('displayDeviceDialog', this.displayDeviceDialogTpl, '750px');
+    this.openTplDialog(
+      'displayDeviceDialog',
+      this.displayDeviceDialogTpl,
+      '750px',
+    );
   }
 
   /**
@@ -1868,26 +2012,34 @@ export class DeviceManagementComponent implements OnInit, OnDestroy {
         color: template.color || '',
         orientation: template.orientation || 0,
         storeId: template.storeId || '',
-        isActive: template.isActive || true
+        isActive: template.isActive || true,
       });
     } else {
       this.isEditMode = false;
       this.selectedTemplate = null;
       this.templateForm.reset({
         isActive: true,
-        storeId: this.storeId
+        storeId: this.storeId,
       });
     }
     this.displayTemplateDialog = true;
-    this.openTplDialog('displayTemplateDialog', this.displayTemplateDialogTpl, '600px');
+    this.openTplDialog(
+      'displayTemplateDialog',
+      this.displayTemplateDialogTpl,
+      '600px',
+    );
   }
 
   openComboDialog(): void {
     this.comboForm.reset({
-      isDefault: false
+      isDefault: false,
     });
     this.displayComboDialog = true;
-    this.openTplDialog('displayComboDialog', this.displayComboDialogTpl, '500px');
+    this.openTplDialog(
+      'displayComboDialog',
+      this.displayComboDialogTpl,
+      '500px',
+    );
   }
 
   // openAssignmentDialog(): void {
@@ -1898,17 +2050,20 @@ export class DeviceManagementComponent implements OnInit, OnDestroy {
   //   this.displayAssignmentDialog = true;
   // }
 
-  openAssignmentDialog(type: 'TEMPLATE' | 'MESSAGE' = 'TEMPLATE', combo?: any): void {
+  openAssignmentDialog(
+    type: 'TEMPLATE' | 'MESSAGE' = 'TEMPLATE',
+    combo?: any,
+  ): void {
     this.assignmentForm.reset({
       displayOrder: 0,
-      isActive: true
+      isActive: true,
     });
 
     // If a specific combo is provided, preselect it
     if (combo) {
       if (type === 'TEMPLATE') {
         this.assignmentForm.patchValue({
-          comboId: combo.id
+          comboId: combo.id,
         });
       } else if (type === 'MESSAGE') {
         // For message combos, you might need a different approach
@@ -1918,9 +2073,12 @@ export class DeviceManagementComponent implements OnInit, OnDestroy {
     }
 
     this.displayAssignmentDialog = true;
-    this.openTplDialog('displayAssignmentDialog', this.displayAssignmentDialogTpl, '500px');
+    this.openTplDialog(
+      'displayAssignmentDialog',
+      this.displayAssignmentDialogTpl,
+      '500px',
+    );
   }
-
 
   /**
    * Fills in screen size for devices in the active store. A device added from
@@ -1950,7 +2108,9 @@ export class DeviceManagementComponent implements OnInit, OnDestroy {
           this.showSuccess(res.message || 'Screen details updated.');
           this.loadDevicesLazy({ first: 0, rows: this.devicesRows });
         } else {
-          this.showSuccess(res?.message || 'No devices needed a screen update.');
+          this.showSuccess(
+            res?.message || 'No devices needed a screen update.',
+          );
         }
       },
       error: (err) => {
@@ -1966,20 +2126,31 @@ export class DeviceManagementComponent implements OnInit, OnDestroy {
     this.selectedSyncType = 'localToCloud';
     this.loading = false; // Reset loading state
     this.displayDeviceSyncDialog = true;
-    this.openTplDialog('displayDeviceSyncDialog', this.displayDeviceSyncDialogTpl, '500px');
+    this.openTplDialog(
+      'displayDeviceSyncDialog',
+      this.displayDeviceSyncDialogTpl,
+      '500px',
+    );
   }
 
   openScreenDimensionDialog(device?: any) {
-    this.selectedDevice = device;   // so your *ngIf="selectedDevice" works
+    this.selectedDevice = device; // so your *ngIf="selectedDevice" works
     this.loadScreenDimensions(device.id); // optional
     this.displayScreenDimensionDialog = true;
-    this.openTplDialog('displayScreenDimensionDialog', this.displayScreenDimensionDialogTpl, '600px');
+    this.openTplDialog(
+      'displayScreenDimensionDialog',
+      this.displayScreenDimensionDialogTpl,
+      '600px',
+    );
   }
-
 
   syncTemplates(): void {
     this.displayTemplateSyncDialog = true;
-    this.openTplDialog('displayTemplateSyncDialog', this.displayTemplateSyncDialogTpl, '500px');
+    this.openTplDialog(
+      'displayTemplateSyncDialog',
+      this.displayTemplateSyncDialogTpl,
+      '500px',
+    );
   }
 
   syncGateways(): void {
@@ -1992,14 +2163,14 @@ export class DeviceManagementComponent implements OnInit, OnDestroy {
       },
       error: (error) => {
         this.showError('Failed to sync gateways');
-      }
+      },
     });
   }
 
   openMessageComboDialog(): void {
     this.messageComboForm.reset({
       displayOrder: 0,
-      isActive: true
+      isActive: true,
     });
     this.displayMessageComboDialog = true;
   }
@@ -2019,7 +2190,7 @@ export class DeviceManagementComponent implements OnInit, OnDestroy {
         firmwareVersion: gateway.firmwareVersion,
         battery: gateway.battery || 100,
         statusId: gateway.statusId,
-        isActive: gateway.isActive
+        isActive: gateway.isActive,
       });
     } else {
       this.isEditMode = false;
@@ -2029,15 +2200,18 @@ export class DeviceManagementComponent implements OnInit, OnDestroy {
         storeId: this.storeId,
         battery: 100,
         statusId: 1,
-        isActive: true
+        isActive: true,
       });
     }
 
     this.loadInitialStores();
     this.displayGatewayDialog = true;
-    this.openTplDialog('displayGatewayDialog', this.displayGatewayDialogTpl, '600px');
+    this.openTplDialog(
+      'displayGatewayDialog',
+      this.displayGatewayDialogTpl,
+      '600px',
+    );
   }
-
 
   // ============ SAVE METHODS ============
 
@@ -2063,14 +2237,14 @@ export class DeviceManagementComponent implements OnInit, OnDestroy {
       battery: formValue.battery,
       statusId: formValue.statusId,
       isActive: formValue.isActive,
-      createdUser: userId
+      createdUser: userId,
     };
 
     if (this.isEditMode) {
       const updateRequest = {
         id: formValue.id,
         ...request,
-        updatedUser: userId
+        updatedUser: userId,
       };
 
       this.deviceService.updateDevice(formValue.id, updateRequest).subscribe({
@@ -2085,7 +2259,7 @@ export class DeviceManagementComponent implements OnInit, OnDestroy {
         },
         error: (error) => {
           this.showError('Failed to update device');
-        }
+        },
       });
     } else {
       this.deviceService.createDevice(request).subscribe({
@@ -2100,7 +2274,7 @@ export class DeviceManagementComponent implements OnInit, OnDestroy {
         },
         error: (error) => {
           this.showError('Failed to create device');
-        }
+        },
       });
     }
   }
@@ -2136,26 +2310,28 @@ export class DeviceManagementComponent implements OnInit, OnDestroy {
 
     const formValue = this.comboForm.value;
 
-    this.deviceService.createDeviceTemplateCombo(
-      formValue.deviceId,
-      formValue.templateId,
-      formValue.isDefault
-    ).subscribe({
-      next: (combo) => {
-        this.showSuccess('Combo created successfully');
-        this.displayComboDialog = false;
-        this.closeTplDialog('displayComboDialog');
-        // Refresh combos list
-        if (this.combosTable) {
-          this.combosTable.reset();
-        }
-        // Refresh combo options
-        this.loadComboOptions();
-      },
-      error: (error) => {
-        this.showError('Failed to create combo');
-      }
-    });
+    this.deviceService
+      .createDeviceTemplateCombo(
+        formValue.deviceId,
+        formValue.templateId,
+        formValue.isDefault,
+      )
+      .subscribe({
+        next: (combo) => {
+          this.showSuccess('Combo created successfully');
+          this.displayComboDialog = false;
+          this.closeTplDialog('displayComboDialog');
+          // Refresh combos list
+          if (this.combosTable) {
+            this.combosTable.reset();
+          }
+          // Refresh combo options
+          this.loadComboOptions();
+        },
+        error: (error) => {
+          this.showError('Failed to create combo');
+        },
+      });
   }
 
   saveAssignment(): void {
@@ -2166,36 +2342,38 @@ export class DeviceManagementComponent implements OnInit, OnDestroy {
 
     const formValue = this.assignmentForm.value;
     console.log('Saving assignment with values:', formValue);
-    this.deviceService.assignComboToLocationWithDetails(
-      'TEMPLATE',
-      formValue.locationType,
-      formValue.locationId,
-      this.currentUserId,
-      formValue.displayOrder,
-      this.storeId
-      // formValue.displayOrder,
-      // formValue.isActive
-    ).subscribe({
-      next: (assignment) => {
-        this.showSuccess('Assignment created successfully');
-        this.displayAssignmentDialog = false;
-        this.closeTplDialog('displayAssignmentDialog');
-        // Refresh assignments list
-        if (this.assignmentsTable) {
-          this.assignmentsTable.reset();
-        }
-      },
-      error: (error) => {
-        console.error('API error:', error);
+    this.deviceService
+      .assignComboToLocationWithDetails(
+        'TEMPLATE',
+        formValue.locationType,
+        formValue.locationId,
+        this.currentUserId,
+        formValue.displayOrder,
+        this.storeId,
+        // formValue.displayOrder,
+        // formValue.isActive
+      )
+      .subscribe({
+        next: (assignment) => {
+          this.showSuccess('Assignment created successfully');
+          this.displayAssignmentDialog = false;
+          this.closeTplDialog('displayAssignmentDialog');
+          // Refresh assignments list
+          if (this.assignmentsTable) {
+            this.assignmentsTable.reset();
+          }
+        },
+        error: (error) => {
+          console.error('API error:', error);
 
-        const apiMessage =
-          error?.error?.message ||
-          error?.error?.Message ||
-          'Failed to create assignment';
+          const apiMessage =
+            error?.error?.message ||
+            error?.error?.Message ||
+            'Failed to create assignment';
 
-        this.showError(apiMessage);
-      }
-    });
+          this.showError(apiMessage);
+        },
+      });
   }
 
   saveGateway(): void {
@@ -2216,7 +2394,7 @@ export class DeviceManagementComponent implements OnInit, OnDestroy {
         isOnline: false,
         lastSeen: null,
         isActive: formValue.isActive,
-        updatedUser: userId
+        updatedUser: userId,
       };
 
       this.gatewayService.updateGateway(formValue.id, updateRequest).subscribe({
@@ -2230,7 +2408,7 @@ export class DeviceManagementComponent implements OnInit, OnDestroy {
         },
         error: (error) => {
           this.showError('Failed to update gateway');
-        }
+        },
       });
     } else {
       const createRequest: CreateGatewayRequest = {
@@ -2244,7 +2422,7 @@ export class DeviceManagementComponent implements OnInit, OnDestroy {
         battery: formValue.battery,
         statusId: formValue.statusId,
         isActive: formValue.isActive,
-        createdUser: userId
+        createdUser: userId,
       };
 
       this.gatewayService.createGateway(createRequest).subscribe({
@@ -2258,11 +2436,10 @@ export class DeviceManagementComponent implements OnInit, OnDestroy {
         },
         error: (error) => {
           this.showError('Failed to create gateway');
-        }
+        },
       });
     }
   }
-
 
   /**
    * Pushes local-only devices for the active store up to the Minew cloud.
@@ -2312,18 +2489,24 @@ export class DeviceManagementComponent implements OnInit, OnDestroy {
               const result = response?.result;
 
               if (!response?.success || !result) {
-                this.showError(response?.message || 'Failed to sync devices to cloud');
+                this.showError(
+                  response?.message || 'Failed to sync devices to cloud',
+                );
                 return;
               }
 
               // Minew answers per MAC in the account's own language, so classify
               // on its wording rather than trusting a single count.
               const verdicts = Object.entries(result.results || {});
-              const isAdded = (v: string) => /^(success|成功)$/i.test((v || '').trim());
-              const isAlreadyThere = (v: string) => (v || '').includes('已被添加');
+              const isAdded = (v: string) =>
+                /^(success|成功)$/i.test((v || '').trim());
+              const isAlreadyThere = (v: string) =>
+                (v || '').includes('已被添加');
 
               const added = verdicts.filter(([, v]) => isAdded(v)).length;
-              const already = verdicts.filter(([, v]) => isAlreadyThere(v)).length;
+              const already = verdicts.filter(([, v]) =>
+                isAlreadyThere(v),
+              ).length;
               const rejected = verdicts.filter(
                 ([, v]) => !isAdded(v) && !isAlreadyThere(v),
               );
@@ -2340,7 +2523,9 @@ export class DeviceManagementComponent implements OnInit, OnDestroy {
                 // wrong store, and so on).
                 this.showError(
                   `Sync to Minew: ${summary}. ` +
-                    rejected.map(([mac, reason]) => `${mac}: ${reason}`).join('; '),
+                    rejected
+                      .map(([mac, reason]) => `${mac}: ${reason}`)
+                      .join('; '),
                 );
               } else {
                 this.showSuccess(`Sync to Minew: ${summary}.`);
@@ -2372,7 +2557,7 @@ export class DeviceManagementComponent implements OnInit, OnDestroy {
         const ref = this.dialog.open(BarcodeScannerComponent, {
           panelClass: 'barcode-scanner-dialog',
           autoFocus: false,
-          restoreFocus: true
+          restoreFocus: true,
         });
 
         ref.afterClosed().subscribe((macs?: string[]) => {
@@ -2396,7 +2581,7 @@ export class DeviceManagementComponent implements OnInit, OnDestroy {
       error: (error) => {
         this.loading = false;
         this.showError('Failed to sync devices from cloud');
-      }
+      },
     });
   }
   saveScreenDimension(): void {
@@ -2416,23 +2601,22 @@ export class DeviceManagementComponent implements OnInit, OnDestroy {
       refreshRate: formValue.refreshRate,
       colorDepth: formValue.colorDepth,
       pixelDensity: formValue.pixelDensity,
-      createdUser: userId
+      createdUser: userId,
     };
 
-    this.deviceService.createDeviceScreenDimension(
-      this.selectedDevice.id,
-      request
-    ).subscribe({
-      next: (dimension) => {
-        this.showSuccess('Screen dimension added successfully');
-        this.displayScreenDimensionDialog = false;
-        this.closeTplDialog('displayScreenDimensionDialog');
-        this.loadScreenDimensions(this.selectedDevice!.id);
-      },
-      error: (error) => {
-        this.showError('Failed to add screen dimension');
-      }
-    });
+    this.deviceService
+      .createDeviceScreenDimension(this.selectedDevice.id, request)
+      .subscribe({
+        next: (dimension) => {
+          this.showSuccess('Screen dimension added successfully');
+          this.displayScreenDimensionDialog = false;
+          this.closeTplDialog('displayScreenDimensionDialog');
+          this.loadScreenDimensions(this.selectedDevice!.id);
+        },
+        error: (error) => {
+          this.showError('Failed to add screen dimension');
+        },
+      });
   }
 
   confirmTemplateSync(): void {
@@ -2443,11 +2627,12 @@ export class DeviceManagementComponent implements OnInit, OnDestroy {
       width: '420px',
       data: {
         title: 'Sync Templates',
-        message: 'This will sync templates from the cloud for this store. Do you want to continue?',
+        message:
+          'This will sync templates from the cloud for this store. Do you want to continue?',
         confirmText: 'Sync',
         cancelText: 'Cancel',
-        confirmColor: 'primary'
-      }
+        confirmColor: 'primary',
+      },
     });
 
     dialogRef.afterClosed().subscribe((confirmed: boolean) => {
@@ -2461,7 +2646,9 @@ export class DeviceManagementComponent implements OnInit, OnDestroy {
 
       this.deviceService.syncTemplatesFromCloud(storeId).subscribe({
         next: (templates) => {
-          this.showSuccess(`Templates synced successfully (${templates.length})`);
+          this.showSuccess(
+            `Templates synced successfully (${templates.length})`,
+          );
           this.syncingTemplates = false;
 
           // Reload templates list after sync
@@ -2478,7 +2665,7 @@ export class DeviceManagementComponent implements OnInit, OnDestroy {
               : 'Failed to sync templates from cloud',
           );
           this.syncingTemplates = false;
-        }
+        },
       });
     });
   }
@@ -2500,11 +2687,11 @@ export class DeviceManagementComponent implements OnInit, OnDestroy {
         message: `Are you sure you want to sync devices ${this.selectedSyncType === 'localToCloud' ? 'to cloud' : 'from cloud'}?`,
         confirmText: 'Start Sync',
         cancelText: 'Cancel',
-        confirmColor: 'primary'
-      }
+        confirmColor: 'primary',
+      },
     });
 
-    dialogRef.afterClosed().subscribe(result => {
+    dialogRef.afterClosed().subscribe((result) => {
       if (result) {
         this.loading = true;
 
@@ -2528,7 +2715,7 @@ export class DeviceManagementComponent implements OnInit, OnDestroy {
       deviceId: formValue.deviceId,
       messageId: formValue.messageId,
       storeId: this.storeId,
-      isActive: formValue.isActive ?? true
+      isActive: formValue.isActive ?? true,
     };
 
     this.deviceService.createDeviceMessageCombo(dto).subscribe({
@@ -2547,8 +2734,11 @@ export class DeviceManagementComponent implements OnInit, OnDestroy {
         }
       },
       error: (error) => {
-        this.showError('Failed to create message combo: ' + (error.error?.message || error.message));
-      }
+        this.showError(
+          'Failed to create message combo: ' +
+            (error.error?.message || error.message),
+        );
+      },
     });
   }
 
@@ -2561,14 +2751,16 @@ export class DeviceManagementComponent implements OnInit, OnDestroy {
         title: 'Delete Device',
         message: `Are you sure you want to delete "${device.deviceName}"?`,
         confirmText: 'Delete',
-        cancelText: 'Cancel'
+        cancelText: 'Cancel',
       },
       panelClass: ['rounded-lg'],
-      disableClose: true
+      disableClose: true,
     });
     dialogRef.afterClosed().subscribe(async (result) => {
       if (result) {
-        const response = await firstValueFrom(this.deviceService.deleteDevice(device.id, this.currentUserId));
+        const response = await firstValueFrom(
+          this.deviceService.deleteDevice(device.id, this.currentUserId),
+        );
         if (response.success) {
           this.showSuccess(response.message);
           this.devicesTable?.reset();
@@ -2584,22 +2776,24 @@ export class DeviceManagementComponent implements OnInit, OnDestroy {
   }
 
   blinkDevice(device: LocalDeviceDto): void {
-    this.deviceService.lightUpDevice(device.mac, Number(device.storeId)).subscribe({
-      next: () => {
-        this.showSuccess(`Blinking "${device.deviceName}"`);
-      },
-      error: (err) => {
-        // The API returns Minew's own reason (gateway offline, unknown label,
-        // store not linked). Swallowing it left only "Failed to blink", which
-        // says nothing about what to fix.
-        const reason = err?.error?.message || err?.message;
-        this.showError(
-          reason
-            ? `Failed to blink "${device.deviceName}": ${reason}`
-            : `Failed to blink "${device.deviceName}"`,
-        );
-      },
-    });
+    this.deviceService
+      .lightUpDevice(device.mac, Number(device.storeId))
+      .subscribe({
+        next: () => {
+          this.showSuccess(`Blinking "${device.deviceName}"`);
+        },
+        error: (err) => {
+          // The API returns Minew's own reason (gateway offline, unknown label,
+          // store not linked). Swallowing it left only "Failed to blink", which
+          // says nothing about what to fix.
+          const reason = err?.error?.message || err?.message;
+          this.showError(
+            reason
+              ? `Failed to blink "${device.deviceName}": ${reason}`
+              : `Failed to blink "${device.deviceName}"`,
+          );
+        },
+      });
   }
 
   deleteTemplate(template: LocalTemplateDto): void {
@@ -2609,15 +2803,17 @@ export class DeviceManagementComponent implements OnInit, OnDestroy {
         title: 'Delete Template',
         message: `Are you sure you want to delete "${template.name}"`,
         confirmText: 'Delete',
-        cancelText: 'Cancel'
+        cancelText: 'Cancel',
       },
       panelClass: ['rounded-lg'],
-      disableClose: true
+      disableClose: true,
     });
 
     dialogRef.afterClosed().subscribe(async (result) => {
       if (result) {
-        const response = await firstValueFrom(this.deviceService.deleteTemplate(template.id, this.currentUserId));
+        const response = await firstValueFrom(
+          this.deviceService.deleteTemplate(template.id, this.currentUserId),
+        );
         if (response.success) {
           this.showSuccess(response.message);
           this.devicesTable?.reset();
@@ -2628,7 +2824,6 @@ export class DeviceManagementComponent implements OnInit, OnDestroy {
     });
   }
 
-
   deleteCombo(combo: DeviceTemplateComboDto): void {
     const dialogRef = this.dialog.open(DeleteConfirmationComponent, {
       width: '400px',
@@ -2636,15 +2831,17 @@ export class DeviceManagementComponent implements OnInit, OnDestroy {
         title: 'Delete Combo',
         message: `Are you sure you want to delete "${combo.deviceName} - ${combo.templateName}" combo?`,
         confirmText: 'Delete',
-        cancelText: 'Cancel'
+        cancelText: 'Cancel',
       },
       panelClass: ['rounded-lg'],
-      disableClose: true
+      disableClose: true,
     });
 
     dialogRef.afterClosed().subscribe(async (result) => {
       if (result) {
-        const response = await firstValueFrom(this.deviceService.deleteCombo(combo.id, this.currentUserId));
+        const response = await firstValueFrom(
+          this.deviceService.deleteCombo(combo.id, this.currentUserId),
+        );
         if (response.success) {
           this.showSuccess(response.message);
           this.devicesTable?.reset();
@@ -2662,21 +2859,23 @@ export class DeviceManagementComponent implements OnInit, OnDestroy {
         title: 'Delete Assignment',
         message: `Are you sure you want to delete the "${assignment.locationName || this.getLocationName(assignment)}" assignment?`,
         confirmText: 'Delete',
-        cancelText: 'Cancel'
+        cancelText: 'Cancel',
       },
       panelClass: ['rounded-lg'],
-      disableClose: true
+      disableClose: true,
     });
 
     dialogRef.afterClosed().subscribe(async (result) => {
       if (result === true && assignment?.id) {
         try {
           const response = await firstValueFrom(
-            this.deviceService.deleteAssignment(assignment.id)
+            this.deviceService.deleteAssignment(assignment.id),
           );
 
           if (response.success) {
-            this.showSuccess(response.message || 'Assignment deleted successfully');
+            this.showSuccess(
+              response.message || 'Assignment deleted successfully',
+            );
             // Refresh table
             this.assignmentsTable?.reset();
           } else {
@@ -2684,7 +2883,9 @@ export class DeviceManagementComponent implements OnInit, OnDestroy {
           }
         } catch (error: any) {
           console.error(error);
-          this.showError(`Failed to delete assignment: ${error.message || error}`);
+          this.showError(
+            `Failed to delete assignment: ${error.message || error}`,
+          );
         }
       }
     });
@@ -2697,21 +2898,26 @@ export class DeviceManagementComponent implements OnInit, OnDestroy {
         title: 'Delete Message Combo',
         message: `Are you sure you want to delete the "${msgcombo.deviceName} - ${msgcombo.messageTitle}" combo?`,
         confirmText: 'Delete',
-        cancelText: 'Cancel'
+        cancelText: 'Cancel',
       },
       panelClass: ['rounded-lg'],
-      disableClose: true
+      disableClose: true,
     });
 
     dialogRef.afterClosed().subscribe(async (result) => {
       if (result === true && msgcombo?.id) {
         try {
           const response = await firstValueFrom(
-            this.deviceService.deleteMessageCombo(msgcombo.id, this.currentUserId)
+            this.deviceService.deleteMessageCombo(
+              msgcombo.id,
+              this.currentUserId,
+            ),
           );
 
           if (response.success) {
-            this.showSuccess(response.message || 'Message Combo deleted successfully');
+            this.showSuccess(
+              response.message || 'Message Combo deleted successfully',
+            );
             // Refresh table
             this.messageCombosTable?.reset();
           } else {
@@ -2719,12 +2925,13 @@ export class DeviceManagementComponent implements OnInit, OnDestroy {
           }
         } catch (error: any) {
           console.error(error);
-          this.showError(`Failed to delete message combo: ${error.message || error}`);
+          this.showError(
+            `Failed to delete message combo: ${error.message || error}`,
+          );
         }
       }
     });
   }
-
 
   // deleteCombo(combo: DeviceTemplateComboDto): void {
   //   this.confirmationService.confirm({
@@ -2771,24 +2978,26 @@ export class DeviceManagementComponent implements OnInit, OnDestroy {
         title: 'Confirm Deletion',
         message: `Are you sure you want to delete screen dimension ${dimension.screenSize}?`,
         confirmText: 'Delete',
-        cancelText: 'Cancel'
-      }
+        cancelText: 'Cancel',
+      },
     });
 
-    dialogRef.afterClosed().subscribe(result => {
+    dialogRef.afterClosed().subscribe((result) => {
       if (result) {
         const userId = 1; // Get from auth service
-        this.deviceService.deleteDeviceScreenDimension(dimension.id, userId).subscribe({
-          next: () => {
-            this.showSuccess(`Screen dimension deleted successfully`);
-            if (this.selectedDevice) {
-              this.loadScreenDimensions(this.selectedDevice.id);
-            }
-          },
-          error: (error) => {
-            this.showError('Failed to delete screen dimension');
-          }
-        });
+        this.deviceService
+          .deleteDeviceScreenDimension(dimension.id, userId)
+          .subscribe({
+            next: () => {
+              this.showSuccess(`Screen dimension deleted successfully`);
+              if (this.selectedDevice) {
+                this.loadScreenDimensions(this.selectedDevice.id);
+              }
+            },
+            error: (error) => {
+              this.showError('Failed to delete screen dimension');
+            },
+          });
       }
     });
   }
@@ -2800,15 +3009,17 @@ export class DeviceManagementComponent implements OnInit, OnDestroy {
         title: 'Delete Gateway',
         message: `Are you sure you want to delete "${gateway.name}"?`,
         confirmText: 'Delete',
-        cancelText: 'Cancel'
+        cancelText: 'Cancel',
       },
       panelClass: ['rounded-lg'],
-      disableClose: true
+      disableClose: true,
     });
 
     dialogRef.afterClosed().subscribe(async (result) => {
       if (result) {
-        const response = await firstValueFrom(this.gatewayService.deleteGateway(gateway.id, this.currentUserId));
+        const response = await firstValueFrom(
+          this.gatewayService.deleteGateway(gateway.id, this.currentUserId),
+        );
         if (response.success) {
           this.showSuccess(response.message);
           this.gatewaysTable?.reset();
@@ -2911,7 +3122,11 @@ export class DeviceManagementComponent implements OnInit, OnDestroy {
     this.selectedTemplateForPreview = template;
     this.isLoadingPreview = true;
     this.displayTemplatePreviewDialog = true;
-    this.openTplDialog('displayTemplatePreviewDialog', this.displayTemplatePreviewDialogTpl, '700px');
+    this.openTplDialog(
+      'displayTemplatePreviewDialog',
+      this.displayTemplatePreviewDialogTpl,
+      '700px',
+    );
     this.templatePreviewImage = null;
 
     // Assuming your device service has a method to get template preview
@@ -2925,7 +3140,7 @@ export class DeviceManagementComponent implements OnInit, OnDestroy {
         console.error('Failed to load template preview:', error);
         this.showError('Failed to load template preview');
         this.isLoadingPreview = false;
-      }
+      },
     });
   }
 
@@ -2961,15 +3176,14 @@ export class DeviceManagementComponent implements OnInit, OnDestroy {
     return infoParts.join(' | ');
   }
   loadTemplatePreviewFromCombo(combo: DeviceTemplateComboDto): void {
-
     // You need to find the template from your templates list
-    const template = this.templates.find(t => t.id === combo.templateId);
-    console.log("template", template)
+    const template = this.templates.find((t) => t.id === combo.templateId);
+    console.log('template', template);
     if (template) {
       this.loadTemplatePreview(template);
     } else {
       // Template not found locally, fetch it from API
-      this.fetchTemplateById(combo.templateId).then(fetchedTemplate => {
+      this.fetchTemplateById(combo.templateId).then((fetchedTemplate) => {
         if (fetchedTemplate) {
           this.loadTemplatePreview(fetchedTemplate);
         } else {
@@ -2979,21 +3193,25 @@ export class DeviceManagementComponent implements OnInit, OnDestroy {
     }
   }
 
-  private fetchTemplateById(templateId: string): Promise<LocalTemplateDto | null> {
+  private fetchTemplateById(
+    templateId: string,
+  ): Promise<LocalTemplateDto | null> {
     return new Promise((resolve) => {
       this.deviceService.getTemplateById(templateId).subscribe({
         next: (template) => {
           // Add to local templates array for future use
-          if (!this.templates.find(t => t.id === template.id)) {
+          if (!this.templates.find((t) => t.id === template.id)) {
             this.templates.push(template);
           }
           resolve(template);
         },
         error: (error) => {
           console.error('Error fetching template:', error);
-          this.showWarning(`Unable to load template: ${error.message || 'Template not found'}`);
+          this.showWarning(
+            `Unable to load template: ${error.message || 'Template not found'}`,
+          );
           resolve(null);
-        }
+        },
       });
     });
   }
@@ -3008,10 +3226,14 @@ export class DeviceManagementComponent implements OnInit, OnDestroy {
       <div><strong>Device:</strong> ${assignment.deviceName}</div>
       <div><strong>Assignment Type:</strong> ${assignment.assignmentType}</div>
       ${assignment.isTemplateAssignment ? `<div><strong>Template:</strong> ${assignment.templateName}</div>` : ''}
-      ${assignment.isMessageAssignment ? `
+      ${
+        assignment.isMessageAssignment
+          ? `
         <div><strong>Message Title:</strong> ${assignment.messageTitle}</div>
         <div><strong>Message Content:</strong> ${assignment.messageContent}</div>
-      ` : ''}
+      `
+          : ''
+      }
       <div><strong>Location:</strong> ${assignment.locationType} - ${assignment.locationName || assignment.locationId}</div>
       <div><strong>Store:</strong> ${assignment.storeName}</div>
       <div><strong>Active:</strong> ${assignment.isActive ? 'Yes' : 'No'}</div>
@@ -3023,10 +3245,9 @@ export class DeviceManagementComponent implements OnInit, OnDestroy {
       severity: 'info',
       summary: 'Assignment Details',
       detail: message,
-      life: 5000
+      life: 5000,
     });
   }
-
 
   getComboDisplay(assignment: DeviceAssignmentDto): string {
     if (assignment.isTemplateAssignment && assignment.isMessageAssignment) {
@@ -3044,7 +3265,7 @@ export class DeviceManagementComponent implements OnInit, OnDestroy {
   }
 
   getScreenDisplay(screenId: number): string {
-    const screen = this.screenOptions.find(s => s.id === screenId);
+    const screen = this.screenOptions.find((s) => s.id === screenId);
     if (screen) {
       return `${screen.name} (${screen.width}x${screen.height})`;
     }
@@ -3055,7 +3276,9 @@ export class DeviceManagementComponent implements OnInit, OnDestroy {
     const storeId = this.deviceForm.get('storeId')?.value;
     if (!storeId) return 'Select Store';
 
-    const selectedStore = this.storeOptions.find(store => store.value === storeId);
+    const selectedStore = this.storeOptions.find(
+      (store) => store.value === storeId,
+    );
     return selectedStore ? selectedStore.storeName : 'Store #' + storeId;
   }
 
@@ -3066,21 +3289,31 @@ export class DeviceManagementComponent implements OnInit, OnDestroy {
 
     // Fallback based on messageId or other properties
     switch (messageCombo.messageContentType) {
-      case 1: return 'Text';
-      case 2: return 'Image';
-      case 3: return 'Video';
-      case 4: return 'HTML';
-      default: return 'Unknown';
+      case 1:
+        return 'Text';
+      case 2:
+        return 'Image';
+      case 3:
+        return 'Video';
+      case 4:
+        return 'HTML';
+      default:
+        return 'Unknown';
     }
   }
 
   getContentTypeSeverity(messageCombo: DeviceMessageComboDto): string {
     switch (messageCombo.messageContentType) {
-      case 1: return 'info';    // Text
-      case 2: return 'success'; // Image
-      case 3: return 'warning'; // Video
-      case 4: return 'help';    // HTML
-      default: return 'secondary';
+      case 1:
+        return 'info'; // Text
+      case 2:
+        return 'success'; // Image
+      case 3:
+        return 'warning'; // Video
+      case 4:
+        return 'help'; // HTML
+      default:
+        return 'secondary';
     }
   }
 
@@ -3117,19 +3350,23 @@ export class DeviceManagementComponent implements OnInit, OnDestroy {
         content: messageCombo.contentTypeName,
         displayOrder: messageCombo.displayOrder ?? 0,
         isActive: messageCombo.isActive,
-        createdDate: messageCombo.createdDate
-      }
+        createdDate: messageCombo.createdDate,
+      },
     });
   }
 
-
   private getContentTypeDisplay(contentType: number): string {
     switch (contentType) {
-      case 1: return 'Text';
-      case 2: return 'Image';
-      case 3: return 'Video';
-      case 4: return 'HTML';
-      default: return 'Unknown';
+      case 1:
+        return 'Text';
+      case 2:
+        return 'Image';
+      case 3:
+        return 'Video';
+      case 4:
+        return 'HTML';
+      default:
+        return 'Unknown';
     }
   }
 
@@ -3192,9 +3429,13 @@ export class DeviceManagementComponent implements OnInit, OnDestroy {
         </div>
         <div>
           <p class="text-sm text-gray-600">Status:</p>
-          <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${gateway.isOnline ? 'bg-green-100 text-green-800' :
-        gateway.isActive ? 'bg-yellow-100 text-yellow-800' : 'bg-red-100 text-red-800'
-      }">
+          <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
+            gateway.isOnline
+              ? 'bg-green-100 text-green-800'
+              : gateway.isActive
+                ? 'bg-yellow-100 text-yellow-800'
+                : 'bg-red-100 text-red-800'
+          }">
             ${this.getGatewayStatusText(gateway)}
           </span>
         </div>
@@ -3218,7 +3459,7 @@ export class DeviceManagementComponent implements OnInit, OnDestroy {
       
       <div>
         <p class="text-sm text-gray-600">Last Seen:</p>
-        <p class="font-medium">${gateway.lastSeen ? (new Date(gateway.lastSeen)).toLocaleString() : 'Never'}</p>
+        <p class="font-medium">${gateway.lastSeen ? new Date(gateway.lastSeen).toLocaleString() : 'Never'}</p>
       </div>
       
       <div class="grid grid-cols-2 gap-3">
@@ -3232,26 +3473,38 @@ export class DeviceManagementComponent implements OnInit, OnDestroy {
         </div>
       </div>
       
-      ${gateway.description ? `
+      ${
+        gateway.description
+          ? `
         <div>
           <p class="text-sm text-gray-600">Description:</p>
           <p class="font-medium">${gateway.description}</p>
         </div>
-      ` : ''}
+      `
+          : ''
+      }
       
-      ${gateway.battery !== undefined ? `
+      ${
+        gateway.battery !== undefined
+          ? `
         <div>
           <p class="text-sm text-gray-600">Battery:</p>
           <div class="flex items-center">
             <div class="w-32 bg-gray-200 rounded-full h-2 mr-2">
-              <div class="h-full rounded-full ${gateway.battery > 70 ? 'bg-green-500' :
-          gateway.battery > 30 ? 'bg-yellow-500' : 'bg-red-500'
-        }" style="width: ${gateway.battery}%"></div>
+              <div class="h-full rounded-full ${
+                gateway.battery > 70
+                  ? 'bg-green-500'
+                  : gateway.battery > 30
+                    ? 'bg-yellow-500'
+                    : 'bg-red-500'
+              }" style="width: ${gateway.battery}%"></div>
             </div>
             <span class="font-medium">${gateway.battery}%</span>
           </div>
         </div>
-      ` : ''}
+      `
+          : ''
+      }
     </div>
   `;
 
@@ -3260,7 +3513,7 @@ export class DeviceManagementComponent implements OnInit, OnDestroy {
       summary: 'Gateway Details',
       detail: message,
       life: 10000,
-      closable: true
+      closable: true,
     });
   }
 
@@ -3311,7 +3564,7 @@ export class DeviceManagementComponent implements OnInit, OnDestroy {
       summary: 'Gateway Help',
       detail: helpMessage,
       life: 15000,
-      closable: true
+      closable: true,
     });
   }
 
@@ -3322,7 +3575,7 @@ export class DeviceManagementComponent implements OnInit, OnDestroy {
       severity: 'success',
       summary: 'Success',
       detail: message,
-      life: 5000
+      life: 5000,
     });
   }
 
@@ -3331,7 +3584,7 @@ export class DeviceManagementComponent implements OnInit, OnDestroy {
       severity: 'error',
       summary: 'Error',
       detail: message,
-      life: 5000
+      life: 5000,
     });
   }
 
@@ -3340,7 +3593,7 @@ export class DeviceManagementComponent implements OnInit, OnDestroy {
       severity: 'warn',
       summary: 'Warning',
       detail: message,
-      life: 5000
+      life: 5000,
     });
   }
 
@@ -3349,7 +3602,7 @@ export class DeviceManagementComponent implements OnInit, OnDestroy {
       severity: 'info',
       summary: 'Info',
       detail: message,
-      life: 5000
+      life: 5000,
     });
   }
 
@@ -3390,7 +3643,7 @@ export class DeviceManagementComponent implements OnInit, OnDestroy {
   // ============ FORM VALIDATION ============
 
   private markFormGroupTouched(formGroup: FormGroup): void {
-    Object.values(formGroup.controls).forEach(control => {
+    Object.values(formGroup.controls).forEach((control) => {
       control.markAsTouched();
       if (control instanceof FormGroup) {
         this.markFormGroupTouched(control);

@@ -14,6 +14,7 @@ import { firstValueFrom, Subscription } from 'rxjs';
 import { MessageService } from 'primeng/api';
 
 import { ImportsModule } from '../../../imports/imports';
+import { RouterModule } from '@angular/router';
 import {
   Product,
   ProductCategory,
@@ -57,7 +58,7 @@ interface EslAssignmentFormValue {
 @Component({
   selector: 'app-product-form-page',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, ImportsModule],
+  imports: [CommonModule, ReactiveFormsModule, ImportsModule, RouterModule],
   templateUrl: './product-form-page.component.html',
   styleUrls: ['./product-form-page.component.css'],
 })
@@ -169,7 +170,9 @@ export class ProductFormPageComponent implements OnInit, OnDestroy {
     if (!this.isMinewRow(index)) return false;
     if (!this.productId) return false;
     const group = this.eslAssignments.at(index);
-    return !!group?.get('deviceTemplateComboId')?.value && !this.bindingRow[index];
+    return (
+      !!group?.get('deviceTemplateComboId')?.value && !this.bindingRow[index]
+    );
   }
 
   bindDisabledReason(index: number): string {
@@ -185,9 +188,7 @@ export class ProductFormPageComponent implements OnInit, OnDestroy {
     const comboId = group?.get('deviceTemplateComboId')?.value;
     if (!comboId) return;
 
-    const messageId = includeMessage
-      ? group?.get('messageId')?.value || 0
-      : 0;
+    const messageId = includeMessage ? group?.get('messageId')?.value || 0 : 0;
 
     if (includeMessage && !messageId) {
       this.showError('This row has no message to bind');
@@ -1051,9 +1052,7 @@ export class ProductFormPageComponent implements OnInit, OnDestroy {
   private ensureDeviceInOptions(index: number, deviceId: number): void {
     if (!deviceId) return;
 
-    const existing = this.deviceOptions[index]?.find(
-      (x) => x.id === deviceId,
-    );
+    const existing = this.deviceOptions[index]?.find((x) => x.id === deviceId);
     if (existing) {
       this.applyBrandFromDeviceType(index, existing.deviceType);
       return;

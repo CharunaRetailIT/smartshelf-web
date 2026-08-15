@@ -1,38 +1,66 @@
-<div class="bg-white rounded-lg shadow-xl w-full max-w-2xl mx-auto flex flex-col" style="height: 85vh;">
+<div
+  class="bg-white rounded-lg shadow-xl w-full max-w-2xl mx-auto flex flex-col"
+  style="height: 85vh"
+>
   <!-- Dialog Header -->
-  <div class="flex items-center justify-between p-6 border-b border-gray-200 flex-shrink-0">
+  <div
+    class="flex items-center justify-between p-6 border-b border-gray-200 flex-shrink-0"
+  >
     <div>
       <h2 class="text-xl font-semibold text-gray-900">
-        {{ isEditMode ? 'Edit Store' : 'Add New Store' }}
+        {{ isEditMode ? "Edit Store" : "Add New Store" }}
       </h2>
       <p class="text-sm text-gray-500 mt-1">
-        {{ isEditMode ? 'Update store information and settings' : 'Create a new store with location and device settings' }}
+        {{
+          isEditMode
+            ? "Update store information and settings"
+            : "Create a new store with location and device settings"
+        }}
       </p>
     </div>
-    <button 
-      (click)="onCancel()" 
-      class="text-gray-400 hover:text-gray-600 focus:outline-none focus:ring-2 focus:ring-emerald-600 focus:ring-offset-2 rounded-full p-2"
-      aria-label="Close dialog">
-      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+    <button
+      (click)="onCancel()"
+      class="text-gray-400 hover:text-gray-600 focus:outline-none focus:ring-2 focus:ring-emerald-600 focus:ring-offset-2 rounded-full p-2 ds-btn-icon"
+      aria-label="Close dialog"
+    >
+      <svg
+        class="w-5 h-5"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M6 18L18 6M6 6l12 12"
+        ></path>
       </svg>
     </button>
   </div>
 
   <!-- Dialog Content -->
-  <form [formGroup]="storeForm" (ngSubmit)="onSubmit()" class="flex flex-col flex-1 min-h-0">
+  <form
+    [formGroup]="storeForm"
+    (ngSubmit)="onSubmit()"
+    class="flex flex-col flex-1 min-h-0"
+  >
     <div class="flex-1 overflow-y-auto p-6 space-y-6">
-      
       <!-- Store Information Section -->
       <div class="space-y-4">
-        <h3 class="text-lg font-medium text-gray-900 border-b border-gray-200 pb-2">
+        <h3
+          class="text-lg font-medium text-gray-900 border-b border-gray-200 pb-2"
+        >
           Store Information
         </h3>
-        
+
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
           <!-- Store Name Field -->
           <div class="space-y-2">
-            <label for="storeName" class="block text-sm font-medium text-gray-700">
+            <label
+              for="storeName"
+              class="block text-sm font-medium text-gray-700"
+            >
               Store Name <span class="text-red-500">*</span>
             </label>
             <input
@@ -41,16 +69,28 @@
               formControlName="storeName"
               placeholder="e.g., Main Store"
               class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-emerald-600 focus:border-emerald-600 placeholder-gray-400"
-              [class.border-red-500]="storeForm.get('storeName')?.invalid && storeForm.get('storeName')?.touched">
-            <div *ngIf="storeForm.get('storeName')?.invalid && storeForm.get('storeName')?.touched" 
-                 class="text-red-500 text-sm">
+              [class.border-red-500]="
+                storeForm.get('storeName')?.invalid &&
+                storeForm.get('storeName')?.touched
+              "
+            />
+            <div
+              *ngIf="
+                storeForm.get('storeName')?.invalid &&
+                storeForm.get('storeName')?.touched
+              "
+              class="text-red-500 text-sm"
+            >
               Store name is required (max 200 characters)
             </div>
           </div>
 
           <!-- Store Code Field -->
           <div class="space-y-2">
-            <label for="storeCode" class="block text-sm font-medium text-gray-700">
+            <label
+              for="storeCode"
+              class="block text-sm font-medium text-gray-700"
+            >
               Store Code <span class="text-red-500">*</span>
             </label>
             <input
@@ -60,31 +100,52 @@
               inputmode="numeric"
               placeholder="Digits only, e.g. 950728"
               class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-emerald-600 focus:border-emerald-600 placeholder-gray-400"
-              [class.border-red-500]="storeForm.get('storeCode')?.invalid && storeForm.get('storeCode')?.touched">
-            <div *ngIf="storeForm.get('storeCode')?.invalid && storeForm.get('storeCode')?.touched"
-                 class="text-red-500 text-sm">
-              <span *ngIf="storeForm.get('storeCode')?.errors?.['required']">Store code is required</span>
-              <span *ngIf="storeForm.get('storeCode')?.errors?.['pattern']">Minew only accepts a numeric store code — digits only, no letters or dashes</span>
-              <span *ngIf="storeForm.get('storeCode')?.errors?.['maxlength']">Store code must be less than 50 characters</span>
+              [class.border-red-500]="
+                storeForm.get('storeCode')?.invalid &&
+                storeForm.get('storeCode')?.touched
+              "
+            />
+            <div
+              *ngIf="
+                storeForm.get('storeCode')?.invalid &&
+                storeForm.get('storeCode')?.touched
+              "
+              class="text-red-500 text-sm"
+            >
+              <span *ngIf="storeForm.get('storeCode')?.errors?.['required']"
+                >Store code is required</span
+              >
+              <span *ngIf="storeForm.get('storeCode')?.errors?.['pattern']"
+                >Minew only accepts a numeric store code — digits only, no
+                letters or dashes</span
+              >
+              <span *ngIf="storeForm.get('storeCode')?.errors?.['maxlength']"
+                >Store code must be less than 50 characters</span
+              >
             </div>
           </div>
         </div>
 
         <!-- Every store is created locally and published to Minew -->
-        <div class="flex items-start p-3 border border-emerald-200 rounded-lg bg-emerald-50">
+        <div
+          class="flex items-start p-3 border border-emerald-200 rounded-lg bg-emerald-50"
+        >
           <i class="fas fa-cloud-upload-alt text-emerald-600 mt-0.5"></i>
           <p class="ml-3 text-xs text-emerald-800">
-            This store is created locally and automatically synced to the Minew cloud.
+            This store is created locally and automatically synced to the Minew
+            cloud.
           </p>
         </div>
       </div>
 
       <!-- Location Information Section -->
       <div class="space-y-4">
-        <h3 class="text-lg font-medium text-gray-900 border-b border-gray-200 pb-2">
+        <h3
+          class="text-lg font-medium text-gray-900 border-b border-gray-200 pb-2"
+        >
           Location Information
         </h3>
-        
+
         <!-- Address Field -->
         <div class="space-y-2">
           <label for="address" class="block text-sm font-medium text-gray-700">
@@ -96,19 +157,35 @@
             rows="3"
             placeholder="Enter store address"
             class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-emerald-600 focus:border-emerald-600 placeholder-gray-400 resize-none"
-            [class.border-red-500]="storeForm.get('address')?.invalid && storeForm.get('address')?.touched">
+            [class.border-red-500]="
+              storeForm.get('address')?.invalid &&
+              storeForm.get('address')?.touched
+            "
+          >
           </textarea>
-          <div *ngIf="storeForm.get('address')?.invalid && storeForm.get('address')?.touched"
-               class="text-red-500 text-sm">
-            <span *ngIf="storeForm.get('address')?.errors?.['required']">Address is required</span>
-            <span *ngIf="storeForm.get('address')?.errors?.['maxlength']">Address must be less than 500 characters</span>
+          <div
+            *ngIf="
+              storeForm.get('address')?.invalid &&
+              storeForm.get('address')?.touched
+            "
+            class="text-red-500 text-sm"
+          >
+            <span *ngIf="storeForm.get('address')?.errors?.['required']"
+              >Address is required</span
+            >
+            <span *ngIf="storeForm.get('address')?.errors?.['maxlength']"
+              >Address must be less than 500 characters</span
+            >
           </div>
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
           <!-- Latitude Field -->
           <div class="space-y-2">
-            <label for="latitude" class="block text-sm font-medium text-gray-700">
+            <label
+              for="latitude"
+              class="block text-sm font-medium text-gray-700"
+            >
               Latitude
             </label>
             <input
@@ -117,12 +194,16 @@
               step="any"
               formControlName="latitude"
               placeholder="e.g., 40.7128"
-              class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-emerald-600 focus:border-emerald-600 placeholder-gray-400">
+              class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-emerald-600 focus:border-emerald-600 placeholder-gray-400"
+            />
           </div>
 
           <!-- Longitude Field -->
           <div class="space-y-2">
-            <label for="longitude" class="block text-sm font-medium text-gray-700">
+            <label
+              for="longitude"
+              class="block text-sm font-medium text-gray-700"
+            >
               Longitude
             </label>
             <input
@@ -131,21 +212,27 @@
               step="any"
               formControlName="longitude"
               placeholder="e.g., -74.0060"
-              class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-emerald-600 focus:border-emerald-600 placeholder-gray-400">
+              class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-emerald-600 focus:border-emerald-600 placeholder-gray-400"
+            />
           </div>
         </div>
       </div>
 
       <!-- Contact Information Section -->
       <div class="space-y-4">
-        <h3 class="text-lg font-medium text-gray-900 border-b border-gray-200 pb-2">
+        <h3
+          class="text-lg font-medium text-gray-900 border-b border-gray-200 pb-2"
+        >
           Contact Information
         </h3>
-        
+
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
           <!-- Contact Person Field -->
           <div class="space-y-2">
-            <label for="contactPerson" class="block text-sm font-medium text-gray-700">
+            <label
+              for="contactPerson"
+              class="block text-sm font-medium text-gray-700"
+            >
               Contact Person
             </label>
             <input
@@ -154,9 +241,18 @@
               formControlName="contactPerson"
               placeholder="e.g., John Doe"
               class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-emerald-600 focus:border-emerald-600 placeholder-gray-400"
-              [class.border-red-500]="storeForm.get('contactPerson')?.invalid && storeForm.get('contactPerson')?.touched">
-            <div *ngIf="storeForm.get('contactPerson')?.invalid && storeForm.get('contactPerson')?.touched" 
-                 class="text-red-500 text-sm">
+              [class.border-red-500]="
+                storeForm.get('contactPerson')?.invalid &&
+                storeForm.get('contactPerson')?.touched
+              "
+            />
+            <div
+              *ngIf="
+                storeForm.get('contactPerson')?.invalid &&
+                storeForm.get('contactPerson')?.touched
+              "
+              class="text-red-500 text-sm"
+            >
               Contact person name must be less than 100 characters
             </div>
           </div>
@@ -172,9 +268,18 @@
               formControlName="phone"
               placeholder="e.g., +1234567890"
               class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-emerald-600 focus:border-emerald-600 placeholder-gray-400"
-              [class.border-red-500]="storeForm.get('phone')?.invalid && storeForm.get('phone')?.touched">
-            <div *ngIf="storeForm.get('phone')?.invalid && storeForm.get('phone')?.touched" 
-                 class="text-red-500 text-sm">
+              [class.border-red-500]="
+                storeForm.get('phone')?.invalid &&
+                storeForm.get('phone')?.touched
+              "
+            />
+            <div
+              *ngIf="
+                storeForm.get('phone')?.invalid &&
+                storeForm.get('phone')?.touched
+              "
+              class="text-red-500 text-sm"
+            >
               Phone number must be less than 20 characters
             </div>
           </div>
@@ -191,25 +296,41 @@
             formControlName="email"
             placeholder="e.g., store@example.com"
             class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-emerald-600 focus:border-emerald-600 placeholder-gray-400"
-            [class.border-red-500]="storeForm.get('email')?.invalid && storeForm.get('email')?.touched">
-          <div *ngIf="storeForm.get('email')?.invalid && storeForm.get('email')?.touched" 
-               class="text-red-500 text-sm">
-            <span *ngIf="storeForm.get('email')?.errors?.['email']">Please enter a valid email address</span>
-            <span *ngIf="storeForm.get('email')?.errors?.['maxlength']">Email must be less than 100 characters</span>
+            [class.border-red-500]="
+              storeForm.get('email')?.invalid && storeForm.get('email')?.touched
+            "
+          />
+          <div
+            *ngIf="
+              storeForm.get('email')?.invalid && storeForm.get('email')?.touched
+            "
+            class="text-red-500 text-sm"
+          >
+            <span *ngIf="storeForm.get('email')?.errors?.['email']"
+              >Please enter a valid email address</span
+            >
+            <span *ngIf="storeForm.get('email')?.errors?.['maxlength']"
+              >Email must be less than 100 characters</span
+            >
           </div>
         </div>
       </div>
 
       <!-- Minew Cloud Settings Section -->
       <div class="space-y-4">
-        <h3 class="text-lg font-medium text-gray-900 border-b border-gray-200 pb-2">
+        <h3
+          class="text-lg font-medium text-gray-900 border-b border-gray-200 pb-2"
+        >
           Minew Cloud Settings
         </h3>
-        
+
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
           <!-- Minew Store ID Field -->
           <div class="space-y-2">
-            <label for="minewStoreId" class="block text-sm font-medium text-gray-700">
+            <label
+              for="minewStoreId"
+              class="block text-sm font-medium text-gray-700"
+            >
               Minew Store ID
             </label>
             <input
@@ -217,7 +338,8 @@
               type="text"
               formControlName="minewStoreId"
               placeholder="Leave empty for auto-generation"
-              class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-emerald-600 focus:border-emerald-600 placeholder-gray-400">
+              class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-emerald-600 focus:border-emerald-600 placeholder-gray-400"
+            />
             <div class="text-xs text-gray-500 mt-1">
               Unique identifier from Minew cloud
             </div>
@@ -225,7 +347,10 @@
 
           <!-- Minew Template ID Field -->
           <div class="space-y-2">
-            <label for="minewTemplateId" class="block text-sm font-medium text-gray-700">
+            <label
+              for="minewTemplateId"
+              class="block text-sm font-medium text-gray-700"
+            >
               Minew Template ID
             </label>
             <input
@@ -233,7 +358,8 @@
               type="text"
               formControlName="minewTemplateId"
               placeholder="Optional template ID"
-              class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-emerald-600 focus:border-emerald-600 placeholder-gray-400">
+              class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-emerald-600 focus:border-emerald-600 placeholder-gray-400"
+            />
             <div class="text-xs text-gray-500 mt-1">
               Default template for store devices
             </div>
@@ -242,14 +368,29 @@
 
         <div class="bg-emerald-50 border border-emerald-200 rounded-md p-3">
           <div class="flex">
-            <svg class="w-5 h-5 text-emerald-500 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            <svg
+              class="w-5 h-5 text-emerald-500 mt-0.5"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+              ></path>
             </svg>
             <div class="ml-3">
               <p class="text-sm text-emerald-700">
-                <strong>Note:</strong> This store will be synchronized with Minew cloud. 
-                <span *ngIf="!isEditMode">A new store will be created in the cloud.</span>
-                <span *ngIf="isEditMode">Changes will be synced to the cloud.</span>
+                <strong>Note:</strong> This store will be synchronized with
+                Minew cloud.
+                <span *ngIf="!isEditMode"
+                  >A new store will be created in the cloud.</span
+                >
+                <span *ngIf="isEditMode"
+                  >Changes will be synced to the cloud.</span
+                >
               </p>
             </div>
           </div>
@@ -258,43 +399,61 @@
 
       <!-- Status & Settings Section -->
       <div class="space-y-4">
-        <h3 class="text-lg font-medium text-gray-900 border-b border-gray-200 pb-2">
+        <h3
+          class="text-lg font-medium text-gray-900 border-b border-gray-200 pb-2"
+        >
           Status & Settings
         </h3>
-        
+
         <div class="space-y-3">
           <!-- Active Status -->
-          <div class="flex items-center justify-between p-3 border rounded-lg bg-gray-50">
+          <div
+            class="flex items-center justify-between p-3 border rounded-lg bg-gray-50"
+          >
             <div>
               <h4 class="text-sm font-medium text-gray-900">Store Status</h4>
-              <p class="text-xs text-gray-500 mt-1">Enable or disable the store</p>
+              <p class="text-xs text-gray-500 mt-1">
+                Enable or disable the store
+              </p>
             </div>
             <label class="relative inline-flex items-center cursor-pointer">
               <input
                 type="checkbox"
                 formControlName="isActive"
-                class="sr-only peer">
-              <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-emerald-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-700"></div>
+                class="sr-only peer"
+              />
+              <div
+                class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-emerald-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-700"
+              ></div>
               <span class="ml-3 text-sm font-medium text-gray-900">
-                {{ storeForm.get('isActive')?.value ? 'Active' : 'Inactive' }}
+                {{ storeForm.get("isActive")?.value ? "Active" : "Inactive" }}
               </span>
             </label>
           </div>
 
           <!-- Auto-sync -->
-          <div class="flex items-center justify-between p-3 border rounded-lg bg-gray-50">
+          <div
+            class="flex items-center justify-between p-3 border rounded-lg bg-gray-50"
+          >
             <div>
-              <h4 class="text-sm font-medium text-gray-900">Auto-sync with Cloud</h4>
-              <p class="text-xs text-gray-500 mt-1">Automatically sync changes to Minew cloud</p>
+              <h4 class="text-sm font-medium text-gray-900">
+                Auto-sync with Cloud
+              </h4>
+              <p class="text-xs text-gray-500 mt-1">
+                Automatically sync changes to Minew cloud
+              </p>
             </div>
             <label class="relative inline-flex items-center cursor-pointer">
               <input
                 type="checkbox"
                 formControlName="autoSync"
-                class="sr-only peer">
-              <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-emerald-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-700"></div>
+                class="sr-only peer"
+              />
+              <div
+                class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-emerald-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-700"
+              ></div>
               <span class="ml-3 text-sm font-medium text-gray-900">
-                {{ storeForm.get('autoSync')?.value ? 'Enabled' : 'Disabled' }}
+                {{ storeForm.get("autoSync")?.value ? "Enabled" : "Disabled" }}
               </span>
             </label>
           </div>
@@ -302,13 +461,24 @@
 
         <div class="bg-emerald-50 border border-emerald-200 rounded-md p-3">
           <div class="flex">
-            <svg class="w-5 h-5 text-emerald-500 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            <svg
+              class="w-5 h-5 text-emerald-500 mt-0.5"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+              ></path>
             </svg>
             <div class="ml-3">
               <p class="text-sm text-emerald-700">
-                <strong>Tip:</strong> All fields marked with <span class="text-red-500">*</span> are required. 
-                Complete store information helps with better management and reporting.
+                <strong>Tip:</strong> All fields marked with
+                <span class="text-red-500">*</span> are required. Complete store
+                information helps with better management and reporting.
               </p>
             </div>
           </div>
@@ -317,22 +487,43 @@
     </div>
 
     <!-- Dialog Actions -->
-    <div class="flex items-center justify-end gap-3 p-6 border-t border-gray-200 bg-gray-50 flex-shrink-0">
+    <div
+      class="flex items-center justify-end gap-3 p-6 border-t border-gray-200 bg-gray-50 flex-shrink-0"
+    >
       <button
         type="button"
         (click)="onCancel()"
-        class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-600 transition-colors">
+        class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-600 transition-colors ds-btn ds-btn--secondary"
+      >
         Cancel
       </button>
       <button
         type="submit"
         [disabled]="storeForm.invalid || isSubmitting()"
-        class="px-4 py-2 text-sm font-medium text-white bg-primary border border-transparent rounded-md shadow-sm hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center gap-2">
-        <svg *ngIf="isSubmitting()" class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+        class="px-4 py-2 text-sm font-medium text-white bg-primary border border-transparent rounded-md shadow-sm hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center gap-2 ds-btn ds-btn--primary"
+      >
+        <svg
+          *ngIf="isSubmitting()"
+          class="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+        >
+          <circle
+            class="opacity-25"
+            cx="12"
+            cy="12"
+            r="10"
+            stroke="currentColor"
+            stroke-width="4"
+          ></circle>
+          <path
+            class="opacity-75"
+            fill="currentColor"
+            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+          ></path>
         </svg>
-        {{ isEditMode ? 'Update Store' : 'Create Store' }}
+        {{ isEditMode ? "Update Store" : "Create Store" }}
       </button>
     </div>
   </form>

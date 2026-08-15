@@ -1,22 +1,15 @@
 import { CommonModule } from '@angular/common';
-import {
-  AfterViewInit,
-  Component,
-  OnDestroy,
-  OnInit,
-  ViewChild
-} from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import {
   FormBuilder,
   FormGroup,
   FormsModule,
   ReactiveFormsModule,
-  Validators
+  Validators,
 } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
-import { MatTableDataSource, MatTableModule } from '@angular/material/table';
+import { TableModule } from 'primeng/table';
 import { Observable, Subject, takeUntil } from 'rxjs';
 
 import { UserService } from '../../../core/services/user.service';
@@ -25,12 +18,15 @@ import {
   Role,
   User,
   UserData,
-  UserFormData
+  UserFormData,
 } from '../../../core/interfaces/user.interface';
 import { EditUserComponent } from '../edit-user/edit-user.component';
 import { CreateUserComponent } from '../create-user/create-user.component';
 import { DeleteConfirmationComponent } from '../../../shared/components/dialog/delete-confirmation/delete-confirmation.component';
-import { SnackbarData, CustomSnackbarComponent } from '../../../shared/components/alert/custom-snackbar.component';
+import {
+  SnackbarData,
+  CustomSnackbarComponent,
+} from '../../../shared/components/alert/custom-snackbar.component';
 import { RestoreConfirmationComponent } from '../../../shared/components/dialog/restore-confirmation/restore-confirmation.component';
 import { AuthService } from '../../../core/services/auth.service';
 import { MessageService } from 'primeng/api';
@@ -38,18 +34,11 @@ import { MessageService } from 'primeng/api';
 @Component({
   selector: 'app-user-management',
   standalone: true,
-  imports: [
-    CommonModule,
-    FormsModule,
-    ReactiveFormsModule,
-    MatTableModule,
-    MatPaginatorModule
-  ],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, TableModule],
   templateUrl: './user-management.component.html',
-  styleUrl: './user-management.component.css'
+  styleUrl: './user-management.component.css',
 })
-export class UserManagementComponent
-  implements OnInit, OnDestroy, AfterViewInit {
+export class UserManagementComponent implements OnInit, OnDestroy {
   //#region Table Config
   displayedColumns: string[] = [
     'user',
@@ -57,10 +46,12 @@ export class UserManagementComponent
     'status',
     'lastLogin',
     'createdAt',
-    'actions'
+    'actions',
   ];
-  dataSource = new MatTableDataSource<User>([]);
-  @ViewChild(MatPaginator) paginator!: MatPaginator;
+  dataSource: User[] = [];
+  /** Row offset of the grid's current page; reset to 0 whenever filters change. */
+  first = 0;
+  rows = 10;
   //#endregion
 
   //#region State
@@ -90,14 +81,14 @@ export class UserManagementComponent
     private messageService: MessageService,
     private fb: FormBuilder,
     private dialog: MatDialog,
-    private snackBar: MatSnackBar
+    private snackBar: MatSnackBar,
   ) {
     this.userForm = this.fb.group({
       name: ['', Validators.required],
       email: ['', [Validators.required, Validators.email]],
       role: ['user', Validators.required],
       status: ['active', Validators.required],
-      password: ['']
+      password: [''],
     });
   }
 
@@ -117,10 +108,6 @@ export class UserManagementComponent
     this.currentUserId = user.id;
   }
 
-  ngAfterViewInit(): void {
-    this.dataSource.paginator = this.paginator;
-  }
-
   ngOnDestroy(): void {
     this.destroy$.next();
     this.destroy$.complete();
@@ -134,10 +121,10 @@ export class UserManagementComponent
         this.roles = roles;
         console.log('Roles loaded:', this.roles);
       },
-      error: err => {
+      error: (err) => {
         console.error('Error fetching roles:', err);
         this.showError('Failed to load roles. Please try again.');
-      }
+      },
     });
   }
 
@@ -147,7 +134,7 @@ export class UserManagementComponent
     // Load users initially
     this.userService.getUsers();
 
-    this.users$.pipe(takeUntil(this.destroy$)).subscribe(users => {
+    this.users$.pipe(takeUntil(this.destroy$)).subscribe((users) => {
       this.users = users;
       this.isLoading = false;
       console.log('Users loaded:', users);
@@ -163,33 +150,37 @@ export class UserManagementComponent
     // Apply search filter
     if (this.searchTerm) {
       const searchLower = this.searchTerm.toLowerCase();
-      filtered = filtered.filter(user =>
-        user.employeeId?.toLowerCase().includes(searchLower) ||
-        user.email?.toLowerCase().includes(searchLower) ||
-        user.firstName?.toLowerCase().includes(searchLower) ||
-        user.lastName?.toLowerCase().includes(searchLower)
+      filtered = filtered.filter(
+        (user) =>
+          user.employeeId?.toLowerCase().includes(searchLower) ||
+          user.email?.toLowerCase().includes(searchLower) ||
+          user.firstName?.toLowerCase().includes(searchLower) ||
+          user.lastName?.toLowerCase().includes(searchLower),
       );
     }
 
     // Apply role filter
     if (this.roleFilter !== 'all') {
-      filtered = filtered.filter(user =>
-        user.role?.toLowerCase() === this.roleFilter.toLowerCase()
+      filtered = filtered.filter(
+        (user) => user.role?.toLowerCase() === this.roleFilter.toLowerCase(),
       );
     }
 
     // Apply status filter
     if (this.statusFilter !== 'all') {
       const isActive = this.statusFilter === 'active';
-      filtered = filtered.filter(user => user.isActive === isActive);
+      filtered = filtered.filter((user) => user.isActive === isActive);
     }
 
-    this.dataSource.data = filtered;
+    this.dataSource = filtered;
 
     // Reset paginator to first page after filtering
-    if (this.paginator) {
-      this.paginator.firstPage();
-    }
+    this.first = 0;
+  }
+
+  onPage(event: { first?: number; rows?: number }): void {
+    this.first = event.first ?? 0;
+    this.rows = event.rows ?? this.rows;
   }
 
   onSearchChange(): void {
@@ -218,10 +209,10 @@ export class UserManagementComponent
     const dialogRef = this.dialog.open(CreateUserComponent, {
       maxWidth: '90vw',
       disableClose: true,
-      data: { roles: this.roles } // Pass roles to the dialog
+      data: { roles: this.roles }, // Pass roles to the dialog
     });
 
-    dialogRef.afterClosed().subscribe(result => {
+    dialogRef.afterClosed().subscribe((result) => {
       if (result) {
         // Refresh users after creation
         this.userService.getUsers();
@@ -237,13 +228,13 @@ export class UserManagementComponent
       maxHeight: '90vh',
       data: {
         user: user,
-        roles: this.roles
+        roles: this.roles,
       },
       disableClose: true,
-      panelClass: 'custom-dialog-panel'
+      panelClass: 'custom-dialog-panel',
     });
 
-    dialogRef.afterClosed().subscribe(result => {
+    dialogRef.afterClosed().subscribe((result) => {
       if (result?.success) {
         // Refresh users after update
         this.userService.getUsers();
@@ -260,13 +251,13 @@ export class UserManagementComponent
         title: 'Delete Employee',
         message: `Are you sure you want to delete ${user.employeeId}? This action cannot be undone.`,
         confirmText: 'Delete',
-        cancelText: 'Cancel'
+        cancelText: 'Cancel',
       },
       panelClass: ['rounded-lg'],
-      disableClose: true
+      disableClose: true,
     });
 
-    dialogRef.afterClosed().subscribe(result => {
+    dialogRef.afterClosed().subscribe((result) => {
       if (result) this.deleteEmployee(user.id);
     });
   }
@@ -278,10 +269,10 @@ export class UserManagementComponent
         this.userService.getUsers();
         this.showSuccess('User deleted successfully!');
       },
-      error: err => {
+      error: (err) => {
         console.error('Error deleting user:', err);
         this.showError('Failed to delete user. Please try again.');
-      }
+      },
     });
   }
 
@@ -299,13 +290,13 @@ export class UserManagementComponent
         title: 'Restore User',
         message: `Are you sure you want to restore user "${user.employeeId}"?`,
         confirmText: 'Restore',
-        cancelText: 'Cancel'
+        cancelText: 'Cancel',
       },
       panelClass: ['rounded-lg'],
-      disableClose: true
+      disableClose: true,
     });
 
-    dialogRef.afterClosed().subscribe(result => {
+    dialogRef.afterClosed().subscribe((result) => {
       if (result) {
         this.userService.restoreUser(user.id).subscribe({
           next: () => {
@@ -315,7 +306,7 @@ export class UserManagementComponent
           error: (err) => {
             console.error('Error restoring user:', err);
             this.showError('Failed to restore user. Please try again.');
-          }
+          },
         });
       }
     });
@@ -357,7 +348,7 @@ export class UserManagementComponent
       severity: 'success',
       summary: 'Success',
       detail: message,
-      life: 5000
+      life: 5000,
     });
   }
 
@@ -366,7 +357,7 @@ export class UserManagementComponent
       severity: 'error',
       summary: 'Error',
       detail: message,
-      life: 5000
+      life: 5000,
     });
   }
 
@@ -375,7 +366,7 @@ export class UserManagementComponent
       severity: 'warn',
       summary: 'Warning',
       detail: message,
-      life: 5000
+      life: 5000,
     });
   }
 
@@ -384,7 +375,7 @@ export class UserManagementComponent
       severity: 'info',
       summary: 'Info',
       detail: message,
-      life: 5000
+      life: 5000,
     });
   }
   // private showSuccess(message: string): void {

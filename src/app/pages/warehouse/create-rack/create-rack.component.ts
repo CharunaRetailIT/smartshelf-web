@@ -1,23 +1,51 @@
-import { AfterViewInit, ChangeDetectorRef, Component, OnInit, OnDestroy } from '@angular/core';
+import {
+  AfterViewInit,
+  ChangeDetectorRef,
+  Component,
+  OnInit,
+  OnDestroy,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormArray, FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
+import {
+  FormArray,
+  FormBuilder,
+  FormGroup,
+  FormsModule,
+  ReactiveFormsModule,
+  Validators,
+} from '@angular/forms';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { AisleMaster } from '../../../core/interfaces/aisle.interface';
 import { AisleService } from '../../../core/services/aisle.service';
 import { AuthService } from '../../../core/services/auth.service';
-import { Store, StoreFilterParams } from '../../../core/interfaces/store.interface';
+import {
+  Store,
+  StoreFilterParams,
+} from '../../../core/interfaces/store.interface';
 import { DeviceService } from '../../../core/services/device.service';
-import { LocalDeviceDto, LocalTemplateDto } from '../../../core/interfaces/device.interface';
+import {
+  LocalDeviceDto,
+  LocalTemplateDto,
+} from '../../../core/interfaces/device.interface';
 import { ConfirmationService, MessageService } from 'primeng/api';
 import { StoreService } from '../../../core/services/store.service';
-import { Subject, debounceTime, distinctUntilChanged, takeUntil, firstValueFrom } from 'rxjs';
+import {
+  Subject,
+  debounceTime,
+  distinctUntilChanged,
+  takeUntil,
+  firstValueFrom,
+} from 'rxjs';
 import { ImportsModule } from '../../../imports/imports';
 import { PagedResult } from '../../../core/interfaces/pagination-result.interface';
 import { MessageWithUser } from '../../../core/interfaces/message.interface';
 // import { MessageService } from '../../../core/services/message.service';
 import { SearchParams } from '../../../core/interfaces/pagination-result.interface';
-import { CustomSnackbarComponent, SnackbarData } from '../../../shared/components/alert/custom-snackbar.component';
+import {
+  CustomSnackbarComponent,
+  SnackbarData,
+} from '../../../shared/components/alert/custom-snackbar.component';
 import { SettingsService } from '../../../core/services/settings.service';
 import { ConfirmationDialogComponent } from '../../../shared/components/dialog/confirmation-dialog/confirmation-dialog.component';
 import { CustomMessageService } from '../../../core/services/message.service';
@@ -61,15 +89,10 @@ interface ComboModeOption {
 @Component({
   selector: 'app-create-rack',
   standalone: true,
-  imports: [
-    CommonModule,
-    ReactiveFormsModule,
-    FormsModule,
-    ImportsModule
-  ],
+  imports: [CommonModule, ReactiveFormsModule, FormsModule, ImportsModule],
   templateUrl: './create-rack.component.html',
   styleUrls: ['./create-rack.component.css'],
-  providers: [ConfirmationService]
+  providers: [ConfirmationService],
 })
 export class CreateRackComponent implements OnInit, AfterViewInit, OnDestroy {
   rackForm: FormGroup;
@@ -98,7 +121,7 @@ export class CreateRackComponent implements OnInit, AfterViewInit, OnDestroy {
   storeFilterParams: StoreFilterParams = {
     pageNumber: 1,
     pageSize: 10,
-    isActive: true
+    isActive: true,
   };
 
   // Search subject for debouncing
@@ -122,8 +145,15 @@ export class CreateRackComponent implements OnInit, AfterViewInit, OnDestroy {
   existingMessageComboLoading = false;
 
   // Combo mode per shelf (stored as shelfIndex => mode)
-  shelfComboModes: Map<number, 'device-template' | 'device-message'> = new Map();
+  shelfComboModes: Map<number, 'device-template' | 'device-message'> =
+    new Map();
   selectedExistingCombos: Map<number, any[]> = new Map(); // shelfIndex => selected combos
+
+  /**
+   * Which shelf panel is open. The accordion is single-select, so this is one
+   * index (or null for all closed) rather than a list.
+   */
+  activeShelfIndex: number | null = null;
 
   // Device+Message combos are hidden from this view; device binding by message
   // is done from Device Management. Flip this to true to bring the UI back —
@@ -131,8 +161,16 @@ export class CreateRackComponent implements OnInit, AfterViewInit, OnDestroy {
   showDeviceMessageCombos = false;
 
   comboModeOptions: ComboModeOption[] = [
-    { label: 'Device + Template', value: 'device-template', icon: 'pi pi-sliders-h' },
-    { label: 'Device + Message', value: 'device-message', icon: 'pi pi-comment' }
+    {
+      label: 'Device + Template',
+      value: 'device-template',
+      icon: 'pi pi-sliders-h',
+    },
+    {
+      label: 'Device + Message',
+      value: 'device-message',
+      icon: 'pi pi-comment',
+    },
   ];
 
   // Pagination
@@ -144,7 +182,6 @@ export class CreateRackComponent implements OnInit, AfterViewInit, OnDestroy {
 
   //dialog control
   private allowClose = false;
-
 
   constructor(
     private fb: FormBuilder,
@@ -180,11 +217,10 @@ export class CreateRackComponent implements OnInit, AfterViewInit, OnDestroy {
     return 'Create a new rack with complete details, shelves, and device assignments';
   }
 
-
   ngOnInit(): void {
     this.initCurrentUser();
 
-    // Initialize the form 
+    // Initialize the form
     this.rackForm = this.createForm();
 
     // get default store (which will patch the form)
@@ -201,9 +237,9 @@ export class CreateRackComponent implements OnInit, AfterViewInit, OnDestroy {
     }, 1000);
 
     // if storeId changes in the form
-    this.rackForm.get('storeId')?.valueChanges.subscribe(storeId => {
+    this.rackForm.get('storeId')?.valueChanges.subscribe((storeId) => {
       if (storeId && !this.selectedStore) {
-        const store = this.stores.find(s => s.id === storeId);
+        const store = this.stores.find((s) => s.id === storeId);
         if (store) {
           this.selectedStore = store;
         }
@@ -215,11 +251,11 @@ export class CreateRackComponent implements OnInit, AfterViewInit, OnDestroy {
     const currentStore = this.settingsService.getCurrentDefaultStore();
     if (currentStore) {
       this.storeId = currentStore.id;
-      console.log("CurrentStore", currentStore)
+      console.log('CurrentStore', currentStore);
       this.selectedStore = currentStore;
       // Set the form control value
       this.rackForm.patchValue({
-        storeId: currentStore.id
+        storeId: currentStore.id,
       });
 
       // Load data for this store
@@ -250,15 +286,13 @@ export class CreateRackComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   private setupStoreSearch(): void {
-    this.storeSearchSubject.pipe(
-      debounceTime(300),
-      distinctUntilChanged(),
-      takeUntil(this.destroy$)
-    ).subscribe(searchTerm => {
-      this.storeFilterParams.searchTerm = searchTerm;
-      this.storeFilterParams.pageNumber = 1;
-      this.loadStoresLazy();
-    });
+    this.storeSearchSubject
+      .pipe(debounceTime(300), distinctUntilChanged(), takeUntil(this.destroy$))
+      .subscribe((searchTerm) => {
+        this.storeFilterParams.searchTerm = searchTerm;
+        this.storeFilterParams.pageNumber = 1;
+        this.loadStoresLazy();
+      });
   }
 
   private createForm(): FormGroup {
@@ -269,7 +303,7 @@ export class CreateRackComponent implements OnInit, AfterViewInit, OnDestroy {
       coordinates: ['', [Validators.maxLength(75)]],
       storeId: [null, [Validators.required]],
       isActive: [true],
-      shelves: this.fb.array([])
+      shelves: this.fb.array([]),
     });
   }
 
@@ -284,11 +318,13 @@ export class CreateRackComponent implements OnInit, AfterViewInit, OnDestroy {
       macAddress: [''],
       description: [''],
       isActive: [true],
-      deviceCombos: this.fb.array([])
+      deviceCombos: this.fb.array([]),
     });
   }
 
-  private createDeviceComboForm(mode: 'device-template' | 'device-message' = 'device-template'): FormGroup {
+  private createDeviceComboForm(
+    mode: 'device-template' | 'device-message' = 'device-template',
+  ): FormGroup {
     if (mode === 'device-template') {
       return this.fb.group({
         deviceId: [null, [Validators.required]],
@@ -296,7 +332,7 @@ export class CreateRackComponent implements OnInit, AfterViewInit, OnDestroy {
         displayOrder: [1, [Validators.required, Validators.min(1)]],
         isActive: [true],
         isDefault: [false],
-        deviceTemplateComboId: [null]
+        deviceTemplateComboId: [null],
       });
     } else {
       return this.fb.group({
@@ -305,7 +341,7 @@ export class CreateRackComponent implements OnInit, AfterViewInit, OnDestroy {
         displayOrder: [1, [Validators.required, Validators.min(1)]],
         isActive: [true],
         isDefault: [false],
-        deviceMessageComboId: [null]
+        deviceMessageComboId: [null],
       });
     }
   }
@@ -324,7 +360,10 @@ export class CreateRackComponent implements OnInit, AfterViewInit, OnDestroy {
     return this.shelfComboModes.get(shelfIndex) || 'device-template';
   }
 
-  setShelfComboMode(shelfIndex: number, mode: 'device-template' | 'device-message'): void {
+  setShelfComboMode(
+    shelfIndex: number,
+    mode: 'device-template' | 'device-message',
+  ): void {
     const currentMode = this.getShelfComboMode(shelfIndex);
 
     if (currentMode !== mode) {
@@ -364,7 +403,8 @@ export class CreateRackComponent implements OnInit, AfterViewInit, OnDestroy {
 
         const selectedStoreId = this.rackForm.get('storeId')?.value;
         if (selectedStoreId && !this.selectedStore) {
-          this.selectedStore = this.stores.find(store => store.id === selectedStoreId) || null;
+          this.selectedStore =
+            this.stores.find((store) => store.id === selectedStoreId) || null;
         }
 
         this.cdRef.detectChanges();
@@ -375,7 +415,7 @@ export class CreateRackComponent implements OnInit, AfterViewInit, OnDestroy {
         this.stores = [];
         this.isStoreLoading = false;
         this.cdRef.detectChanges();
-      }
+      },
     });
   }
 
@@ -441,27 +481,29 @@ export class CreateRackComponent implements OnInit, AfterViewInit, OnDestroy {
         this.isDevicesLoading = false;
         this.localDevices = [];
         this.filteredDevices = [];
-      }
+      },
     });
   }
 
   loadTemplatesForStore(storeId: number): void {
     this.isTemplatesLoading = true;
 
-    this.deviceService.getLocalTemplatesPagedByStore(storeId, 1, 100).subscribe({
-      next: (response) => {
-        this.localTemplates = response.items || [];
-        this.filteredTemplates = [...this.localTemplates];
-        this.isTemplatesLoading = false;
-        this.cdRef.detectChanges();
-      },
-      error: (error) => {
-        console.error('Error loading templates:', error);
-        this.isTemplatesLoading = false;
-        this.localTemplates = [];
-        this.filteredTemplates = [];
-      }
-    });
+    this.deviceService
+      .getLocalTemplatesPagedByStore(storeId, 1, 100)
+      .subscribe({
+        next: (response) => {
+          this.localTemplates = response.items || [];
+          this.filteredTemplates = [...this.localTemplates];
+          this.isTemplatesLoading = false;
+          this.cdRef.detectChanges();
+        },
+        error: (error) => {
+          console.error('Error loading templates:', error);
+          this.isTemplatesLoading = false;
+          this.localTemplates = [];
+          this.filteredTemplates = [];
+        },
+      });
   }
 
   async loadMessagesForStore(): Promise<void> {
@@ -475,7 +517,7 @@ export class CreateRackComponent implements OnInit, AfterViewInit, OnDestroy {
       };
 
       const response = await firstValueFrom(
-        this.messageService.getMessagesPaged(request)
+        this.messageService.getMessagesPaged(request),
       );
 
       if (response.success && response.result) {
@@ -496,11 +538,11 @@ export class CreateRackComponent implements OnInit, AfterViewInit, OnDestroy {
       const request: SearchParams = {
         pageNumber: this.existingComboPage,
         pageSize: this.pageSize,
-        searchTerm: ''
+        searchTerm: '',
       };
 
       const pagedResult = await firstValueFrom(
-        this.deviceService.getCombosPaged(request)
+        this.deviceService.getCombosPaged(request),
       );
 
       const result = pagedResult.result;
@@ -519,11 +561,12 @@ export class CreateRackComponent implements OnInit, AfterViewInit, OnDestroy {
         screenSize: combo.screenSize,
         screenWidth: combo.screenWidth,
         screenHeight: combo.screenHeight,
-        battery: combo.battery
+        battery: combo.battery,
       }));
 
       this.existingCombos = mappedCombos;
-      this.existingComboHasMore = this.existingCombos.length < (result?.totalCount || 0);
+      this.existingComboHasMore =
+        this.existingCombos.length < (result?.totalCount || 0);
     } catch (error) {
       console.error('Error loading existing combos:', error);
       this.existingCombos = [];
@@ -536,48 +579,57 @@ export class CreateRackComponent implements OnInit, AfterViewInit, OnDestroy {
     this.existingMessageComboLoading = true;
 
     try {
-      const request: SearchParams & { deviceId?: number; messageId?: number; isActive?: boolean } = {
+      const request: SearchParams & {
+        deviceId?: number;
+        messageId?: number;
+        isActive?: boolean;
+      } = {
         pageNumber: this.existingMessageComboPage,
         pageSize: this.pageSize,
         searchTerm: '',
-        isActive: true
+        isActive: true,
       };
 
       const pagedResult = await firstValueFrom(
-        this.deviceService.getDeviceMessageCombosPagedByParams(request)
+        this.deviceService.getDeviceMessageCombosPagedByParams(request),
       );
 
       const newCombos = pagedResult.items || [];
 
-      const mappedCombos = await Promise.all(newCombos.map(async (combo: any) => {
-        let deviceName = 'Unknown Device';
-        let messageTitle = 'Unknown Message';
+      const mappedCombos = await Promise.all(
+        newCombos.map(async (combo: any) => {
+          let deviceName = 'Unknown Device';
+          let messageTitle = 'Unknown Message';
 
-        if (combo.deviceId) {
-          const device = this.localDevices.find(d => d.id === combo.deviceId);
-          if (device) deviceName = device.deviceName;
-        }
+          if (combo.deviceId) {
+            const device = this.localDevices.find(
+              (d) => d.id === combo.deviceId,
+            );
+            if (device) deviceName = device.deviceName;
+          }
 
-        if (combo.messageId) {
-          const message = this.messages.find(m => m.id === combo.messageId);
-          if (message) messageTitle = message.title;
-        }
+          if (combo.messageId) {
+            const message = this.messages.find((m) => m.id === combo.messageId);
+            if (message) messageTitle = message.title;
+          }
 
-        return {
-          id: combo.id,
-          deviceId: combo.deviceId,
-          deviceName: deviceName,
-          messageId: combo.messageId,
-          messageTitle: messageTitle,
-          deviceMAC: combo.deviceMac || '',
-          status: combo.isActive ? 'Active' : 'Inactive',
-          isDefault: false,
-          isActive: combo.isActive
-        };
-      }));
+          return {
+            id: combo.id,
+            deviceId: combo.deviceId,
+            deviceName: deviceName,
+            messageId: combo.messageId,
+            messageTitle: messageTitle,
+            deviceMAC: combo.deviceMac || '',
+            status: combo.isActive ? 'Active' : 'Inactive',
+            isDefault: false,
+            isActive: combo.isActive,
+          };
+        }),
+      );
 
       this.existingMessageCombos = mappedCombos;
-      this.existingMessageComboHasMore = this.existingMessageCombos.length < (pagedResult.totalCount || 0);
+      this.existingMessageComboHasMore =
+        this.existingMessageCombos.length < (pagedResult.totalCount || 0);
     } catch (error) {
       console.error('Error loading existing message combos:', error);
       this.existingMessageCombos = [];
@@ -596,6 +648,11 @@ export class CreateRackComponent implements OnInit, AfterViewInit, OnDestroy {
     this.shelfComboModes.set(shelfIndex, 'device-template');
     this.selectedExistingCombos.set(shelfIndex, []);
 
+    // Open the shelf that was just added so its fields are ready to fill in.
+    // The accordion is single-select, so pointing it at the new index also
+    // collapses whichever shelf was open before.
+    this.activeShelfIndex = shelfIndex;
+
     setTimeout(() => {
       this.cdRef.detectChanges();
     }, 0);
@@ -610,9 +667,41 @@ export class CreateRackComponent implements OnInit, AfterViewInit, OnDestroy {
         this.shelves.removeAt(index);
         this.shelfComboModes.delete(index);
         this.selectedExistingCombos.delete(index);
+        this.syncActiveShelfAfterRemoval(index);
         this.showSuccess('Shelf removed successfully');
-      }
+      },
     });
+  }
+
+  /**
+   * The user opened or closed a panel by hand. PrimeNG reports `null` when a
+   * panel is collapsed and single-select accordions hand back a single index.
+   */
+  onActiveShelfChange(index: number | number[] | null): void {
+    this.activeShelfIndex = Array.isArray(index) ? (index[0] ?? null) : index;
+  }
+
+  /**
+   * Keeps the open panel pointing at the same shelf after a removal shifts the
+   * indices. Removing the open shelf leaves the one before it open, and the
+   * last shelf going away closes the accordion rather than leaving a stale
+   * index pointing past the end of the list.
+   */
+  private syncActiveShelfAfterRemoval(removedIndex: number): void {
+    if (this.shelves.length === 0) {
+      this.activeShelfIndex = null;
+      return;
+    }
+
+    if (this.activeShelfIndex === null) {
+      return;
+    }
+
+    if (this.activeShelfIndex === removedIndex) {
+      this.activeShelfIndex = Math.max(0, removedIndex - 1);
+    } else if (this.activeShelfIndex > removedIndex) {
+      this.activeShelfIndex--;
+    }
   }
 
   // Device Combo Management
@@ -649,7 +738,7 @@ export class CreateRackComponent implements OnInit, AfterViewInit, OnDestroy {
 
     const combos = this.getShelfCombos(shelfIndex);
 
-    selectedCombos.forEach(combo => {
+    selectedCombos.forEach((combo) => {
       const newCombo = this.createDeviceComboForm(mode);
       newCombo.patchValue({
         deviceId: combo.deviceId,
@@ -659,7 +748,7 @@ export class CreateRackComponent implements OnInit, AfterViewInit, OnDestroy {
         isActive: combo.isActive,
         isDefault: combo.isDefault || false,
         deviceTemplateComboId: mode === 'device-template' ? combo.id : null,
-        deviceMessageComboId: mode === 'device-message' ? combo.id : null
+        deviceMessageComboId: mode === 'device-message' ? combo.id : null,
       });
       combos.push(newCombo);
     });
@@ -670,17 +759,17 @@ export class CreateRackComponent implements OnInit, AfterViewInit, OnDestroy {
 
   // Helper methods for UI
   getDeviceName(deviceId: number): string {
-    const device = this.localDevices.find(d => d.id === deviceId);
+    const device = this.localDevices.find((d) => d.id === deviceId);
     return device?.deviceName || 'Unknown Device';
   }
 
   getTemplateName(templateId: string): string {
-    const template = this.localTemplates.find(t => t.id === templateId);
+    const template = this.localTemplates.find((t) => t.id === templateId);
     return template?.name || 'Unknown Template';
   }
 
   getMessageTitle(messageId: number): string {
-    const message = this.messages.find(m => m.id === messageId);
+    const message = this.messages.find((m) => m.id === messageId);
     return message ? message.title : 'Unknown Message';
   }
 
@@ -689,13 +778,13 @@ export class CreateRackComponent implements OnInit, AfterViewInit, OnDestroy {
       0: 'General',
       1: 'Image',
       2: 'Video',
-      3: 'Custom Image'
+      3: 'Custom Image',
     };
     return types[contentType] || 'General';
   }
 
   getDeviceStatus(deviceId: number): string {
-    const device = this.localDevices.find(d => d.id === deviceId);
+    const device = this.localDevices.find((d) => d.id === deviceId);
     return device?.status || 'Unknown';
   }
 
@@ -782,18 +871,21 @@ export class CreateRackComponent implements OnInit, AfterViewInit, OnDestroy {
           isActive: shelf.isActive !== false,
           createdUser: this.currentUserId,
           aisleId: 0,
-          deviceAssignments: []
+          deviceAssignments: [],
         };
 
         if (shelf.deviceCombos && shelf.deviceCombos.length > 0) {
           shelfData.deviceAssignments = shelf.deviceCombos
-            .filter((combo: any) => combo.deviceId && (combo.templateId || combo.messageId))
+            .filter(
+              (combo: any) =>
+                combo.deviceId && (combo.templateId || combo.messageId),
+            )
             .map((combo: any) => {
               const assignment: any = {
                 assignmentType: shelf.comboMode || 'TEMPLATE',
                 displayOrder: combo.displayOrder || 1,
                 isActive: combo.isActive !== false,
-                isDefault: combo.isDefault || false
+                isDefault: combo.isDefault || false,
               };
 
               if (combo.deviceTemplateComboId) {
@@ -816,7 +908,7 @@ export class CreateRackComponent implements OnInit, AfterViewInit, OnDestroy {
             });
         }
         return shelfData;
-      })
+      }),
     };
 
     this.aisleService.createAisle(rackData).subscribe({
@@ -829,7 +921,7 @@ export class CreateRackComponent implements OnInit, AfterViewInit, OnDestroy {
         this.isSubmitting = false;
         console.error('Error creating rack:', err);
         this.showError('Failed to create rack. Please try again.');
-      }
+      },
     });
   }
 
@@ -838,8 +930,10 @@ export class CreateRackComponent implements OnInit, AfterViewInit, OnDestroy {
 
     if (this.rackForm.invalid) {
       const errors = [];
-      if (this.rackForm.get('name')?.invalid) errors.push('Rack name is required');
-      if (this.rackForm.get('location')?.invalid) errors.push('Location is required');
+      if (this.rackForm.get('name')?.invalid)
+        errors.push('Rack name is required');
+      if (this.rackForm.get('location')?.invalid)
+        errors.push('Location is required');
       if (!this.selectedStore) errors.push('Store selection is required');
 
       this.showError(errors.join(', '));
@@ -862,8 +956,6 @@ export class CreateRackComponent implements OnInit, AfterViewInit, OnDestroy {
     return true;
   }
 
-
-
   onCancel(): void {
     if (this.rackForm.dirty || this.shelves.length > 0) {
       const confirmDialog = this.dialog.open(ConfirmationDialogComponent, {
@@ -874,13 +966,13 @@ export class CreateRackComponent implements OnInit, AfterViewInit, OnDestroy {
           message: 'You have unsaved changes. Are you sure you want to cancel?',
           confirmText: 'Yes, Cancel',
           cancelText: 'No',
-          confirmColor: 'warn'
-        }
+          confirmColor: 'warn',
+        },
       });
 
       confirmDialog.afterClosed().subscribe((confirmed: boolean) => {
         if (confirmed) {
-          this.visible = false;              // ✅ NOW close PrimeNG dialog
+          this.visible = false; // ✅ NOW close PrimeNG dialog
           this.dialogRef.close({ success: false });
         }
         // ❌ DO NOTHING if NO — dialog stays open
@@ -890,7 +982,6 @@ export class CreateRackComponent implements OnInit, AfterViewInit, OnDestroy {
       this.dialogRef.close({ success: false });
     }
   }
-
 
   // Helper Methods
   getFieldError(fieldName: string): string {
@@ -919,17 +1010,26 @@ export class CreateRackComponent implements OnInit, AfterViewInit, OnDestroy {
     return '';
   }
 
-  getDeviceComboFieldError(shelfIndex: number, comboIndex: number, fieldName: string): string {
+  getDeviceComboFieldError(
+    shelfIndex: number,
+    comboIndex: number,
+    fieldName: string,
+  ): string {
     const combos = this.getShelfCombos(shelfIndex);
     const combo = combos.at(comboIndex) as FormGroup;
     const control = combo?.get(fieldName);
 
     if (control?.errors && control.touched) {
       if (control.errors['required']) {
-        return `${fieldName === 'deviceId' ? 'Device' :
-          fieldName === 'templateId' ? 'Template' :
-            fieldName === 'messageId' ? 'Message' :
-              fieldName} is required`;
+        return `${
+          fieldName === 'deviceId'
+            ? 'Device'
+            : fieldName === 'templateId'
+              ? 'Template'
+              : fieldName === 'messageId'
+                ? 'Message'
+                : fieldName
+        } is required`;
       }
       if (control.errors['min']) {
         return 'Display order must be at least 1';
@@ -940,11 +1040,11 @@ export class CreateRackComponent implements OnInit, AfterViewInit, OnDestroy {
 
   private getFieldLabel(fieldName: string): string {
     const labels: { [key: string]: string } = {
-      'name': 'Rack Name',
-      'description': 'Description',
-      'location': 'Location',
-      'coordinates': 'Coordinates',
-      'storeId': 'Store'
+      name: 'Rack Name',
+      description: 'Description',
+      location: 'Location',
+      coordinates: 'Coordinates',
+      storeId: 'Store',
     };
     return labels[fieldName] || fieldName;
   }
@@ -956,7 +1056,11 @@ export class CreateRackComponent implements OnInit, AfterViewInit, OnDestroy {
 
   isShelfValid(shelfIndex: number): boolean {
     const shelf = this.shelves.at(shelfIndex) as FormGroup | null;
-    return !!(shelf && shelf.get('name')?.valid && shelf.get('location')?.valid);
+    return !!(
+      shelf &&
+      shelf.get('name')?.valid &&
+      shelf.get('location')?.valid
+    );
   }
 
   // Snackbar Methods
@@ -965,7 +1069,7 @@ export class CreateRackComponent implements OnInit, AfterViewInit, OnDestroy {
       severity: 'success',
       summary: 'Success',
       detail: message,
-      life: 5000
+      life: 5000,
     });
   }
 
@@ -974,7 +1078,7 @@ export class CreateRackComponent implements OnInit, AfterViewInit, OnDestroy {
       severity: 'error',
       summary: 'Error',
       detail: message,
-      life: 5000
+      life: 5000,
     });
   }
 
@@ -983,7 +1087,7 @@ export class CreateRackComponent implements OnInit, AfterViewInit, OnDestroy {
       severity: 'warn',
       summary: 'Warning',
       detail: message,
-      life: 5000
+      life: 5000,
     });
   }
 
@@ -992,7 +1096,7 @@ export class CreateRackComponent implements OnInit, AfterViewInit, OnDestroy {
       severity: 'info',
       summary: 'Info',
       detail: message,
-      life: 5000
+      life: 5000,
     });
   }
   // private showSuccess(message: string): void {

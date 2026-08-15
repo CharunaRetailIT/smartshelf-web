@@ -1,12 +1,31 @@
 import { CommonModule } from '@angular/common';
 import { Component, Inject, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import {
+  FormBuilder,
+  FormGroup,
+  ReactiveFormsModule,
+  Validators,
+} from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
-import { MatDialogRef, MAT_DIALOG_DATA, MatDialogModule } from '@angular/material/dialog';
+import {
+  MatDialogRef,
+  MAT_DIALOG_DATA,
+  MatDialogModule,
+} from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { UserService } from '../../../core/services/user.service';
-import { AssignRoleDto, Department, Role, UpdateUserDto, User, UserData } from '../../../core/interfaces/user.interface';
-import { SnackbarData, CustomSnackbarComponent } from '../../../shared/components/alert/custom-snackbar.component';
+import {
+  AssignRoleDto,
+  Department,
+  Role,
+  UpdateUserDto,
+  User,
+  UserData,
+} from '../../../core/interfaces/user.interface';
+import {
+  SnackbarData,
+  CustomSnackbarComponent,
+} from '../../../shared/components/alert/custom-snackbar.component';
 import { MessageService } from 'primeng/api';
 
 interface EditUserDialogData {
@@ -17,12 +36,16 @@ interface EditUserDialogData {
 @Component({
   selector: 'app-edit-user',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, MatDialogModule, MatButtonModule],
+  imports: [
+    CommonModule,
+    ReactiveFormsModule,
+    MatDialogModule,
+    MatButtonModule,
+  ],
   templateUrl: './edit-user.component.html',
-  styleUrl: './edit-user.component.css'
+  styleUrl: './edit-user.component.css',
 })
 export class EditUserComponent implements OnInit {
-
   // #region Properties
   userForm: FormGroup;
   isSubmitting = false;
@@ -39,7 +62,7 @@ export class EditUserComponent implements OnInit {
     private messageService: MessageService,
     private snackBar: MatSnackBar,
     public dialogRef: MatDialogRef<EditUserComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: EditUserDialogData
+    @Inject(MAT_DIALOG_DATA) public data: EditUserDialogData,
   ) {
     console.log('Edit user data received:', data); // Debug log
 
@@ -70,7 +93,7 @@ export class EditUserComponent implements OnInit {
         formErrors: this.userForm.errors,
         departmentValue: this.userForm.get('department')?.value,
         roleValue: this.userForm.get('role')?.value,
-        currentUser: this.currentUser
+        currentUser: this.currentUser,
       });
     }, 500);
   }
@@ -80,15 +103,23 @@ export class EditUserComponent implements OnInit {
   private createUserForm(user: User): FormGroup {
     console.log('Creating form with user:', user);
     console.log('User roleId:', user.roleId, 'Type:', typeof user.roleId);
-    console.log('User departmentId:', user.departmentId, 'Type:', typeof user.departmentId);
+    console.log(
+      'User departmentId:',
+      user.departmentId,
+      'Type:',
+      typeof user.departmentId,
+    );
 
     const form = this.fb.group({
       employeeId: [user?.employeeId || '', [Validators.required]],
       firstName: [user?.firstName || '', [Validators.required]],
       lastName: [user?.lastName || '', [Validators.required]],
       email: [user?.email || '', [Validators.required, Validators.email]],
-      department: [user?.departmentId ? Number(user.departmentId) : null, [Validators.required]],
-      role: [user?.roleId ? Number(user.roleId) : null, [Validators.required]]
+      department: [
+        user?.departmentId ? Number(user.departmentId) : null,
+        [Validators.required],
+      ],
+      role: [user?.roleId ? Number(user.roleId) : null, [Validators.required]],
     });
 
     // Log initial form values
@@ -113,7 +144,7 @@ export class EditUserComponent implements OnInit {
       error: (error) => {
         console.error('Error checking permissions:', error);
         this.canAssignRole = false;
-      }
+      },
     });
   }
   // #endregion
@@ -130,18 +161,22 @@ export class EditUserComponent implements OnInit {
         console.log('Current department ID in form:', currentDeptId);
 
         if (currentDeptId) {
-          const departmentExists = this.departments.some(d => d.id === currentDeptId);
+          const departmentExists = this.departments.some(
+            (d) => d.id === currentDeptId,
+          );
           console.log('Department exists in list:', departmentExists);
 
           if (!departmentExists) {
-            console.warn(`Department ID ${currentDeptId} not found in available departments`);
+            console.warn(
+              `Department ID ${currentDeptId} not found in available departments`,
+            );
           }
         }
       },
       error: (error) => {
         console.error('Error loading departments:', error);
         this.showError('Error loading departments');
-      }
+      },
     });
   }
 
@@ -156,18 +191,20 @@ export class EditUserComponent implements OnInit {
         console.log('Current role ID in form:', currentRoleId);
 
         if (currentRoleId) {
-          const roleExists = this.roles.some(r => r.id === currentRoleId);
+          const roleExists = this.roles.some((r) => r.id === currentRoleId);
           console.log('Role exists in list:', roleExists);
 
           if (!roleExists) {
-            console.warn(`Role ID ${currentRoleId} not found in available roles`);
+            console.warn(
+              `Role ID ${currentRoleId} not found in available roles`,
+            );
           }
         }
       },
       error: (error) => {
         console.error('Error loading roles:', error);
         this.showError('Error loading roles');
-      }
+      },
     });
   }
   // #endregion
@@ -181,7 +218,7 @@ export class EditUserComponent implements OnInit {
       console.log('Form invalid or submitting:', {
         invalid: this.userForm.invalid,
         submitting: this.isSubmitting,
-        errors: this.getFormControlErrors()
+        errors: this.getFormControlErrors(),
       });
       return;
     }
@@ -192,12 +229,12 @@ export class EditUserComponent implements OnInit {
     console.log('Submitting update:', {
       userId: this.currentUser.id,
       dto: updateUserDto,
-      formValue: this.userForm.value
+      formValue: this.userForm.value,
     });
 
     this.userService.updateUser(this.currentUser.id, updateUserDto).subscribe({
       next: (response) => this.handleUpdateResponse(response),
-      error: (error) => this.handleError(error, 'Failed to update user')
+      error: (error) => this.handleError(error, 'Failed to update user'),
     });
   }
 
@@ -208,7 +245,7 @@ export class EditUserComponent implements OnInit {
       firstName: formValue.firstName,
       lastName: formValue.lastName,
       email: formValue.email,
-      department: formValue.department
+      department: formValue.department,
     };
 
     console.log('Mapped DTO:', dto);
@@ -224,7 +261,8 @@ export class EditUserComponent implements OnInit {
         canAssignRole: this.canAssignRole,
         currentRoleId: this.currentUser.roleId,
         newRoleId: formRole,
-        needsRoleUpdate: this.canAssignRole && formRole !== this.currentUser.roleId
+        needsRoleUpdate:
+          this.canAssignRole && formRole !== this.currentUser.roleId,
       });
 
       if (this.canAssignRole && formRole !== this.currentUser.roleId) {
@@ -235,13 +273,16 @@ export class EditUserComponent implements OnInit {
     } else {
       this.handleError(
         { message: response.message, statusCode: response.statusCode },
-        'Update completed with non-200 status'
+        'Update completed with non-200 status',
       );
     }
   }
 
   private assignRole(roleId: number): void {
-    const assignRoleDto: AssignRoleDto = { userId: this.currentUser.id, role: roleId };
+    const assignRoleDto: AssignRoleDto = {
+      userId: this.currentUser.id,
+      role: roleId,
+    };
     console.log('Assigning role:', assignRoleDto);
 
     this.userService.assignRole(assignRoleDto).subscribe({
@@ -252,14 +293,16 @@ export class EditUserComponent implements OnInit {
       error: (error) => {
         console.error('Role assignment error:', error);
         // Even if role assignment fails, consider the user update successful
-        this.handleSuccess('User updated successfully, but role assignment failed');
-      }
+        this.handleSuccess(
+          'User updated successfully, but role assignment failed',
+        );
+      },
     });
   }
 
   // Helper to mark all form controls as touched
   private markFormGroupTouched(formGroup: FormGroup): void {
-    Object.keys(formGroup.controls).forEach(key => {
+    Object.keys(formGroup.controls).forEach((key) => {
       const control = formGroup.get(key);
       control?.markAsTouched();
     });
@@ -268,7 +311,7 @@ export class EditUserComponent implements OnInit {
   // Helper to get form control errors
   private getFormControlErrors(): any {
     const errors: any = {};
-    Object.keys(this.userForm.controls).forEach(key => {
+    Object.keys(this.userForm.controls).forEach((key) => {
       const control = this.userForm.get(key);
       if (control?.errors) {
         errors[key] = control.errors;
@@ -285,7 +328,7 @@ export class EditUserComponent implements OnInit {
     this.dialogRef.close({
       success: true,
       data: this.userForm.value,
-      user: this.currentUser
+      user: this.currentUser,
     });
   }
 
@@ -299,7 +342,7 @@ export class EditUserComponent implements OnInit {
     } else if (error.message) {
       errorMessage = error.message;
     }
-    this.showError(errorMessage)
+    this.showError(errorMessage);
   }
 
   // #endregion
@@ -312,12 +355,12 @@ export class EditUserComponent implements OnInit {
 
   // #region Helper Methods for Template
   getDepartmentName(deptId: number): string {
-    const dept = this.departments.find(d => d.id === deptId);
+    const dept = this.departments.find((d) => d.id === deptId);
     return dept ? dept.name : 'Loading...';
   }
 
   getRoleName(roleId: number): string {
-    const role = this.roles.find(r => r.id === roleId);
+    const role = this.roles.find((r) => r.id === roleId);
     return role ? role.name : 'Loading...';
   }
 
@@ -353,7 +396,7 @@ export class EditUserComponent implements OnInit {
       severity: 'success',
       summary: 'Success',
       detail: message,
-      life: 5000
+      life: 5000,
     });
   }
 
@@ -362,7 +405,7 @@ export class EditUserComponent implements OnInit {
       severity: 'error',
       summary: 'Error',
       detail: message,
-      life: 5000
+      life: 5000,
     });
   }
 
@@ -371,7 +414,7 @@ export class EditUserComponent implements OnInit {
       severity: 'warn',
       summary: 'Warning',
       detail: message,
-      life: 5000
+      life: 5000,
     });
   }
 
@@ -380,7 +423,7 @@ export class EditUserComponent implements OnInit {
       severity: 'info',
       summary: 'Info',
       detail: message,
-      life: 5000
+      life: 5000,
     });
   }
   // private showSuccess(message: string): void {

@@ -1,7 +1,9 @@
-<div class="min-h-screen bg-gray-50 py-6">
+<div class="min-h-screen bg-gray-50 py-6 ds-page-shell">
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
     <!-- Header -->
-    <div class="bg-white rounded-lg shadow-sm border border-gray-200 mb-6 p-6">
+    <div
+      class="bg-white rounded-lg shadow-sm border border-gray-200 mb-6 p-6 ds-card"
+    >
       <div class="flex items-center justify-between">
         <div class="flex items-center space-x-3">
           <i class="pi pi-warehouse text-blue-600 text-2xl"></i>
@@ -28,25 +30,25 @@
             *ngIf="auth.hasAnyRole(['Admin', 'Manager', 'Operator'])"
           >
             <!-- <button (click)="exportData()" 
-                    class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50">
+                    class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 ds-btn ds-btn--secondary">
               <i class="fas fa-download mr-2"></i>Export
             </button>
             <button (click)="importData()" 
-                    class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50">
+                    class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 ds-btn ds-btn--secondary">
               <i class="fas fa-upload mr-2"></i>Import
             </button> -->
             <!-- Sync to Cloud Button -->
             <button
               (click)="syncToCloud()"
               [disabled]="syncing"
-              class="cursor-pointer bg-blue-500 hover:bg-blue-800 text-white px-4 py-2 rounded-lg flex items-center space-x-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              class="cursor-pointer bg-blue-500 hover:bg-blue-800 text-white px-4 py-2 rounded-lg flex items-center space-x-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed ds-btn ds-btn--primary"
             >
               <i class="fas fa-cloud-upload-alt" [class.fa-spin]="syncing"></i>
               <span>{{ syncing ? "Syncing..." : "Sync to Cloud" }}</span>
             </button>
             <button
               (click)="openCreateRackModal()"
-              class="inline-flex items-center px-4 py-2 bg-primary border border-transparent rounded-md shadow-sm text-sm font-medium text-white hover:bg-primary-dark"
+              class="inline-flex items-center px-4 py-2 bg-primary border border-transparent rounded-md shadow-sm text-sm font-medium text-white hover:bg-primary-dark ds-btn ds-btn--primary"
             >
               <i class="fas fa-plus mr-2"></i>Add Rack
             </button>
@@ -56,7 +58,9 @@
     </div>
 
     <!-- Top Bar: Search, Filters, Bulk Actions -->
-    <div class="bg-white rounded-lg shadow-sm border border-gray-200 mb-6 p-4">
+    <div
+      class="bg-white rounded-lg shadow-sm border border-gray-200 mb-6 p-4 ds-card"
+    >
       <div class="flex justify-between items-center gap-4">
         <!-- Search -->
         <div class="relative flex-1 max-w-md">
@@ -97,7 +101,7 @@
           >
           <button
             (click)="bulkDelete()"
-            class="inline-flex items-center px-3 py-2 border border-red-300 rounded-md text-sm font-medium text-red-700 bg-red-50 hover:bg-red-100"
+            class="inline-flex items-center px-3 py-2 border border-red-300 rounded-md text-sm font-medium text-red-700 bg-red-50 hover:bg-red-100 ds-btn ds-btn--secondary"
           >
             <i class="fas fa-trash mr-1"></i>Delete Selected
           </button>
@@ -150,9 +154,12 @@
             Get started by creating your first rack.
           </p>
           <div class="mt-6">
+            <!-- Same dialog as the toolbar's Add Rack. This used to open the
+                 older CreateAisle dialog, so an empty warehouse was the one
+                 route into the previous UI. -->
             <button
-              (click)="openAddAisleDialog()"
-              class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+              (click)="openCreateRackModal()"
+              class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 ds-btn ds-btn--primary"
             >
               <i class="fas fa-plus mr-2"></i>
               Add Rack
@@ -208,7 +215,7 @@
               <!-- Expand/Collapse -->
               <button
                 (click)="toggleExpansion(aisle)"
-                class="p-2 text-gray-400 hover:text-gray-600 transition-colors"
+                class="p-2 text-gray-400 hover:text-gray-600 transition-colors ds-btn-icon"
                 [attr.aria-expanded]="aisle.expanded"
                 [attr.aria-label]="
                   aisle.expanded ? 'Collapse shelves' : 'Expand shelves'
@@ -227,7 +234,7 @@
               <button
                 *ngIf="auth.hasAnyRole(['Admin', 'Manager'])"
                 (click)="openShelfModal('create', aisle, aisle.id)"
-                class="p-2 text-green-600 hover:text-green-700 transition-colors"
+                class="p-2 text-green-600 hover:text-green-700 transition-colors ds-btn-icon"
                 title="Add Shelf"
               >
                 <i class="pi pi-plus-circle"></i>
@@ -237,7 +244,7 @@
               <button
                 *ngIf="auth.hasAnyRole(['Admin', 'Manager', 'Operator'])"
                 (click)="editAisle(aisle)"
-                class="p-2 text-blue-600 hover:text-blue-700 transition-colors"
+                class="p-2 text-blue-600 hover:text-blue-700 transition-colors ds-btn-icon"
                 title="Edit Rack"
               >
                 <i class="fas fa-edit"></i>
@@ -247,7 +254,7 @@
               <button
                 *ngIf="auth.hasAnyRole(['Viewer'])"
                 (click)="editAisle(aisle)"
-                class="p-2 text-blue-600 hover:text-blue-700 transition-colors"
+                class="p-2 text-blue-600 hover:text-blue-700 transition-colors ds-btn-icon"
                 title="View Rack"
               >
                 <i class="fas fa-eye"></i>
@@ -258,7 +265,7 @@
                 (click)="
                   aisle.isActive ? deleteAisle(aisle) : restoreAisle(aisle)
                 "
-                class="p-2 transition-colors"
+                class="p-2 transition-colors ds-btn-icon"
                 [ngClass]="{
                   'text-red-600 hover:text-red-700': aisle.isActive,
                   'text-green-600 hover:text-green-700': !aisle.isActive,
@@ -329,7 +336,7 @@
               <button
                 *ngIf="shelfSearchValue || shelfStatusFilter !== 'all'"
                 (click)="clearShelfFilters()"
-                class="flex items-center px-3 py-2 text-sm text-gray-600 hover:text-gray-800 transition-colors"
+                class="flex items-center px-3 py-2 text-sm text-gray-600 hover:text-gray-800 transition-colors ds-btn ds-btn--tertiary"
               >
                 <i class="fas fa-times mr-1"></i>
                 Clear Filters
@@ -339,7 +346,7 @@
               <button
                 *ngIf="auth.hasAnyRole(['Admin', 'Manager'])"
                 (click)="openShelfModal('create', aisle, aisle.id)"
-                class="flex items-center px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700 transition-colors ml-auto"
+                class="flex items-center px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700 transition-colors ml-auto ds-btn ds-btn--primary"
               >
                 <i class="pi pi-plus-circle mr-2"></i>
                 Add Shelf
@@ -414,7 +421,7 @@
                   <button
                     *ngIf="auth.hasAnyRole(['Admin', 'Manager', 'Operator'])"
                     (click)="openShelfModal('edit', shelf, shelf.aisleId)"
-                    class="p-1 text-blue-600 hover:text-blue-700 text-sm transition-colors"
+                    class="p-1 text-blue-600 hover:text-blue-700 text-sm transition-colors ds-btn-icon"
                     title="Edit Shelf"
                   >
                     <i class="fas fa-edit"></i>
@@ -422,7 +429,7 @@
                   <button
                     *ngIf="auth.hasAnyRole(['Viewer'])"
                     (click)="openShelfModal('edit', shelf, shelf.aisleId)"
-                    class="p-1 text-blue-600 hover:text-blue-700 text-sm transition-colors"
+                    class="p-1 text-blue-600 hover:text-blue-700 text-sm transition-colors ds-btn-icon"
                     title="View Shelf"
                   >
                     <i class="fas fa-eye"></i>
@@ -434,7 +441,7 @@
                     (click)="
                       shelf.isActive ? deleteShelf(shelf) : restoreShelf(shelf)
                     "
-                    class="p-1 text-sm transition-colors"
+                    class="p-1 text-sm transition-colors ds-btn-icon"
                     [ngClass]="{
                       'text-red-600 hover:text-red-700': shelf.isActive,
                       'text-green-600 hover:text-green-700': !shelf.isActive,
@@ -447,13 +454,13 @@
                   </button>
                   <!-- <button
                     (click)="openProductAssignment(shelf)"
-                    class="p-2 text-purple-600 hover:text-purple-700 transition-colors"
+                    class="p-2 text-purple-600 hover:text-purple-700 transition-colors ds-btn-icon"
                     title="Assign Products">
                     <i class="fas fa-boxes"></i>
                   </button> -->
                   <button
                     (click)="navigateToProductAssignment(shelf.id)"
-                    class="p-2 text-purple-600 hover:text-purple-700 transition-colors"
+                    class="p-2 text-purple-600 hover:text-purple-700 transition-colors ds-btn-icon"
                     title="Assign Products"
                   >
                     <i class="pi pi-list-check"></i>
@@ -506,7 +513,7 @@
             </p>
             <button
               (click)="clearShelfFilters()"
-              class="inline-flex items-center text-blue-600 hover:text-blue-700 text-xs font-medium"
+              class="inline-flex items-center text-blue-600 hover:text-blue-700 text-xs font-medium ds-btn ds-btn--tertiary"
             >
               <i class="fas fa-times mr-1"></i>
               Clear filters
@@ -527,7 +534,7 @@
             <button
               *ngIf="auth.hasAnyRole(['Admin', 'Manager', 'Operator'])"
               (click)="openShelfModal('create', aisle, aisle.id)"
-              class="inline-flex items-center text-blue-600 hover:text-blue-700 text-sm font-medium"
+              class="inline-flex items-center text-blue-600 hover:text-blue-700 text-sm font-medium ds-btn ds-btn--tertiary"
             >
               <i class="fas fa-plus mr-1"></i>
               Add first shelf
@@ -554,7 +561,7 @@
           <button
             (click)="goToPreviousPage()"
             [disabled]="currentPage <= 1"
-            class="flex items-center px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            class="flex items-center px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors ds-btn ds-btn--secondary"
           >
             <i class="fas fa-chevron-left mr-1"></i>
             Previous
@@ -571,7 +578,7 @@
           <button
             (click)="goToNextPage()"
             [disabled]="currentPage >= totalPages"
-            class="flex items-center px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            class="flex items-center px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors ds-btn ds-btn--secondary"
           >
             Next
             <i class="fas fa-chevron-right ml-1"></i>

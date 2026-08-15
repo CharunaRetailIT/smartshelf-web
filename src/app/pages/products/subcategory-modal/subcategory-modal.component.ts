@@ -1,12 +1,27 @@
 import { Component, Inject, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
-import { MatDialogRef, MAT_DIALOG_DATA, MatDialogModule } from '@angular/material/dialog';
+import {
+  FormBuilder,
+  FormGroup,
+  Validators,
+  ReactiveFormsModule,
+} from '@angular/forms';
+import {
+  MatDialogRef,
+  MAT_DIALOG_DATA,
+  MatDialogModule,
+} from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { CommonModule } from '@angular/common';
-import { ProductSubCategory, ProductCategory } from '../../../core/interfaces/product.interface';
+import {
+  ProductSubCategory,
+  ProductCategory,
+} from '../../../core/interfaces/product.interface';
 import { CategoryService } from '../../../core/services/category.service';
 import { AuthService } from '../../../core/services/auth.service';
-import { CustomSnackbarComponent, SnackbarData } from '../../../shared/components/alert/custom-snackbar.component';
+import {
+  CustomSnackbarComponent,
+  SnackbarData,
+} from '../../../shared/components/alert/custom-snackbar.component';
 import { MatButtonModule } from '@angular/material/button';
 import { MatInputModule } from '@angular/material/input';
 import { MatCardModule } from '@angular/material/card';
@@ -36,7 +51,7 @@ export interface SubcategoryModalData {
     MatDividerModule,
     MatIconModule,
     MatSelectModule,
-    MatCheckboxModule
+    MatCheckboxModule,
   ],
   templateUrl: './subcategory-modal.component.html',
   styleUrls: ['./subcategory-modal.component.css'],
@@ -58,7 +73,7 @@ export class SubcategoryModalComponent implements OnInit {
     public auth: AuthService,
     private settingsService: SettingsService,
     public dialogRef: MatDialogRef<SubcategoryModalComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: SubcategoryModalData
+    @Inject(MAT_DIALOG_DATA) public data: SubcategoryModalData,
   ) {
     this.subCategoryForm = this.createForm();
   }
@@ -88,7 +103,6 @@ export class SubcategoryModalComponent implements OnInit {
       ? 'Update existing subcategory information'
       : 'View subcategory details';
   }
-
 
   ngOnInit(): void {
     console.log('Modal Data Received:', this.data);
@@ -144,7 +158,7 @@ export class SubcategoryModalComponent implements OnInit {
       // Meta Fields (hidden in form but needed for API)
       id: [0],
       createdUser: [0],
-      updatedUser: [0]
+      updatedUser: [0],
     });
   }
 
@@ -155,15 +169,18 @@ export class SubcategoryModalComponent implements OnInit {
       subCategoryName: subCategory.subCategoryName || '',
       subCategoryCode: subCategory.subCategoryCode || '',
       subCategoryDescription: subCategory.subCategoryDescription || '',
-      isActive: subCategory.isActive !== undefined ? subCategory.isActive : true,
+      isActive:
+        subCategory.isActive !== undefined ? subCategory.isActive : true,
       createdUser: subCategory.createdUser || 0,
       updatedUser: subCategory.updatedUser || 0,
-      storeId: this.storeId
+      storeId: this.storeId,
     });
   }
 
   get canSubmit(): boolean {
-    return this.subCategoryForm.valid && !this.isSubmitting && !!this.currentUserId;
+    return (
+      this.subCategoryForm.valid && !this.isSubmitting && !!this.currentUserId
+    );
   }
 
   // Add this getter to access form controls in template
@@ -172,7 +189,7 @@ export class SubcategoryModalComponent implements OnInit {
   }
 
   getCategoryName(categoryId: number): string {
-    const category = this.categories.find(c => c.id === categoryId);
+    const category = this.categories.find((c) => c.id === categoryId);
     return category ? category.categoryName : 'Not selected';
   }
 
@@ -194,15 +211,20 @@ export class SubcategoryModalComponent implements OnInit {
         subCategoryCode: formValue.subCategoryCode,
         subCategoryDescription: formValue.subCategoryDescription,
         isActive: formValue.isActive,
-        createdUser: this.isEditMode ? formValue.createdUser : this.currentUserId,
+        createdUser: this.isEditMode
+          ? formValue.createdUser
+          : this.currentUserId,
         updatedUser: this.currentUserId,
-        storeId: this.storeId
+        storeId: this.storeId,
       };
 
       console.log('Submitting Subcategory Data:', subCategoryData);
 
       const operation = this.isEditMode
-        ? this.categoryService.updateSubCategory(subCategoryData.id!, subCategoryData)
+        ? this.categoryService.updateSubCategory(
+            subCategoryData.id!,
+            subCategoryData,
+          )
         : this.categoryService.createSubCategory(subCategoryData);
 
       operation.subscribe({
@@ -221,7 +243,7 @@ export class SubcategoryModalComponent implements OnInit {
             : 'Failed to create subcategory.';
           this.showError(message);
           console.error('Error saving subcategory:', err);
-        }
+        },
       });
     } else {
       this.markFormGroupTouched();
@@ -233,7 +255,7 @@ export class SubcategoryModalComponent implements OnInit {
   }
 
   private markFormGroupTouched(): void {
-    Object.keys(this.subCategoryForm.controls).forEach(key => {
+    Object.keys(this.subCategoryForm.controls).forEach((key) => {
       const control = this.subCategoryForm.get(key);
       control?.markAsTouched();
     });
@@ -262,7 +284,7 @@ export class SubcategoryModalComponent implements OnInit {
       categoryId: 'Parent Category',
       subCategoryName: 'Subcategory Name',
       subCategoryCode: 'Subcategory Code',
-      subCategoryDescription: 'Description'
+      subCategoryDescription: 'Description',
     };
     return labels[fieldName] || fieldName;
   }
@@ -273,7 +295,7 @@ export class SubcategoryModalComponent implements OnInit {
       severity: 'success',
       summary: 'Success',
       detail: message,
-      life: 5000
+      life: 5000,
     });
   }
 
@@ -282,7 +304,7 @@ export class SubcategoryModalComponent implements OnInit {
       severity: 'error',
       summary: 'Error',
       detail: message,
-      life: 5000
+      life: 5000,
     });
   }
 
@@ -291,7 +313,7 @@ export class SubcategoryModalComponent implements OnInit {
       severity: 'warn',
       summary: 'Warning',
       detail: message,
-      life: 5000
+      life: 5000,
     });
   }
 
@@ -300,7 +322,7 @@ export class SubcategoryModalComponent implements OnInit {
       severity: 'info',
       summary: 'Info',
       detail: message,
-      life: 5000
+      life: 5000,
     });
   }
   // private showSuccess(message: string): void {

@@ -15,6 +15,16 @@
         </button>
         <div class="logo-text" *ngIf="!isLeftSidebarCollapsed()">
           <span class="brand-name">Smart ESL</span>
+          <!-- The store everything on screen is scoped to. Hidden rather than
+               left blank when no store is set. -->
+          <span
+            class="store-name"
+            *ngIf="defaultStore$ | async as store"
+            [matTooltip]="store.storeName"
+            matTooltipPosition="right"
+          >
+            {{ store.storeName }}
+          </span>
           <!-- <span>Version 1.2.0</span> -->
         </div>
 

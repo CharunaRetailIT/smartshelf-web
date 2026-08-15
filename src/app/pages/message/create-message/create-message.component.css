@@ -25,18 +25,6 @@ canvas {
   overflow-y: auto;
 }
 
-:host ::ng-deep .p-dropdown-item {
-  padding: 0.5rem 1rem;
-}
-
-:host ::ng-deep .p-dropdown-header {
-  padding: 0.75rem;
-}
-
-:host ::ng-deep .p-dropdown-footer {
-  padding: 0.75rem;
-}
-
 /* Add this to your global styles or component CSS */
 input:focus,
 textarea:focus,
