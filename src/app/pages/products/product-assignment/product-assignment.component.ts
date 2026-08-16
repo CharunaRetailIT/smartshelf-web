@@ -1,5 +1,13 @@
 // product-assignment.component.ts - REFACTORED FOR PRIMENG 19
-import { Component, OnInit, inject, HostListener, ChangeDetectorRef, TemplateRef, ViewChild } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  inject,
+  HostListener,
+  ChangeDetectorRef,
+  TemplateRef,
+  ViewChild,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -18,8 +26,16 @@ import { CategoryService } from '../../../core/services/category.service';
 import { AuthService } from '../../../core/services/auth.service';
 
 // Interfaces
-import { Product, ProductCategory, ProductSubCategory } from '../../../core/interfaces/product.interface';
-import { AssignmentDto, DeviceAssignmentDto, UnifiedBindDataRequest } from '../../../core/interfaces/device.interface';
+import {
+  Product,
+  ProductCategory,
+  ProductSubCategory,
+} from '../../../core/interfaces/product.interface';
+import {
+  AssignmentDto,
+  DeviceAssignmentDto,
+  UnifiedBindDataRequest,
+} from '../../../core/interfaces/device.interface';
 import { Message } from '../../../core/interfaces/message.interface';
 
 // Pipes
@@ -52,10 +68,10 @@ interface LayoutOption {
     ImportsModule,
 
     // Custom Pipes
-    FilterPipe
+    FilterPipe,
   ],
   templateUrl: './product-assignment.component.html',
-  styleUrls: ['./product-assignment.component.css']
+  styleUrls: ['./product-assignment.component.css'],
 })
 export class ProductAssignmentComponent implements OnInit {
   private route = inject(ActivatedRoute);
@@ -69,9 +85,12 @@ export class ProductAssignmentComponent implements OnInit {
   private snackBar = inject(MatSnackBar);
   private messageService = inject(MessageService);
   public auth = inject(AuthService);
-  public msgService = inject(CustomMessageService)
+  public msgService = inject(CustomMessageService);
 
-  constructor(private cdr: ChangeDetectorRef, private dialog: MatDialog) { }
+  constructor(
+    private cdr: ChangeDetectorRef,
+    private dialog: MatDialog,
+  ) {}
 
   //#region Properties
   shelf!: Shelf;
@@ -86,7 +105,7 @@ export class ProductAssignmentComponent implements OnInit {
   // Layout options
   layoutOptions: LayoutOption[] = [
     { label: 'List View', value: 'list', icon: 'pi pi-list' },
-    { label: 'Grid View', value: 'grid', icon: 'pi pi-th-large' }
+    { label: 'Grid View', value: 'grid', icon: 'pi pi-th-large' },
   ];
 
   selectedAssignedProductsLayout: 'list' | 'grid' = 'grid';
@@ -189,7 +208,7 @@ export class ProductAssignmentComponent implements OnInit {
   //#endregion
 
   async ngOnInit(): Promise<void> {
-    this.loadDefaultStore()
+    this.loadDefaultStore();
     this.shelfId = Number(this.route.snapshot.paramMap.get('id'));
 
     if (!this.shelfId) {
@@ -198,7 +217,9 @@ export class ProductAssignmentComponent implements OnInit {
       return;
     }
 
-    this.viewMode = this.auth.hasAnyRole(['Admin', 'Manager', 'Operator']) ? 'assign' : 'view';
+    this.viewMode = this.auth.hasAnyRole(['Admin', 'Manager', 'Operator'])
+      ? 'assign'
+      : 'view';
 
     await this.loadInitialData();
   }
@@ -219,7 +240,10 @@ export class ProductAssignmentComponent implements OnInit {
   @HostListener('scroll', ['$event'])
   onScroll(event: any): void {
     const element = event.target;
-    if (element.scrollHeight - element.scrollTop <= element.clientHeight + 100) {
+    if (
+      element.scrollHeight - element.scrollTop <=
+      element.clientHeight + 100
+    ) {
       this.loadMoreProducts(element);
     }
   }
@@ -229,15 +253,15 @@ export class ProductAssignmentComponent implements OnInit {
   //   const scrollPosition = element.scrollTop + element.clientHeight;
   //   const scrollHeight = element.scrollHeight;
 
-  //   const shouldLoadFromAPI = 
-  //     scrollPosition >= scrollHeight * 0.8 && 
-  //     !this.isLoadingMoreAvailable && 
+  //   const shouldLoadFromAPI =
+  //     scrollPosition >= scrollHeight * 0.8 &&
+  //     !this.isLoadingMoreAvailable &&
   //     this.hasMoreAvailable &&
   //     (!this.selectedCategoryId || this.filteredAvailableProducts.length < 10);
 
   //   if (shouldLoadFromAPI) {
   //     this.loadAvailableProducts();
-  //   } else if (scrollPosition >= scrollHeight * 0.8 && 
+  //   } else if (scrollPosition >= scrollHeight * 0.8 &&
   //              this.displayedAvailableProducts.length < this.filteredAvailableProducts.length) {
   //     this.loadMoreAvailableProducts();
   //   }
@@ -248,8 +272,8 @@ export class ProductAssignmentComponent implements OnInit {
   //   const scrollHeight = element.scrollHeight;
 
   //   // Load more when reaching 80% of scroll
-  //   if (scrollPosition >= scrollHeight * 0.8 && 
-  //       !this.isLoadingMoreAvailable && 
+  //   if (scrollPosition >= scrollHeight * 0.8 &&
+  //       !this.isLoadingMoreAvailable &&
   //       this.hasMoreAvailable) {
   //     this.loadMoreAvailableProducts();
   //   }
@@ -261,19 +285,17 @@ export class ProductAssignmentComponent implements OnInit {
     const scrollHeight = element.scrollHeight;
 
     // Load more when reaching 90% of scroll
-    if (scrollPosition >= scrollHeight * 0.9 &&
-      !this.isLoadingMoreAvailable) {
+    if (scrollPosition >= scrollHeight * 0.9 && !this.isLoadingMoreAvailable) {
       this.loadMoreAvailableProducts();
     }
   }
-
 
   // onAvailableScroll(event: any): void {
   //   const element = event.target;
   //   const scrollPosition = element.scrollTop + element.clientHeight;
   //   const scrollHeight = element.scrollHeight;
 
-  //   console.log(`Scroll - Position: ${scrollPosition}, Height: ${scrollHeight}, 
+  //   console.log(`Scroll - Position: ${scrollPosition}, Height: ${scrollHeight},
   //             Ratio: ${(scrollPosition / scrollHeight).toFixed(2)}`);
 
   //   // Load more when reaching 90% of scroll (more sensitive)
@@ -311,8 +333,11 @@ export class ProductAssignmentComponent implements OnInit {
     const scrollPosition = element.scrollTop + element.clientHeight;
     const scrollHeight = element.scrollHeight;
 
-    if (scrollPosition >= scrollHeight - 50 &&
-      this.displayedAssignedProducts.length < this.filteredAssignedProducts.length) {
+    if (
+      scrollPosition >= scrollHeight - 50 &&
+      this.displayedAssignedProducts.length <
+        this.filteredAssignedProducts.length
+    ) {
       this.loadMoreAssignedProducts();
     }
   }
@@ -363,26 +388,30 @@ export class ProductAssignmentComponent implements OnInit {
     }
 
     // Check if we need to load more from API
-    if (this.hasMoreAvailable &&
-      this.availableProductsCurrentIndex >= this.filteredAvailableProducts.length) {
+    if (
+      this.hasMoreAvailable &&
+      this.availableProductsCurrentIndex >=
+        this.filteredAvailableProducts.length
+    ) {
       // We've exhausted local filtered products, load more from API
       await this.loadAvailableProducts(false);
-    } else if (this.availableProductsCurrentIndex < this.filteredAvailableProducts.length) {
+    } else if (
+      this.availableProductsCurrentIndex < this.filteredAvailableProducts.length
+    ) {
       // We have more filtered products to display locally
       this.updateDisplayedAvailableProducts();
     }
   }
 
-
   private loadMoreAssignedProducts(): void {
     const nextBatch = this.filteredAssignedProducts.slice(
       this.assignedProductsCurrentIndex,
-      this.assignedProductsCurrentIndex + this.assignedProductsLoadCount
+      this.assignedProductsCurrentIndex + this.assignedProductsLoadCount,
     );
 
     this.displayedAssignedProducts = [
       ...this.displayedAssignedProducts,
-      ...nextBatch
+      ...nextBatch,
     ];
 
     this.assignedProductsCurrentIndex += this.assignedProductsLoadCount;
@@ -425,7 +454,7 @@ export class ProductAssignmentComponent implements OnInit {
     this.assignedProductsCurrentIndex = 0;
     this.displayedAssignedProducts = this.filteredAssignedProducts.slice(
       0,
-      this.assignedProductsLoadCount
+      this.assignedProductsLoadCount,
     );
     this.assignedProductsCurrentIndex = this.assignedProductsLoadCount;
   }
@@ -469,7 +498,7 @@ export class ProductAssignmentComponent implements OnInit {
   private async loadShelfDetails(): Promise<void> {
     try {
       this.shelf = await firstValueFrom(
-        this.shelfService.getShelfById(this.shelfId, this.storeId)
+        this.shelfService.getShelfById(this.shelfId, this.storeId),
       );
     } catch (error: any) {
       console.error('Error loading shelf details:', error);
@@ -497,32 +526,40 @@ export class ProductAssignmentComponent implements OnInit {
         pageNumber: this.categoryCurrentPage,
         pageSize: this.categoryPageSize,
         searchTerm: this.categorySearchTerm || undefined,
-        storeId: this.storeId
+        storeId: this.storeId,
       };
       console.log('Loading categories with params:', requestParams);
       const pagedResult = await firstValueFrom(
-        this.categoryService.getCategoriesPaged(requestParams)
+        this.categoryService.getCategoriesPaged(requestParams),
       );
 
       const newCategories = pagedResult.items || [];
-      console.log(newCategories)
+      console.log(newCategories);
       if (loadMore) {
-        this.filteredCategories = [...this.filteredCategories, ...newCategories];
-        this.displayedCategories = [...this.displayedCategories, ...newCategories];
+        this.filteredCategories = [
+          ...this.filteredCategories,
+          ...newCategories,
+        ];
+        this.displayedCategories = [
+          ...this.displayedCategories,
+          ...newCategories,
+        ];
       } else {
         this.filteredCategories = newCategories;
         this.displayedCategories = newCategories;
       }
 
       this.totalCategoryPages = pagedResult.totalPages;
-      this.hasMoreCategories = this.categoryCurrentPage < pagedResult.totalPages;
+      this.hasMoreCategories =
+        this.categoryCurrentPage < pagedResult.totalPages;
 
       if (newCategories.length > 0) {
         this.categoryCurrentPage++;
       }
 
-      console.log(`Loaded ${newCategories.length} categories. Total: ${this.filteredCategories.length}, Has more: ${this.hasMoreCategories}`);
-
+      console.log(
+        `Loaded ${newCategories.length} categories. Total: ${this.filteredCategories.length}, Has more: ${this.hasMoreCategories}`,
+      );
     } catch (error: any) {
       console.error('Error loading categories:', error);
       this.showError('Failed to load categories');
@@ -535,7 +572,10 @@ export class ProductAssignmentComponent implements OnInit {
     await this.loadCategories(true);
   }
 
-  private async loadSubCategories(categoryId: number, loadMore: boolean = false): Promise<void> {
+  private async loadSubCategories(
+    categoryId: number,
+    loadMore: boolean = false,
+  ): Promise<void> {
     if (!loadMore) {
       // Reset for fresh load
       this.subCategoryCurrentPage = 1;
@@ -557,18 +597,24 @@ export class ProductAssignmentComponent implements OnInit {
         pageSize: this.subCategoryPageSize,
         categoryId: categoryId,
         searchTerm: this.subCategorySearchTerm || undefined,
-        storeId: this.storeId
+        storeId: this.storeId,
       };
       console.log('Loading subcategories with params:', requestParams);
       const pagedResult = await firstValueFrom(
-        this.categoryService.getSubCategoriesPaged(requestParams)
+        this.categoryService.getSubCategoriesPaged(requestParams),
       );
 
       const newSubCategories = pagedResult.items || [];
 
       if (loadMore) {
-        this.filteredSubCategories = [...this.filteredSubCategories, ...newSubCategories];
-        this.displayedSubCategories = [...this.displayedSubCategories, ...newSubCategories];
+        this.filteredSubCategories = [
+          ...this.filteredSubCategories,
+          ...newSubCategories,
+        ];
+        this.displayedSubCategories = [
+          ...this.displayedSubCategories,
+          ...newSubCategories,
+        ];
         this.subCategories = [...this.subCategories, ...newSubCategories];
       } else {
         this.filteredSubCategories = newSubCategories;
@@ -577,12 +623,12 @@ export class ProductAssignmentComponent implements OnInit {
       }
 
       this.totalSubCategoryPages = pagedResult.totalPages;
-      this.hasMoreSubCategories = this.subCategoryCurrentPage < pagedResult.totalPages;
+      this.hasMoreSubCategories =
+        this.subCategoryCurrentPage < pagedResult.totalPages;
 
       if (newSubCategories.length > 0) {
         this.subCategoryCurrentPage++;
       }
-
     } catch (error: any) {
       console.error('Error loading subcategories:', error);
       this.filteredSubCategories = [];
@@ -605,9 +651,11 @@ export class ProductAssignmentComponent implements OnInit {
     const scrollPosition = element.scrollTop + element.clientHeight;
     const scrollHeight = element.scrollHeight;
 
-    if (scrollPosition >= scrollHeight - 50 &&
+    if (
+      scrollPosition >= scrollHeight - 50 &&
       !this.isLoadingCategories &&
-      this.hasMoreCategories) {
+      this.hasMoreCategories
+    ) {
       this.loadMoreCategories();
     }
   }
@@ -617,16 +665,17 @@ export class ProductAssignmentComponent implements OnInit {
     const scrollPosition = element.scrollTop + element.clientHeight;
     const scrollHeight = element.scrollHeight;
 
-    if (scrollPosition >= scrollHeight - 50 &&
+    if (
+      scrollPosition >= scrollHeight - 50 &&
       !this.isLoadingSubCategories &&
       this.hasMoreSubCategories &&
-      this.selectedCategoryId) {
+      this.selectedCategoryId
+    ) {
       this.loadMoreSubCategories();
     }
   }
 
-
-  // 
+  //
 
   private async loadAvailableProducts(reset: boolean = false): Promise<void> {
     if (reset) {
@@ -651,11 +700,11 @@ export class ProductAssignmentComponent implements OnInit {
         storeId: this.storeId,
         searchTerm: this.availableSearchTerm || undefined,
         categoryId: this.selectedCategoryId || undefined,
-        subcategoryId: this.selectedSubCategoryId || undefined
+        subcategoryId: this.selectedSubCategoryId || undefined,
       };
 
       const pagedResult = await firstValueFrom(
-        this.productService.getProductsPaged(requestParams)
+        this.productService.getProductsPaged(requestParams),
       );
 
       const newProducts = pagedResult.items || [];
@@ -665,7 +714,8 @@ export class ProductAssignmentComponent implements OnInit {
 
       // Update pagination state
       this.totalAvailablePages = pagedResult.totalPages;
-      this.hasMoreAvailable = this.currentAvailablePage < pagedResult.totalPages;
+      this.hasMoreAvailable =
+        this.currentAvailablePage < pagedResult.totalPages;
 
       // IMPORTANT: Update filtered list with ALL products
       this.filterAvailableProducts();
@@ -676,12 +726,13 @@ export class ProductAssignmentComponent implements OnInit {
       // Increment page counter for next load
       this.currentAvailablePage++;
 
-      console.log(`Loaded ${newProducts.length} products. ` +
-        `Total in memory: ${this.availableProducts.length}, ` +
-        `Filtered: ${this.filteredAvailableProducts.length}, ` +
-        `Displayed: ${this.displayedAvailableProducts.length}, ` +
-        `Has more: ${this.hasMoreAvailable}`);
-
+      console.log(
+        `Loaded ${newProducts.length} products. ` +
+          `Total in memory: ${this.availableProducts.length}, ` +
+          `Filtered: ${this.filteredAvailableProducts.length}, ` +
+          `Displayed: ${this.displayedAvailableProducts.length}, ` +
+          `Has more: ${this.hasMoreAvailable}`,
+      );
     } catch (error: any) {
       console.error('Error loading products:', error);
       this.showError('Failed to load products: ' + error.message);
@@ -820,12 +871,12 @@ export class ProductAssignmentComponent implements OnInit {
   private async loadAssignedProducts(): Promise<void> {
     try {
       const products = await firstValueFrom(
-        this.shelfService.getProductsByShelf(this.shelf.id!, this.storeId)
+        this.shelfService.getProductsByShelf(this.shelf.id!, this.storeId),
       );
 
-      this.assignedProducts = products.map(p => ({
+      this.assignedProducts = products.map((p) => ({
         ...p,
-        assignmentId: undefined
+        assignmentId: undefined,
       }));
 
       console.log('Assigned products loaded:', this.assignedProducts);
@@ -833,7 +884,6 @@ export class ProductAssignmentComponent implements OnInit {
 
       // Force change detection
       this.cdr.detectChanges();
-
     } catch (error: any) {
       console.error('Error loading assigned products:', error);
       this.assignedProducts = [];
@@ -850,11 +900,11 @@ export class ProductAssignmentComponent implements OnInit {
         pageSize: 100,
         locationType: 'Shelf',
         locationId: this.shelf.id!,
-        storeId: this.storeId
+        storeId: this.storeId,
       };
 
       const shelfResult = await firstValueFrom(
-        this.deviceService.getAssignmentsPaged(shelfParams)
+        this.deviceService.getAssignmentsPaged(shelfParams),
       );
       this.shelfDevices = shelfResult.items;
       console.log('Shelf devices loaded:', this.shelfDevices);
@@ -863,32 +913,34 @@ export class ProductAssignmentComponent implements OnInit {
       if (this.assignedProducts.length === 0) {
         console.warn('No assigned products yet, delaying product device load');
         // Add a small delay to ensure assigned products are loaded
-        await new Promise(resolve => setTimeout(resolve, 500));
+        await new Promise((resolve) => setTimeout(resolve, 500));
       }
 
       // Load devices for each assigned product
-      const productDevicePromises = this.assignedProducts.map(async (product): Promise<void> => {
-        try {
-          const productParams = {
-            pageNumber: 1,
-            pageSize: 100,
-            locationType: 'Product',
-            locationId: product.id,
-            storeId: this.storeId
-          };
+      const productDevicePromises = this.assignedProducts.map(
+        async (product): Promise<void> => {
+          try {
+            const productParams = {
+              pageNumber: 1,
+              pageSize: 100,
+              locationType: 'Product',
+              locationId: product.id,
+              storeId: this.storeId,
+            };
 
-          const productResult = await firstValueFrom(
-            this.deviceService.getAssignmentsPaged(productParams)
-          );
+            const productResult = await firstValueFrom(
+              this.deviceService.getAssignmentsPaged(productParams),
+            );
 
-          if (productResult.items.length > 0) {
-            this.productDevices.set(product.id, productResult.items);
+            if (productResult.items.length > 0) {
+              this.productDevices.set(product.id, productResult.items);
+            }
+          } catch (error) {
+            console.warn(`No devices found for product ${product.id}`, error);
+            // Don't throw here, just log
           }
-        } catch (error) {
-          console.warn(`No devices found for product ${product.id}`, error);
-          // Don't throw here, just log
-        }
-      });
+        },
+      );
 
       // Wait for all product device loads to complete
       await Promise.allSettled(productDevicePromises);
@@ -897,7 +949,6 @@ export class ProductAssignmentComponent implements OnInit {
 
       // Trigger change detection
       this.cdr.detectChanges();
-
     } catch (error: any) {
       console.error('Error loading device assignments:', error);
       this.showError('Failed to load device assignments');
@@ -977,16 +1028,16 @@ export class ProductAssignmentComponent implements OnInit {
       this.filteredMessages = [];
 
       const messages = await firstValueFrom(
-        this.msgService.getMessages(this.storeId)
+        this.msgService.getMessages(this.storeId),
       );
 
       if (Array.isArray(messages)) {
-        this.availableMessages = messages.map(message => ({
+        this.availableMessages = messages.map((message) => ({
           ...message,
           contentTypeString: this.getContentTypeString(message.content_type),
           title: message.title || 'Untitled Message',
           duration: message.duration || 0,
-          is_active: message.is_active ?? true
+          is_active: message.is_active ?? true,
         }));
 
         this.filterMessages();
@@ -1017,19 +1068,21 @@ export class ProductAssignmentComponent implements OnInit {
 
     if (this.searchQuery.trim()) {
       const query = this.searchQuery.toLowerCase().trim();
-      filtered = filtered.filter(message => {
+      filtered = filtered.filter((message) => {
         const title = (message.title || '').toLowerCase();
         const contentType = (message.contentTypeString || '').toLowerCase();
         const description = (message.content_data || '').toLowerCase();
 
-        return title.includes(query) ||
+        return (
+          title.includes(query) ||
           contentType.includes(query) ||
-          description.includes(query);
+          description.includes(query)
+        );
       });
     }
 
     if (this.showActiveOnly) {
-      filtered = filtered.filter(message => message.is_active);
+      filtered = filtered.filter((message) => message.is_active);
     }
 
     filtered.sort((a, b) => {
@@ -1041,51 +1094,72 @@ export class ProductAssignmentComponent implements OnInit {
 
   getContentTypeString(contentTypeId: number): string {
     switch (contentTypeId) {
-      case 1: return 'general';
-      case 2: return 'image';
-      case 3: return 'video';
-      case 4: return 'custom_image';
-      default: return 'unknown';
+      case 1:
+        return 'general';
+      case 2:
+        return 'image';
+      case 3:
+        return 'video';
+      case 4:
+        return 'custom_image';
+      default:
+        return 'unknown';
     }
   }
 
   getContentTypeDisplayName(contentTypeId: number): string {
     switch (contentTypeId) {
-      case 1: return 'General';
-      case 2: return 'Image';
-      case 3: return 'Video';
-      case 4: return 'Custom Image';
-      default: return 'Unknown';
+      case 1:
+        return 'General';
+      case 2:
+        return 'Image';
+      case 3:
+        return 'Video';
+      case 4:
+        return 'Custom Image';
+      default:
+        return 'Unknown';
     }
   }
 
   getContentTypeIcon(contentTypeId: number): string {
     switch (contentTypeId) {
-      case 1: return 'pi pi-file';
-      case 2: return 'pi pi-image';
-      case 3: return 'pi pi-video';
-      case 4: return 'pi pi-palette';
-      default: return 'pi pi-question-circle';
+      case 1:
+        return 'pi pi-file';
+      case 2:
+        return 'pi pi-image';
+      case 3:
+        return 'pi pi-video';
+      case 4:
+        return 'pi pi-palette';
+      default:
+        return 'pi pi-question-circle';
     }
   }
 
   getSelectedMessageTitle(): string {
     if (!this.selectedMessageId) return '';
-    const message = this.availableMessages.find(m => m.id === this.selectedMessageId);
+    const message = this.availableMessages.find(
+      (m) => m.id === this.selectedMessageId,
+    );
     return message?.title || '';
   }
 
   getSelectedMessage(): any {
     if (!this.selectedMessageId) return null;
-    return this.availableMessages.find(m => m.id === this.selectedMessageId);
+    return this.availableMessages.find((m) => m.id === this.selectedMessageId);
   }
 
   getPriorityClass(priority: string): string {
     switch (priority?.toLowerCase()) {
-      case 'high': return 'bg-red-50 text-red-800';
-      case 'medium': return 'bg-yellow-50 text-yellow-800';
-      case 'low': return 'bg-blue-50 text-blue-800';
-      default: return 'bg-gray-50 text-gray-800';
+      case 'high':
+        return 'bg-red-50 text-red-800';
+      case 'medium':
+        return 'bg-yellow-50 text-yellow-800';
+      case 'low':
+        return 'bg-blue-50 text-blue-800';
+      default:
+        return 'bg-gray-50 text-gray-800';
     }
   }
 
@@ -1127,10 +1201,7 @@ export class ProductAssignmentComponent implements OnInit {
     this.hasMoreAvailable = true;
 
     // Reload categories and products
-    Promise.all([
-      this.loadCategories(true),
-      this.loadAvailableProducts(true)
-    ]);
+    Promise.all([this.loadCategories(true), this.loadAvailableProducts(true)]);
 
     this.filterMessages();
     this.showSuccess('Filters cleared');
@@ -1142,36 +1213,33 @@ export class ProductAssignmentComponent implements OnInit {
     this.loadMessages();
   }
 
-
-
-
-
   private filterAvailableProducts(): void {
     // Start with all loaded products
     let filtered = [...this.availableProducts];
 
     // Filter out assigned products
-    const assignedIds = new Set(this.assignedProducts.map(p => p.id));
-    filtered = filtered.filter(p => !assignedIds.has(p.id));
+    const assignedIds = new Set(this.assignedProducts.map((p) => p.id));
+    filtered = filtered.filter((p) => !assignedIds.has(p.id));
 
     // Apply category filters
     if (this.selectedCategoryId) {
       const categoryIdNum = Number(this.selectedCategoryId);
-      filtered = filtered.filter(p => p.categoryId === categoryIdNum);
+      filtered = filtered.filter((p) => p.categoryId === categoryIdNum);
     }
 
     if (this.selectedSubCategoryId) {
       const subCategoryIdNum = Number(this.selectedSubCategoryId);
-      filtered = filtered.filter(p => p.subCategoryId === subCategoryIdNum);
+      filtered = filtered.filter((p) => p.subCategoryId === subCategoryIdNum);
     }
 
     // Apply search filter
     if (this.availableSearchTerm.trim()) {
       const term = this.availableSearchTerm.toLowerCase();
-      filtered = filtered.filter(p =>
-        p.productName?.toLowerCase().includes(term) ||
-        p.productCode?.toLowerCase().includes(term) ||
-        p.barCode?.toLowerCase().includes(term)
+      filtered = filtered.filter(
+        (p) =>
+          p.productName?.toLowerCase().includes(term) ||
+          p.productCode?.toLowerCase().includes(term) ||
+          p.barCode?.toLowerCase().includes(term),
       );
     }
 
@@ -1189,24 +1257,32 @@ export class ProductAssignmentComponent implements OnInit {
     const startIndex = this.availableProductsCurrentIndex;
     const endIndex = Math.min(
       startIndex + this.availableProductsLoadCount,
-      this.filteredAvailableProducts.length
+      this.filteredAvailableProducts.length,
     );
 
     // Get the next batch of products
-    const nextBatch = this.filteredAvailableProducts.slice(startIndex, endIndex);
+    const nextBatch = this.filteredAvailableProducts.slice(
+      startIndex,
+      endIndex,
+    );
 
     // If we're resetting (startIndex = 0), replace the array, otherwise append
     if (startIndex === 0) {
       this.displayedAvailableProducts = nextBatch;
     } else {
-      this.displayedAvailableProducts = [...this.displayedAvailableProducts, ...nextBatch];
+      this.displayedAvailableProducts = [
+        ...this.displayedAvailableProducts,
+        ...nextBatch,
+      ];
     }
 
     // Update the index
     this.availableProductsCurrentIndex = endIndex;
 
-    console.log(`Displayed products updated: ${this.displayedAvailableProducts.length} shown, ` +
-      `index at ${this.availableProductsCurrentIndex}`);
+    console.log(
+      `Displayed products updated: ${this.displayedAvailableProducts.length} shown, ` +
+        `index at ${this.availableProductsCurrentIndex}`,
+    );
   }
 
   // filterAvailableProducts(): void {
@@ -1240,8 +1316,8 @@ export class ProductAssignmentComponent implements OnInit {
   //   this.filteredAvailableProducts = filtered;
 
   //   // Debug log
-  //   console.log(`Filtering - Available: ${this.availableProducts.length}, 
-  //             Assigned: ${this.assignedProducts.length}, 
+  //   console.log(`Filtering - Available: ${this.availableProducts.length},
+  //             Assigned: ${this.assignedProducts.length},
   //             Filtered: ${this.filteredAvailableProducts.length}`);
   // }
 
@@ -1263,7 +1339,7 @@ export class ProductAssignmentComponent implements OnInit {
 
   //   if (this.availableSearchTerm.trim()) {
   //     const term = this.availableSearchTerm.toLowerCase();
-  //     filtered = filtered.filter(p => 
+  //     filtered = filtered.filter(p =>
   //       p.productName?.toLowerCase().includes(term) ||
   //       p.productCode?.toLowerCase().includes(term) ||
   //       p.barCode?.toLowerCase().includes(term)
@@ -1279,7 +1355,7 @@ export class ProductAssignmentComponent implements OnInit {
 
   //   if (this.assignedSearchTerm.trim()) {
   //     const term = this.assignedSearchTerm.toLowerCase();
-  //     filtered = filtered.filter(p => 
+  //     filtered = filtered.filter(p =>
   //       p.productName?.toLowerCase().includes(term) ||
   //       p.productCode?.toLowerCase().includes(term)
   //     );
@@ -1297,9 +1373,10 @@ export class ProductAssignmentComponent implements OnInit {
 
     if (this.assignedSearchTerm.trim()) {
       const term = this.assignedSearchTerm.toLowerCase();
-      filtered = filtered.filter(p =>
-        p.productName?.toLowerCase().includes(term) ||
-        p.productCode?.toLowerCase().includes(term)
+      filtered = filtered.filter(
+        (p) =>
+          p.productName?.toLowerCase().includes(term) ||
+          p.productCode?.toLowerCase().includes(term),
       );
     }
 
@@ -1412,7 +1489,6 @@ export class ProductAssignmentComponent implements OnInit {
     await this.loadSubCategories(this.selectedCategoryId, false);
   }
 
-
   // onAvailableSearch(): void {
   //   // Reset to page 1 when search changes
   //   this.currentAvailablePage = 1;
@@ -1448,7 +1524,10 @@ export class ProductAssignmentComponent implements OnInit {
   // Calculate discount percentage
   calculateDiscountPercent(product: any): number {
     if (!product.discountPrice || product.discountPrice <= 0) return 0;
-    return Math.round(((product.sellingPrice - product.discountPrice) / product.sellingPrice) * 100);
+    return Math.round(
+      ((product.sellingPrice - product.discountPrice) / product.sellingPrice) *
+        100,
+    );
   }
 
   // Get paginated products
@@ -1489,14 +1568,20 @@ export class ProductAssignmentComponent implements OnInit {
         title: 'Delete Product Assign',
         message: `Are you sure you want to delete ${product.productCode}? This action cannot be undone.`,
         confirmText: 'Delete',
-        cancelText: 'Cancel'
+        cancelText: 'Cancel',
       },
       panelClass: ['rounded-lg'],
-      disableClose: true
+      disableClose: true,
     });
 
-    dialogRef.afterClosed().subscribe(result => {
-      if (result) this.shelfService.removeProduct(this.shelf.id!, product.id, this.storeId, this.currentUserId)
+    dialogRef.afterClosed().subscribe((result) => {
+      if (result)
+        this.shelfService.removeProduct(
+          this.shelf.id!,
+          product.id,
+          this.storeId,
+          this.currentUserId,
+        );
     });
   }
 
@@ -1520,7 +1605,9 @@ export class ProductAssignmentComponent implements OnInit {
   }
 
   selectAllAvailable(): void {
-    this.filteredAvailableProducts.forEach(p => this.selectedAvailable.add(p.id));
+    this.filteredAvailableProducts.forEach((p) =>
+      this.selectedAvailable.add(p.id),
+    );
   }
 
   deselectAllAvailable(): void {
@@ -1528,7 +1615,9 @@ export class ProductAssignmentComponent implements OnInit {
   }
 
   selectAllAssigned(): void {
-    this.filteredAssignedProducts.forEach(p => this.selectedAssigned.add(p.id));
+    this.filteredAssignedProducts.forEach((p) =>
+      this.selectedAssigned.add(p.id),
+    );
   }
 
   deselectAllAssigned(): void {
@@ -1544,22 +1633,28 @@ export class ProductAssignmentComponent implements OnInit {
     const errors: string[] = [];
 
     try {
-      const productsToAssign = this.availableProducts.filter(p =>
-        this.selectedAvailable.has(p.id)
+      const productsToAssign = this.availableProducts.filter((p) =>
+        this.selectedAvailable.has(p.id),
       );
 
       for (const product of productsToAssign) {
         try {
           await firstValueFrom(
-            this.shelfService.assignProduct(this.shelf.id!, product.id, this.storeId, this.currentUserId)
+            this.shelfService.assignProduct(
+              this.shelf.id!,
+              product.id,
+              this.storeId,
+              this.currentUserId,
+            ),
           );
 
           // Add to assigned products
           this.assignedProducts.push(product);
 
           // Remove from available products immediately
-          this.availableProducts = this.availableProducts.filter(p => p.id !== product.id);
-
+          this.availableProducts = this.availableProducts.filter(
+            (p) => p.id !== product.id,
+          );
         } catch (error: any) {
           errors.push(`${product.productName}: ${error.message}`);
         }
@@ -1572,7 +1667,9 @@ export class ProductAssignmentComponent implements OnInit {
       this.filterAssignedProducts();
 
       if (errors.length === 0) {
-        this.showSuccess(`Successfully assigned ${productsToAssign.length} product(s)`);
+        this.showSuccess(
+          `Successfully assigned ${productsToAssign.length} product(s)`,
+        );
       } else {
         this.showWarning(`Assigned with errors: ${errors.join(', ')}`);
       }
@@ -1590,25 +1687,31 @@ export class ProductAssignmentComponent implements OnInit {
     const errors: string[] = [];
 
     try {
-      const productsToUnassign = this.assignedProducts.filter(p =>
-        this.selectedAssigned.has(p.id)
+      const productsToUnassign = this.assignedProducts.filter((p) =>
+        this.selectedAssigned.has(p.id),
       );
 
       for (const product of productsToUnassign) {
         try {
           await firstValueFrom(
-            this.shelfService.removeProduct(this.shelf.id!, product.id, this.storeId, this.currentUserId)
+            this.shelfService.removeProduct(
+              this.shelf.id!,
+              product.id,
+              this.storeId,
+              this.currentUserId,
+            ),
           );
 
           // Remove from assigned products
-          this.assignedProducts = this.assignedProducts.filter(p => p.id !== product.id);
+          this.assignedProducts = this.assignedProducts.filter(
+            (p) => p.id !== product.id,
+          );
           this.productDevices.delete(product.id);
 
           // Add back to available products if not already there
-          if (!this.availableProducts.some(p => p.id === product.id)) {
+          if (!this.availableProducts.some((p) => p.id === product.id)) {
             this.availableProducts.push(product);
           }
-
         } catch (error: any) {
           errors.push(`${product.productName}: ${error.message}`);
         }
@@ -1619,7 +1722,9 @@ export class ProductAssignmentComponent implements OnInit {
       this.filterAssignedProducts();
 
       if (errors.length === 0) {
-        this.showSuccess(`Successfully removed ${productsToUnassign.length} product(s)`);
+        this.showSuccess(
+          `Successfully removed ${productsToUnassign.length} product(s)`,
+        );
       } else {
         this.showWarning(`Removed with errors: ${errors.join(', ')}`);
       }
@@ -1719,7 +1824,12 @@ export class ProductAssignmentComponent implements OnInit {
 
     try {
       await firstValueFrom(
-        this.shelfService.assignProductsByCategory(this.shelf.id!, this.selectedCategoryId, this.storeId, this.currentUserId)
+        this.shelfService.assignProductsByCategory(
+          this.shelf.id!,
+          this.selectedCategoryId,
+          this.storeId,
+          this.currentUserId,
+        ),
       );
 
       await this.loadAssignedProducts();
@@ -1743,7 +1853,7 @@ export class ProductAssignmentComponent implements OnInit {
 
     try {
       const productsInSubCategory = this.availableProducts.filter(
-        p => p.subCategoryId === this.selectedSubCategoryId
+        (p) => p.subCategoryId === this.selectedSubCategoryId,
       );
 
       const errors: string[] = [];
@@ -1751,7 +1861,12 @@ export class ProductAssignmentComponent implements OnInit {
       for (const product of productsInSubCategory) {
         try {
           await firstValueFrom(
-            this.shelfService.assignProduct(this.shelf.id!, product.id, this.storeId, this.currentUserId)
+            this.shelfService.assignProduct(
+              this.shelf.id!,
+              product.id,
+              this.storeId,
+              this.currentUserId,
+            ),
           );
         } catch (error: any) {
           errors.push(`${product.productName}: ${error.message}`);
@@ -1762,7 +1877,9 @@ export class ProductAssignmentComponent implements OnInit {
       this.filterAvailableProducts();
 
       if (errors.length === 0) {
-        this.showSuccess(`Successfully assigned ${productsInSubCategory.length} products from subcategory`);
+        this.showSuccess(
+          `Successfully assigned ${productsInSubCategory.length} products from subcategory`,
+        );
       } else {
         this.showWarning(`Assigned with some errors: ${errors.join(', ')}`);
       }
@@ -1815,19 +1932,21 @@ export class ProductAssignmentComponent implements OnInit {
       this.showWarning('No device selected for binding');
       return;
     }
-    console.log("bindingty", assignment.locationType)
-    const isShelfBinding = assignment.locationType.toLocaleUpperCase() === 'SHELF';
+    console.log('bindingty', assignment.locationType);
+    const isShelfBinding =
+      assignment.locationType.toLocaleUpperCase() === 'SHELF';
 
     const dialogRef = this.dialog.open(ConfirmationDialogComponent, {
       width: '420px',
       data: {
         title: 'Confirm Quick Bind',
-        message: `Are you sure you want to quick bind ${isShelfBinding ? 'shelf' : 'product'
-          } data to this device without a message?`,
+        message: `Are you sure you want to quick bind ${
+          isShelfBinding ? 'shelf' : 'product'
+        } data to this device without a message?`,
         confirmText: 'Yes, Bind',
         cancelText: 'Cancel',
-        confirmColor: 'green'
-      }
+        confirmColor: 'green',
+      },
     });
 
     const confirmed = await firstValueFrom(dialogRef.afterClosed());
@@ -1862,7 +1981,7 @@ export class ProductAssignmentComponent implements OnInit {
         total: 5,
         period: 500,
         interval: 900,
-        brightness: 100
+        brightness: 100,
       };
 
       if (isShelfBinding) {
@@ -1871,24 +1990,21 @@ export class ProductAssignmentComponent implements OnInit {
         bindRequest.shelfCode = `SHELF-${this.shelf.id}`;
       } else {
         const product = this.assignedProducts.find(
-          p => p.id === assignment.locationId
+          (p) => p.id === assignment.locationId,
         );
         bindRequest.productId = product?.id ?? assignment.locationId;
       }
-      console.log("isshelf", isShelfBinding, bindRequest)
+      console.log('isshelf', isShelfBinding, bindRequest);
       await firstValueFrom(this.deviceService.bindDataUnified(bindRequest));
 
       this.showSuccess(
-        `${isShelfBinding ? 'SHELF' : 'PRODUCT'} data successfully bound to device (no message)`
+        `${isShelfBinding ? 'SHELF' : 'PRODUCT'} data successfully bound to device (no message)`,
       );
-    }
-    catch (error: any) {
+    } catch (error: any) {
       console.error('Error in quick bind:', error);
 
       const errorMsg =
-        typeof error === 'string'
-          ? error
-          : error?.message || 'Unknown error';
+        typeof error === 'string' ? error : error?.message || 'Unknown error';
 
       this.showError('Failed to quick bind: ' + errorMsg);
 
@@ -1974,7 +2090,6 @@ export class ProductAssignmentComponent implements OnInit {
   //   }
   // }
 
-
   // async quickBindDevice(assignment: AssignmentDto): Promise<void> {
   //   if (!assignment) {
   //     this.showWarning('No device selected for binding');
@@ -2044,13 +2159,17 @@ export class ProductAssignmentComponent implements OnInit {
     this.bindingInProgress = true;
 
     try {
-      const selectedMessage = this.availableMessages.find(m => m.id === this.selectedMessageId);
+      const selectedMessage = this.availableMessages.find(
+        (m) => m.id === this.selectedMessageId,
+      );
 
       if (!selectedMessage) {
         throw new Error('Selected message not found');
       }
 
-      const isShelfBinding = this.selectedAssignmentForBind.locationType.toLocaleUpperCase() === 'SHELF';
+      const isShelfBinding =
+        this.selectedAssignmentForBind.locationType.toLocaleUpperCase() ===
+        'SHELF';
 
       let comboId: number | undefined;
       let comboType: 'TEMPLATE' | 'MESSAGE' = 'TEMPLATE';
@@ -2058,10 +2177,12 @@ export class ProductAssignmentComponent implements OnInit {
       // Narrow the type. A MESSAGE row has no template combo of its own - the
       // server resolves the device's template from the message combo.
       if (this.selectedAssignmentForBind.assignmentType === 'TEMPLATE') {
-        comboId = this.selectedAssignmentForBind.deviceTemplateComboId ?? undefined;
+        comboId =
+          this.selectedAssignmentForBind.deviceTemplateComboId ?? undefined;
         comboType = 'TEMPLATE';
       } else {
-        comboId = this.selectedAssignmentForBind.deviceMessageComboId ?? undefined;
+        comboId =
+          this.selectedAssignmentForBind.deviceMessageComboId ?? undefined;
         comboType = 'MESSAGE';
       }
 
@@ -2079,7 +2200,7 @@ export class ProductAssignmentComponent implements OnInit {
         total: 5,
         period: 500,
         interval: 900,
-        brightness: 100
+        brightness: 100,
       };
 
       if (isShelfBinding) {
@@ -2088,7 +2209,7 @@ export class ProductAssignmentComponent implements OnInit {
         bindRequest.shelfCode = `SHELF-${this.shelf.id}`;
       } else {
         const productId = this.selectedAssignmentForBind.locationId;
-        const product = this.assignedProducts.find(p => p.id === productId);
+        const product = this.assignedProducts.find((p) => p.id === productId);
         if (product) {
           bindRequest.productId = product.id;
         } else {
@@ -2097,20 +2218,20 @@ export class ProductAssignmentComponent implements OnInit {
       }
 
       const response = await firstValueFrom(
-        this.deviceService.bindDataUnified(bindRequest)
+        this.deviceService.bindDataUnified(bindRequest),
       );
 
       const bindingType = isShelfBinding ? 'shelf' : 'product';
-      this.showSuccess(`${bindingType.toUpperCase()} message "${selectedMessage.title}" successfully bound to device`);
+      this.showSuccess(
+        `${bindingType.toUpperCase()} message "${selectedMessage.title}" successfully bound to device`,
+      );
 
       this.closeBindDialog();
     } catch (error: any) {
       console.error('Error in bind message:', error);
 
       const errorMsg =
-        typeof error === 'string'
-          ? error
-          : error?.message || 'Unknown error';
+        typeof error === 'string' ? error : error?.message || 'Unknown error';
 
       this.showError('Failed to bind message: ' + errorMsg);
 
@@ -2129,7 +2250,9 @@ export class ProductAssignmentComponent implements OnInit {
 
   //#region Navigation (No changes needed)
   goBack(): void {
-    this.router.navigate(['./aisle-management'], { relativeTo: this.route.parent });
+    this.router.navigate(['./aisle-management'], {
+      relativeTo: this.route.parent,
+    });
   }
   //#endregion
 
@@ -2139,7 +2262,7 @@ export class ProductAssignmentComponent implements OnInit {
       severity: 'success',
       summary: 'Success',
       detail: message,
-      life: 5000
+      life: 5000,
     });
   }
 
@@ -2148,7 +2271,7 @@ export class ProductAssignmentComponent implements OnInit {
       severity: 'error',
       summary: 'Error',
       detail: message,
-      life: 5000
+      life: 5000,
     });
   }
 
@@ -2157,7 +2280,7 @@ export class ProductAssignmentComponent implements OnInit {
       severity: 'warn',
       summary: 'Warning',
       detail: message,
-      life: 5000
+      life: 5000,
     });
   }
 
@@ -2166,7 +2289,7 @@ export class ProductAssignmentComponent implements OnInit {
       severity: 'info',
       summary: 'Info',
       detail: message,
-      life: 5000
+      life: 5000,
     });
   }
   //#endregion

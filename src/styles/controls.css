@@ -1,0 +1,434 @@
+/* =============================================================================
+   Form controls
+   =============================================================================
+
+   Goal: a user cannot tell which library rendered a field.
+
+   Most of the visual language (padding, radius, option density, focus ring)
+   is already handled by the PrimeNG preset in
+   `src/app/theme/smart-esl-preset.ts`, which is why this file is short. What
+   is left here is what a token cannot express:
+
+     * a single pinned control height across every library,
+     * dropdown triggers that never resize with their selected value,
+     * a capped, scrollable option list,
+     * native <input>/<select>/<textarea> brought onto the same rhythm,
+     * shared hover / focus / disabled / readonly / error states.
+
+   Only presentational properties are set. No control is restructured, and no
+   library feature (filtering, virtual scroll, lazy loading, clear buttons) is
+   touched.
+   ========================================================================== */
+
+/* -----------------------------------------------------------------------------
+   1. One height for every standard control
+   -------------------------------------------------------------------------- */
+
+.p-select,
+.p-multiselect,
+.p-inputtext:not(textarea),
+.p-inputnumber-input,
+.p-datepicker-input,
+.p-password-input,
+.p-inputmask,
+.p-treeselect,
+.p-cascadeselect,
+.p-autocomplete-input,
+.p-inputgroup > .p-inputtext:not(textarea),
+.p-inputgroup > .p-inputgroupaddon {
+  height: var(--ds-control-height);
+  min-height: var(--ds-control-height);
+  font-size: var(--ds-control-font);
+  line-height: 1.4;
+}
+
+/* The wrappers PrimeNG puts around an input have to follow, otherwise the
+   border sits at a different height than the field inside it. */
+.p-inputnumber,
+.p-datepicker:not(.p-datepicker-panel):not(.p-datepicker-inline),
+.p-autocomplete,
+.p-iconfield,
+.p-inputgroup {
+  height: var(--ds-control-height);
+  font-size: var(--ds-control-font);
+}
+
+.p-inputnumber,
+.p-datepicker:not(.p-datepicker-panel):not(.p-datepicker-inline),
+.p-autocomplete,
+.p-iconfield {
+  display: inline-flex;
+  align-items: stretch;
+}
+
+/* Labels inside a trigger centre themselves instead of relying on padding-y. */
+.p-select-label,
+.p-multiselect-label {
+  display: flex;
+  align-items: center;
+  padding-block: 0;
+  min-width: 0;
+}
+
+/* Compact variants for dense toolbars and in-table editors. */
+.p-select-sm,
+.p-multiselect-sm,
+.p-inputtext-sm:not(textarea),
+.p-datatable-sm .p-select,
+.p-datatable-sm .p-inputtext:not(textarea),
+.ds-control-sm .p-select,
+.ds-control-sm .p-inputtext:not(textarea) {
+  height: var(--ds-control-height-sm);
+  min-height: var(--ds-control-height-sm);
+  font-size: var(--ds-control-font-sm);
+}
+
+/* Textareas keep their own sizing but share everything else. */
+textarea.p-inputtext,
+.p-textarea {
+  min-height: calc(var(--ds-control-height) * 2);
+  font-size: var(--ds-control-font);
+  line-height: 1.5;
+}
+
+/* -----------------------------------------------------------------------------
+   2. Dropdown width stability
+   -------------------------------------------------------------------------- */
+
+/* A dropdown is sized by its container, never by the text it happens to show.
+   `min-width: 0` lets it shrink inside flex/grid parents instead of pushing
+   the layout wider; `max-width: 100%` stops long values from overflowing.
+   Paginator dropdowns are excluded - they are intentionally intrinsic.
+
+   The date picker and number input are inline-flex wrappers that otherwise
+   size to their content, which is why a date field used to end up half the
+   width of the select beside it.
+
+   This sits in the `components` layer on purpose. Tailwind orders its layers
+   `theme, base, components, utilities`, so a utility the template asks for
+   explicitly - `styleClass="w-32"` on a toolbar filter, say - still wins,
+   while a control with no width of its own falls back to filling its
+   container. Unlayered, this rule beat every `w-*` in the app and stretched
+   short filters across the whole toolbar.
+
+   Height is deliberately NOT handled this way: the system owns control height
+   (see section 1), and only width is the template's call. */
+@layer components {
+  .p-select:not(.p-paginator-rpp-dropdown),
+  .p-multiselect,
+  .p-treeselect,
+  .p-cascadeselect,
+  .p-datepicker:not(.p-datepicker-panel):not(.p-datepicker-inline),
+  .p-inputnumber,
+  .p-autocomplete {
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+  }
+}
+
+.p-paginator .p-select {
+  width: auto;
+  min-width: 4.5rem;
+}
+
+/* Long selected values truncate rather than stretch or wrap the trigger. */
+.p-select-label,
+.p-multiselect-label,
+.p-treeselect-label,
+.p-cascadeselect-label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Chip-style multiselects stay on one line and scroll their chips instead of
+   growing the control's height. */
+.p-multiselect-label-container {
+  min-width: 0;
+  overflow: hidden;
+}
+
+/* -----------------------------------------------------------------------------
+   3. Option lists: capped height, consistent density
+   -------------------------------------------------------------------------- */
+
+/* PrimeNG writes `max-height` inline from the `scrollHeight` input. Where a
+   template passes a real length that inline value still wins, which is what we
+   want. This rule catches the cases that pass nothing - or pass `flex`, which
+   is not a valid max-height and is dropped - so an unbounded popup can no
+   longer cover the page. Virtual-scroll lists set `auto` inline and manage
+   their own viewport, so they are unaffected. */
+.p-select-list-container,
+.p-multiselect-list-container,
+.p-autocomplete-list-container,
+.p-treeselect-tree-container {
+  max-height: var(--ds-overlay-max-height);
+  overscroll-behavior: contain;
+}
+
+/* Popup width. PrimeNG wraps every overlay in `.p-overlay-content`, and that
+   wrapper is the box that grows to fit the widest option - capping the panel
+   alone does nothing, because the panel resolves its percentage against the
+   already-stretched wrapper. Capping the wrapper (and letting the panel follow
+   it) is what stops one long label from dragging the popup off the right edge
+   of a narrow screen. */
+.p-overlay,
+.p-overlay-content {
+  max-width: calc(100vw - 1.5rem);
+}
+
+.p-select-overlay,
+.p-multiselect-overlay,
+.p-autocomplete-overlay,
+.p-treeselect-overlay,
+.p-cascadeselect-overlay,
+.p-datepicker-panel,
+.p-popover {
+  max-width: 100%;
+}
+
+.p-select-option,
+.p-multiselect-option,
+.p-autocomplete-option,
+.p-cascadeselect-option-content {
+  font-size: var(--ds-option-font);
+  line-height: var(--ds-option-line-height);
+  min-height: 0;
+}
+
+/* Option text truncates instead of widening the popup. Without this a single
+   long label stretches the list, and the overlay runs off the right edge of a
+   narrow screen. */
+.p-select-list,
+.p-multiselect-list,
+.p-autocomplete-list {
+  min-width: 0;
+}
+
+.p-select-option,
+.p-multiselect-option,
+.p-autocomplete-option {
+  min-width: 0;
+  text-overflow: ellipsis;
+}
+
+.p-select-option > span,
+.p-multiselect-option > span,
+.p-select-option-label,
+.p-multiselect-option-label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0;
+}
+
+/* The in-popup filter matches the compact control size. */
+.p-select-filter,
+.p-multiselect-filter {
+  height: var(--ds-control-height-sm);
+  min-height: var(--ds-control-height-sm);
+  font-size: var(--ds-control-font-sm);
+}
+
+.p-select-empty-message,
+.p-multiselect-empty-message,
+.p-autocomplete-empty-message {
+  padding: var(--ds-space-3) var(--ds-option-padding-x);
+  font-size: var(--ds-option-font);
+  color: var(--ds-text-muted);
+}
+
+/* -----------------------------------------------------------------------------
+   4. Native controls brought onto the same rhythm
+   -------------------------------------------------------------------------- */
+
+/* Horizontal padding is deliberately left to the template: several search
+   fields use `pl-10` to clear an overlaid icon, and forcing padding here would
+   push the text under it. Height, radius, border and type are enough to make
+   native fields read as part of the same system.
+
+   These rules are unlayered, so they win over Tailwind utilities in `@layer
+   utilities` - that is intentional: the design system decides control height,
+   not a one-off `py-1` in a template. Where a field genuinely needs to escape
+   (a colour swatch, a canvas overlay input), add the `ds-unstyled` class. */
+input[type="text"],
+input[type="search"],
+input[type="email"],
+input[type="password"],
+input[type="number"],
+input[type="tel"],
+input[type="url"],
+input[type="date"],
+input[type="time"],
+input[type="datetime-local"],
+select {
+  height: var(--ds-control-height);
+  border-radius: var(--ds-radius);
+  font-size: var(--ds-control-font);
+  line-height: 1.4;
+  padding-block: 0;
+}
+
+textarea {
+  border-radius: var(--ds-radius);
+  font-size: var(--ds-control-font);
+  line-height: 1.5;
+}
+
+/* Native selects keep the browser arrow but match the trigger padding of a
+   PrimeNG dropdown, and never resize with the option they display. */
+select {
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  text-overflow: ellipsis;
+}
+
+select:not([size]):not([multiple]) {
+  padding-inline-end: var(--ds-space-6);
+}
+
+/* Opt-out for the handful of inputs that are not really form fields. */
+input.ds-unstyled,
+select.ds-unstyled,
+textarea.ds-unstyled {
+  height: auto;
+  min-height: 0;
+  width: auto;
+  border-radius: revert;
+  font-size: inherit;
+  padding-block: revert;
+}
+
+/* -----------------------------------------------------------------------------
+   5. Shared states
+   -------------------------------------------------------------------------- */
+
+.p-select:not(.p-disabled):hover,
+.p-multiselect:not(.p-disabled):hover,
+.p-inputtext:not(:disabled):not(:focus):hover,
+.p-textarea:not(:disabled):not(:focus):hover {
+  border-color: var(--ds-border-strong);
+}
+
+/* Native fields get the same focus treatment PrimeNG fields get from the
+   preset's focus ring, so tabbing through a mixed form looks continuous. */
+input:not([type="checkbox"]):not([type="radio"]):not(
+    [type="range"]
+  ):focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: none;
+  border-color: var(--ds-primary);
+  box-shadow: 0 0 0 3px var(--ds-focus-ring);
+}
+
+.p-select.p-disabled,
+.p-multiselect.p-disabled,
+.p-inputtext:disabled,
+.p-textarea:disabled,
+input:disabled,
+select:disabled,
+textarea:disabled {
+  background: var(--ds-surface-disabled);
+  color: var(--ds-text-disabled);
+  cursor: not-allowed;
+  opacity: 1;
+}
+
+/* Readonly is editable-looking today; give it its own flat treatment so it
+   reads as "shown, not entered". */
+input:read-only:not([type="checkbox"]):not([type="radio"]),
+textarea:read-only,
+.p-inputtext[readonly] {
+  background: var(--ds-surface-muted);
+  cursor: default;
+}
+
+/* Error state, matched across libraries and hand-rolled fields. */
+.p-invalid,
+.ng-submitted .ng-invalid.p-inputtext,
+input.ds-invalid,
+select.ds-invalid,
+textarea.ds-invalid {
+  border-color: var(--ds-danger);
+}
+
+.p-invalid:focus-visible,
+input.ds-invalid:focus-visible,
+select.ds-invalid:focus-visible,
+textarea.ds-invalid:focus-visible {
+  border-color: var(--ds-danger);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--ds-danger) 18%, transparent);
+}
+
+/* -----------------------------------------------------------------------------
+   6. Checkbox / radio / switch alignment
+   -------------------------------------------------------------------------- */
+
+/* Size comes from the theme preset (`--p-checkbox-width` / `-height`), not from
+   a rule here. PrimeNG 19 puts the dimensions on the `.p-checkbox` root *and*
+   fills it with `.p-checkbox-box`; overriding only the inner box left an 18px
+   square sitting top-left inside a 20px root, so the tick rendered a couple of
+   pixels above the label it was supposed to line up with.
+
+   `vertical-align` is still worth setting: PrimeNG ships `bottom`, which drops
+   the box onto the text baseline. `middle` centres it against the label on the
+   rows that are not flex containers. */
+.p-checkbox,
+.p-radiobutton {
+  vertical-align: middle;
+}
+
+/* The element that participates in a `flex items-center` row is the Angular
+   host tag, not `.p-checkbox` inside it. Left as a block it inherits the
+   row's 24px line-height, so centring aligns that 24px line box while the
+   18px control sits on its baseline - which is why the tick read as ~3px
+   low against its label. Making the host hug the control fixes every
+   checkbox row at once, however the page wrapped it. */
+p-checkbox,
+p-radiobutton,
+p-triStateCheckbox,
+p-toggleswitch,
+p-inputSwitch {
+  display: inline-flex;
+  align-items: center;
+}
+
+/* A checkbox or radio and its label on one line, aligned on their centres.
+   Use this instead of hand-rolling `flex items-center` per screen. */
+.ds-check {
+  display: flex;
+  align-items: center;
+  gap: var(--ds-space-2);
+}
+
+.ds-check > label {
+  margin: 0;
+  font-size: var(--ds-font-body);
+  line-height: 1.4;
+  cursor: pointer;
+}
+
+/* -----------------------------------------------------------------------------
+   7. Touch targets
+   -------------------------------------------------------------------------- */
+
+/* Several pages used to grow their own controls to 44px inside a mobile media
+   query. Those per-page rules are gone; this replaces them once, keyed on the
+   pointer rather than on a breakpoint, so a touch device gets comfortable
+   targets on any screen width. */
+@media (pointer: coarse) {
+  .ds-btn,
+  .p-button,
+  .ds-btn-icon,
+  .p-button.p-button-icon-only {
+    min-height: 40px;
+  }
+
+  .ds-btn-icon,
+  .p-button.p-button-icon-only {
+    min-width: 40px;
+  }
+}

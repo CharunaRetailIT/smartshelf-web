@@ -1,31 +1,36 @@
-<div class="min-h-screen bg-gray-50 p-6">
+<div class="bg-gray-50 p-6 ds-page-shell ds-page-shell--fixed">
   <div class="max-w-7xl mx-auto">
-    
     <!-- Header -->
-    <div class="bg-white rounded-lg shadow-sm border border-gray-200 mb-6 p-6">
+    <div
+      class="bg-white rounded-lg shadow-sm border border-gray-200 mb-6 p-6 ds-card"
+    >
       <div class="flex items-center justify-between">
         <!-- Left content -->
         <div class="flex items-center space-x-3">
           <i class="fas fa-store-alt text-2xl text-secondary"></i>
           <div>
-            <h1 class="text-2xl font-bold text-secondary-dark">Store Management</h1>
+            <h1 class="text-2xl font-bold text-secondary-dark">
+              Store Management
+            </h1>
             <p class="text-secondary-light">Manage stores and their devices</p>
           </div>
         </div>
-        
+
         <!-- Right buttons with proper spacing -->
         <div class="flex items-center space-x-4">
           <button
             (click)="openSyncModal()"
-            class="cursor-pointer bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center space-x-2 transition-colors">
+            class="cursor-pointer bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center space-x-2 transition-colors ds-btn ds-btn--primary"
+          >
             <i class="fas fa-sync-alt"></i>
             <span>Sync Stores</span>
           </button>
-          
+
           <button
             (click)="openCreateModal()"
             id="addStoreButton"
-            class="cursor-pointer bg-primary hover:bg-primary-light text-white px-4 py-2 rounded-lg flex items-center space-x-2 transition-colors">
+            class="cursor-pointer bg-primary hover:bg-primary-light text-white px-4 py-2 rounded-lg flex items-center space-x-2 transition-colors ds-btn ds-btn--primary"
+          >
             <i class="fas fa-plus"></i>
             <span>Add Store</span>
           </button>
@@ -36,40 +41,56 @@
     <!-- Statistics Cards -->
     <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
       <!-- Total Stores Card -->
-      <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+      <div
+        class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 ds-card"
+      >
         <div class="flex items-center">
           <div class="flex-shrink-0">
-            <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+            <div
+              class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center"
+            >
               <i class="fas fa-store text-blue-600 text-xl"></i>
             </div>
           </div>
           <div class="ml-4">
             <p class="text-sm font-medium text-gray-600">Total Stores</p>
-            <p class="text-2xl font-bold text-gray-900">{{ statistics?.totalStores || 0 }}</p>
+            <p class="text-2xl font-bold text-gray-900">
+              {{ statistics?.totalStores || 0 }}
+            </p>
           </div>
         </div>
       </div>
 
       <!-- Active Stores Card -->
-      <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+      <div
+        class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 ds-card"
+      >
         <div class="flex items-center">
           <div class="flex-shrink-0">
-            <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
+            <div
+              class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center"
+            >
               <i class="fas fa-check-circle text-green-600 text-xl"></i>
             </div>
           </div>
           <div class="ml-4">
             <p class="text-sm font-medium text-gray-600">Active Stores</p>
-            <p class="text-2xl font-bold text-gray-900">{{ statistics?.activeStores || 0 }}</p>
+            <p class="text-2xl font-bold text-gray-900">
+              {{ statistics?.activeStores || 0 }}
+            </p>
           </div>
         </div>
       </div>
 
       <!-- Synced to Minew Card -->
-      <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+      <div
+        class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 ds-card"
+      >
         <div class="flex items-center">
           <div class="flex-shrink-0">
-            <div class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
+            <div
+              class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center"
+            >
               <i class="fas fa-cloud text-purple-600 text-xl"></i>
             </div>
           </div>
@@ -77,7 +98,10 @@
             <p class="text-sm font-medium text-gray-600">Synced to Minew</p>
             <p class="text-2xl font-bold text-gray-900">
               {{ statistics?.syncedStores || 0 }}
-              <span class="text-sm font-normal text-gray-500" *ngIf="statistics?.pendingSyncStores">
+              <span
+                class="text-sm font-normal text-gray-500"
+                *ngIf="statistics?.pendingSyncStores"
+              >
                 ({{ statistics.pendingSyncStores }} pending)
               </span>
             </p>
@@ -86,28 +110,37 @@
       </div>
 
       <!-- Device Count Card -->
-      <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+      <div
+        class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 ds-card"
+      >
         <div class="flex items-center">
           <div class="flex-shrink-0">
-            <div class="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center">
+            <div
+              class="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center"
+            >
               <i class="fas fa-tablet-alt text-orange-600 text-xl"></i>
             </div>
           </div>
           <div class="ml-4">
             <p class="text-sm font-medium text-gray-600">Total Devices</p>
-            <p class="text-2xl font-bold text-gray-900">{{ totalDeviceCount }}</p>
+            <p class="text-2xl font-bold text-gray-900">
+              {{ totalDeviceCount }}
+            </p>
           </div>
         </div>
       </div>
     </div>
 
     <!-- Filters -->
-    <div class="bg-white rounded-lg shadow-sm border border-gray-200 mb-6 p-6">
+    <div
+      class="bg-white rounded-lg shadow-sm border border-gray-200 mb-6 p-6 ds-card"
+    >
       <div class="grid grid-cols-1 md:grid-cols-5 gap-4">
-        
         <!-- Search Input -->
         <div class="relative col-span-2">
-          <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+          <div
+            class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"
+          >
             <i class="fas fa-search text-gray-400"></i>
           </div>
           <input
@@ -115,7 +148,8 @@
             placeholder="Search stores..."
             [(ngModel)]="searchTerm"
             (input)="onSearchChange()"
-            class="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+            class="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+          />
         </div>
 
         <!-- Status Filter -->
@@ -123,7 +157,8 @@
           <select
             [(ngModel)]="statusFilter"
             (change)="onFilterChange()"
-            class="px-3 py-2 w-full border border-gray-300 rounded-md bg-white text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500">
+            class="px-3 py-2 w-full border border-gray-300 rounded-md bg-white text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+          >
             <option value="">All Status</option>
             <option value="true">Active</option>
             <option value="false">Inactive</option>
@@ -135,48 +170,66 @@
           <select
             [(ngModel)]="syncStatusFilter"
             (change)="onFilterChange()"
-            class="px-3 py-2 w-full border border-gray-300 rounded-md bg-white text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500">
+            class="px-3 py-2 w-full border border-gray-300 rounded-md bg-white text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+          >
             <option value="">Sync Status</option>
             <option value="true">Synced</option>
             <option value="false">Pending Sync</option>
           </select>
         </div>
-
       </div>
-      
+
       <!-- Advanced Filters Toggle -->
       <div class="mt-4">
         <button
           (click)="toggleAdvancedFilters()"
-          class="text-sm text-gray-600 hover:text-gray-800 flex items-center space-x-1">
-          <i class="fas" [ngClass]="showAdvancedFilters ? 'fa-chevron-up' : 'fa-chevron-down'"></i>
-          <span>{{ showAdvancedFilters ? 'Hide' : 'Show' }} Advanced Filters</span>
+          class="text-sm text-gray-600 hover:text-gray-800 flex items-center space-x-1 ds-btn ds-btn--tertiary"
+        >
+          <i
+            class="fas"
+            [ngClass]="
+              showAdvancedFilters ? 'fa-chevron-up' : 'fa-chevron-down'
+            "
+          ></i>
+          <span
+            >{{ showAdvancedFilters ? "Hide" : "Show" }} Advanced Filters</span
+          >
         </button>
-        
+
         <!-- Advanced Filters -->
-        <div *ngIf="showAdvancedFilters" class="mt-4 grid grid-cols-1 md:grid-cols-3 gap-4 pt-4 border-t border-gray-200">
+        <div
+          *ngIf="showAdvancedFilters"
+          class="mt-4 grid grid-cols-1 md:grid-cols-3 gap-4 pt-4 border-t border-gray-200"
+        >
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">Created From</label>
+            <label class="block text-sm font-medium text-gray-700 mb-1"
+              >Created From</label
+            >
             <input
               type="date"
               [(ngModel)]="createdFrom"
               (change)="onFilterChange()"
-              class="px-3 py-2 w-full border border-gray-300 rounded-md bg-white text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500">
+              class="px-3 py-2 w-full border border-gray-300 rounded-md bg-white text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+            />
           </div>
-          
+
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">Created To</label>
+            <label class="block text-sm font-medium text-gray-700 mb-1"
+              >Created To</label
+            >
             <input
               type="date"
               [(ngModel)]="createdTo"
               (change)="onFilterChange()"
-              class="px-3 py-2 w-full border border-gray-300 rounded-md bg-white text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500">
+              class="px-3 py-2 w-full border border-gray-300 rounded-md bg-white text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+            />
           </div>
-          
+
           <div class="flex items-end">
             <button
               (click)="resetFilters()"
-              class="w-full px-3 py-2 border border-gray-300 rounded-md bg-white text-sm text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500">
+              class="w-full px-3 py-2 border border-gray-300 rounded-md bg-white text-sm text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 ds-btn ds-btn--secondary"
+            >
               Reset Filters
             </button>
           </div>
@@ -185,182 +238,197 @@
     </div>
 
     <!-- Stores Table -->
-    <div class="bg-white rounded-lg shadow-sm border border-gray-200">
-      <div class="overflow-y-auto max-h-[calc(100vh-450px)]">
-        <table mat-table [dataSource]="dataSource" class="mat-elevation-z0 w-full text-sm">
+    <div class="ds-card ds-table-panel">
+      <p-table
+        [value]="dataSource"
+        [lazy]="true"
+        (onLazyLoad)="onLazyLoad($event)"
+        [paginator]="true"
+        [rows]="pageSize"
+        [first]="(pageIndex - 1) * pageSize"
+        [totalRecords]="total"
+        [loading]="loading"
+        [rowsPerPageOptions]="[5, 10, 25, 50]"
+        [showFirstLastIcon]="true"
+        [showCurrentPageReport]="true"
+        currentPageReportTemplate="{first} - {last} of {totalRecords}"
+        [scrollable]="true"
+        scrollHeight="flex"
+        dataKey="id"
+      >
+        <ng-template pTemplate="header">
+          <tr>
+            <th class="w-1/5">Store</th>
+            <th class="w-1/6">Status</th>
+            <th class="w-1/6">Devices</th>
+            <th class="w-1/6">Contact</th>
+            <th class="w-1/6">Created</th>
+            <th class="ds-table-actions">Actions</th>
+          </tr>
+        </ng-template>
 
-          <!-- Store Column -->
-          <ng-container matColumnDef="store">
-            <th mat-header-cell *matHeaderCellDef class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase w-1/5 bg-gray-100" style="border-bottom: 1px solid #e5e7eb !important;">
-              Store
-            </th>
-            <td mat-cell *matCellDef="let store" class="px-6 py-4" style="border-bottom: 1px solid #e5e7eb !important;">
+        <ng-template pTemplate="body" let-store>
+          <tr>
+            <!-- Store -->
+            <td>
               <div class="flex items-center space-x-3">
                 <!-- Avatar with initials -->
-                <div class="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold bg-emerald-600">
+                <div
+                  class="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold bg-emerald-600"
+                >
                   {{ getStoreInitials(store.storeName) }}
                 </div>
                 <div>
-                  <div class="font-medium text-gray-900">{{ store.storeName }}</div>
-                  <div class="text-gray-500 text-xs">{{ store.storeCode || 'No code' }}</div>
-                  <div class="text-gray-400 text-xs">{{ store.address || 'No address' }}</div>
+                  <div class="font-medium text-gray-900">
+                    {{ store.storeName }}
+                  </div>
+                  <div class="text-gray-500 text-xs">
+                    {{ store.storeCode || "No code" }}
+                  </div>
+                  <div class="text-gray-400 text-xs">
+                    {{ store.address || "No address" }}
+                  </div>
                 </div>
               </div>
             </td>
-          </ng-container>
 
-          <!-- Status Column -->
-          <ng-container matColumnDef="status">
-            <th mat-header-cell *matHeaderCellDef class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase w-1/6 bg-gray-100" style="border-bottom: 1px solid #e5e7eb !important;">
-              Status
-            </th>
-            <td mat-cell *matCellDef="let store" class="px-6 py-4" style="border-bottom: 1px solid #e5e7eb !important;">
-              <div class="flex flex-col space-y-1">
-                <!-- Active Status -->
-                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border"
-                      [ngClass]="getStatusColor(store.isActive)">
-                  <i class="fas" 
-                     [ngClass]="store.isActive ? 'fa-circle text-green-400' : 'fa-circle text-red-400'"
-                     [style.font-size.px]="8"></i>
-                  <span class="ml-1.5">{{ store.isActive ? 'Active' : 'Inactive' }}</span>
+            <!-- Status -->
+            <td>
+              <div class="flex flex-col space-y-1 items-start">
+                <span
+                  class="ds-pill border"
+                  [ngClass]="getStatusColor(store.isActive)"
+                >
+                  <i
+                    class="fas"
+                    [ngClass]="
+                      store.isActive
+                        ? 'fa-circle text-green-400'
+                        : 'fa-circle text-red-400'
+                    "
+                    [style.font-size.px]="8"
+                  ></i>
+                  <span>{{ store.isActive ? "Active" : "Inactive" }}</span>
                 </span>
-                
-                <!-- Sync Status -->
-                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border"
-                      [ngClass]="getSyncStatusColor(store.syncStatus)">
-                  <i class="fas mr-1.5 text-xs" 
-                     [ngClass]="getSyncStatusIcon(store.syncStatus)"></i>
+
+                <span
+                  class="ds-pill border"
+                  [ngClass]="getSyncStatusColor(store.syncStatus)"
+                >
+                  <i
+                    class="fas text-xs"
+                    [ngClass]="getSyncStatusIcon(store.syncStatus)"
+                  ></i>
                   {{ getSyncStatusLabel(store.syncStatus) }}
                 </span>
               </div>
             </td>
-          </ng-container>
 
-          <!-- Devices Column -->
-          <ng-container matColumnDef="devices">
-            <th mat-header-cell *matHeaderCellDef class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase w-1/6 bg-gray-100" style="border-bottom: 1px solid #e5e7eb !important;">
-              Devices
-            </th>
-            <td mat-cell *matCellDef="let store" class="px-6 py-4 text-gray-600" style="border-bottom: 1px solid #e5e7eb !important;">
+            <!-- Devices -->
+            <td class="text-gray-600">
               <div class="flex items-center space-x-2">
                 <i class="fas fa-tablet-alt text-gray-400"></i>
                 <span class="font-medium">{{ store.deviceCount || 0 }}</span>
                 <span class="text-xs text-gray-500">devices</span>
               </div>
-              <div *ngIf="store.deviceCount > 0" class="text-xs text-gray-500 mt-1">
-                <button (click)="viewStoreDevices(store)" 
-                        class="text-blue-600 hover:text-blue-800 hover:underline">
+              <div *ngIf="store.deviceCount > 0" class="text-xs text-gray-500">
+                <button
+                  (click)="viewStoreDevices(store)"
+                  class="text-blue-600 hover:text-blue-800 hover:underline ds-btn ds-btn--tertiary ds-btn--sm"
+                >
                   View devices
                 </button>
               </div>
             </td>
-          </ng-container>
 
-          <!-- Contact Column -->
-          <ng-container matColumnDef="contact">
-            <th mat-header-cell *matHeaderCellDef class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase w-1/6 bg-gray-100" style="border-bottom: 1px solid #e5e7eb !important;">
-              Contact
-            </th>
-            <td mat-cell *matCellDef="let store" class="px-6 py-4 text-gray-600" style="border-bottom: 1px solid #e5e7eb !important;">
-              <div class="text-sm">
-                <div class="font-medium">{{ store.contactPerson || 'No contact' }}</div>
-                <div class="text-gray-500 text-xs">{{ store.phone || 'No phone' }}</div>
-                <div class="text-gray-400 text-xs truncate max-w-xs">{{ store.email || 'No email' }}</div>
+            <!-- Contact -->
+            <td class="text-gray-600">
+              <div class="font-medium">
+                {{ store.contactPerson || "No contact" }}
+              </div>
+              <div class="text-gray-500 text-xs">
+                {{ store.phone || "No phone" }}
+              </div>
+              <div class="text-gray-400 text-xs truncate max-w-xs">
+                {{ store.email || "No email" }}
               </div>
             </td>
-          </ng-container>
 
-          <!-- Created Column -->
-          <ng-container matColumnDef="created">
-            <th mat-header-cell *matHeaderCellDef class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase w-1/6 bg-gray-100" style="border-bottom: 1px solid #e5e7eb !important;">
-              Created
-            </th>
-            <td mat-cell *matCellDef="let store" class="px-6 py-4 text-gray-600" style="border-bottom: 1px solid #e5e7eb !important;">
-              <div class="text-sm">
-                <div>{{ store.createdDate | date:'MMM d, y' }}</div>
-                <div class="text-gray-400 text-xs" *ngIf="store.lastSyncDate">
-                  <i class="fas fa-sync-alt mr-1"></i>
-                  Synced: {{ store.lastSyncDate | date:'MMM d, y' }}
-                </div>
+            <!-- Created -->
+            <td class="text-gray-600">
+              <div>{{ store.createdDate | date: "MMM d, y" }}</div>
+              <div class="text-gray-400 text-xs" *ngIf="store.lastSyncDate">
+                <i class="fas fa-sync-alt mr-1"></i>
+                Synced: {{ store.lastSyncDate | date: "MMM d, y" }}
               </div>
             </td>
-          </ng-container>
 
-          <!-- Actions Column -->
-          <ng-container matColumnDef="actions">
-            <th mat-header-cell *matHeaderCellDef class="px-6 py-4 text-center text-xs font-medium text-gray-500 uppercase w-1/12 bg-gray-100" style="border-bottom: 1px solid #e5e7eb !important;">
-              Actions
-            </th>
-            <td mat-cell *matCellDef="let store" class="px-6 py-4 text-center" style="border-bottom: 1px solid #e5e7eb !important;">
-              <div class="flex justify-center space-x-4">
+            <!-- Actions -->
+            <td class="ds-table-actions">
+              <div class="ds-btn-group">
                 <!-- Edit Button -->
-                <button 
-                  class="text-secondary hover:text-secondary-light p-1 rounded hover:bg-blue-50 transition-colors duration-150 cursor-pointer" 
+                <button
+                  class="text-secondary hover:text-secondary-light rounded hover:bg-blue-50 transition-colors duration-150 cursor-pointer ds-btn-icon"
                   (click)="openEditModal(store)"
-                  title="Edit Store">
+                  title="Edit Store"
+                >
                   <i class="fas fa-edit"></i>
                 </button>
-                
+
                 <!-- Sync Button -->
                 <button
-                  class="text-blue-600 hover:text-blue-900 p-1 rounded hover:bg-blue-50 transition-colors duration-150 cursor-pointer"
+                  class="text-blue-600 hover:text-blue-900 rounded hover:bg-blue-50 transition-colors duration-150 cursor-pointer ds-btn-icon"
                   (click)="syncSingleStore(store)"
-                  [title]="store.isSynced ? 'Re-sync Store' : 'Sync Store'">
+                  [title]="store.isSynced ? 'Re-sync Store' : 'Sync Store'"
+                >
                   <i class="fas fa-sync-alt"></i>
                 </button>
-                
-                <!-- View Details Button -->
-                <button 
-                  class="text-green-600 hover:text-green-900 p-1 rounded hover:bg-green-50 transition-colors duration-150 cursor-pointer"
-                  (click)="viewStoreDetails(store)"
-                  title="View Details">
-                  <i class="fas fa-eye"></i>
-                </button>
-                
+
                 <!-- Delete/Restore Button -->
-                <button 
-                *ngIf="auth.hasAnyRole(['Admin','Manager'])"
-                  class="p-1 rounded transition-colors duration-150 cursor-pointer"
+                <button
+                  *ngIf="auth.hasAnyRole(['Admin', 'Manager'])"
+                  class="rounded transition-colors duration-150 cursor-pointer ds-btn-icon"
                   [ngClass]="{
-                    'text-red-600 hover:text-red-900 hover:bg-red-50': store.isActive,
-                    'text-green-600 hover:text-green-900 hover:bg-green-50': !store.isActive
-                  }" 
+                    'text-red-600 hover:text-red-900 hover:bg-red-50':
+                      store.isActive,
+                    'text-green-600 hover:text-green-900 hover:bg-green-50':
+                      !store.isActive,
+                  }"
                   (click)="openDeleteDialog(store)"
-                  [title]="store.isActive ? 'Deactivate Store' : 'Activate Store'">
-                  <i [class]="store.isActive ? 'fas fa-trash' : 'fas fa-undo'"></i>
+                  [title]="
+                    store.isActive ? 'Deactivate Store' : 'Activate Store'
+                  "
+                >
+                  <i
+                    [class]="store.isActive ? 'fas fa-trash' : 'fas fa-undo'"
+                  ></i>
                 </button>
               </div>
             </td>
-          </ng-container>
+          </tr>
+        </ng-template>
 
-          <!-- Header & Row Declarations -->
-          <tr mat-header-row *matHeaderRowDef="displayedColumns" class="bg-gray-100 hover:bg-secondary-light/5"></tr>
-          <tr mat-row *matRowDef="let row; columns: displayedColumns;" class="hover:bg-secondary-light/5" style="border-bottom: 1px solid #e5e7eb !important;"></tr>
-          
-          <!-- Empty State -->
-          <tr *matNoDataRow class="text-center py-8">
-            <td colspan="7" class="py-8 text-gray-500">
-              <i class="fas fa-store-slash text-4xl mb-4 text-gray-300"></i>
-              <p class="text-lg font-medium">No stores found</p>
-              <p class="text-sm mt-2">Try adjusting your filters or add a new store.</p>
-              <button (click)="openCreateModal()" class="mt-4 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-light">
-                <i class="fas fa-plus mr-2"></i>Add First Store
-              </button>
+        <!-- Empty State -->
+        <ng-template pTemplate="emptymessage">
+          <tr>
+            <td colspan="6">
+              <div class="ds-table-empty">
+                <i class="fas fa-store-slash ds-table-empty__icon"></i>
+                <p class="ds-table-empty__title">No stores found</p>
+                <p class="ds-table-empty__desc">
+                  Try adjusting your filters or add a new store.
+                </p>
+                <button
+                  (click)="openCreateModal()"
+                  class="bg-primary text-white hover:bg-primary-light ds-btn ds-btn--primary"
+                >
+                  <i class="fas fa-plus"></i>Add First Store
+                </button>
+              </div>
             </td>
           </tr>
-        </table>
-      </div>
-      
-      <!-- Pagination -->
-      <mat-paginator [length]="total"
-                     [pageSize]="pageSize"
-                     [pageSizeOptions]="[5, 10, 25, 50]"
-                     [pageIndex]="pageIndex - 1"
-                     (page)="onPageChange($event)"
-                     showFirstLastButtons
-                     aria-label="Select page of stores"
-                     class="border-t border-gray-200">
-      </mat-paginator>
+        </ng-template>
+      </p-table>
     </div>
   </div>
 </div>

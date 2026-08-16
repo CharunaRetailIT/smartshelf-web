@@ -223,6 +223,18 @@ export const routes: Routes = [
         },
       },
       {
+        path: 'settings',
+        loadComponent: () =>
+          import('./pages/settings/settings.component').then(
+            (m) => m.SettingsComponent,
+          ),
+        canActivate: [RoleGuard],
+        data: {
+          roles: ['Viewer', 'Admin', 'Manager', 'Operator'],
+          showHeader: false,
+        },
+      },
+      {
         path: 'store-management',
         loadComponent: () =>
           import('./pages/store/store-management/store-management.component').then(

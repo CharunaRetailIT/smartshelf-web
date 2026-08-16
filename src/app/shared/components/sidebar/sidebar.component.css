@@ -82,6 +82,18 @@
   overflow: visible;
   border-right: none;
 
+  /* Material projects the sidenav's content into its own wrapper, so that
+     wrapper - not `.app-sidenav` - is the real column. Without this the logo,
+     nav list and user block are not flex children of anything, `flex: 1` on
+     the nav list has nothing to resolve against, and a nav list taller than
+     the viewport is simply cut off instead of scrolling. */
+  ::ng-deep .mat-drawer-inner-container {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    overflow: hidden;
+  }
+
   &.expanded {
     width: 16.8625rem;
     /* width: 270px; */
@@ -184,6 +196,23 @@
       line-height: 1.2;
       color: white;
     }
+
+    /* The active store, sitting under the brand. Long store names truncate
+       rather than widening the sidebar or wrapping onto a second line - the
+       full name is available via the tooltip. */
+    .store-name {
+      display: block;
+      margin-top: 2px;
+      font-size: 12px;
+      font-weight: 600;
+      line-height: 1.3;
+      letter-spacing: 0.01em;
+      color: rgba(255, 255, 255, 0.75);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      max-width: 100%;
+    }
   }
 
   .btn-close {
@@ -213,9 +242,13 @@
 
 /* Navigation List */
 .nav-list {
-  flex: 1;
+  flex: 1 1 auto;
+  /* A flex item will not shrink below its content without this, so the
+     overflow would escape the column instead of scrolling here. */
+  min-height: 0;
   overflow-y: auto;
   overflow-x: hidden;
+  overscroll-behavior: contain;
   padding: 0 8px;
 
   /* Custom scrollbar */
@@ -317,17 +350,15 @@
   }
 }
 
-/* User Section */
+/* User Section
+   Pinned to the bottom by `margin-top: auto` as the last item in the column
+   rather than by absolute positioning - as an out-of-flow element it sat on
+   top of the nav list, so a long menu scrolled underneath the user block
+   instead of stopping above it. */
 .user-section {
   margin-top: auto;
-  flex-shrink: 0;
-  position: absolute;
-  bottom: 1rem;
-  left: 0;
-  right: 0;
-  padding: 0 12px;
-  /* left: 0; */
-  /* padding: 16px; */
+  flex: 0 0 auto;
+  padding: 0 12px 1rem;
   border-top: 1px solid rgba(255, 255, 255, 0.1);
 
   .user-separator {
@@ -425,12 +456,18 @@
   }
 }
 
-/* Main Content */
+/* Main Content
+   The shell is a fixed-height column that never scrolls itself. Scrolling is
+   owned by the page inside it (`.ds-page-shell`), which lets a table page hand
+   the scroll further down to its grid body while the header, toolbar and
+   paginator stay put. */
 .main-content {
   background: #f9fafb;
   height: 100vh;
-  overflow-y: auto;
-  overflow-x: hidden;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
 }
 
 /* ========================================

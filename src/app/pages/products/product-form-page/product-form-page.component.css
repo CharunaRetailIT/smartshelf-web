@@ -321,11 +321,8 @@
 :host ::ng-deep .p-inputnumber-input,
 :host ::ng-deep .p-textarea {
   border-color: #bbcabf;
-  border-radius: 11px;
   background: #f9f9ff;
-  min-height: 46px;
   color: #121c2a;
-  font-weight: 600;
 }
 
 :host ::ng-deep .p-inputtext:enabled:focus,

@@ -2,144 +2,113 @@
 
 /* Custom PrimeNG Theme Adjustments */
 :host ::ng-deep {
-  
   /* Toolbar customization */
   .p-toolbar {
     background: white;
     border: 1px solid #e5e7eb;
     border-radius: 0.5rem;
   }
-  
+
   /* Card hover effects */
   .p-card {
     transition: all 0.3s ease;
   }
-  
+
   .p-card:hover {
     box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
   }
-  
+
   /* DataView layout options */
   .p-dataview-header {
     background: transparent;
     border: none;
     padding: 0;
   }
-  
+
   /* Tab customization */
   .p-tabview .p-tabview-nav {
     background: white;
     border: 1px solid #e5e7eb;
     border-bottom: 2px solid #e5e7eb;
   }
-  
+
   .p-tabview .p-tabview-nav li .p-tabview-nav-link {
     padding: 1rem 1.5rem;
   }
-  
+
   .p-tabview .p-tabview-nav li.p-highlight .p-tabview-nav-link {
     border-color: var(--dlg-accent);
     color: var(--dlg-primary);
   }
-  
+
   /* ScrollPanel styling */
   .p-scrollpanel .p-scrollpanel-bar {
     background-color: #cbd5e0;
     opacity: 0.6;
     transition: opacity 0.3s;
   }
-  
+
   .p-scrollpanel .p-scrollpanel-bar:hover {
     opacity: 1;
   }
-  
+
   /* Dialog customization */
   .p-dialog .p-dialog-header {
     background: linear-gradient(to right, #ecfdf5, white);
     border-bottom: 1px solid #e5e7eb;
   }
-  
+
   .p-dialog .p-dialog-content {
     padding: 1.5rem;
   }
-  
+
   /* Badge styling */
   .p-badge {
     font-weight: 600;
   }
-  
-  /* Tag styling */
-  .p-tag {
-    font-weight: 500;
-  }
-  
+
   /* Accordion customization */
   .p-accordion .p-accordion-header-link {
     padding: 1rem 1.25rem;
   }
-  
+
   .p-accordion .p-accordion-content {
     padding: 1.5rem;
   }
-  
-  /* Input styling */
-  .p-inputtext {
-    border-radius: 0.375rem;
-  }
-  
+
   .p-inputtext:focus {
     box-shadow: 0 0 0 3px var(--dlg-primary-ring);
   }
-  
-  /* Dropdown styling */
-  .p-dropdown {
-    border-radius: 0.375rem;
-  }
-  
+
   .p-dropdown:focus {
     box-shadow: 0 0 0 3px var(--dlg-primary-ring);
   }
-  
-  /* Button customization */
-  .p-button {
-    border-radius: 0.375rem;
-    font-weight: 500;
-  }
-  
-  .p-button.p-button-rounded {
-    border-radius: 50%;
-  }
-  
-  /* Checkbox styling */
-  .p-checkbox .p-checkbox-box {
-    border-radius: 0.25rem;
-  }
-  
+
   /* Radio button styling */
   .p-radiobutton .p-radiobutton-box {
     border: 2px solid #d1d5db;
   }
-  
+
   .p-radiobutton .p-radiobutton-box.p-highlight {
     border-color: var(--dlg-primary);
     background: var(--dlg-primary);
   }
-  
+
   /* Message styling */
   .p-message {
     border-radius: 0.5rem;
   }
-  
+
   /* Toast positioning */
   .p-toast {
     opacity: 0.98;
   }
-  
+
   .p-toast .p-toast-message {
     border-radius: 0.5rem;
     box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.2);
   }
-  
+
   /* Progress spinner */
   .p-progress-spinner-circle {
     stroke: var(--dlg-primary);
@@ -216,7 +185,7 @@
     flex-direction: column;
     gap: 1rem;
   }
-  
+
   :host ::ng-deep .p-toolbar .p-toolbar-group-start,
   :host ::ng-deep .p-toolbar .p-toolbar-group-end {
     width: 100%;
@@ -288,7 +257,9 @@
 
 /* Hover lift effect */
 .hover-lift {
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
 }
 
 .hover-lift:hover {
@@ -339,4 +310,3 @@
 :host ::ng-deep .p-dataview-grid .p-dataview-content {
   display: grid !important;
 }
-

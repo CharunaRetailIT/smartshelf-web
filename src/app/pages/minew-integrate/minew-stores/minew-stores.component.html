@@ -1,37 +1,45 @@
 <div class="bg-white p-6 sm:p-8 rounded-lg shadow-md max-w-2xl mx-auto">
   <div class="flex justify-between items-center mb-4">
-    <h2 class="text-xl sm:text-2xl font-semibold text-[var(--color-secondary)]">Select or Manage Stores</h2>
+    <h2 class="text-xl sm:text-2xl font-semibold text-[var(--color-secondary)]">
+      Select or Manage Stores
+    </h2>
     <button
       (click)="onLogout()"
-      class="bg-[var(--color-secondary)] text-white px-4 py-2 rounded-md hover:bg-[var(--color-secondary-dark)]"
+      class="bg-[var(--color-secondary)] text-white px-4 py-2 rounded-md hover:bg-[var(--color-secondary-dark)] ds-btn ds-btn--primary"
     >
       Logout
     </button>
   </div>
 
   <!-- Store List -->
-   <!-- Loading State -->
-    <div *ngIf="isLoading" class="flex justify-center items-center py-12">
-      <mat-spinner [diameter]="50" class="text-primary"></mat-spinner>
-    </div>  <div *ngIf="errorMessage" class="text-red-500 mb-4">{{ errorMessage }}</div>
+  <!-- Loading State -->
+  <div *ngIf="isLoading" class="flex justify-center items-center py-12">
+    <mat-spinner [diameter]="50" class="text-primary"></mat-spinner>
+  </div>
+  <div *ngIf="errorMessage" class="text-red-500 mb-4">{{ errorMessage }}</div>
   <ul *ngIf="!isLoading && stores.length" class="space-y-4">
-    <li *ngFor="let store of stores" class="flex items-center justify-between p-4 border border-[var(--color-primary-light)] rounded-md">
+    <li
+      *ngFor="let store of stores"
+      class="flex items-center justify-between p-4 border border-[var(--color-primary-light)] rounded-md"
+    >
       <div>
-        <p class="font-medium text-[var(--color-secondary-dark)]">{{ store.storeName }}</p>
-        <p class="text-sm text-gray-600">{{ store.address || 'No address' }}</p>
+        <p class="font-medium text-[var(--color-secondary-dark)]">
+          {{ store.storeName }}
+        </p>
+        <p class="text-sm text-gray-600">{{ store.address || "No address" }}</p>
       </div>
       <div class="flex space-x-2">
         <button
           (click)="selectStore(store)"
-          class="bg-[var(--color-primary)] text-white px-3 py-1 rounded-md hover:bg-[var(--color-primary-dark)]"
+          class="bg-[var(--color-primary)] text-white px-3 py-1 rounded-md hover:bg-[var(--color-primary-dark)] ds-btn ds-btn--primary"
         >
           Select
         </button>
         <button
           (click)="toggleStore(store)"
-          class="bg-[var(--color-secondary-light)] text-white px-3 py-1 rounded-md hover:bg-[var(--color-secondary-dark)]"
+          class="bg-[var(--color-secondary-light)] text-white px-3 py-1 rounded-md hover:bg-[var(--color-secondary-dark)] ds-btn ds-btn--primary"
         >
-          {{ store.active ? 'Close' : 'Open' }}
+          {{ store.active ? "Close" : "Open" }}
         </button>
       </div>
     </li>
@@ -39,9 +47,15 @@
 
   <!-- Add Store Form -->
   <form (ngSubmit)="addStore()" class="mt-6 space-y-4">
-    <h3 class="text-lg font-medium text-[var(--color-secondary)]">Add New Store</h3>
+    <h3 class="text-lg font-medium text-[var(--color-secondary)]">
+      Add New Store
+    </h3>
     <div>
-      <label for="storeName" class="block text-sm font-medium text-[var(--color-secondary-dark)]">Store Name</label>
+      <label
+        for="storeName"
+        class="block text-sm font-medium text-[var(--color-secondary-dark)]"
+        >Store Name</label
+      >
       <input
         id="storeName"
         type="text"
@@ -52,7 +66,11 @@
       />
     </div>
     <div>
-      <label for="address" class="block text-sm font-medium text-[var(--color-secondary-dark)]">Address</label>
+      <label
+        for="address"
+        class="block text-sm font-medium text-[var(--color-secondary-dark)]"
+        >Address</label
+      >
       <input
         id="address"
         type="text"
@@ -63,7 +81,7 @@
     </div>
     <button
       type="submit"
-      class="w-full bg-[var(--color-primary)] text-white py-2 rounded-md hover:bg-[var(--color-primary-dark)]"
+      class="w-full bg-[var(--color-primary)] text-white py-2 rounded-md hover:bg-[var(--color-primary-dark)] ds-btn ds-btn--primary"
     >
       Add Store
     </button>

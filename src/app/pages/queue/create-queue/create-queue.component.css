@@ -244,7 +244,9 @@
   font-weight: 600;
   color: var(--text-secondary);
   cursor: pointer;
-  transition: color var(--transition), border-color var(--transition),
+  transition:
+    color var(--transition),
+    border-color var(--transition),
     background-color var(--transition);
 }
 
@@ -288,10 +290,6 @@
 .location-toggle ::ng-deep .p-selectbutton .p-button {
   border: none !important;
   background: transparent !important;
-  border-radius: calc(var(--radius-sm) - 3px) !important;
-  font-size: 0.8rem !important;
-  font-weight: 600;
-  padding: 0.45rem 0.85rem !important;
   color: var(--text-secondary) !important;
   box-shadow: none !important;
 }
@@ -321,7 +319,6 @@
 
 /* ─── Dropdown ──────────────────────────────────────────────────── */
 .dlg-shell ::ng-deep .p-dropdown {
-  border-radius: var(--radius-sm) !important;
   border: 1.5px solid var(--border) !important;
   background: var(--surface) !important;
   transition:
@@ -336,9 +333,7 @@
 }
 
 .dlg-shell ::ng-deep .p-dropdown-label {
-  font-size: 0.875rem;
   color: var(--text-primary);
-  padding: 0.55rem 0.75rem;
 }
 
 .dlg-shell ::ng-deep .p-dropdown-trigger {
@@ -347,9 +342,7 @@
 
 /* ─── Calendar ──────────────────────────────────────────────────── */
 .dlg-shell ::ng-deep .p-calendar .p-inputtext {
-  border-radius: var(--radius-sm) !important;
   border: 1.5px solid var(--border) !important;
-  font-size: 0.875rem;
   transition:
     border-color var(--transition),
     box-shadow var(--transition);
@@ -454,10 +447,6 @@
   border-color: var(--border) !important;
   color: var(--text-secondary) !important;
   background: var(--surface) !important;
-  font-weight: 500;
-  font-size: 0.875rem;
-  padding: 0.55rem 1.125rem !important;
-  border-radius: var(--radius-sm) !important;
   transition: all var(--transition);
 }
 
@@ -471,10 +460,6 @@
   background: var(--brand-teal) !important;
   border-color: var(--brand-teal) !important;
   color: #fff !important;
-  font-weight: 600;
-  font-size: 0.875rem;
-  padding: 0.575rem 1.25rem !important;
-  border-radius: var(--radius-sm) !important;
   box-shadow: var(--shadow-sm);
   transition: all var(--transition);
 }
@@ -509,7 +494,6 @@
     opacity: 1;
     transform: translateY(0);
   }
-
 }
 
 /* ─── Responsive: Tablet ─────────────────────────────────────────── */
@@ -546,7 +530,6 @@
   .footer-actions {
     justify-content: flex-end;
   }
-
 }
 
 /* ─── Responsive: Mobile ─────────────────────────────────────────── */
@@ -568,5 +551,4 @@
     width: 100% !important;
     justify-content: center;
   }
-
 }

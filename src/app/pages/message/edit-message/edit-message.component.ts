@@ -1,9 +1,27 @@
 import { CommonModule } from '@angular/common';
-import { AfterViewInit, Component, ElementRef, Inject, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
+import {
+  AfterViewInit,
+  Component,
+  ElementRef,
+  Inject,
+  OnDestroy,
+  OnInit,
+  ViewChild,
+} from '@angular/core';
+import {
+  FormBuilder,
+  FormGroup,
+  FormsModule,
+  ReactiveFormsModule,
+  Validators,
+} from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
-import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
+import {
+  MAT_DIALOG_DATA,
+  MatDialogModule,
+  MatDialogRef,
+} from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
@@ -18,10 +36,13 @@ import { Canvas } from 'fabric';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { FabricCanvasService } from '../../../core/services/fabric-canvas.service';
 import { AuthService } from '../../../core/services/auth.service';
-import { CustomSnackbarComponent, SnackbarData } from '../../../shared/components/alert/custom-snackbar.component';
+import {
+  CustomSnackbarComponent,
+  SnackbarData,
+} from '../../../shared/components/alert/custom-snackbar.component';
 import { SettingsService } from '../../../core/services/settings.service';
 import { CustomMessageService } from '../../../core/services/message.service';
-import { MessageService } from 'primeng/api';
+import { ConfirmationService, MessageService } from 'primeng/api';
 import { Dropdown } from 'primeng/dropdown';
 import { DeviceService } from '../../../core/services/device.service';
 import { ImportsModule } from '../../../imports/imports';
@@ -40,15 +61,17 @@ interface ScreenSize {
 
 @Component({
   selector: 'app-edit-message',
-  imports: [CommonModule,
+  imports: [
+    CommonModule,
     ReactiveFormsModule,
     FormsModule,
     MatInputModule,
     MatSelectModule,
     MatCheckboxModule,
-    ImportsModule],
+    ImportsModule,
+  ],
   templateUrl: './edit-message.component.html',
-  styleUrl: './edit-message.component.css'
+  styleUrl: './edit-message.component.css',
 })
 export class EditMessageComponent implements OnInit, OnDestroy {
   @ViewChild('fabricCanvas') fabricCanvasRef!: ElementRef<HTMLCanvasElement>;
@@ -93,8 +116,12 @@ export class EditMessageComponent implements OnInit, OnDestroy {
   toolCategories = [
     { id: 'shapes', name: 'Shapes', icon: 'fas fa-shapes' },
     { id: 'colors', name: 'Colors', icon: 'fas fa-palette' },
-    { id: 'layout', name: 'Layout', icon: 'fas fa-layer-group' }
+    { id: 'layout', name: 'Layout', icon: 'fas fa-layer-group' },
   ];
+
+  /** Add-text dialog, replacing the browser's prompt(). */
+  showAddTextDialog = false;
+  newTextValue = '';
 
   constructor(
     private fb: FormBuilder,
@@ -106,17 +133,24 @@ export class EditMessageComponent implements OnInit, OnDestroy {
     private fabricService: FabricCanvasService,
     public auth: AuthService,
     private snackBar: MatSnackBar,
-    private deviceService: DeviceService
+    private deviceService: DeviceService,
+    private confirmationService: ConfirmationService,
   ) {
     this.messageData = data.message;
     console.log('Received message data:', this.messageData);
 
     this.editForm = this.fb.group({
-      title: [this.messageData.title, [Validators.required, Validators.maxLength(255)]],
+      title: [
+        this.messageData.title,
+        [Validators.required, Validators.maxLength(255)],
+      ],
       contentData: [this.messageData.contentData || ''],
-      duration: [this.messageData.duration, [Validators.required, Validators.min(1), Validators.max(300)]],
+      duration: [
+        this.messageData.duration,
+        [Validators.required, Validators.min(1), Validators.max(300)],
+      ],
       screenSizeId: [this.messageData.screenSizeId || '', Validators.required],
-      isActive: [this.messageData.isActive || false]
+      isActive: [this.messageData.isActive || false],
     });
   }
 
@@ -124,7 +158,7 @@ export class EditMessageComponent implements OnInit, OnDestroy {
     this.setDefaultStore();
 
     // Get current user
-    this.auth.currentUser$.subscribe(user => {
+    this.auth.currentUser$.subscribe((user) => {
       if (user) {
         this.currentUserId = user.id;
       }
@@ -158,7 +192,7 @@ export class EditMessageComponent implements OnInit, OnDestroy {
       pageNumber: this.screenSizePageNumber,
       pageSize: this.screenSizePageSize,
       searchTerm: this.screenSizeSearchTerm,
-      isActive: true
+      isActive: true,
     };
 
     this.deviceService.getDeviceScreensPaged(searchParams).subscribe({
@@ -169,7 +203,7 @@ export class EditMessageComponent implements OnInit, OnDestroy {
           width: screen.width,
           height: screen.height,
           aspectRatio: screen.aspectRatio,
-          label: `${screen.name} - ${screen.width}x${screen.height}px`
+          label: `${screen.name} - ${screen.width}x${screen.height}px`,
         }));
 
         if (this.screenSizePageNumber === 1) {
@@ -183,8 +217,13 @@ export class EditMessageComponent implements OnInit, OnDestroy {
         this.screenSizeHasPreviousPage = response.hasPreviousPage;
 
         // Set selected screen size if exists
-        if (this.messageData.screenSizeId && this.screenSizeOptions.length > 0) {
-          const selectedSize = this.screenSizeOptions.find(s => s.id === this.messageData.screenSizeId);
+        if (
+          this.messageData.screenSizeId &&
+          this.screenSizeOptions.length > 0
+        ) {
+          const selectedSize = this.screenSizeOptions.find(
+            (s) => s.id === this.messageData.screenSizeId,
+          );
           if (selectedSize) {
             this.selectedScreenSize = selectedSize;
             this.selectedScreenSizeOption = selectedSize;
@@ -199,7 +238,7 @@ export class EditMessageComponent implements OnInit, OnDestroy {
         console.error('Error loading screen sizes:', error);
         this.screenSizeLoading = false;
         this.showError('Failed to load screen sizes');
-      }
+      },
     });
   }
 
@@ -234,14 +273,20 @@ export class EditMessageComponent implements OnInit, OnDestroy {
 
   // Handle screen size selection
   onScreenSizeSelected(event: any): void {
-    const selectedSize = this.screenSizeOptions.find(s => s.id === event.value);
+    const selectedSize = this.screenSizeOptions.find(
+      (s) => s.id === event.value,
+    );
     if (selectedSize) {
       this.selectedScreenSize = selectedSize;
       this.selectedScreenSizeOption = selectedSize;
       this.updateCanvasDimensions(selectedSize);
 
       // Re-validate existing image file if dimensions changed
-      if (this.selectedFile && this.messageData.contentType === 2 && this.imagePreview) {
+      if (
+        this.selectedFile &&
+        this.messageData.contentType === 2 &&
+        this.imagePreview
+      ) {
         this.validateSelectedImage(selectedSize);
       }
     }
@@ -263,7 +308,9 @@ export class EditMessageComponent implements OnInit, OnDestroy {
     const img = new Image();
     img.onload = () => {
       if (img.width > screenSize.width || img.height > screenSize.height) {
-        this.showError(`Current image (${img.width}x${img.height}) exceeds new screen size (${screenSize.width}x${screenSize.height}). Please select a new image.`);
+        this.showError(
+          `Current image (${img.width}x${img.height}) exceeds new screen size (${screenSize.width}x${screenSize.height}). Please select a new image.`,
+        );
         this.selectedFile = null;
         this.imagePreview = null;
         if (this.fileInput) {
@@ -278,7 +325,7 @@ export class EditMessageComponent implements OnInit, OnDestroy {
     if (this.canvas) {
       this.canvas.setDimensions({
         width: width,
-        height: height
+        height: height,
       });
       this.canvas.calcOffset();
       this.canvas.renderAll();
@@ -323,7 +370,11 @@ export class EditMessageComponent implements OnInit, OnDestroy {
       const width = this.selectedScreenSize?.width || this.canvasWidth;
       const height = this.selectedScreenSize?.height || this.canvasHeight;
 
-      this.canvas = this.fabricService.initCanvas(this.fabricCanvasRef.nativeElement, width, height);
+      this.canvas = this.fabricService.initCanvas(
+        this.fabricCanvasRef.nativeElement,
+        width,
+        height,
+      );
 
       // Load existing fabric data if available
       if (this.messageData.fabricJsData) {
@@ -373,10 +424,50 @@ export class EditMessageComponent implements OnInit, OnDestroy {
   }
 
   // Canvas operations
+  /**
+   * Opens the add-text dialog. Cancelling now adds nothing - the old
+   * `prompt()` fell through to 'Sample Text' when dismissed, so cancelling
+   * still dropped a text object onto the canvas.
+   */
   addText(): void {
-    const text = prompt('Enter text:') || 'Sample Text';
+    this.newTextValue = '';
+    this.showAddTextDialog = true;
+    this.focusAddTextInput();
+  }
+
+  confirmAddText(): void {
+    const text = this.newTextValue.trim();
+    if (!text) return;
+
     this.fabricService.addText(text);
     this.updateSelectionState();
+    this.showAddTextDialog = false;
+  }
+
+  cancelAddText(): void {
+    this.showAddTextDialog = false;
+  }
+
+  /**
+   * Focus the field once the dialog has rendered.
+   *
+   * Two PrimeNG behaviours are worked around here. Its own `focusOnShow`
+   * prefers the dialog *footer*, so it lands on Cancel - hence
+   * [focusOnShow]="false". And its (onShow) event never fires in this app,
+   * because it is emitted from an animation callback and app.config registers
+   * both provideNoopAnimations() and provideAnimations(); so this is driven
+   * from addText() on a timer rather than from the event.
+   *
+   * The input is looked up by id because it is projected into the dialog's
+   * own view, where a @ViewChild on the host does not resolve it.
+   */
+  focusAddTextInput(): void {
+    setTimeout(() => {
+      const input = document.getElementById(
+        'addTextValue',
+      ) as HTMLInputElement | null;
+      input?.focus();
+    }, 150);
   }
 
   addRectangle(): void {
@@ -423,10 +514,17 @@ export class EditMessageComponent implements OnInit, OnDestroy {
   }
 
   clearCanvas(): void {
-    if (confirm('Are you sure you want to clear the canvas?')) {
-      this.fabricService.clearCanvas();
-      this.updateSelectionState();
-    }
+    this.confirmationService.confirm({
+      message: 'Are you sure you want to clear the canvas?',
+      header: 'Clear Canvas',
+      icon: 'pi pi-exclamation-triangle',
+      acceptLabel: 'Clear',
+      rejectLabel: 'Cancel',
+      accept: () => {
+        this.fabricService.clearCanvas();
+        this.updateSelectionState();
+      },
+    });
   }
 
   duplicateSelected(): void {
@@ -437,47 +535,67 @@ export class EditMessageComponent implements OnInit, OnDestroy {
   // Content type helpers
   getContentTypeIcon(): string {
     switch (this.messageData.contentType) {
-      case 1: return 'fas fa-align-left';
-      case 2: return 'fas fa-image';
-      case 3: return 'fas fa-video';
-      case 4: return 'fas fa-paint-brush';
-      default: return 'fas fa-question';
+      case 1:
+        return 'fas fa-align-left';
+      case 2:
+        return 'fas fa-image';
+      case 3:
+        return 'fas fa-video';
+      case 4:
+        return 'fas fa-paint-brush';
+      default:
+        return 'fas fa-question';
     }
   }
 
   getContentTypeBackground(): string {
     switch (this.messageData.contentType) {
-      case 1: return 'bg-blue-100';
-      case 2: return 'bg-green-100';
-      case 3: return 'bg-purple-100';
-      case 4: return 'bg-orange-100';
-      default: return 'bg-gray-100';
+      case 1:
+        return 'bg-blue-100';
+      case 2:
+        return 'bg-green-100';
+      case 3:
+        return 'bg-purple-100';
+      case 4:
+        return 'bg-orange-100';
+      default:
+        return 'bg-gray-100';
     }
   }
 
   getContentTypeIconColor(): string {
     switch (this.messageData.contentType) {
-      case 1: return 'text-blue-600';
-      case 2: return 'text-green-600';
-      case 3: return 'text-purple-600';
-      case 4: return 'text-orange-600';
-      default: return 'text-gray-600';
+      case 1:
+        return 'text-blue-600';
+      case 2:
+        return 'text-green-600';
+      case 3:
+        return 'text-purple-600';
+      case 4:
+        return 'text-orange-600';
+      default:
+        return 'text-gray-600';
     }
   }
 
   getContentTypeName(): string {
     switch (this.messageData.contentType) {
-      case 1: return 'General Message';
-      case 2: return 'Image Upload';
-      case 3: return 'Video Upload';
-      case 4: return 'Custom Design';
-      default: return 'Unknown';
+      case 1:
+        return 'General Message';
+      case 2:
+        return 'Image Upload';
+      case 3:
+        return 'Video Upload';
+      case 4:
+        return 'Custom Design';
+      default:
+        return 'Unknown';
     }
   }
 
   // Form submission
   onSubmit(): void {
-    console.log("on submit called?")
+    console.log('on submit called?');
     if (this.editForm.invalid) {
       this.markFormGroupTouched();
       return;
@@ -511,9 +629,9 @@ export class EditMessageComponent implements OnInit, OnDestroy {
       screenSizeId: formData.screenSizeId,
       isActive: formData.isActive,
       UpdatedBy: this.currentUserId,
-      StoreId: this.storeId
+      StoreId: this.storeId,
     };
-    console.log(payload)
+    console.log(payload);
     this.messageService.updateGeneralMessage(payload).subscribe({
       next: () => {
         this.showSuccess('General message updated successfully');
@@ -522,7 +640,7 @@ export class EditMessageComponent implements OnInit, OnDestroy {
       error: (error) => {
         this.showError('Failed to update message: ' + error.message);
         this.isLoading = false;
-      }
+      },
     });
   }
 
@@ -548,7 +666,7 @@ export class EditMessageComponent implements OnInit, OnDestroy {
       error: (error) => {
         this.showError('Failed to update image message: ' + error.message);
         this.isLoading = false;
-      }
+      },
     });
   }
 
@@ -574,7 +692,7 @@ export class EditMessageComponent implements OnInit, OnDestroy {
       error: (error) => {
         this.showError('Failed to update video message: ' + error.message);
         this.isLoading = false;
-      }
+      },
     });
   }
 
@@ -597,7 +715,7 @@ export class EditMessageComponent implements OnInit, OnDestroy {
       screenSizeId: formData.screenSizeId,
       is_active: formData.isActive,
       updated_by: this.currentUserId,
-      storeId: this.storeId
+      storeId: this.storeId,
     };
 
     this.messageService.updateCustomImageMessage(messageData).subscribe({
@@ -606,9 +724,11 @@ export class EditMessageComponent implements OnInit, OnDestroy {
         this.dialogRef.close(true);
       },
       error: (error) => {
-        this.showError('Failed to update custom image message: ' + error.message);
+        this.showError(
+          'Failed to update custom image message: ' + error.message,
+        );
         this.isLoading = false;
-      }
+      },
     });
   }
 
@@ -617,7 +737,7 @@ export class EditMessageComponent implements OnInit, OnDestroy {
   }
 
   private markFormGroupTouched(): void {
-    Object.keys(this.editForm.controls).forEach(key => {
+    Object.keys(this.editForm.controls).forEach((key) => {
       this.editForm.get(key)?.markAsTouched();
     });
   }
@@ -628,7 +748,7 @@ export class EditMessageComponent implements OnInit, OnDestroy {
       severity: 'success',
       summary: 'Success',
       detail: message,
-      life: 5000
+      life: 5000,
     });
   }
 
@@ -637,7 +757,7 @@ export class EditMessageComponent implements OnInit, OnDestroy {
       severity: 'error',
       summary: 'Error',
       detail: message,
-      life: 5000
+      life: 5000,
     });
   }
 
@@ -646,7 +766,7 @@ export class EditMessageComponent implements OnInit, OnDestroy {
       severity: 'warn',
       summary: 'Warning',
       detail: message,
-      life: 5000
+      life: 5000,
     });
   }
 
@@ -655,7 +775,7 @@ export class EditMessageComponent implements OnInit, OnDestroy {
       severity: 'info',
       summary: 'Info',
       detail: message,
-      life: 5000
+      life: 5000,
     });
   }
   //#endregion

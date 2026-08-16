@@ -10,9 +10,15 @@ import { ButtonModule } from 'primeng/button';
 @Component({
   selector: 'app-product-dropdown',
   standalone: true,
-  imports: [CommonModule, FormsModule, ImportsModule, DropdownModule, ButtonModule],
+  imports: [
+    CommonModule,
+    FormsModule,
+    ImportsModule,
+    DropdownModule,
+    ButtonModule,
+  ],
   templateUrl: './product-dropdown.component.html',
-  styleUrls: ['./product-dropdown.component.css']
+  styleUrls: ['./product-dropdown.component.css'],
 })
 export class ProductDropdownComponent implements OnInit {
   products: any[] = [];
@@ -23,7 +29,7 @@ export class ProductDropdownComponent implements OnInit {
   totalCount = 0;
   loading = false;
   searchTerm = '';
-  Math = Math; 
+  Math = Math;
 
   constructor(private productService: ProductService) {}
 
@@ -45,22 +51,22 @@ export class ProductDropdownComponent implements OnInit {
     const params: SearchParams = {
       pageNumber: this.pageNumber,
       pageSize: this.pageSize,
-      searchTerm: this.searchTerm
+      searchTerm: this.searchTerm,
     };
 
     this.productService.getProductsPaged(params).subscribe({
-      next: res => {
+      next: (res) => {
         this.products = res.items;
-        console.log("loaded produts ->",this.products)
+        console.log('loaded produts ->', this.products);
         this.totalCount = res.totalCount;
         this.loading = false;
       },
-      error: () => this.loading = false
+      error: () => (this.loading = false),
     });
   }
 
   loadNext() {
-    if ((this.pageNumber * this.pageSize) >= this.totalCount) return;
+    if (this.pageNumber * this.pageSize >= this.totalCount) return;
     this.pageNumber++;
     this.loadProducts();
   }

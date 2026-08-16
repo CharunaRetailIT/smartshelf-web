@@ -1,12 +1,24 @@
 import { Component, Inject, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import {
+  FormBuilder,
+  FormGroup,
+  ReactiveFormsModule,
+  Validators,
+} from '@angular/forms';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 
 import { UserService } from '../../../core/services/user.service';
-import { CreateUserDto, Department, Role } from '../../../core/interfaces/user.interface';
-import { SnackbarData, CustomSnackbarComponent } from '../../../shared/components/alert/custom-snackbar.component';
+import {
+  CreateUserDto,
+  Department,
+  Role,
+} from '../../../core/interfaces/user.interface';
+import {
+  SnackbarData,
+  CustomSnackbarComponent,
+} from '../../../shared/components/alert/custom-snackbar.component';
 import { MessageService } from 'primeng/api';
 
 @Component({
@@ -14,10 +26,9 @@ import { MessageService } from 'primeng/api';
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule],
   templateUrl: './create-user.component.html',
-  styleUrl: './create-user.component.css'
+  styleUrl: './create-user.component.css',
 })
 export class CreateUserComponent implements OnInit {
-
   //#region Properties
   userForm: FormGroup;
   departments = signal<Department[]>([]);
@@ -33,7 +44,7 @@ export class CreateUserComponent implements OnInit {
     private messageService: MessageService,
     private snackBar: MatSnackBar,
     public dialogRef: MatDialogRef<CreateUserComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: any
+    @Inject(MAT_DIALOG_DATA) public data: any,
   ) {
     this.userForm = this.fb.group({
       employeeId: ['', [Validators.required]],
@@ -42,7 +53,7 @@ export class CreateUserComponent implements OnInit {
       email: ['', [Validators.required, Validators.email]],
       password: ['', [Validators.required, Validators.minLength(6)]],
       department: [''],
-      roleId: ['', [Validators.required]]
+      roleId: ['', [Validators.required]],
     });
   }
   //#endregion
@@ -61,7 +72,7 @@ export class CreateUserComponent implements OnInit {
       error: (error) => {
         console.error('Error loading departments:', error);
         this.showError('Error loading departments');
-      }
+      },
     });
   }
 
@@ -71,7 +82,7 @@ export class CreateUserComponent implements OnInit {
       error: (error) => {
         console.error('Error loading roles:', error);
         this.showError('Error loading roles');
-      }
+      },
     });
   }
   //#endregion
@@ -99,13 +110,13 @@ export class CreateUserComponent implements OnInit {
         email: formValue.email,
         password: formValue.password,
         department: formValue.department || 0,
-        roleId: formValue.roleId
+        roleId: formValue.roleId,
       };
       console.log('Creating user with data:', createUserDto);
 
       this.userService.createUser(createUserDto).subscribe({
         next: () => this.handleSuccess('User created successfully'),
-        error: (error) => this.handleError(error, 'Failed to create user')
+        error: (error) => this.handleError(error, 'Failed to create user'),
       });
     }
   }
@@ -144,7 +155,7 @@ export class CreateUserComponent implements OnInit {
       severity: 'success',
       summary: 'Success',
       detail: message,
-      life: 5000
+      life: 5000,
     });
   }
 
@@ -153,7 +164,7 @@ export class CreateUserComponent implements OnInit {
       severity: 'error',
       summary: 'Error',
       detail: message,
-      life: 5000
+      life: 5000,
     });
   }
 
@@ -162,7 +173,7 @@ export class CreateUserComponent implements OnInit {
       severity: 'warn',
       summary: 'Warning',
       detail: message,
-      life: 5000
+      life: 5000,
     });
   }
 
@@ -171,7 +182,7 @@ export class CreateUserComponent implements OnInit {
       severity: 'info',
       summary: 'Info',
       detail: message,
-      life: 5000
+      life: 5000,
     });
   }
   // private showSuccess(message: string): void {

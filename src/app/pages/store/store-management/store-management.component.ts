@@ -1,37 +1,56 @@
 // store-management.component.ts
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
-import { MatTableDataSource, MatTableModule } from '@angular/material/table';
-import { MatPaginator, MatPaginatorModule, PageEvent } from '@angular/material/paginator';
+import {
+  FormBuilder,
+  FormGroup,
+  FormsModule,
+  ReactiveFormsModule,
+  Validators,
+} from '@angular/forms';
+import { TableModule, TableLazyLoadEvent } from 'primeng/table';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { StoreService } from '../../../core/services/store.service';
 import { finalize, debounceTime, distinctUntilChanged } from 'rxjs/operators';
 import { Subject } from 'rxjs';
-import { Store, StoreFilterParams, StoreSyncRequest, StoreSyncResult } from '../../../core/interfaces/store.interface';
+import {
+  Store,
+  StoreFilterParams,
+  StoreSyncRequest,
+  StoreSyncResult,
+} from '../../../core/interfaces/store.interface';
 import { CommonModule } from '@angular/common';
-import { SnackbarData, CustomSnackbarComponent } from '../../../shared/components/alert/custom-snackbar.component';
+import {
+  SnackbarData,
+  CustomSnackbarComponent,
+} from '../../../shared/components/alert/custom-snackbar.component';
 import { StoreModalComponent } from '../store-modal/store-modal.component';
 import { StoreSyncComponent } from '../store-sync/store-sync.component';
 import { DeleteConfirmationComponent } from '../../../shared/components/dialog/delete-confirmation/delete-confirmation.component';
 import { ConfirmationDialogComponent } from '../../../shared/components/dialog/confirmation-dialog/confirmation-dialog.component';
 import { AuthService } from '../../../core/services/auth.service';
 import { MessageService } from 'primeng/api';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-store-management',
   standalone: true,
-  imports: [CommonModule, FormsModule, ReactiveFormsModule, MatTableModule, MatPaginatorModule],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, TableModule],
   templateUrl: './store-management.component.html',
-  styleUrls: ['./store-management.component.css']
+  styleUrls: ['./store-management.component.css'],
 })
 export class StoreManagementComponent implements OnInit {
-  @ViewChild(MatPaginator) paginator!: MatPaginator;
-
   // Data
   stores: Store[] = [];
-  dataSource = new MatTableDataSource<Store>([]);
-  displayedColumns: string[] = ['store', 'status', 'devices', 'contact', 'created', 'actions'];
+  dataSource: Store[] = [];
+  displayedColumns: string[] = [
+    'store',
+    'status',
+    'devices',
+    'contact',
+    'created',
+    'actions',
+  ];
 
   // Loading states
   loading = false;
@@ -68,23 +87,24 @@ export class StoreManagementComponent implements OnInit {
     public auth: AuthService,
     private messageService: MessageService,
     private dialog: MatDialog,
-    private snackBar: MatSnackBar
-  ) { }
+    private snackBar: MatSnackBar,
+    private router: Router,
+  ) {}
 
   ngOnInit(): void {
     this.getCurrentUser();
     this.initForms();
-    this.loadStores();
+    // The grid is lazy, so its own initial onLazyLoad issues the first
+    // loadStores() call - calling it here as well would double the request.
     this.loadStatistics();
 
     // Setup search debounce
-    this.searchSubject.pipe(
-      debounceTime(300),
-      distinctUntilChanged()
-    ).subscribe(() => {
-      this.pageIndex = 1;
-      this.loadStores();
-    });
+    this.searchSubject
+      .pipe(debounceTime(300), distinctUntilChanged())
+      .subscribe(() => {
+        this.pageIndex = 1;
+        this.loadStores();
+      });
   }
 
   getCurrentUser() {
@@ -102,7 +122,7 @@ export class StoreManagementComponent implements OnInit {
       status: [''],
       syncStatus: [''],
       createdFrom: [null],
-      createdTo: [null]
+      createdTo: [null],
     });
   }
 
@@ -114,23 +134,26 @@ export class StoreManagementComponent implements OnInit {
       pageSize: this.pageSize,
       searchTerm: this.searchTerm,
       isActive: this.statusFilter ? JSON.parse(this.statusFilter) : undefined,
-      isSynced: this.syncStatusFilter ? JSON.parse(this.syncStatusFilter) : undefined,
+      isSynced: this.syncStatusFilter
+        ? JSON.parse(this.syncStatusFilter)
+        : undefined,
       createdFrom: this.createdFrom,
-      createdTo: this.createdTo
+      createdTo: this.createdTo,
     };
 
-    this.storeService.getStores(filters)
-      .pipe(finalize(() => this.loading = false))
+    this.storeService
+      .getStores(filters)
+      .pipe(finalize(() => (this.loading = false)))
       .subscribe({
         next: (response) => {
           this.stores = response.items;
-          this.dataSource.data = this.stores;
+          this.dataSource = this.stores;
           this.total = response.totalCount;
         },
         error: (error) => {
           this.showError('Failed to load stores');
           console.error('Error loading stores:', error);
-        }
+        },
       });
   }
 
@@ -138,17 +161,20 @@ export class StoreManagementComponent implements OnInit {
     this.storeService.getStoreStatistics().subscribe({
       next: (stats) => {
         this.statistics = stats;
-        console.log("stats", stats);
+        console.log('stats', stats);
         this.calculateTotalDevices();
       },
       error: (error) => {
         console.error('Error loading statistics:', error);
-      }
+      },
     });
   }
 
   calculateTotalDevices(): void {
-    this.totalDeviceCount = this.stores.reduce((total, store) => total + (store.deviceCount || 0), 0);
+    this.totalDeviceCount = this.stores.reduce(
+      (total, store) => total + (store.deviceCount || 0),
+      0,
+    );
   }
 
   onSearchChange(): void {
@@ -174,9 +200,15 @@ export class StoreManagementComponent implements OnInit {
     this.loadStores();
   }
 
-  onPageChange(event: PageEvent): void {
-    this.pageIndex = event.pageIndex + 1;
-    this.pageSize = event.pageSize;
+  /**
+   * The grid asks for a page. `first` is a row offset, so it converts back to
+   * the 1-based page number the API expects - the same arithmetic the Material
+   * paginator's `pageIndex + 1` used to do.
+   */
+  onLazyLoad(event: TableLazyLoadEvent): void {
+    const rows = event.rows ?? this.pageSize;
+    this.pageSize = rows;
+    this.pageIndex = Math.floor((event.first ?? 0) / rows) + 1;
     this.loadStores();
   }
 
@@ -185,12 +217,14 @@ export class StoreManagementComponent implements OnInit {
     const dialogRef = this.dialog.open(StoreModalComponent, {
       //width: '800px',
       maxHeight: '90vh',
-      data: { isEdit: false }
+      data: { isEdit: false },
     });
 
-    dialogRef.afterClosed().subscribe(result => {
+    dialogRef.afterClosed().subscribe((result) => {
       if (result?.success) {
-        this.showSuccess(`Store ${result.isEdit ? 'updated' : 'created'} successfully`);
+        this.showSuccess(
+          `Store ${result.isEdit ? 'updated' : 'created'} successfully`,
+        );
         this.loadStores();
         this.loadStatistics();
       }
@@ -202,10 +236,10 @@ export class StoreManagementComponent implements OnInit {
     const dialogRef = this.dialog.open(StoreModalComponent, {
       //width: '800px',
       maxHeight: '90vh',
-      data: { store: store, isEdit: true }
+      data: { store: store, isEdit: true },
     });
 
-    dialogRef.afterClosed().subscribe(result => {
+    dialogRef.afterClosed().subscribe((result) => {
       if (result?.success) {
         this.showSuccess('Store updated successfully');
         this.loadStores();
@@ -216,18 +250,20 @@ export class StoreManagementComponent implements OnInit {
 
   // Open sync dialog
   openSyncModal(): void {
-    const pendingSyncStores = this.stores.filter(s => !s.isSynced);
+    const pendingSyncStores = this.stores.filter((s) => !s.isSynced);
 
     const dialogRef = this.dialog.open(StoreSyncComponent, {
       // width: '800px',
       maxHeight: '90vh',
-      data: { stores: pendingSyncStores }
+      data: { stores: pendingSyncStores },
     });
 
-    dialogRef.afterClosed().subscribe(result => {
+    dialogRef.afterClosed().subscribe((result) => {
       if (result?.success) {
         if (result.hasErrors) {
-          this.showWarning(`Sync completed with ${result.data.failedCount} errors`);
+          this.showWarning(
+            `Sync completed with ${result.data.failedCount} errors`,
+          );
         } else {
           this.showSuccess('Sync completed successfully!');
         }
@@ -239,25 +275,24 @@ export class StoreManagementComponent implements OnInit {
 
   // Sync single store
   syncSingleStore(store: Store): void {
-    const dialogRef = this.dialog.open(ConfirmationDialogComponent
-      , {
-        width: '400px',
-        data: {
-          title: 'Sync Store',
-          message: `Are you sure you want to sync store "${store.storeName}"?`,
-          confirmText: 'Sync',
-          cancelText: 'Cancel',
-          confirmColor: 'primary'
-        },
-        panelClass: ['rounded-lg'],
-        disableClose: true
-      });
+    const dialogRef = this.dialog.open(ConfirmationDialogComponent, {
+      width: '400px',
+      data: {
+        title: 'Sync Store',
+        message: `Are you sure you want to sync store "${store.storeName}"?`,
+        confirmText: 'Sync',
+        cancelText: 'Cancel',
+        confirmColor: 'primary',
+      },
+      panelClass: ['rounded-lg'],
+      disableClose: true,
+    });
 
-    dialogRef.afterClosed().subscribe(result => {
+    dialogRef.afterClosed().subscribe((result) => {
       if (result) {
         const syncRequest: StoreSyncRequest = {
           syncToCloud: true,
-          storeIds: [store.id]
+          storeIds: [store.id],
         };
 
         this.storeService.syncStores(syncRequest).subscribe({
@@ -265,13 +300,15 @@ export class StoreManagementComponent implements OnInit {
             if (response.failedCount === 0) {
               this.showSuccess('Store synced successfully');
             } else {
-              this.showWarning(`Sync completed with ${response.failedCount} errors`);
+              this.showWarning(
+                `Sync completed with ${response.failedCount} errors`,
+              );
             }
             this.loadStores();
           },
           error: () => {
             this.showError('Failed to sync store');
-          }
+          },
         });
       }
     });
@@ -292,13 +329,13 @@ export class StoreManagementComponent implements OnInit {
         message: message,
         confirmText: actionCapitalized,
         cancelText: 'Cancel',
-        confirmColor: store.isActive ? 'warn' : 'primary'
+        confirmColor: store.isActive ? 'warn' : 'primary',
       },
       panelClass: ['rounded-lg'],
-      disableClose: true
+      disableClose: true,
     });
 
-    dialogRef.afterClosed().subscribe(result => {
+    dialogRef.afterClosed().subscribe((result) => {
       if (result) {
         const updatedStore = { ...store, isActive: !store.isActive };
         this.storeService.updateStore(store.id, updatedStore).subscribe({
@@ -309,22 +346,22 @@ export class StoreManagementComponent implements OnInit {
           },
           error: (error) => {
             this.showError(`Failed to ${action} store`);
-          }
+          },
         });
       }
     });
   }
 
-  viewStoreDetails(store: Store): void {
-    // Navigate to store details page
-    console.log('View store details:', store);
-    // this.router.navigate(['/stores', store.id]);
-  }
-
+  /**
+   * Opens Device Management. The store id is passed as a query param so the
+   * link carries the user's intent, but note that page scopes itself to the
+   * current default store rather than reading the param, so it will show that
+   * store's devices - see the note in the handover.
+   */
   viewStoreDevices(store: Store): void {
-    // Navigate to devices page for this store
-    console.log('View store devices:', store);
-    // this.router.navigate(['/devices'], { queryParams: { storeId: store.id } });
+    this.router.navigate(['/device-management'], {
+      queryParams: { storeId: store.id },
+    });
   }
 
   //#region Snackbar Methods
@@ -333,7 +370,7 @@ export class StoreManagementComponent implements OnInit {
       severity: 'success',
       summary: 'Success',
       detail: message,
-      life: 5000
+      life: 5000,
     });
   }
 
@@ -342,7 +379,7 @@ export class StoreManagementComponent implements OnInit {
       severity: 'error',
       summary: 'Error',
       detail: message,
-      life: 5000
+      life: 5000,
     });
   }
 
@@ -351,7 +388,7 @@ export class StoreManagementComponent implements OnInit {
       severity: 'warn',
       summary: 'Warning',
       detail: message,
-      life: 5000
+      life: 5000,
     });
   }
 
@@ -360,7 +397,7 @@ export class StoreManagementComponent implements OnInit {
       severity: 'info',
       summary: 'Info',
       detail: message,
-      life: 5000
+      life: 5000,
     });
   }
   // private showSuccess(message: string): void {
@@ -416,28 +453,40 @@ export class StoreManagementComponent implements OnInit {
 
   getSyncStatusColor(syncStatus: string): string {
     switch (syncStatus) {
-      case 'success': return 'border-green-200 text-green-800 bg-green-50';
-      case 'pending': return 'border-yellow-200 text-yellow-800 bg-yellow-50';
-      case 'failed': return 'border-red-200 text-red-800 bg-red-50';
-      default: return 'border-gray-200 text-gray-800 bg-gray-50';
+      case 'success':
+        return 'border-green-200 text-green-800 bg-green-50';
+      case 'pending':
+        return 'border-yellow-200 text-yellow-800 bg-yellow-50';
+      case 'failed':
+        return 'border-red-200 text-red-800 bg-red-50';
+      default:
+        return 'border-gray-200 text-gray-800 bg-gray-50';
     }
   }
 
   getSyncStatusIcon(syncStatus: string): string {
     switch (syncStatus) {
-      case 'success': return 'fa-check-circle text-green-400';
-      case 'pending': return 'fa-clock text-yellow-400';
-      case 'failed': return 'fa-times-circle text-red-400';
-      default: return 'fa-question-circle text-gray-400';
+      case 'success':
+        return 'fa-check-circle text-green-400';
+      case 'pending':
+        return 'fa-clock text-yellow-400';
+      case 'failed':
+        return 'fa-times-circle text-red-400';
+      default:
+        return 'fa-question-circle text-gray-400';
     }
   }
 
   getSyncStatusLabel(syncStatus: string): string {
     switch (syncStatus) {
-      case 'success': return 'Synced';
-      case 'pending': return 'Pending Sync';
-      case 'failed': return 'Sync Failed';
-      default: return 'Not Required';
+      case 'success':
+        return 'Synced';
+      case 'pending':
+        return 'Pending Sync';
+      case 'failed':
+        return 'Sync Failed';
+      default:
+        return 'Not Required';
     }
   }
 }

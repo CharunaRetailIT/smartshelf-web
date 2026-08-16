@@ -1,0 +1,336 @@
+/* =============================================================================
+   Buttons
+   =============================================================================
+
+   The application has two kinds of button: PrimeNG's `p-button` and plain
+   `<button>` elements styled with Tailwind utilities. Both are kept - nothing
+   is migrated - but they are given the same metrics so a toolbar mixing the
+   two reads as one control strip.
+
+   Colour is deliberately left alone. A Tailwind button keeps its own
+   `bg-*` / `text-*` utilities; a PrimeNG button keeps its severity. This file
+   only decides size, shape, weight, spacing and interaction states.
+
+   Roles
+     .ds-btn            base metrics (height, padding, radius, type)
+     .ds-btn--primary   Save / Create / Submit / Confirm
+     .ds-btn--secondary Cancel / Back / Close / Reset
+     .ds-btn--tertiary  low-emphasis inline actions
+     .ds-btn-icon       square icon-only action (Edit / Delete / View / More)
+     .ds-btn--sm        dense toolbars and table rows
+     .ds-btn--lg        when the button sits beside a 40px form control
+   ========================================================================== */
+
+/* -----------------------------------------------------------------------------
+   1. Shared base for hand-rolled buttons
+   -------------------------------------------------------------------------- */
+
+.ds-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--ds-button-gap);
+  height: var(--ds-button-height);
+  min-height: var(--ds-button-height);
+  padding-block: 0;
+  padding-inline: var(--ds-button-padding-x);
+  border-radius: var(--ds-radius);
+  font-size: var(--ds-button-font);
+  font-weight: var(--ds-button-weight);
+  line-height: 1;
+  white-space: nowrap;
+  cursor: pointer;
+  transition:
+    background-color var(--ds-transition),
+    border-color var(--ds-transition),
+    color var(--ds-transition),
+    box-shadow var(--ds-transition);
+}
+
+.ds-btn--sm {
+  height: var(--ds-button-height-sm);
+  min-height: var(--ds-button-height-sm);
+  padding-inline: var(--ds-button-padding-x-sm);
+  font-size: var(--ds-font-xs);
+}
+
+.ds-btn--lg {
+  height: var(--ds-button-height-lg);
+  min-height: var(--ds-button-height-lg);
+}
+
+/* Full-width buttons keep their height, only the box stretches. */
+.ds-btn.w-full,
+.ds-btn.flex-1 {
+  width: 100%;
+}
+
+/* A pill corner is a deliberate choice in one place only - the sign-in /
+   sign-up segmented control - so honour it there rather than squaring a
+   segment inside a rounded track. */
+.ds-btn.rounded-full,
+.ds-btn-icon.rounded-full {
+  border-radius: var(--ds-radius-pill);
+}
+
+/* Icons inside a button are sized by the system, not by the icon font. */
+.ds-btn > i,
+.ds-btn > svg,
+.ds-btn > .pi,
+.ds-btn > .fas,
+.ds-btn > .far,
+.ds-btn > .fab {
+  font-size: var(--ds-button-icon-size);
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+/* The old markup separates icon and label with `space-x-2`; the flex `gap`
+   above already handles it, so neutralise the extra margin to keep the
+   icon/label distance identical everywhere. */
+.ds-btn > * + * {
+  margin-inline-start: 0;
+}
+
+/* -----------------------------------------------------------------------------
+   2. Roles - structure only, the palette comes from the existing utilities
+   -------------------------------------------------------------------------- */
+
+/* Primary and secondary differ in emphasis, which the template's own
+   background utilities already express. What the system adds is a consistent
+   border box so a filled and an outlined button are exactly the same height. */
+.ds-btn--primary,
+.ds-btn--secondary,
+.ds-btn--tertiary {
+  border: var(--ds-border-width) solid transparent;
+}
+
+.ds-btn--secondary {
+  border-color: var(--ds-border);
+}
+
+.ds-btn--tertiary {
+  padding-inline: var(--ds-space-3);
+  font-weight: 500;
+}
+
+/* Stacked action tile - an icon above a short label, used in grids of quick
+   actions (dashboard shortcuts, the canvas "Add Shapes" row). It is still a
+   button, so it keeps the system's radius, weight and states, but it sizes to
+   its content instead of the fixed control height: at 36px the icon was
+   clipped at the top and the label spilled out of the bottom. */
+.ds-btn--stacked {
+  flex-direction: column;
+  justify-content: center;
+  height: auto;
+  min-height: var(--ds-button-height);
+  gap: var(--ds-space-1);
+  padding-block: var(--ds-space-3);
+  line-height: 1.2;
+}
+
+.ds-btn--stacked > i,
+.ds-btn--stacked > svg {
+  font-size: 1.125rem;
+}
+
+/* -----------------------------------------------------------------------------
+   2b. Choice cards
+   -------------------------------------------------------------------------- */
+
+/* A `<button>` that is really a selectable tile - an icon, a title and a line
+   of help text stacked vertically (the "Message Type" picker, for example).
+   It is not a control, so it must not inherit the 36px control height; it
+   sizes to its content and only borrows the system's radius and transition.
+   The selected/idle colours stay with the template's own utilities. */
+.ds-choice-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--ds-space-3);
+  width: 100%;
+  height: auto;
+  min-height: 0;
+  padding: var(--ds-space-4);
+  border-radius: var(--ds-radius-lg);
+  text-align: center;
+  cursor: pointer;
+  transition:
+    border-color var(--ds-transition),
+    background-color var(--ds-transition),
+    box-shadow var(--ds-transition);
+}
+
+.ds-choice-card__title {
+  font-size: var(--ds-font-body);
+  font-weight: 600;
+  line-height: 1.3;
+  margin: 0;
+}
+
+.ds-choice-card__desc {
+  font-size: var(--ds-font-xs);
+  color: var(--ds-text-muted);
+  line-height: 1.3;
+  margin: 0;
+}
+
+.ds-choice-card:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px var(--ds-focus-ring);
+}
+
+/* Safety net: if stacked, multi-line content ever ends up in a `.ds-btn`, let
+   it size to its content instead of overflowing the fixed control height.
+   `.ds-btn--stacked` and `.ds-choice-card` are the intended ways to express
+   this - these rules just stop the failure being a visual break.
+
+   `.ds-btn.flex-col` matters as much as the `:has()` cases: the column can be
+   declared on the button itself rather than on a child, and a net that only
+   looked at descendants missed every button written that way. */
+.ds-btn.flex-col,
+.ds-btn:has(.flex-col),
+.ds-btn:has(h3),
+.ds-btn:has(h4) {
+  height: auto;
+  min-height: var(--ds-button-height);
+  padding-block: var(--ds-space-2);
+}
+
+/* Square icon-only action button. */
+.ds-btn-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--ds-icon-button-size);
+  height: var(--ds-icon-button-size);
+  padding: 0;
+  border-radius: var(--ds-radius);
+  cursor: pointer;
+  transition:
+    background-color var(--ds-transition),
+    color var(--ds-transition);
+}
+
+.ds-btn-icon > i,
+.ds-btn-icon > svg {
+  font-size: var(--ds-button-icon-size);
+  line-height: 1;
+}
+
+.ds-btn-icon--sm {
+  width: 1.75rem;
+  height: 1.75rem;
+}
+
+/* The `display` values above are unlayered, so they would otherwise win over
+   Tailwind's `hidden` and force a hidden control back onto the screen. Nothing
+   in the app relies on that today (visibility is done with *ngIf), but the
+   failure would be silent and confusing, so close it off explicitly. */
+.ds-btn.hidden,
+.ds-btn-icon.hidden,
+.ds-choice-card.hidden,
+.ds-btn-group.hidden {
+  display: none;
+}
+
+/* Groups of actions - table action columns, toolbars, dialog footers. */
+.ds-btn-group {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--ds-space-2);
+}
+
+.ds-btn-group--tight {
+  gap: var(--ds-space-1);
+}
+
+/* -----------------------------------------------------------------------------
+   3. States - identical for both button families
+   -------------------------------------------------------------------------- */
+
+.ds-btn:disabled,
+.ds-btn-icon:disabled,
+.p-button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.ds-btn:focus-visible,
+.ds-btn-icon:focus-visible,
+.p-button:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px var(--ds-focus-ring);
+}
+
+.ds-btn:active:not(:disabled),
+.ds-btn-icon:active:not(:disabled) {
+  transform: none;
+}
+
+/* -----------------------------------------------------------------------------
+   4. PrimeNG buttons
+   -------------------------------------------------------------------------- */
+
+/* Padding, radius, gap and label weight come from the preset. Height is pinned
+   here because PrimeNG derives it from padding and line-height, which drifts
+   between a label-only, an icon-only and an icon+label button. */
+.p-button {
+  height: var(--ds-button-height);
+  min-height: var(--ds-button-height);
+  font-size: var(--ds-button-font);
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.p-button.p-button-sm {
+  height: var(--ds-button-height-sm);
+  min-height: var(--ds-button-height-sm);
+}
+
+.p-button.p-button-lg {
+  height: var(--ds-button-height-lg);
+  min-height: var(--ds-button-height-lg);
+}
+
+/* Icon-only stays square at every size. */
+.p-button.p-button-icon-only {
+  width: var(--ds-icon-button-size);
+  min-width: var(--ds-icon-button-size);
+  padding-inline: 0;
+}
+
+.p-button.p-button-icon-only.p-button-sm {
+  width: 1.75rem;
+  min-width: 1.75rem;
+}
+
+.p-button.p-button-icon-only.p-button-lg {
+  width: var(--ds-button-height-lg);
+  min-width: var(--ds-button-height-lg);
+}
+
+.p-button .p-button-icon {
+  font-size: var(--ds-button-icon-size);
+  line-height: 1;
+}
+
+/* Rounded ("pill") buttons are a consumer pattern; keep the corner soft but
+   stop it turning into a capsule. */
+.p-button.p-button-rounded {
+  border-radius: var(--ds-radius-lg);
+}
+
+.p-button.p-button-text,
+.p-button.p-button-link {
+  font-weight: 500;
+}
+
+/* A button that sits in the same row as a 40px form control matches it. */
+.ds-field-actions .p-button,
+.ds-field-actions .ds-btn {
+  height: var(--ds-button-height-lg);
+  min-height: var(--ds-button-height-lg);
+}

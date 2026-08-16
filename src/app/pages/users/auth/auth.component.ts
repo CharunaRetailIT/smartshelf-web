@@ -1,11 +1,19 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit, signal } from '@angular/core';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import {
+  FormBuilder,
+  FormGroup,
+  ReactiveFormsModule,
+  Validators,
+} from '@angular/forms';
 import { AuthService } from '../../../core/services/auth.service';
 import { Router } from '@angular/router';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { RegisterRequest } from '../../../core/interfaces/auth.interface';
-import { SnackbarData, CustomSnackbarComponent } from '../../../shared/components/alert/custom-snackbar.component';
+import {
+  SnackbarData,
+  CustomSnackbarComponent,
+} from '../../../shared/components/alert/custom-snackbar.component';
 import { MessageService } from 'primeng/api';
 import { ImportsModule } from '../../../imports/imports';
 import { StoreService } from '../../../core/services/store.service';
@@ -16,7 +24,7 @@ import { StoreLookup } from '../../../core/interfaces/store.interface';
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule, ImportsModule],
   templateUrl: './auth.component.html',
-  styleUrl: './auth.component.css'
+  styleUrl: './auth.component.css',
 })
 export class AuthComponent implements OnInit {
   // #region State
@@ -39,7 +47,7 @@ export class AuthComponent implements OnInit {
     private storeService: StoreService,
     private messageService: MessageService,
     private router: Router,
-    private snackBar: MatSnackBar
+    private snackBar: MatSnackBar,
   ) {
     this.signInForm = this.fb.group({
       employeeId: ['', Validators.required],
@@ -59,9 +67,9 @@ export class AuthComponent implements OnInit {
         storeId: [null, Validators.required],
         password: ['', [Validators.required, Validators.minLength(8)]],
         confirmPassword: ['', Validators.required],
-        agreeToTerms: [false, Validators.requiredTrue]
+        agreeToTerms: [false, Validators.requiredTrue],
       },
-      { validators: this.passwordMatchValidator }
+      { validators: this.passwordMatchValidator },
     );
   }
   // #endregion
@@ -82,7 +90,7 @@ export class AuthComponent implements OnInit {
       error: () => {
         this.storesLoading.set(false);
         this.showError('Failed to load stores. Please refresh and try again.');
-      }
+      },
     });
   }
   // #endregion
@@ -95,7 +103,7 @@ export class AuthComponent implements OnInit {
       this.signInForm.patchValue({
         employeeId: savedCredentials.employeeId,
         password: savedCredentials.password,
-        rememberMe: true
+        rememberMe: true,
       });
       this.rememberMe.set(true);
     }
@@ -106,14 +114,20 @@ export class AuthComponent implements OnInit {
       const credentials = {
         employeeId,
         password: this.encryptPassword(password),
-        timestamp: new Date().getTime()
+        timestamp: new Date().getTime(),
       };
 
-      localStorage.setItem('rememberedCredentials', JSON.stringify(credentials));
+      localStorage.setItem(
+        'rememberedCredentials',
+        JSON.stringify(credentials),
+      );
     }
   }
 
-  private getSavedCredentials(): { employeeId: string; password: string } | null {
+  private getSavedCredentials(): {
+    employeeId: string;
+    password: string;
+  } | null {
     try {
       const saved = localStorage.getItem('rememberedCredentials');
 
@@ -132,7 +146,7 @@ export class AuthComponent implements OnInit {
 
       return {
         employeeId: credentials.employeeId,
-        password: this.decryptPassword(credentials.password)
+        password: this.decryptPassword(credentials.password),
       };
     } catch (error) {
       console.error('Error loading saved credentials:', error);
@@ -196,7 +210,7 @@ export class AuthComponent implements OnInit {
 
       const credentials = {
         userName: this.signInForm.value.employeeId,
-        password: this.signInForm.value.password
+        password: this.signInForm.value.password,
       };
 
       // // Save credentials if "Remember Me" is checked
@@ -216,7 +230,7 @@ export class AuthComponent implements OnInit {
           console.error('❌ Login failed:', err);
           this.isLoading.set(false);
           this.showError('Invalid Credentials!');
-        }
+        },
       });
     }
   }
@@ -234,7 +248,7 @@ export class AuthComponent implements OnInit {
         storeId: formValue.storeId,
         address1: formValue.address1,
         address2: formValue.address2,
-        address3: formValue.address3
+        address3: formValue.address3,
       };
 
       this.authService.register(createUserDto).subscribe({
@@ -246,7 +260,7 @@ export class AuthComponent implements OnInit {
         error: (err) => {
           console.error('❌ Registration failed', err);
           this.showError('Registration failed!,RIT Please try again.');
-        }
+        },
       });
     }
   }
@@ -257,7 +271,11 @@ export class AuthComponent implements OnInit {
     const password = form.get('password');
     const confirmPassword = form.get('confirmPassword');
 
-    if (password && confirmPassword && password.value !== confirmPassword.value) {
+    if (
+      password &&
+      confirmPassword &&
+      password.value !== confirmPassword.value
+    ) {
       confirmPassword.setErrors({ mismatch: true });
       return { mismatch: true };
     }
@@ -279,7 +297,7 @@ export class AuthComponent implements OnInit {
       severity: 'success',
       summary: 'Success',
       detail: message,
-      life: 5000
+      life: 5000,
     });
   }
 
@@ -288,7 +306,7 @@ export class AuthComponent implements OnInit {
       severity: 'error',
       summary: 'Error',
       detail: message,
-      life: 5000
+      life: 5000,
     });
   }
 
@@ -297,7 +315,7 @@ export class AuthComponent implements OnInit {
       severity: 'warn',
       summary: 'Warning',
       detail: message,
-      life: 5000
+      life: 5000,
     });
   }
 
@@ -306,7 +324,7 @@ export class AuthComponent implements OnInit {
       severity: 'info',
       summary: 'Info',
       detail: message,
-      life: 5000
+      life: 5000,
     });
   }
   // private showSuccess(message: string): void {

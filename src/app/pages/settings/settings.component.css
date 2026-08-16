@@ -1,0 +1,35 @@
+/* Settings - component styles
+   Layout, spacing, typography and table density all come from the global
+   design system; only the two code chips are specific to this page. */
+
+/* The source tag is a two-word label; let its column size to the tag rather
+   than squeezing it onto two lines. */
+.settings-source,
+.settings-source .p-tag {
+  white-space: nowrap;
+  width: 1%;
+}
+
+.settings-key {
+  display: inline-block;
+  padding: 2px var(--ds-space-2);
+  border-radius: var(--ds-radius-xs);
+  background: var(--ds-surface-sunken);
+  border: var(--ds-border-width) solid var(--ds-border);
+  font-family:
+    ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+  font-size: var(--ds-font-xs);
+  color: var(--ds-text);
+  white-space: nowrap;
+}
+
+/* `overflow-wrap` rather than `word-break`: it only breaks when a token
+   genuinely cannot fit, so `ToString("0.00")` stays intact instead of being
+   split mid-literal. */
+.settings-expression {
+  font-family:
+    ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+  font-size: var(--ds-font-xs);
+  color: var(--ds-text-muted);
+  overflow-wrap: break-word;
+}

@@ -5,7 +5,18 @@
     <title>Smart ESL</title>
     <base href="/" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <link rel="icon" type="image/png" href="favicon.png" />
+    <!-- SVG first so modern browsers get the crisp, scalable icon; the small
+         PNG is the fallback for anything that cannot use it. -->
+    <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+    <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png" />
+    <!-- iOS home screen. Must be PNG (SVG is not accepted) and is full-bleed:
+         iOS applies its own rounded mask, so baking our corners in would
+         double-round it. -->
+    <link
+      rel="apple-touch-icon"
+      sizes="180x180"
+      href="apple-touch-icon.png"
+    />
     <link
       href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500&display=swap"
       rel="stylesheet"

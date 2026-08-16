@@ -1,0 +1,145 @@
+/* =============================================================================
+   Design tokens
+   =============================================================================
+
+   One place that decides the *shape* of the application: control heights,
+   spacing rhythm, radii, borders, type scale and table density.
+
+   Colours are deliberately NOT redefined here. Every colour token below is a
+   value the application already uses (the slate/neutral scale that the
+   existing pages and dialogs.css are built on) or a reference to the brand
+   variable Tailwind already generates from `@theme` in styles.css. Nothing in
+   this file introduces a new palette or repaints an existing component.
+
+   The sibling files (controls / buttons / tables / layout) consume these
+   tokens so that a change here propagates everywhere instead of being
+   re-typed per component.
+   ========================================================================== */
+
+:root {
+  /* ---------------------------------------------------------------------
+     Brand + intent colours (existing values, re-exposed as tokens)
+     --------------------------------------------------------------------- */
+  /* --color-primary is emitted by Tailwind's @theme block in styles.css. */
+  --ds-primary: var(--color-primary, #328e6e);
+  --ds-focus-ring: color-mix(in srgb, var(--ds-primary) 22%, transparent);
+
+  --ds-danger: #dc2626;
+  --ds-danger-soft: #fee2e2;
+  --ds-warn: #b45309;
+  --ds-success: #059669;
+
+  /* ---------------------------------------------------------------------
+     Surfaces, borders and text - the neutral scale already in use
+     --------------------------------------------------------------------- */
+  --ds-surface: #ffffff;
+  --ds-surface-muted: #f8fafc;
+  --ds-surface-sunken: #f1f5f9;
+  --ds-surface-hover: #f8fafc;
+  --ds-surface-disabled: #f1f5f9;
+
+  --ds-border: #e2e8f0;
+  --ds-border-strong: #cbd5e1;
+  --ds-border-width: 1px;
+
+  --ds-text: #1e293b;
+  --ds-text-muted: #64748b;
+  --ds-text-subtle: #94a3b8;
+  --ds-text-label: #334155;
+  --ds-text-disabled: #94a3b8;
+
+  /* ---------------------------------------------------------------------
+     Shape
+     --------------------------------------------------------------------- */
+  --ds-radius-xs: 4px;
+  --ds-radius: 6px; /* form controls, buttons */
+  --ds-radius-lg: 8px; /* grouped surfaces, popups */
+  --ds-radius-xl: 12px; /* cards and panels */
+  --ds-radius-pill: 9999px; /* status pills only */
+
+  --ds-shadow-xs: 0 1px 2px rgba(15, 23, 42, 0.04);
+  --ds-shadow-sm: 0 1px 3px rgba(15, 23, 42, 0.06);
+  --ds-shadow-overlay:
+    0 10px 24px -8px rgba(15, 23, 42, 0.2), 0 0 0 1px rgba(15, 23, 42, 0.04);
+
+  /* ---------------------------------------------------------------------
+     Spacing scale - 4px based. Use these instead of one-off values.
+     --------------------------------------------------------------------- */
+  --ds-space-1: 4px;
+  --ds-space-2: 8px;
+  --ds-space-3: 12px;
+  --ds-space-4: 16px;
+  --ds-space-5: 20px;
+  --ds-space-6: 24px;
+  --ds-space-8: 32px;
+
+  --ds-page-padding: 24px;
+  --ds-section-gap: 20px;
+  --ds-card-padding: 20px;
+  --ds-field-gap: 16px; /* between fields in a form grid */
+  --ds-label-gap: 6px; /* label -> control */
+  --ds-toolbar-gap: 12px;
+
+  /* ---------------------------------------------------------------------
+     Form controls
+     --------------------------------------------------------------------- */
+  --ds-control-height: 40px;
+  --ds-control-height-sm: 32px; /* inside tables / dense toolbars */
+  --ds-control-height-lg: 46px;
+  --ds-control-padding-x: 12px;
+  --ds-control-padding-x-sm: 10px;
+  --ds-control-font: 0.875rem; /* 14px */
+  --ds-control-font-sm: 0.8125rem; /* 13px */
+  --ds-control-min-width: 0; /* controls size to their container */
+
+  /* Dropdown overlay + option density */
+  --ds-overlay-max-height: 18rem; /* ~288px, scrolls beyond this */
+  --ds-option-padding-y: 7px;
+  --ds-option-padding-x: 12px;
+  --ds-option-font: 0.8125rem;
+  --ds-option-line-height: 1.35;
+  --ds-option-radius: 4px;
+
+  /* ---------------------------------------------------------------------
+     Buttons
+     --------------------------------------------------------------------- */
+  --ds-button-height: 36px;
+  --ds-button-height-sm: 30px;
+  --ds-button-height-lg: 40px; /* use when sitting beside a form control */
+  --ds-button-padding-x: 14px;
+  --ds-button-padding-x-sm: 10px;
+  --ds-button-font: 0.8125rem;
+  --ds-button-weight: 600;
+  --ds-button-gap: 8px;
+  --ds-button-icon-size: 0.875rem;
+  --ds-icon-button-size: 32px;
+
+  /* ---------------------------------------------------------------------
+     Tables - ERP density: compact but readable
+     --------------------------------------------------------------------- */
+  --ds-table-header-height: 40px;
+  --ds-table-row-height: 44px;
+  --ds-table-cell-padding-x: 12px;
+  --ds-table-cell-padding-y: 8px;
+  --ds-table-font: 0.8125rem;
+  --ds-table-header-font: 0.6875rem;
+  --ds-table-header-bg: #f8fafc;
+  --ds-table-row-hover: #f8fafc;
+  --ds-table-row-selected: #f1f5f9;
+
+  /* ---------------------------------------------------------------------
+     Typography scale
+     --------------------------------------------------------------------- */
+  --ds-font-page-title: 1.25rem; /* 20px */
+  --ds-font-section-title: 0.9375rem; /* 15px */
+  --ds-font-body: 0.875rem; /* 14px */
+  --ds-font-sm: 0.8125rem; /* 13px */
+  --ds-font-xs: 0.75rem; /* 12px */
+  --ds-font-label: 0.75rem; /* 12px field labels */
+  --ds-font-overline: 0.6875rem; /* 11px uppercase eyebrows */
+
+  --ds-weight-title: 700;
+  --ds-weight-label: 600;
+
+  --ds-transition: 0.15s ease;
+}

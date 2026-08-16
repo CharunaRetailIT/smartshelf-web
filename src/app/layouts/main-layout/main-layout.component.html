@@ -11,6 +11,10 @@
     <main class="page-content" [class.no-header]="!showHeader()">
       <!-- for notifications -->
       <p-toast position="top-right"></p-toast>
+      <!-- One confirmation dialog for the whole app. ConfirmationService only
+           publishes to a rendered <p-confirmDialog>; pages that called it
+           without one had their confirmations silently do nothing. -->
+      <p-confirmDialog></p-confirmDialog>
       <router-outlet></router-outlet>
     </main>
   </div>

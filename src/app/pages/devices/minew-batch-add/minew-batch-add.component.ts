@@ -21,7 +21,7 @@ import {
   BatchAddResult,
   EnhancedBatchAddResult,
   BatchWakeDevicesRequest,
-  DelayedSyncRequest
+  DelayedSyncRequest,
 } from '../../../core/interfaces/device.interface';
 import { ImportsModule } from '../../../imports/imports';
 import { FileSizePipe } from '../../../pipes/file-size.pipe';
@@ -29,14 +29,9 @@ import { FileSizePipe } from '../../../pipes/file-size.pipe';
 @Component({
   selector: 'app-minew-batch-add',
   standalone: true,
-  imports: [
-    CommonModule,
-    FormsModule,
-    ImportsModule,
-    FileSizePipe,
-  ],
+  imports: [CommonModule, FormsModule, ImportsModule, FileSizePipe],
   templateUrl: './minew-batch-add.component.html',
-  styleUrls: ['./minew-batch-add.component.css']
+  styleUrls: ['./minew-batch-add.component.css'],
 })
 export class MinewBatchAddComponent implements OnInit {
   @Output() devicesAdded = new EventEmitter<number>(); // Emit count of devices added
@@ -63,7 +58,7 @@ export class MinewBatchAddComponent implements OnInit {
 
   // Preview data
   importPreview: ImportPreview | null = null;
-  previewData: { macAddress: string, isValid: boolean, message: string }[] = [];
+  previewData: { macAddress: string; isValid: boolean; message: string }[] = [];
 
   // Processing
   isProcessing = false;
@@ -72,7 +67,12 @@ export class MinewBatchAddComponent implements OnInit {
   importResult: EnhancedBatchAddResult | null = null;
 
   // Results
-  results: { macAddress: string, success: boolean, message: string, status: string }[] = [];
+  results: {
+    macAddress: string;
+    success: boolean;
+    message: string;
+    status: string;
+  }[] = [];
 
   // Sync options
   syncAfterAdd = true;
@@ -84,15 +84,16 @@ export class MinewBatchAddComponent implements OnInit {
   localStoreName: string = '';
 
   // Process steps
-  currentStep: 'preview' | 'adding' | 'waking' | 'syncing' | 'complete' = 'preview';
+  currentStep: 'preview' | 'adding' | 'waking' | 'syncing' | 'complete' =
+    'preview';
   stepProgress = 0;
 
   constructor(
     private deviceService: DeviceService,
     private storeService: StoreService,
     private settingsService: SettingsService,
-    private messageService: MessageService
-  ) { }
+    private messageService: MessageService,
+  ) {}
 
   ngOnInit(): void {
     this.loadStores();
@@ -104,34 +105,37 @@ export class MinewBatchAddComponent implements OnInit {
   // map each local store onto its MinewStoreId. Stores that have never synced
   // have no cloud id and cannot take a batch add, so they are left out.
   loadStores(): void {
-    this.storeService.getStores({ pageNumber: 1, pageSize: 200, isActive: true }).subscribe({
-      next: (response) => {
-        this.stores = response.items
-          .filter(store => !!store.minewStoreId)
-          .map(store => ({
-            storeId: store.minewStoreId!,
-            storeName: store.storeName,
-            address: store.address,
-            active: store.isActive ? 1 : 0
-          }));
+    this.storeService
+      .getStores({ pageNumber: 1, pageSize: 200, isActive: true })
+      .subscribe({
+        next: (response) => {
+          this.stores = response.items
+            .filter((store) => !!store.minewStoreId)
+            .map((store) => ({
+              storeId: store.minewStoreId!,
+              storeName: store.storeName,
+              address: store.address,
+              active: store.isActive ? 1 : 0,
+            }));
 
-        if (this.stores.length === 0) {
-          this.showWarning(
-            'No store is synced with Minew yet. Sync a store before adding devices.');
-          return;
-        }
+          if (this.stores.length === 0) {
+            this.showWarning(
+              'No store is synced with Minew yet. Sync a store before adding devices.',
+            );
+            return;
+          }
 
-        // Preselect the user's own store when it has a cloud id.
-        const currentStore = this.settingsService.getCurrentDefaultStore();
-        const match = currentStore
-          ? this.stores.find(s => s.storeId === currentStore.minewStoreId)
-          : null;
-        this.selectedStore = (match ?? this.stores[0]).storeId;
-      },
-      error: () => {
-        this.showError('Failed to load stores');
-      }
-    });
+          // Preselect the user's own store when it has a cloud id.
+          const currentStore = this.settingsService.getCurrentDefaultStore();
+          const match = currentStore
+            ? this.stores.find((s) => s.storeId === currentStore.minewStoreId)
+            : null;
+          this.selectedStore = (match ?? this.stores[0]).storeId;
+        },
+        error: () => {
+          this.showError('Failed to load stores');
+        },
+      });
   }
 
   loadDefaultStore(): void {
@@ -184,8 +188,8 @@ export class MinewBatchAddComponent implements OnInit {
   private currentMacLines(): string[] {
     return this.macAddressesInput
       .split('\n')
-      .map(line => line.trim())
-      .filter(line => line.length > 0);
+      .map((line) => line.trim())
+      .filter((line) => line.length > 0);
   }
 
   /**
@@ -200,7 +204,7 @@ export class MinewBatchAddComponent implements OnInit {
           panelClass: 'barcode-scanner-dialog',
           autoFocus: false,
           restoreFocus: true,
-          data: { multiple: true, existing: this.currentMacLines() }
+          data: { multiple: true, existing: this.currentMacLines() },
         });
 
         ref.afterClosed().subscribe((macs?: string[]) => {
@@ -213,7 +217,8 @@ export class MinewBatchAddComponent implements OnInit {
           this.validateManualInput();
 
           this.showSuccess(
-            `Added ${macs.length} scanned device${macs.length === 1 ? '' : 's'}`);
+            `Added ${macs.length} scanned device${macs.length === 1 ? '' : 's'}`,
+          );
         });
       })
       .catch(() => this.showError('Could not load the barcode scanner'));
@@ -248,7 +253,7 @@ export class MinewBatchAddComponent implements OnInit {
       this.messageService.add({
         severity: 'info',
         summary: 'Excel File',
-        detail: 'Excel file will be processed on server'
+        detail: 'Excel file will be processed on server',
       });
       this.generatePreview([]);
     }
@@ -257,26 +262,28 @@ export class MinewBatchAddComponent implements OnInit {
   generatePreview(macAddresses: string[]): void {
     const validMacs: string[] = [];
     const invalidMacs: string[] = [];
-    const preview: { macAddress: string, isValid: boolean, message: string }[] = [];
+    const preview: { macAddress: string; isValid: boolean; message: string }[] =
+      [];
 
-    macAddresses.forEach(mac => {
+    macAddresses.forEach((mac) => {
       // Clean and validate MAC
       const cleanedMac = mac.replace(/[:-\s]/g, '').toLowerCase();
-      const isValid = cleanedMac.length === 12 && /^[0-9a-f]{12}$/.test(cleanedMac);
+      const isValid =
+        cleanedMac.length === 12 && /^[0-9a-f]{12}$/.test(cleanedMac);
 
       if (isValid) {
         validMacs.push(cleanedMac);
         preview.push({
           macAddress: cleanedMac,
           isValid: true,
-          message: 'Valid MAC address'
+          message: 'Valid MAC address',
         });
       } else {
         invalidMacs.push(mac);
         preview.push({
           macAddress: mac,
           isValid: false,
-          message: 'Invalid MAC address format (should be 12 hex characters)'
+          message: 'Invalid MAC address format (should be 12 hex characters)',
         });
       }
     });
@@ -286,7 +293,7 @@ export class MinewBatchAddComponent implements OnInit {
       totalCount: macAddresses.length,
       validCount: validMacs.length,
       invalidCount: invalidMacs.length,
-      invalidMacs: invalidMacs
+      invalidMacs: invalidMacs,
     };
 
     this.previewData = preview;
@@ -302,13 +309,18 @@ export class MinewBatchAddComponent implements OnInit {
 
     let macAddresses: string[] = [];
 
-    if (this.activeTabIndex === 0) { // Manual input
+    if (this.activeTabIndex === 0) {
+      // Manual input
       macAddresses = this.macAddressesInput
         .split('\n')
-        .map(line => line.trim())
-        .filter(line => line.length > 0);
-    } else if (this.activeTabIndex === 1 && this.uploadedFile) { // File upload
-      if (this.uploadedFile.name.endsWith('.csv') || this.uploadedFile.name.endsWith('.txt')) {
+        .map((line) => line.trim())
+        .filter((line) => line.length > 0);
+    } else if (this.activeTabIndex === 1 && this.uploadedFile) {
+      // File upload
+      if (
+        this.uploadedFile.name.endsWith('.csv') ||
+        this.uploadedFile.name.endsWith('.txt')
+      ) {
         macAddresses = this.filePreview;
       } else {
         // For Excel files, we need to upload to server
@@ -334,12 +346,14 @@ export class MinewBatchAddComponent implements OnInit {
     this.currentStep = 'adding';
 
     try {
-      const response = await this.deviceService.uploadBatchDevicesFile(
-        this.uploadedFile,
-        this.selectedStore,
-        this.deviceType,
-        1 // User ID from auth service
-      ).toPromise();
+      const response = await this.deviceService
+        .uploadBatchDevicesFile(
+          this.uploadedFile,
+          this.selectedStore,
+          this.deviceType,
+          1, // User ID from auth service
+        )
+        .toPromise();
 
       this.isProcessing = false;
 
@@ -369,10 +383,12 @@ export class MinewBatchAddComponent implements OnInit {
         storeId: this.selectedStore,
         macAddresses: macAddresses,
         type: this.deviceType,
-        userId: 1 // Get from auth service
+        userId: 1, // Get from auth service
       };
 
-      const response = await this.deviceService.batchAddDevicesToMinew(request).toPromise();
+      const response = await this.deviceService
+        .batchAddDevicesToMinew(request)
+        .toPromise();
 
       if (response?.success && response.result) {
         this.importResult = response.result;
@@ -389,10 +405,12 @@ export class MinewBatchAddComponent implements OnInit {
             : `Wake up failed: ${this.importResult.wakeUpResult.message}`;
 
           this.messageService.add({
-            severity: this.importResult.wakeUpResult.success ? 'success' : 'warn',
+            severity: this.importResult.wakeUpResult.success
+              ? 'success'
+              : 'warn',
             summary: 'Wake Up Status',
             detail: wakeMsg,
-            life: 5000
+            life: 5000,
           });
         }
 
@@ -416,16 +434,25 @@ export class MinewBatchAddComponent implements OnInit {
   processResults(): void {
     if (!this.importResult) return;
 
-    this.results = Object.entries(this.importResult.results || {}).map(([mac, message]) => {
-      const isFailedToWake = this.importResult?.failedToWakeDevices?.includes(mac) || false;
+    this.results = Object.entries(this.importResult.results || {}).map(
+      ([mac, message]) => {
+        const isFailedToWake =
+          this.importResult?.failedToWakeDevices?.includes(mac) || false;
 
-      return {
-        macAddress: mac,
-        success: message.toLowerCase() === 'success',
-        message: isFailedToWake ? 'Wake up failed - Set to maintenance status' : message,
-        status: isFailedToWake ? 'maintenance' : (message.toLowerCase() === 'success' ? 'success' : 'failed')
-      };
-    });
+        return {
+          macAddress: mac,
+          success: message.toLowerCase() === 'success',
+          message: isFailedToWake
+            ? 'Wake up failed - Set to maintenance status'
+            : message,
+          status: isFailedToWake
+            ? 'maintenance'
+            : message.toLowerCase() === 'success'
+              ? 'success'
+              : 'failed',
+        };
+      },
+    );
   }
 
   private async delayedSyncFromCloud(): Promise<void> {
@@ -438,18 +465,19 @@ export class MinewBatchAddComponent implements OnInit {
       severity: 'info',
       summary: 'Waiting for Devices',
       detail: `Waiting ${this.wakeDelaySeconds} seconds for devices to wake up...`,
-      life: 6000
+      life: 6000,
     });
 
     // Wait for devices to wake up
-    await new Promise(resolve => setTimeout(resolve, this.wakeDelaySeconds * 1000));
+    await new Promise((resolve) =>
+      setTimeout(resolve, this.wakeDelaySeconds * 1000),
+    );
 
     // Perform delayed sync
     try {
-      const response = await this.deviceService.delayedSyncAfterWake(
-        this.selectedStore,
-        this.wakeDelaySeconds
-      ).toPromise();
+      const response = await this.deviceService
+        .delayedSyncAfterWake(this.selectedStore, this.wakeDelaySeconds)
+        .toPromise();
 
       if (response?.success) {
         const syncedCount = response.result?.devicesSynced || 0;
@@ -467,7 +495,9 @@ export class MinewBatchAddComponent implements OnInit {
           this.devicesAdded.emit(syncedCount);
         }
       } else {
-        this.showWarning(response?.message || 'Failed to sync devices from cloud');
+        this.showWarning(
+          response?.message || 'Failed to sync devices from cloud',
+        );
       }
     } catch (error) {
       this.showError('Failed to sync devices from cloud');
@@ -486,7 +516,7 @@ export class MinewBatchAddComponent implements OnInit {
     }
 
     // Get all MAC addresses from results
-    const macAddresses = this.results.map(r => r.macAddress);
+    const macAddresses = this.results.map((r) => r.macAddress);
 
     this.isWakingUp = true;
 
@@ -494,16 +524,20 @@ export class MinewBatchAddComponent implements OnInit {
       const request: BatchWakeDevicesRequest = {
         storeId: this.selectedStore,
         macAddresses: macAddresses,
-        userId: 1
+        userId: 1,
       };
 
-      const response = await this.deviceService.batchWakeDevices(request).toPromise();
+      const response = await this.deviceService
+        .batchWakeDevices(request)
+        .toPromise();
 
       if (response?.success) {
-        this.showSuccess(`Successfully woke up ${response.result?.wokeCount} devices`);
+        this.showSuccess(
+          `Successfully woke up ${response.result?.wokeCount} devices`,
+        );
 
         // Update results to show maintenance status cleared
-        this.results.forEach(result => {
+        this.results.forEach((result) => {
           if (result.status === 'maintenance') {
             result.status = 'success';
             result.message = 'Woke up successfully';
@@ -526,30 +560,44 @@ export class MinewBatchAddComponent implements OnInit {
 
   getStatusSeverity(status: string): string {
     switch (status) {
-      case 'success': return 'success';
-      case 'failed': return 'danger';
-      case 'maintenance': return 'warning';
-      default: return 'info';
+      case 'success':
+        return 'success';
+      case 'failed':
+        return 'danger';
+      case 'maintenance':
+        return 'warning';
+      default:
+        return 'info';
     }
   }
 
   getStatusLabel(status: string): string {
     switch (status) {
-      case 'success': return 'Success';
-      case 'failed': return 'Failed';
-      case 'maintenance': return 'Maintenance';
-      default: return 'Unknown';
+      case 'success':
+        return 'Success';
+      case 'failed':
+        return 'Failed';
+      case 'maintenance':
+        return 'Maintenance';
+      default:
+        return 'Unknown';
     }
   }
 
   getStepIcon(step: string): string {
     switch (step) {
-      case 'preview': return 'pi-eye';
-      case 'adding': return 'pi-plus';
-      case 'waking': return 'pi-power-off';
-      case 'syncing': return 'pi-cloud-download';
-      case 'complete': return 'pi-check';
-      default: return 'pi-info-circle';
+      case 'preview':
+        return 'pi-eye';
+      case 'adding':
+        return 'pi-plus';
+      case 'waking':
+        return 'pi-power-off';
+      case 'syncing':
+        return 'pi-cloud-download';
+      case 'complete':
+        return 'pi-check';
+      default:
+        return 'pi-info-circle';
     }
   }
 
@@ -568,7 +616,7 @@ export class MinewBatchAddComponent implements OnInit {
       severity: 'success',
       summary: 'Success',
       detail: message,
-      life: 5000
+      life: 5000,
     });
   }
 
@@ -577,7 +625,7 @@ export class MinewBatchAddComponent implements OnInit {
       severity: 'error',
       summary: 'Error',
       detail: message,
-      life: 5000
+      life: 5000,
     });
   }
 
@@ -586,20 +634,21 @@ export class MinewBatchAddComponent implements OnInit {
       severity: 'warn',
       summary: 'Warning',
       detail: message,
-      life: 5000
+      life: 5000,
     });
   }
 
   getSelectedStoreName(): string {
-    const store = this.stores.find(s => s.storeId === this.selectedStore);
+    const store = this.stores.find((s) => s.storeId === this.selectedStore);
     return store?.storeName || 'Unknown Store';
   }
 
   hasMaintenanceDevices(): boolean {
-    return this.results.some(result => result.status === 'maintenance');
+    return this.results.some((result) => result.status === 'maintenance');
   }
 
   getMaintenanceCount(): number {
-    return this.results.filter(result => result.status === 'maintenance').length;
+    return this.results.filter((result) => result.status === 'maintenance')
+      .length;
   }
 }

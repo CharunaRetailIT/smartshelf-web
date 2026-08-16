@@ -1,15 +1,24 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
+import {
+  FormBuilder,
+  FormGroup,
+  FormsModule,
+  ReactiveFormsModule,
+  Validators,
+} from '@angular/forms';
 import { ImportsModule } from '../../../imports/imports';
 import { MessageService } from 'primeng/api';
 import { HttpResponseData } from '../../../core/interfaces/http-response.interface';
 import { UpdateUserDto } from '../../../core/interfaces/user.interface';
-import { SnackbarData, CustomSnackbarComponent } from '../../../shared/components/alert/custom-snackbar.component';
+import {
+  SnackbarData,
+  CustomSnackbarComponent,
+} from '../../../shared/components/alert/custom-snackbar.component';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { AuthService } from '../../../core/services/auth.service';
 import { UserService } from '../../../core/services/user.service';
-import { MinewModule } from "../../minew-integrate/minew.module";
+import { MinewModule } from '../../minew-integrate/minew.module';
 import { RouterModule } from '@angular/router';
 
 interface UserProfile {
@@ -31,9 +40,16 @@ interface UserProfile {
 @Component({
   selector: 'app-user-profile',
   standalone: true,
-  imports: [CommonModule, FormsModule, ReactiveFormsModule, ImportsModule, MinewModule, RouterModule],
+  imports: [
+    CommonModule,
+    FormsModule,
+    ReactiveFormsModule,
+    ImportsModule,
+    MinewModule,
+    RouterModule,
+  ],
   templateUrl: './user-profile.component.html',
-  styleUrls: ['./user-profile.component.css']
+  styleUrls: ['./user-profile.component.css'],
 })
 export class UserProfileComponent implements OnInit {
   profileForm: FormGroup;
@@ -49,7 +65,7 @@ export class UserProfileComponent implements OnInit {
     private userService: UserService,
     private auth: AuthService,
     private messageService: MessageService,
-    private snackBar: MatSnackBar
+    private snackBar: MatSnackBar,
   ) {
     this.profileForm = this.fb.group({
       firstName: ['', [Validators.required, Validators.maxLength(50)]],
@@ -57,7 +73,7 @@ export class UserProfileComponent implements OnInit {
       email: ['', [Validators.required, Validators.email]],
       address1: ['', Validators.maxLength(200)],
       address2: ['', Validators.maxLength(200)],
-      address3: ['', Validators.maxLength(200)]
+      address3: ['', Validators.maxLength(200)],
     });
   }
 
@@ -92,9 +108,11 @@ export class UserProfileComponent implements OnInit {
       },
       error: (error) => {
         console.error('Error loading profile:', error);
-        this.showError('Failed to load profile: ' + (error.message || 'Unknown error'));
+        this.showError(
+          'Failed to load profile: ' + (error.message || 'Unknown error'),
+        );
         this.loading = false;
-      }
+      },
     });
   }
 
@@ -106,7 +124,7 @@ export class UserProfileComponent implements OnInit {
         email: this.userProfile.email,
         address1: this.userProfile.address1 || '',
         address2: this.userProfile.address2 || '',
-        address3: this.userProfile.address3 || ''
+        address3: this.userProfile.address3 || '',
       });
       this.profileForm.disable();
     }
@@ -152,7 +170,7 @@ export class UserProfileComponent implements OnInit {
         this.showError(errorMsg);
         this.saving = false;
         console.error('Error updating profile:', error);
-      }
+      },
     });
   }
 
@@ -188,7 +206,7 @@ export class UserProfileComponent implements OnInit {
         this.showError(errorMsg);
         this.uploadingImage = false;
         console.error('Error uploading image:', error);
-      }
+      },
     });
   }
 
@@ -227,7 +245,9 @@ export class UserProfileComponent implements OnInit {
     // If we have a relative path, construct the full URL
     const baseUrl = 'https://localhost:44321';
     // Remove leading slash if present to avoid double slash
-    const cleanPath = imageUrl.startsWith('/') ? imageUrl.substring(1) : imageUrl;
+    const cleanPath = imageUrl.startsWith('/')
+      ? imageUrl.substring(1)
+      : imageUrl;
     const fullUrl = `${baseUrl}/${cleanPath}`;
 
     console.log('Constructed image URL:', fullUrl);
@@ -263,7 +283,7 @@ export class UserProfileComponent implements OnInit {
   }
 
   private markFormGroupTouched(formGroup: FormGroup): void {
-    Object.keys(formGroup.controls).forEach(key => {
+    Object.keys(formGroup.controls).forEach((key) => {
       const control = formGroup.get(key);
       control?.markAsTouched();
     });
@@ -275,7 +295,7 @@ export class UserProfileComponent implements OnInit {
       severity: 'success',
       summary: 'Success',
       detail: message,
-      life: 5000
+      life: 5000,
     });
   }
 
@@ -284,7 +304,7 @@ export class UserProfileComponent implements OnInit {
       severity: 'error',
       summary: 'Error',
       detail: message,
-      life: 5000
+      life: 5000,
     });
   }
 
@@ -293,7 +313,7 @@ export class UserProfileComponent implements OnInit {
       severity: 'warn',
       summary: 'Warning',
       detail: message,
-      life: 5000
+      life: 5000,
     });
   }
 
@@ -302,7 +322,7 @@ export class UserProfileComponent implements OnInit {
       severity: 'info',
       summary: 'Info',
       detail: message,
-      life: 5000
+      life: 5000,
     });
   }
   // private showSuccess(message: string): void {

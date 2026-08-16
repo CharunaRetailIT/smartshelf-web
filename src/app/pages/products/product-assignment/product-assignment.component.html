@@ -14,7 +14,7 @@
     min-height: 150px !important;
   }
 </style> -->
-<div class="min-h-screen bg-gray-50 py-6">
+<div class="min-h-screen bg-gray-50 py-6 ds-page-shell">
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
     <!-- Header Toolbar -->
     <p-toolbar styleClass="mb-6 shadow-sm border border-gray-200 rounded-lg">
@@ -260,59 +260,27 @@
             >
               <!-- List Table -->
               <div class="overflow-x-auto border border-gray-200 rounded-lg">
-                <table class="min-w-full divide-y divide-gray-200">
-                  <thead class="bg-gray-50">
+                <p-table
+                  [value]="getPaginatedProducts()"
+                  [scrollable]="true"
+                  scrollHeight="50vh"
+                  dataKey="id"
+                >
+                  <ng-template pTemplate="header">
                     <tr>
-                      <th
-                        scope="col"
-                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                      >
-                        Product
-                      </th>
-                      <th
-                        scope="col"
-                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                      >
-                        Code
-                      </th>
-                      <th
-                        scope="col"
-                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                      >
-                        Price
-                      </th>
-                      <th
-                        scope="col"
-                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                      >
-                        Category
-                      </th>
-                      <th
-                        scope="col"
-                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                      >
-                        Devices
-                      </th>
-                      <th
-                        scope="col"
-                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                      >
-                        Status
-                      </th>
-                      <th
-                        scope="col"
-                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                      >
-                        Actions
-                      </th>
+                      <th>Product</th>
+                      <th>Code</th>
+                      <th>Price</th>
+                      <th>Category</th>
+                      <th>Devices</th>
+                      <th>Status</th>
+                      <th class="ds-table-actions">Actions</th>
                     </tr>
-                  </thead>
-                  <tbody class="bg-white divide-y divide-gray-200">
-                    <tr
-                      *ngFor="let product of getPaginatedProducts()"
-                      class="hover:bg-gray-50 transition-colors"
-                    >
-                      <td class="px-6 py-4 whitespace-nowrap">
+                  </ng-template>
+
+                  <ng-template pTemplate="body" let-product>
+                    <tr>
+                      <td class="whitespace-nowrap">
                         <div class="flex items-center">
                           <div
                             class="flex-shrink-0 h-10 w-10 bg-gray-100 rounded-lg flex items-center justify-center"
@@ -320,7 +288,7 @@
                             <i class="pi pi-box text-gray-600"></i>
                           </div>
                           <div class="ml-4">
-                            <div class="text-sm font-medium text-gray-900">
+                            <div class="font-medium text-gray-900">
                               {{ product.productName }}
                             </div>
                             <div
@@ -331,16 +299,16 @@
                           </div>
                         </div>
                       </td>
-                      <td class="px-6 py-4 whitespace-nowrap">
-                        <div class="text-sm text-gray-900">
+                      <td class="whitespace-nowrap">
+                        <div class="text-gray-900">
                           {{ product.productCode }}
                         </div>
                         <div class="text-xs text-gray-500">
                           {{ product.barCode }}
                         </div>
                       </td>
-                      <td class="px-6 py-4 whitespace-nowrap">
-                        <div class="text-sm font-bold text-gray-900">
+                      <td class="whitespace-nowrap">
+                        <div class="font-bold text-gray-900">
                           LKR {{ product.sellingPrice }}
                         </div>
                         <div
@@ -352,20 +320,20 @@
                           }}% off)
                         </div>
                       </td>
-                      <td class="px-6 py-4 whitespace-nowrap">
-                        <div class="text-sm text-gray-900">
+                      <td class="whitespace-nowrap">
+                        <div class="text-gray-900">
                           {{ product.categoryName }}
                         </div>
                         <div class="text-xs text-gray-500">
                           {{ product.subCategoryName }}
                         </div>
                       </td>
-                      <td class="px-6 py-4 whitespace-nowrap">
+                      <td class="whitespace-nowrap">
                         <div
                           *ngIf="getProductDeviceCount(product.id) > 0"
-                          class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800"
+                          class="ds-pill bg-blue-100 text-blue-800"
                         >
-                          <i class="pi pi-tablet mr-1"></i>
+                          <i class="pi pi-tablet"></i>
                           {{ getProductDeviceCount(product.id) }}
                         </div>
                         <span
@@ -374,21 +342,19 @@
                           >None</span
                         >
                       </td>
-                      <td class="px-6 py-4 whitespace-nowrap">
+                      <td class="whitespace-nowrap">
                         <span
                           [ngClass]="
                             product.isActive
-                              ? 'px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800'
-                              : 'px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800'
+                              ? 'ds-pill bg-green-100 text-green-800'
+                              : 'ds-pill bg-red-100 text-red-800'
                           "
                         >
                           {{ product.isActive ? "Active" : "Inactive" }}
                         </span>
                       </td>
-                      <td
-                        class="px-6 py-4 whitespace-nowrap text-sm font-medium"
-                      >
-                        <div class="flex space-x-2">
+                      <td class="ds-table-actions">
+                        <div class="ds-btn-group ds-btn-group--tight">
                           <p-button
                             icon="pi pi-eye"
                             [text]="true"
@@ -412,8 +378,8 @@
                         </div>
                       </td>
                     </tr>
-                  </tbody>
-                </table>
+                  </ng-template>
+                </p-table>
               </div>
 
               <!-- List View Pagination -->
@@ -1252,53 +1218,26 @@
                 *ngIf="shelfDevices.length > 0"
                 class="overflow-x-auto border border-gray-200 rounded-lg"
               >
-                <table class="min-w-full divide-y divide-gray-200">
-                  <thead class="bg-gray-50">
+                <p-table
+                  [value]="shelfDevices"
+                  [scrollable]="true"
+                  scrollHeight="50vh"
+                  dataKey="deviceMac"
+                >
+                  <ng-template pTemplate="header">
                     <tr>
-                      <th
-                        scope="col"
-                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                      >
-                        Device
-                      </th>
-                      <th
-                        scope="col"
-                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                      >
-                        Screen
-                      </th>
-                      <th
-                        scope="col"
-                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                      >
-                        Template
-                      </th>
-                      <th
-                        scope="col"
-                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                      >
-                        Location
-                      </th>
-                      <th
-                        scope="col"
-                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                      >
-                        Status
-                      </th>
-                      <th
-                        scope="col"
-                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                      >
-                        Actions
-                      </th>
+                      <th>Device</th>
+                      <th>Screen</th>
+                      <th>Template</th>
+                      <th>Location</th>
+                      <th>Status</th>
+                      <th class="ds-table-actions">Actions</th>
                     </tr>
-                  </thead>
-                  <tbody class="bg-white divide-y divide-gray-200">
-                    <tr
-                      *ngFor="let device of shelfDevices"
-                      class="hover:bg-gray-50 transition-colors"
-                    >
-                      <td class="px-6 py-4 whitespace-nowrap">
+                  </ng-template>
+
+                  <ng-template pTemplate="body" let-device>
+                    <tr>
+                      <td class="whitespace-nowrap">
                         <div class="flex items-center">
                           <div
                             class="flex-shrink-0 h-10 w-10 bg-purple-100 rounded-lg flex items-center justify-center"
@@ -1306,7 +1245,7 @@
                             <i class="pi pi-tablet text-purple-600"></i>
                           </div>
                           <div class="ml-4">
-                            <div class="text-sm font-medium text-gray-900">
+                            <div class="font-medium text-gray-900">
                               {{ device.deviceMac }}
                             </div>
                             <div class="text-xs text-gray-500">
@@ -1315,41 +1254,37 @@
                           </div>
                         </div>
                       </td>
-                      <td class="px-6 py-4 whitespace-nowrap">
+                      <td class="whitespace-nowrap">
                         <div
                           *ngIf="device.assignmentType === 'TEMPLATE'"
-                          class="text-sm text-gray-900"
+                          class="text-gray-900"
                         >
                           {{ device.deviceWidth }}x{{ device.deviceHeight }}px
                         </div>
                       </td>
-                      <td class="px-6 py-4 whitespace-nowrap">
+                      <td class="whitespace-nowrap">
                         <div
                           *ngIf="device.assignmentType === 'TEMPLATE'"
-                          class="text-sm text-gray-900"
+                          class="text-gray-900"
                         >
                           {{ device.templateName }}
                         </div>
                       </td>
-                      <td class="px-6 py-4 whitespace-nowrap">
-                        <div class="text-sm text-gray-900">
+                      <td class="whitespace-nowrap">
+                        <div class="text-gray-900">
                           {{ device.locationType }}
                         </div>
                         <div class="text-xs text-gray-500">
                           ID: {{ device.locationId }}
                         </div>
                       </td>
-                      <td class="px-6 py-4 whitespace-nowrap">
-                        <span
-                          class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800"
-                        >
+                      <td class="whitespace-nowrap">
+                        <span class="ds-pill bg-green-100 text-green-800">
                           Active
                         </span>
                       </td>
-                      <td
-                        class="px-6 py-4 whitespace-nowrap text-sm font-medium"
-                      >
-                        <div class="flex space-x-2">
+                      <td class="ds-table-actions">
+                        <div class="ds-btn-group ds-btn-group--tight">
                           <p-button
                             *ngIf="auth.hasAnyRole(['Admin', 'Manager'])"
                             icon="pi pi-bolt"
@@ -1375,8 +1310,8 @@
                         </div>
                       </td>
                     </tr>
-                  </tbody>
-                </table>
+                  </ng-template>
+                </p-table>
               </div>
             </div>
 
@@ -1487,41 +1422,19 @@
                     *ngIf="selectedDevicesLayout === 'list'"
                     class="overflow-x-auto border border-gray-200 rounded-lg"
                   >
-                    <table class="min-w-full divide-y divide-gray-200">
-                      <thead class="bg-gray-50">
+                    <p-table [value]="entry.value" dataKey="deviceMac">
+                      <ng-template pTemplate="header">
                         <tr>
-                          <th
-                            scope="col"
-                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                          >
-                            Device
-                          </th>
-                          <th
-                            scope="col"
-                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                          >
-                            Screen
-                          </th>
-                          <th
-                            scope="col"
-                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                          >
-                            Template
-                          </th>
-                          <th
-                            scope="col"
-                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                          >
-                            Actions
-                          </th>
+                          <th>Device</th>
+                          <th>Screen</th>
+                          <th>Template</th>
+                          <th class="ds-table-actions">Actions</th>
                         </tr>
-                      </thead>
-                      <tbody class="bg-white divide-y divide-gray-200">
-                        <tr
-                          *ngFor="let device of entry.value"
-                          class="hover:bg-gray-50 transition-colors"
-                        >
-                          <td class="px-6 py-4 whitespace-nowrap">
+                      </ng-template>
+
+                      <ng-template pTemplate="body" let-device>
+                        <tr>
+                          <td class="whitespace-nowrap">
                             <div class="flex items-center">
                               <div
                                 class="flex-shrink-0 h-10 w-10 bg-blue-100 rounded-lg flex items-center justify-center"
@@ -1529,34 +1442,32 @@
                                 <i class="pi pi-tablet text-blue-600"></i>
                               </div>
                               <div class="ml-4">
-                                <div class="text-sm font-medium text-gray-900">
+                                <div class="font-medium text-gray-900">
                                   {{ device.deviceMac }}
                                 </div>
                               </div>
                             </div>
                           </td>
-                          <td class="px-6 py-4 whitespace-nowrap">
+                          <td class="whitespace-nowrap">
                             <div
                               *ngIf="device.assignmentType === 'TEMPLATE'"
-                              class="text-sm text-gray-900"
+                              class="text-gray-900"
                             >
                               {{ device.deviceWidth }}x{{
                                 device.deviceHeight
                               }}px
                             </div>
                           </td>
-                          <td class="px-6 py-4 whitespace-nowrap">
+                          <td class="whitespace-nowrap">
                             <div
                               *ngIf="device.assignmentType === 'TEMPLATE'"
-                              class="text-sm text-gray-900"
+                              class="text-gray-900"
                             >
                               {{ device.templateName }}
                             </div>
                           </td>
-                          <td
-                            class="px-6 py-4 whitespace-nowrap text-sm font-medium"
-                          >
-                            <div class="flex space-x-2">
+                          <td class="ds-table-actions">
+                            <div class="ds-btn-group ds-btn-group--tight">
                               <p-button
                                 *ngIf="auth.hasAnyRole(['Admin', 'Manager'])"
                                 icon="pi pi-bolt"
@@ -1582,8 +1493,8 @@
                             </div>
                           </td>
                         </tr>
-                      </tbody>
-                    </table>
+                      </ng-template>
+                    </p-table>
                   </div>
                 </p-accordionTab>
               </p-accordion>
@@ -1616,7 +1527,12 @@
         class="dlg-close"
         aria-label="Close dialog"
       >
-        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <svg
+          class="w-5 h-5"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
           <path
             stroke-linecap="round"
             stroke-linejoin="round"
@@ -1628,197 +1544,201 @@
     </div>
 
     <div class="dlg-body">
-  <!-- Search and Filters -->
-  <div class="mb-4">
-    <div class="grid grid-cols-1 gap-3">
-      <!-- <span class="p-input-icon-left w-full">
+      <!-- Search and Filters -->
+      <div class="mb-4">
+        <div class="grid grid-cols-1 gap-3">
+          <!-- <span class="p-input-icon-left w-full">
         <i class="pi pi-search"></i> -->
-      <input
-        type="text"
-        pButtonIcon="pi pi-search"
-        pInputText
-        [(ngModel)]="searchQuery"
-        (input)="filterMessages()"
-        placeholder="Search messages by title, description, or content type..."
-        class="w-full"
-      />
-      <!-- </span> -->
+          <input
+            type="text"
+            pButtonIcon="pi pi-search"
+            pInputText
+            [(ngModel)]="searchQuery"
+            (input)="filterMessages()"
+            placeholder="Search messages by title, description, or content type..."
+            class="w-full"
+          />
+          <!-- </span> -->
 
-      <div class="flex justify-between items-center">
-        <div class="flex gap-4">
-          <p-checkbox
-            [(ngModel)]="showActiveOnly"
-            (onChange)="filterMessages()"
-            [binary]="true"
-            label="Show active only"
-            inputId="activeOnly"
-          >
-          </p-checkbox>
+          <div class="flex justify-between items-center">
+            <div class="ds-check">
+              <p-checkbox
+                [(ngModel)]="showActiveOnly"
+                (onChange)="filterMessages()"
+                [binary]="true"
+                inputId="activeOnly"
+              >
+              </p-checkbox>
+              <!-- PrimeNG 19 dropped p-checkbox's `label` input, so the text
+                   has to be a real <label> or it renders nothing at all. -->
+              <label for="activeOnly">Show active only</label>
+            </div>
+
+            <div class="flex items-center gap-3 text-sm text-gray-600">
+              <span
+                >Showing {{ filteredMessages.length }} of
+                {{ availableMessages.length }} messages</span
+              >
+              <p-button
+                icon="pi pi-refresh"
+                [text]="true"
+                [loading]="loadingMessages"
+                size="small"
+                (onClick)="refreshMessages()"
+              >
+              </p-button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Messages List -->
+      <div
+        class="border border-gray-200 rounded-lg"
+        style="max-height: 400px; overflow-y: auto"
+      >
+        <!-- Loading State -->
+        <div
+          *ngIf="loadingMessages"
+          class="flex justify-center items-center py-12"
+        >
+          <p-progressSpinner
+            [style]="{ width: '40px', height: '40px' }"
+          ></p-progressSpinner>
+          <span class="ml-3 text-gray-600">Loading messages...</span>
         </div>
 
-        <div class="flex items-center gap-3 text-sm text-gray-600">
-          <span
-            >Showing {{ filteredMessages.length }} of
-            {{ availableMessages.length }} messages</span
-          >
+        <!-- Empty State -->
+        <div
+          *ngIf="!loadingMessages && filteredMessages.length === 0"
+          class="text-center py-12"
+        >
+          <i class="pi pi-inbox text-gray-300 text-5xl mb-4"></i>
+          <p class="text-gray-600 font-medium text-lg">No messages found</p>
+          <p class="text-sm text-gray-500 mt-1" *ngIf="searchQuery">
+            No messages match "{{ searchQuery }}"
+          </p>
           <p-button
-            icon="pi pi-refresh"
+            *ngIf="searchQuery || showActiveOnly"
+            label="Clear filters"
+            icon="pi pi-times"
             [text]="true"
-            [loading]="loadingMessages"
             size="small"
-            (onClick)="refreshMessages()"
+            (onClick)="clearFilters()"
+            styleClass="mt-4"
           >
           </p-button>
         </div>
-      </div>
-    </div>
-  </div>
 
-  <!-- Messages List -->
-  <div
-    class="border border-gray-200 rounded-lg"
-    style="max-height: 400px; overflow-y: auto"
-  >
-    <!-- Loading State -->
-    <div *ngIf="loadingMessages" class="flex justify-center items-center py-12">
-      <p-progressSpinner
-        [style]="{ width: '40px', height: '40px' }"
-      ></p-progressSpinner>
-      <span class="ml-3 text-gray-600">Loading messages...</span>
-    </div>
-
-    <!-- Empty State -->
-    <div
-      *ngIf="!loadingMessages && filteredMessages.length === 0"
-      class="text-center py-12"
-    >
-      <i class="pi pi-inbox text-gray-300 text-5xl mb-4"></i>
-      <p class="text-gray-600 font-medium text-lg">No messages found</p>
-      <p class="text-sm text-gray-500 mt-1" *ngIf="searchQuery">
-        No messages match "{{ searchQuery }}"
-      </p>
-      <p-button
-        *ngIf="searchQuery || showActiveOnly"
-        label="Clear filters"
-        icon="pi pi-times"
-        [text]="true"
-        size="small"
-        (onClick)="clearFilters()"
-        styleClass="mt-4"
-      >
-      </p-button>
-    </div>
-
-    <!-- Messages -->
-    <div
-      *ngIf="!loadingMessages && filteredMessages.length > 0"
-      class="divide-y"
-    >
-      <div
-        *ngFor="let message of filteredMessages"
-        (click)="selectedMessageId = message.id"
-        [class]="
-          selectedMessageId === message.id
-            ? 'bg-blue-50 border-l-4 border-l-blue-500'
-            : 'border-l-4 border-l-transparent hover:bg-gray-50'
-        "
-        class="p-4 cursor-pointer transition-all"
-      >
-        <div class="flex items-start gap-3">
-          <p-radioButton
-            [value]="message.id"
-            [(ngModel)]="selectedMessageId"
-            [inputId]="'msg-' + message.id"
+        <!-- Messages -->
+        <div
+          *ngIf="!loadingMessages && filteredMessages.length > 0"
+          class="divide-y"
+        >
+          <div
+            *ngFor="let message of filteredMessages"
+            (click)="selectedMessageId = message.id"
+            [class]="
+              selectedMessageId === message.id
+                ? 'bg-blue-50 border-l-4 border-l-blue-500'
+                : 'border-l-4 border-l-transparent hover:bg-gray-50'
+            "
+            class="p-4 cursor-pointer transition-all"
           >
-          </p-radioButton>
+            <div class="flex items-start gap-3">
+              <p-radioButton
+                [value]="message.id"
+                [(ngModel)]="selectedMessageId"
+                [inputId]="'msg-' + message.id"
+              >
+              </p-radioButton>
 
-          <div class="flex-1 min-w-0">
-            <div class="flex justify-between items-start">
-              <div class="flex-1">
-                <h4 class="font-semibold text-gray-900 truncate">
-                  {{ message.title }}
-                </h4>
-                <p class="text-sm text-gray-600 mt-1 line-clamp-2">
-                  {{ message.description || "No description" }}
-                </p>
+              <div class="flex-1 min-w-0">
+                <div class="flex justify-between items-start">
+                  <div class="flex-1">
+                    <h4 class="font-semibold text-gray-900 truncate">
+                      {{ message.title }}
+                    </h4>
+                    <p class="text-sm text-gray-600 mt-1 line-clamp-2">
+                      {{ message.description || "No description" }}
+                    </p>
+                  </div>
+                  <p-tag
+                    [value]="message.is_active ? 'Active' : 'Inactive'"
+                    [severity]="message.is_active ? 'success' : 'secondary'"
+                    [rounded]="true"
+                    styleClass="ml-3"
+                  >
+                  </p-tag>
+                </div>
+
+                <div class="flex flex-wrap gap-2 mt-3">
+                  <p-tag
+                    [icon]="getContentTypeIcon(message.content_type)"
+                    [value]="getContentTypeDisplayName(message.content_type)"
+                    severity="info"
+                    styleClass="text-xs"
+                  >
+                  </p-tag>
+                  <p-tag
+                    icon="pi pi-clock"
+                    [value]="(message.duration || '0') + 's'"
+                    severity="secondary"
+                    styleClass="text-xs"
+                  >
+                  </p-tag>
+                  <span
+                    *ngIf="message.created_at"
+                    class="inline-flex items-center bg-gray-100 text-gray-700 px-2.5 py-1 rounded-full text-xs"
+                  >
+                    <i class="pi pi-calendar mr-1.5"></i>
+                    {{ message.created_at | date: "shortDate" }}
+                  </span>
+                </div>
               </div>
-              <p-tag
-                [value]="message.is_active ? 'Active' : 'Inactive'"
-                [severity]="message.is_active ? 'success' : 'secondary'"
-                [rounded]="true"
-                styleClass="ml-3"
-              >
-              </p-tag>
-            </div>
-
-            <div class="flex flex-wrap gap-2 mt-3">
-              <p-tag
-                [icon]="getContentTypeIcon(message.content_type)"
-                [value]="getContentTypeDisplayName(message.content_type)"
-                severity="info"
-                styleClass="text-xs"
-              >
-              </p-tag>
-              <p-tag
-                icon="pi pi-clock"
-                [value]="(message.duration || '0') + 's'"
-                severity="secondary"
-                styleClass="text-xs"
-              >
-              </p-tag>
-              <span
-                *ngIf="message.created_at"
-                class="inline-flex items-center bg-gray-100 text-gray-700 px-2.5 py-1 rounded-full text-xs"
-              >
-                <i class="pi pi-calendar mr-1.5"></i>
-                {{ message.created_at | date: "shortDate" }}
-              </span>
             </div>
           </div>
         </div>
       </div>
     </div>
-  </div>
 
-    </div>
-
-  <div class="dlg-footer">
-    <div class="flex justify-between items-center w-full">
-      <div class="text-sm text-gray-600">
-        <span *ngIf="selectedMessageId">
-          <span class="font-medium">{{ getSelectedMessageTitle() }}</span>
-          <p-tag
-            [icon]="getContentTypeIcon(getSelectedMessage()?.content_type)"
-            [value]="
-              getContentTypeDisplayName(getSelectedMessage()?.content_type)
-            "
-            severity="info"
-            styleClass="text-xs ml-2"
+    <div class="dlg-footer">
+      <div class="flex justify-between items-center w-full">
+        <div class="text-sm text-gray-600">
+          <span *ngIf="selectedMessageId">
+            <span class="font-medium">{{ getSelectedMessageTitle() }}</span>
+            <p-tag
+              [icon]="getContentTypeIcon(getSelectedMessage()?.content_type)"
+              [value]="
+                getContentTypeDisplayName(getSelectedMessage()?.content_type)
+              "
+              severity="info"
+              styleClass="text-xs ml-2"
+            >
+            </p-tag>
+          </span>
+          <span *ngIf="!selectedMessageId" class="text-gray-400">
+            <i class="pi pi-info-circle mr-1"></i>Select a message to bind
+          </span>
+        </div>
+        <div class="flex gap-2">
+          <p-button
+            label="Cancel"
+            severity="secondary"
+            [text]="true"
+            (onClick)="closeBindDialog()"
           >
-          </p-tag>
-        </span>
-        <span *ngIf="!selectedMessageId" class="text-gray-400">
-          <i class="pi pi-info-circle mr-1"></i>Select a message to bind
-        </span>
-      </div>
-      <div class="flex gap-2">
-        <p-button
-          label="Cancel"
-          severity="secondary"
-          [text]="true"
-          (onClick)="closeBindDialog()"
-        >
-        </p-button>
-        <p-button
-          label="Bind Message"
-          icon="pi pi-link"
-          [disabled]="!selectedMessageId || bindingInProgress"
-          [loading]="bindingInProgress"
-          (onClick)="bindMessageToDevice()"
-        >
-        </p-button>
+          </p-button>
+          <p-button
+            label="Bind Message"
+            icon="pi pi-link"
+            [disabled]="!selectedMessageId || bindingInProgress"
+            [loading]="bindingInProgress"
+            (onClick)="bindMessageToDevice()"
+          >
+          </p-button>
+        </div>
       </div>
     </div>
-  </div>
   </div>
 </ng-template>

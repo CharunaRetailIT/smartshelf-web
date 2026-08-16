@@ -1,35 +1,55 @@
 <!-- device-template-management.component.html -->
-<div class="min-h-screen bg-gray-50 p-6">
+<!-- Only the devices tab shows a grid, so only that tab pins the page and
+     hands scrolling to the table; the other tabs scroll normally. -->
+<div
+  class="bg-gray-50 p-6 ds-page-shell"
+  [class.ds-page-shell--fixed]="activeTab === 'devices'"
+>
   <div class="max-w-7xl mx-auto">
-    
     <!-- Header -->
-    <div class="bg-white rounded-lg shadow-sm border border-gray-200 mb-6 p-6">
+    <div
+      class="bg-white rounded-lg shadow-sm border border-gray-200 mb-6 p-6 ds-card"
+    >
       <div class="flex items-center justify-between">
         <div class="flex items-center space-x-3">
           <i class="fas fa-tablet-alt text-2xl text-secondary"></i>
           <div>
-            <h1 class="text-2xl font-bold text-secondary-dark">Device & Template Management</h1>
-            <p class="text-secondary-light">Manage ESL devices, templates, and bindings</p>
+            <h1 class="text-2xl font-bold text-secondary-dark">
+              Device & Template Management
+            </h1>
+            <p class="text-secondary-light">
+              Manage ESL devices, templates, and bindings
+            </p>
           </div>
         </div>
       </div>
     </div>
 
     <!-- Store Selection -->
-    <div class="bg-white rounded-lg shadow-sm border border-gray-200 mb-6 p-6">
+    <div
+      class="bg-white rounded-lg shadow-sm border border-gray-200 mb-6 p-6 ds-card"
+    >
       <h5 class="text-lg font-semibold text-gray-900 mb-4">
         <i class="fas fa-store mr-2"></i>Store Selection
       </h5>
       <div class="flex items-center space-x-4">
         <div class="flex-1">
-          <select class="block w-full px-4 py-2 border border-gray-300 rounded-md leading-5 bg-white focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-900" [(ngModel)]="selectedStoreId">
+          <select
+            class="block w-full px-4 py-2 border border-gray-300 rounded-md leading-5 bg-white focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-900"
+            [(ngModel)]="selectedStoreId"
+          >
             <option value="">Select Store</option>
             <option *ngFor="let store of stores" [value]="store.id">
-              {{store.storeName}}{{ store.storeCode ? ' (' + store.storeCode + ')' : '' }}
+              {{ store.storeName
+              }}{{ store.storeCode ? " (" + store.storeCode + ")" : "" }}
             </option>
           </select>
         </div>
-        <button class="cursor-pointer bg-primary hover:bg-primary-light text-white px-6 py-2 rounded-md flex items-center space-x-2 transition-colors" (click)="loadStoreData()" [disabled]="!selectedStoreId">
+        <button
+          class="cursor-pointer bg-primary hover:bg-primary-light text-white px-6 py-2 rounded-md flex items-center space-x-2 transition-colors ds-btn ds-btn--primary"
+          (click)="loadStoreData()"
+          [disabled]="!selectedStoreId"
+        >
           <i class="fas fa-download"></i>
           <span>Load Store Data</span>
         </button>
@@ -37,45 +57,51 @@
     </div>
 
     <!-- Tabs Navigation -->
-    <div class="bg-white rounded-lg shadow-sm border border-gray-200 mb-6 overflow-x-auto">
+    <div
+      class="bg-white rounded-lg shadow-sm border border-gray-200 mb-6 overflow-x-auto ds-card"
+    >
       <div class="flex border-b">
-        <button 
+        <button
           (click)="activeTab = 'devices'"
           [class.border-b-2]="activeTab === 'devices'"
           [class.border-blue-900]="activeTab === 'devices'"
           [class.text-blue-900]="activeTab === 'devices'"
           [class.text-gray-600]="activeTab !== 'devices'"
-          class="px-6 py-3 font-medium hover:text-blue-900 transition-colors whitespace-nowrap">
+          class="px-6 py-3 font-medium hover:text-blue-900 transition-colors whitespace-nowrap ds-btn ds-btn--tertiary"
+        >
           <i class="fas fa-tablet-alt mr-2"></i>
           Devices
         </button>
-        <button 
+        <button
           (click)="activeTab = 'templates'"
           [class.border-b-2]="activeTab === 'templates'"
           [class.border-blue-900]="activeTab === 'templates'"
           [class.text-blue-900]="activeTab === 'templates'"
           [class.text-gray-600]="activeTab !== 'templates'"
-          class="px-6 py-3 font-medium hover:text-blue-900 transition-colors whitespace-nowrap">
+          class="px-6 py-3 font-medium hover:text-blue-900 transition-colors whitespace-nowrap ds-btn ds-btn--tertiary"
+        >
           <i class="fas fa-file-alt mr-2"></i>
           Templates
         </button>
-        <button 
+        <button
           (click)="activeTab = 'assignments'"
           [class.border-b-2]="activeTab === 'assignments'"
           [class.border-blue-900]="activeTab === 'assignments'"
           [class.text-blue-900]="activeTab === 'assignments'"
           [class.text-gray-600]="activeTab !== 'assignments'"
-          class="px-6 py-3 font-medium hover:text-blue-900 transition-colors whitespace-nowrap">
+          class="px-6 py-3 font-medium hover:text-blue-900 transition-colors whitespace-nowrap ds-btn ds-btn--tertiary"
+        >
           <i class="fas fa-link mr-2"></i>
           Assignments
         </button>
-        <button 
+        <button
           (click)="activeTab = 'bind'"
           [class.border-b-2]="activeTab === 'bind'"
           [class.border-blue-900]="activeTab === 'bind'"
           [class.text-blue-900]="activeTab === 'bind'"
           [class.text-gray-600]="activeTab !== 'bind'"
-          class="px-6 py-3 font-medium hover:text-blue-900 transition-colors whitespace-nowrap">
+          class="px-6 py-3 font-medium hover:text-blue-900 transition-colors whitespace-nowrap ds-btn ds-btn--tertiary"
+        >
           <i class="fas fa-database mr-2"></i>
           Bind Data
         </button>
@@ -83,42 +109,65 @@
     </div>
 
     <!-- Loading Overlay -->
-    <div *ngIf="loading" class="fixed inset-0 bg-white bg-opacity-80 flex items-center justify-center z-50 backdrop-blur-sm">
+    <div
+      *ngIf="loading"
+      class="fixed inset-0 bg-white bg-opacity-80 flex items-center justify-center z-50 backdrop-blur-sm"
+    >
       <div class="text-center">
-        <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-900"></div>
+        <div
+          class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-900"
+        ></div>
         <p class="mt-4 text-gray-600 font-medium">Loading...</p>
       </div>
     </div>
 
     <!-- Devices Tab -->
-    <div *ngIf="activeTab === 'devices'">
+    <div *ngIf="activeTab === 'devices'" class="ds-tab-panel">
       <!-- Action Bar -->
-      <div class="bg-white rounded-lg shadow-sm border border-gray-200 mb-6 p-6">
+      <div
+        class="bg-white rounded-lg shadow-sm border border-gray-200 mb-6 p-6 ds-card"
+      >
         <div class="flex items-center justify-between mb-4">
-          <button class="cursor-pointer bg-success hover:bg-emerald-600 text-white px-4 py-2 rounded-md flex items-center space-x-2 transition-colors" 
-                  (click)="syncDevicesFromCloud()" 
-                  [disabled]="!selectedStoreId || loading">
+          <button
+            class="cursor-pointer bg-success hover:bg-emerald-600 text-white px-4 py-2 rounded-md flex items-center space-x-2 transition-colors ds-btn ds-btn--primary"
+            (click)="syncDevicesFromCloud()"
+            [disabled]="!selectedStoreId || loading"
+          >
             <i class="fas fa-sync"></i>
             <span>Sync from Cloud</span>
           </button>
           <div class="text-sm text-gray-600">
-            Showing {{filteredDevices.length}} of {{minewDevices.length}} devices
+            Showing {{ filteredDevices.length }} of
+            {{ minewDevices.length }} devices
           </div>
         </div>
 
         <!-- Device Filters -->
-        <form [formGroup]="deviceFilterForm" class="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <form
+          [formGroup]="deviceFilterForm"
+          class="grid grid-cols-1 md:grid-cols-4 gap-4"
+        >
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">Status</label>
-            <select formControlName="status" class="block w-full px-4 py-2 border border-gray-300 rounded-md leading-5 bg-white focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-900">
+            <label class="block text-sm font-medium text-gray-700 mb-1"
+              >Status</label
+            >
+            <select
+              formControlName="status"
+              class="block w-full px-4 py-2 border border-gray-300 rounded-md leading-5 bg-white focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-900"
+            >
               <option value="all">All Status</option>
               <option value="online">Online</option>
               <option value="offline">Offline</option>
             </select>
           </div>
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">Battery Level</label>
-            <select formControlName="batteryLevel" class="block w-full px-4 py-2 border border-gray-300 rounded-md leading-5 bg-white focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-900">
+            <label class="block text-sm font-medium text-gray-700 mb-1"
+              >Battery Level</label
+            >
+            <select
+              formControlName="batteryLevel"
+              class="block w-full px-4 py-2 border border-gray-300 rounded-md leading-5 bg-white focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-900"
+            >
               <option value="all">All Battery Levels</option>
               <option value="high">High (&gt;70%)</option>
               <option value="medium">Medium (30-70%)</option>
@@ -126,13 +175,28 @@
             </select>
           </div>
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">Search</label>
-            <input type="text" formControlName="search" class="block w-full px-4 py-2 border border-gray-300 rounded-md leading-5 bg-white focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-900" 
-                   placeholder="Search MAC or Name">
+            <label class="block text-sm font-medium text-gray-700 mb-1"
+              >Search</label
+            >
+            <input
+              type="text"
+              formControlName="search"
+              class="block w-full px-4 py-2 border border-gray-300 rounded-md leading-5 bg-white focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-900"
+              placeholder="Search MAC or Name"
+            />
           </div>
           <div class="flex items-end">
-            <button type="button" class="cursor-pointer w-full bg-gray-200 hover:bg-gray-300 text-gray-700 px-4 py-2 rounded-md transition-colors" 
-                    (click)="deviceFilterForm.reset({status: 'all', batteryLevel: 'all', search: ''})">
+            <button
+              type="button"
+              class="cursor-pointer w-full bg-gray-200 hover:bg-gray-300 text-gray-700 px-4 py-2 rounded-md transition-colors ds-btn ds-btn--secondary"
+              (click)="
+                deviceFilterForm.reset({
+                  status: 'all',
+                  batteryLevel: 'all',
+                  search: '',
+                })
+              "
+            >
               <i class="fas fa-times mr-2"></i>Clear Filters
             </button>
           </div>
@@ -140,101 +204,140 @@
       </div>
 
       <!-- Devices Table -->
-      <div *ngIf="filteredDevices.length > 0" class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
-        <div class="overflow-x-auto">
-          <table class="min-w-full divide-y divide-gray-200">
-            <thead class="bg-gray-100">
-              <tr>
-                <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase">MAC Address</th>
-                <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase">Device Name</th>
-                <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
-                <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase">Battery</th>
-                <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase">Screen Size</th>
-                <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase">Last Seen</th>
-                <th class="px-6 py-4 text-center text-xs font-medium text-gray-500 uppercase">Actions</th>
-              </tr>
-            </thead>
-            <tbody class="bg-white divide-y divide-gray-200">
-              <tr *ngFor="let device of filteredDevices" 
-                  [class.bg-yellow-50]="device.battery < 30"
-                  [class.bg-red-50]="device.battery < 10"
-                  class="hover:bg-gray-50">
-                <td class="px-6 py-4 whitespace-nowrap">
-                  <code class="text-sm text-gray-900 bg-gray-100 px-2 py-1 rounded">{{device.mac}}</code>
-                </td>
-                <td class="px-6 py-4">
-                  <div class="text-sm font-medium text-gray-900">{{device.deviceName || 'Unnamed'}}</div>
-                  <div class="text-xs text-gray-500">
-                    {{device.screenWidth}}x{{device.screenHeight}}
+      <div *ngIf="filteredDevices.length > 0" class="ds-card ds-table-panel">
+        <p-table
+          [value]="filteredDevices"
+          [paginator]="true"
+          [rows]="10"
+          [rowsPerPageOptions]="[10, 25, 50]"
+          [showFirstLastIcon]="true"
+          [showCurrentPageReport]="true"
+          currentPageReportTemplate="{first} - {last} of {totalRecords}"
+          [scrollable]="true"
+          scrollHeight="flex"
+          dataKey="mac"
+        >
+          <ng-template pTemplate="header">
+            <tr>
+              <th>MAC Address</th>
+              <th>Device Name</th>
+              <th>Status</th>
+              <th>Battery</th>
+              <th>Screen Size</th>
+              <th>Last Seen</th>
+              <th class="ds-table-actions">Actions</th>
+            </tr>
+          </ng-template>
+
+          <ng-template pTemplate="body" let-device>
+            <tr
+              [class.bg-yellow-50]="device.battery < 30"
+              [class.bg-red-50]="device.battery < 10"
+            >
+              <td class="whitespace-nowrap">
+                <code class="text-gray-900 bg-gray-100 px-2 py-1 rounded">{{
+                  device.mac
+                }}</code>
+              </td>
+              <td>
+                <div class="font-medium text-gray-900">
+                  {{ device.deviceName || "Unnamed" }}
+                </div>
+                <div class="text-xs text-gray-500">
+                  {{ device.screenWidth }}x{{ device.screenHeight }}
+                </div>
+              </td>
+              <td class="whitespace-nowrap">
+                <span
+                  class="ds-pill"
+                  [ngClass]="{
+                    'bg-green-100 text-green-800':
+                      device.status.toLowerCase() === 'online',
+                    'bg-red-100 text-red-800':
+                      device.status.toLowerCase() === 'offline',
+                    'bg-yellow-100 text-yellow-800':
+                      device.status.toLowerCase() === 'low battery',
+                    'bg-gray-100 text-gray-800':
+                      device.status.toLowerCase() !== 'online' &&
+                      device.status.toLowerCase() !== 'offline' &&
+                      device.status.toLowerCase() !== 'low battery',
+                  }"
+                >
+                  {{ device.status }}
+                </span>
+              </td>
+              <td class="whitespace-nowrap">
+                <div class="flex items-center">
+                  <div
+                    class="w-16 h-4 bg-gray-200 rounded-full overflow-hidden mr-2"
+                  >
+                    <div
+                      class="h-full rounded-full transition-all"
+                      [style.width.%]="device.battery"
+                      [ngClass]="{
+                        'bg-green-500': device.battery > 70,
+                        'bg-yellow-500':
+                          device.battery > 30 && device.battery <= 70,
+                        'bg-red-500': device.battery <= 30,
+                      }"
+                    ></div>
                   </div>
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap">
-                  <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
-                        [ngClass]="{
-                          'bg-green-100 text-green-800': device.status.toLowerCase() === 'online',
-                          'bg-red-100 text-red-800': device.status.toLowerCase() === 'offline',
-                          'bg-yellow-100 text-yellow-800': device.status.toLowerCase() === 'low battery',
-                          'bg-gray-100 text-gray-800': device.status.toLowerCase() !== 'online' && device.status.toLowerCase() !== 'offline' && device.status.toLowerCase() !== 'low battery'
-                        }">
-                    {{device.status}}
-                  </span>
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap">
-                  <div class="flex items-center">
-                    <div class="w-16 h-4 bg-gray-200 rounded-full overflow-hidden mr-2">
-                      <div class="h-full rounded-full transition-all"
-                           [style.width.%]="device.battery"
-                           [ngClass]="{
-                             'bg-green-500': device.battery > 70,
-                             'bg-yellow-500': device.battery > 30 && device.battery <= 70,
-                             'bg-red-500': device.battery <= 30
-                           }">
-                      </div>
-                    </div>
-                    <span class="text-sm text-gray-900 font-medium">{{device.battery}}%</span>
-                  </div>
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap">
-                  <div class="text-sm text-gray-900">{{device.screenSize}}</div>
-                  <div *ngIf="device.screenInch" class="text-xs text-gray-500">
-                    {{device.screenInch}} inch
-                  </div>
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                  {{device.lastSeen | date:'short'}}
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap text-center">
-                  <div class="flex justify-center space-x-2">
-                    <button class="cursor-pointer text-blue-600 hover:text-blue-900 p-2 rounded hover:bg-blue-50 transition-colors" 
-                            (click)="identifyDevice(device)"
-                            title="Identify Device">
-                      <i class="fas fa-lightbulb"></i>
-                    </button>
-                    <button class="cursor-pointer text-green-600 hover:text-green-900 p-2 rounded hover:bg-green-50 transition-colors" 
-                            (click)="lightUpDevice(device, 2)"
-                            title="Light Up Green">
-                      <i class="fas fa-lightbulb"></i>
-                    </button>
-                    <button class="cursor-pointer text-yellow-600 hover:text-yellow-900 p-2 rounded hover:bg-yellow-50 transition-colors" 
-                            (click)="lightUpDevice(device, 4)"
-                            title="Light Up Yellow">
-                      <i class="fas fa-lightbulb"></i>
-                    </button>
-                    <button class="cursor-pointer text-purple-600 hover:text-purple-900 p-2 rounded hover:bg-purple-50 transition-colors" 
-                            (click)="createComboWithDevice(device)"
-                            title="Create Combo">
-                      <i class="fas fa-plus"></i>
-                    </button>
-                  </div>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
+                  <span class="text-gray-900 font-medium"
+                    >{{ device.battery }}%</span
+                  >
+                </div>
+              </td>
+              <td class="whitespace-nowrap">
+                <div class="text-gray-900">{{ device.screenSize }}</div>
+                <div *ngIf="device.screenInch" class="text-xs text-gray-500">
+                  {{ device.screenInch }} inch
+                </div>
+              </td>
+              <td class="whitespace-nowrap text-gray-600">
+                {{ device.lastSeen | date: "short" }}
+              </td>
+              <td class="ds-table-actions">
+                <div class="ds-btn-group ds-btn-group--tight">
+                  <button
+                    class="cursor-pointer text-blue-600 hover:text-blue-900 rounded hover:bg-blue-50 transition-colors ds-btn-icon"
+                    (click)="identifyDevice(device)"
+                    title="Identify Device"
+                  >
+                    <i class="fas fa-lightbulb"></i>
+                  </button>
+                  <button
+                    class="cursor-pointer text-green-600 hover:text-green-900 rounded hover:bg-green-50 transition-colors ds-btn-icon"
+                    (click)="lightUpDevice(device, 2)"
+                    title="Light Up Green"
+                  >
+                    <i class="fas fa-lightbulb"></i>
+                  </button>
+                  <button
+                    class="cursor-pointer text-yellow-600 hover:text-yellow-900 rounded hover:bg-yellow-50 transition-colors ds-btn-icon"
+                    (click)="lightUpDevice(device, 4)"
+                    title="Light Up Yellow"
+                  >
+                    <i class="fas fa-lightbulb"></i>
+                  </button>
+                  <button
+                    class="cursor-pointer text-purple-600 hover:text-purple-900 rounded hover:bg-purple-50 transition-colors ds-btn-icon"
+                    (click)="createComboWithDevice(device)"
+                    title="Create Combo"
+                  >
+                    <i class="fas fa-plus"></i>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          </ng-template>
+        </p-table>
       </div>
 
       <!-- Empty State -->
-      <div *ngIf="filteredDevices.length === 0 && !loading" class="bg-white rounded-lg shadow-sm border border-gray-200 p-12 text-center">
+      <div
+        *ngIf="filteredDevices.length === 0 && !loading"
+        class="bg-white rounded-lg shadow-sm border border-gray-200 p-12 text-center ds-card"
+      >
         <i class="fas fa-inbox text-6xl text-gray-300 mb-4"></i>
         <h3 class="text-lg font-medium text-gray-900 mb-2">No Devices Found</h3>
         <p class="text-gray-600 mb-6">
@@ -245,13 +348,26 @@
             No devices match your filters. Try adjusting your search criteria.
           </span>
         </p>
-        <button *ngIf="minewDevices.length === 0" class="cursor-pointer bg-primary hover:bg-primary-light text-white px-6 py-2 rounded-md inline-flex items-center space-x-2 transition-colors" 
-                (click)="syncDevicesFromCloud()" [disabled]="!selectedStoreId">
+        <button
+          *ngIf="minewDevices.length === 0"
+          class="cursor-pointer bg-primary hover:bg-primary-light text-white px-6 py-2 rounded-md inline-flex items-center space-x-2 transition-colors ds-btn ds-btn--primary"
+          (click)="syncDevicesFromCloud()"
+          [disabled]="!selectedStoreId"
+        >
           <i class="fas fa-sync"></i>
           <span>Sync Devices</span>
         </button>
-        <button *ngIf="minewDevices.length > 0" class="cursor-pointer bg-gray-200 hover:bg-gray-300 text-gray-700 px-6 py-2 rounded-md inline-flex items-center space-x-2 transition-colors" 
-                (click)="deviceFilterForm.reset({status: 'all', batteryLevel: 'all', search: ''})">
+        <button
+          *ngIf="minewDevices.length > 0"
+          class="cursor-pointer bg-gray-200 hover:bg-gray-300 text-gray-700 px-6 py-2 rounded-md inline-flex items-center space-x-2 transition-colors ds-btn ds-btn--secondary"
+          (click)="
+            deviceFilterForm.reset({
+              status: 'all',
+              batteryLevel: 'all',
+              search: '',
+            })
+          "
+        >
           <i class="fas fa-times"></i>
           <span>Clear Filters</span>
         </button>
@@ -261,52 +377,76 @@
     <!-- Templates Tab -->
     <div *ngIf="activeTab === 'templates'">
       <!-- Action Bar -->
-      <div class="bg-white rounded-lg shadow-sm border border-gray-200 mb-6 p-6">
+      <div
+        class="bg-white rounded-lg shadow-sm border border-gray-200 mb-6 p-6 ds-card"
+      >
         <div class="flex items-center justify-between">
-          <button class="cursor-pointer bg-success hover:bg-emerald-600 text-white px-4 py-2 rounded-md flex items-center space-x-2 transition-colors" 
-                  (click)="syncTemplatesFromCloud()" 
-                  [disabled]="!selectedStoreId">
+          <button
+            class="cursor-pointer bg-success hover:bg-emerald-600 text-white px-4 py-2 rounded-md flex items-center space-x-2 transition-colors ds-btn ds-btn--primary"
+            (click)="syncTemplatesFromCloud()"
+            [disabled]="!selectedStoreId"
+          >
             <i class="fas fa-sync"></i>
             <span>Sync Templates</span>
           </button>
           <div class="text-sm text-gray-600">
-            {{minewTemplates.length}} templates available
+            {{ minewTemplates.length }} templates available
           </div>
         </div>
       </div>
 
       <!-- Templates Grid -->
-      <div *ngIf="minewTemplates.length > 0" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        <div *ngFor="let template of minewTemplates" class="bg-white rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition-shadow overflow-hidden">
+      <div
+        *ngIf="minewTemplates.length > 0"
+        class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+      >
+        <div
+          *ngFor="let template of minewTemplates"
+          class="bg-white rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition-shadow overflow-hidden ds-card"
+        >
           <div class="p-6">
-            <h6 class="text-lg font-semibold text-gray-900 mb-2">{{template.name}}</h6>
+            <h6 class="text-lg font-semibold text-gray-900 mb-2">
+              {{ template.name }}
+            </h6>
             <div class="flex items-center text-sm text-gray-600 mb-2">
               <i class="fas fa-expand-alt mr-2"></i>
-              {{template.screenWidth}}x{{template.screenHeight}} | {{template.screenInch}}"
+              {{ template.screenWidth }}x{{ template.screenHeight }} |
+              {{ template.screenInch }}"
             </div>
             <div class="flex items-center text-sm text-gray-600 mb-4">
               <i class="fas fa-palette mr-2"></i>
-              {{template.color || 'Default'}}
+              {{ template.color || "Default" }}
             </div>
-            
-            <div class="bg-gray-50 rounded-lg p-4 mb-4 flex items-center justify-center min-h-[150px]">
+
+            <div
+              class="bg-gray-50 rounded-lg p-4 mb-4 flex items-center justify-center min-h-[150px]"
+            >
               <div *ngIf="template.previewImage" class="text-center">
-                <img [src]="'data:image/png;base64,' + template.previewImage" 
-                     class="max-h-32 mx-auto rounded border border-gray-200">
+                <img
+                  [src]="'data:image/png;base64,' + template.previewImage"
+                  class="max-h-32 mx-auto rounded border border-gray-200"
+                />
               </div>
-              <div *ngIf="!template.previewImage" class="text-center text-gray-400">
+              <div
+                *ngIf="!template.previewImage"
+                class="text-center text-gray-400"
+              >
                 <i class="fas fa-image text-4xl mb-2"></i>
                 <p class="text-sm">Preview not loaded</p>
               </div>
             </div>
-            
+
             <div class="flex space-x-2">
-              <button class="cursor-pointer flex-1 bg-blue-50 hover:bg-blue-100 text-blue-700 px-4 py-2 rounded-md transition-colors"
-                      (click)="loadTemplatePreview(template)">
+              <button
+                class="cursor-pointer flex-1 bg-blue-50 hover:bg-blue-100 text-blue-700 px-4 py-2 rounded-md transition-colors ds-btn ds-btn--secondary"
+                (click)="loadTemplatePreview(template)"
+              >
                 <i class="fas fa-eye mr-2"></i>Preview
               </button>
-              <button class="cursor-pointer flex-1 bg-green-50 hover:bg-green-100 text-green-700 px-4 py-2 rounded-md transition-colors"
-                      (click)="createComboWithTemplate(template)">
+              <button
+                class="cursor-pointer flex-1 bg-green-50 hover:bg-green-100 text-green-700 px-4 py-2 rounded-md transition-colors ds-btn ds-btn--secondary"
+                (click)="createComboWithTemplate(template)"
+              >
                 <i class="fas fa-plus mr-2"></i>Use
               </button>
             </div>
@@ -315,13 +455,22 @@
       </div>
 
       <!-- Empty State -->
-      <div *ngIf="minewTemplates.length === 0 && !loading" class="bg-white rounded-lg shadow-sm border border-gray-200 p-12 text-center">
+      <div
+        *ngIf="minewTemplates.length === 0 && !loading"
+        class="bg-white rounded-lg shadow-sm border border-gray-200 p-12 text-center ds-card"
+      >
         <i class="fas fa-file-alt text-6xl text-gray-300 mb-4"></i>
-        <h3 class="text-lg font-medium text-gray-900 mb-2">No Templates Found</h3>
-        <p class="text-gray-600 mb-6">Sync templates from cloud to get started.</p>
-        <button class="cursor-pointer bg-primary hover:bg-primary-light text-white px-6 py-2 rounded-md inline-flex items-center space-x-2 transition-colors" 
-                (click)="syncTemplatesFromCloud()" 
-                [disabled]="!selectedStoreId">
+        <h3 class="text-lg font-medium text-gray-900 mb-2">
+          No Templates Found
+        </h3>
+        <p class="text-gray-600 mb-6">
+          Sync templates from cloud to get started.
+        </p>
+        <button
+          class="cursor-pointer bg-primary hover:bg-primary-light text-white px-6 py-2 rounded-md inline-flex items-center space-x-2 transition-colors ds-btn ds-btn--primary"
+          (click)="syncTemplatesFromCloud()"
+          [disabled]="!selectedStoreId"
+        >
           <i class="fas fa-sync"></i>
           <span>Sync Templates</span>
         </button>
@@ -330,89 +479,145 @@
 
     <!-- Assignments Tab -->
     <div *ngIf="activeTab === 'assignments'">
-      <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+      <div
+        class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 ds-card"
+      >
         <form [formGroup]="assignmentForm">
           <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-2">Location Type</label>
-              <select formControlName="locationType" class="block w-full px-4 py-2 border border-gray-300 rounded-md leading-5 bg-white focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-900"
-                      (change)="onLocationTypeChange()">
+              <label class="block text-sm font-medium text-gray-700 mb-2"
+                >Location Type</label
+              >
+              <select
+                formControlName="locationType"
+                class="block w-full px-4 py-2 border border-gray-300 rounded-md leading-5 bg-white focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-900"
+                (change)="onLocationTypeChange()"
+              >
                 <option value="Aisle">Aisle</option>
                 <option value="Shelf">Shelf</option>
                 <option value="Product">Product</option>
               </select>
             </div>
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-2">Location</label>
-              <select formControlName="locationId" class="block w-full px-4 py-2 border border-gray-300 rounded-md leading-5 bg-white focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-900"
-                      (change)="loadAssignments()">
-                <option value="">Select {{assignmentForm.get('locationType')?.value}}</option>
-                <option *ngFor="let location of getLocationsByType(assignmentForm.get('locationType')?.value)" 
-                        [value]="location.id">
-                  {{location.name}}
-                  <span *ngIf="location.aisleName">({{location.aisleName}})</span>
+              <label class="block text-sm font-medium text-gray-700 mb-2"
+                >Location</label
+              >
+              <select
+                formControlName="locationId"
+                class="block w-full px-4 py-2 border border-gray-300 rounded-md leading-5 bg-white focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-900"
+                (change)="loadAssignments()"
+              >
+                <option value="">
+                  Select {{ assignmentForm.get("locationType")?.value }}
+                </option>
+                <option
+                  *ngFor="
+                    let location of getLocationsByType(
+                      assignmentForm.get('locationType')?.value
+                    )
+                  "
+                  [value]="location.id"
+                >
+                  {{ location.name }}
+                  <span *ngIf="location.aisleName"
+                    >({{ location.aisleName }})</span
+                  >
                 </option>
               </select>
             </div>
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-2">Device-Template Combo</label>
-              <select formControlName="selectedCombo" class="block w-full px-4 py-2 border border-gray-300 rounded-md leading-5 bg-white focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-900">
+              <label class="block text-sm font-medium text-gray-700 mb-2"
+                >Device-Template Combo</label
+              >
+              <select
+                formControlName="selectedCombo"
+                class="block w-full px-4 py-2 border border-gray-300 rounded-md leading-5 bg-white focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-900"
+              >
                 <option value="">Select Combo</option>
-                <option *ngFor="let combo of deviceTemplateCombos" 
-                        [value]="combo.id">
-                  {{combo.deviceName || combo.deviceId}} - {{combo.templateName || combo.templateId}}
+                <option
+                  *ngFor="let combo of deviceTemplateCombos"
+                  [value]="combo.id"
+                >
+                  {{ combo.deviceName || combo.deviceId }} -
+                  {{ combo.templateName || combo.templateId }}
                 </option>
               </select>
             </div>
           </div>
 
           <div class="flex space-x-3 mb-6">
-            <button class="cursor-pointer bg-primary hover:bg-primary-light text-white px-6 py-2 rounded-md flex items-center space-x-2 transition-colors" 
-                    (click)="assignCombo()"
-                    [disabled]="!assignmentForm.valid">
+            <button
+              class="cursor-pointer bg-primary hover:bg-primary-light text-white px-6 py-2 rounded-md flex items-center space-x-2 transition-colors ds-btn ds-btn--primary"
+              (click)="assignCombo()"
+              [disabled]="!assignmentForm.valid"
+            >
               <i class="fas fa-link"></i>
               <span>Assign Combo</span>
             </button>
-            <button class="cursor-pointer bg-gray-200 hover:bg-gray-300 text-gray-700 px-6 py-2 rounded-md transition-colors" 
-                    (click)="assignmentForm.reset({locationType: 'Aisle', locationId: '', selectedCombo: ''})">
+            <button
+              class="cursor-pointer bg-gray-200 hover:bg-gray-300 text-gray-700 px-6 py-2 rounded-md transition-colors ds-btn ds-btn--secondary"
+              (click)="
+                assignmentForm.reset({
+                  locationType: 'Aisle',
+                  locationId: '',
+                  selectedCombo: '',
+                })
+              "
+            >
               Clear Form
             </button>
           </div>
 
           <!-- Existing Assignments -->
           <div *ngIf="assignments.length > 0" class="mt-6">
-            <h5 class="text-lg font-semibold text-gray-900 mb-4 pb-2 border-b border-gray-200">
+            <h5
+              class="text-lg font-semibold text-gray-900 mb-4 pb-2 border-b border-gray-200"
+            >
               <i class="fas fa-list-check mr-2"></i>
-              Current Assignments ({{assignments.length}})
+              Current Assignments ({{ assignments.length }})
             </h5>
             <div class="space-y-3">
-              <div *ngFor="let assignment of assignments; let i = index" 
-                   class="bg-gray-50 rounded-lg p-4 hover:bg-gray-100 transition-colors border border-gray-200">
+              <div
+                *ngFor="let assignment of assignments; let i = index"
+                class="bg-gray-50 rounded-lg p-4 hover:bg-gray-100 transition-colors border border-gray-200"
+              >
                 <div class="flex justify-between items-center">
                   <div class="flex-1">
                     <div class="flex items-center mb-2">
-                      <span class="inline-flex items-center justify-center w-6 h-6 bg-blue-900 text-white text-xs font-bold rounded-full mr-3">
-                        {{i + 1}}
+                      <span
+                        class="inline-flex items-center justify-center w-6 h-6 bg-blue-900 text-white text-xs font-bold rounded-full mr-3"
+                      >
+                        {{ i + 1 }}
                       </span>
-                      <strong class="text-gray-900">{{assignment.combo?.deviceName || assignment.deviceId}}</strong>
+                      <strong class="text-gray-900">{{
+                        assignment.combo?.deviceName || assignment.deviceId
+                      }}</strong>
                       <i class="fas fa-arrow-right mx-3 text-gray-400"></i>
-                      <span class="text-gray-700">{{assignment.combo?.templateName || assignment.templateId}}</span>
+                      <span class="text-gray-700">{{
+                        assignment.combo?.templateName || assignment.templateId
+                      }}</span>
                     </div>
                     <div class="text-sm text-gray-600 ml-9">
                       <i class="fas fa-location-dot mr-2"></i>
-                      {{assignment.locationType}}: 
-                      {{getLocationName(assignment.locationType, assignment.locationId)}}
+                      {{ assignment.locationType }}:
+                      {{
+                        getLocationName(
+                          assignment.locationType,
+                          assignment.locationId
+                        )
+                      }}
                       <span *ngIf="assignment.displayOrder > 0" class="ml-4">
                         <i class="fas fa-sort-numeric-up mr-1"></i>
-                        Order: {{assignment.displayOrder}}
+                        Order: {{ assignment.displayOrder }}
                       </span>
                     </div>
                   </div>
                   <button
-                  *ngIf="auth.hasAnyRole(['Admin','Manager'])"
-                  class="cursor-pointer text-red-600 hover:text-red-900 p-2 rounded hover:bg-red-50 transition-colors" 
-                          (click)="removeAssignment(assignment.id)"
-                          title="Remove Assignment">
+                    *ngIf="auth.hasAnyRole(['Admin', 'Manager'])"
+                    class="cursor-pointer text-red-600 hover:text-red-900 p-2 rounded hover:bg-red-50 transition-colors ds-btn-icon"
+                    (click)="removeAssignment(assignment.id)"
+                    title="Remove Assignment"
+                  >
                     <i class="fas fa-trash"></i>
                   </button>
                 </div>
@@ -421,17 +626,34 @@
           </div>
 
           <!-- Empty States -->
-          <div *ngIf="assignments.length === 0 && assignmentForm.get('locationId')?.value" 
-               class="text-center py-12">
+          <div
+            *ngIf="
+              assignments.length === 0 &&
+              assignmentForm.get('locationId')?.value
+            "
+            class="text-center py-12"
+          >
             <i class="fas fa-link text-6xl text-gray-300 mb-4"></i>
-            <h5 class="text-lg font-medium text-gray-900 mb-2">No Assignments Found</h5>
-            <p class="text-gray-600">No combos assigned to this location yet.</p>
+            <h5 class="text-lg font-medium text-gray-900 mb-2">
+              No Assignments Found
+            </h5>
+            <p class="text-gray-600">
+              No combos assigned to this location yet.
+            </p>
           </div>
 
-          <div *ngIf="!assignmentForm.get('locationId')?.value" class="text-center py-12">
+          <div
+            *ngIf="!assignmentForm.get('locationId')?.value"
+            class="text-center py-12"
+          >
             <i class="fas fa-map-marker-alt text-6xl text-gray-300 mb-4"></i>
-            <h5 class="text-lg font-medium text-gray-900 mb-2">Select a Location</h5>
-            <p class="text-gray-600">Choose a location type and specific location to view or create assignments.</p>
+            <h5 class="text-lg font-medium text-gray-900 mb-2">
+              Select a Location
+            </h5>
+            <p class="text-gray-600">
+              Choose a location type and specific location to view or create
+              assignments.
+            </p>
           </div>
         </form>
       </div>
@@ -439,31 +661,45 @@
 
     <!-- Bind Data Tab -->
     <div *ngIf="activeTab === 'bind'">
-      <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
+      <div
+        class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6 ds-card"
+      >
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
           <!-- Aisles -->
           <div>
-            <h6 class="text-lg font-semibold text-gray-900 mb-4 pb-2 border-b border-gray-200">
+            <h6
+              class="text-lg font-semibold text-gray-900 mb-4 pb-2 border-b border-gray-200"
+            >
               <i class="fas fa-road mr-2"></i>
-              Aisles ({{aisles.length}})
+              Aisles ({{ aisles.length }})
             </h6>
             <div class="space-y-2 max-h-96 overflow-y-auto">
-              <div *ngFor="let aisle of aisles" 
-                   class="p-3 rounded-lg border cursor-pointer transition-all hover:shadow-sm"
-                   [class.bg-blue-50]="selectedItem?.id === aisle.id && selectedItemType === 'Aisle'"
-                   [class.border-blue-500]="selectedItem?.id === aisle.id && selectedItemType === 'Aisle'"
-                   [class.border-gray-200]="selectedItem?.id !== aisle.id || selectedItemType !== 'Aisle'"
-                   (click)="selectAisle(aisle)">
+              <div
+                *ngFor="let aisle of aisles"
+                class="p-3 rounded-lg border cursor-pointer transition-all hover:shadow-sm"
+                [class.bg-blue-50]="
+                  selectedItem?.id === aisle.id && selectedItemType === 'Aisle'
+                "
+                [class.border-blue-500]="
+                  selectedItem?.id === aisle.id && selectedItemType === 'Aisle'
+                "
+                [class.border-gray-200]="
+                  selectedItem?.id !== aisle.id || selectedItemType !== 'Aisle'
+                "
+                (click)="selectAisle(aisle)"
+              >
                 <div class="flex justify-between items-center">
                   <div class="flex-1">
-                    <strong class="text-gray-900">{{aisle.name}}</strong>
+                    <strong class="text-gray-900">{{ aisle.name }}</strong>
                     <div class="text-xs text-gray-500 mt-1">
                       <i class="fas fa-map-marker-alt mr-1"></i>
-                      {{aisle.location || 'No location'}}
+                      {{ aisle.location || "No location" }}
                     </div>
                   </div>
-                  <span class="inline-flex items-center justify-center w-8 h-8 bg-blue-100 text-blue-800 text-xs font-bold rounded-full">
-                    {{aisle.shelves?.length || 0}}
+                  <span
+                    class="inline-flex items-center justify-center w-8 h-8 bg-blue-100 text-blue-800 text-xs font-bold rounded-full"
+                  >
+                    {{ aisle.shelves?.length || 0 }}
                   </span>
                 </div>
               </div>
@@ -472,31 +708,46 @@
 
           <!-- Shelves -->
           <div>
-            <h6 class="text-lg font-semibold text-gray-900 mb-4 pb-2 border-b border-gray-200">
+            <h6
+              class="text-lg font-semibold text-gray-900 mb-4 pb-2 border-b border-gray-200"
+            >
               <i class="fas fa-layer-group mr-2"></i>
-              Shelves ({{filteredShelves.length}})
+              Shelves ({{ filteredShelves.length }})
             </h6>
             <div class="space-y-2 max-h-96 overflow-y-auto">
-              <div *ngFor="let shelf of filteredShelves" 
-                   class="p-3 rounded-lg border cursor-pointer transition-all hover:shadow-sm"
-                   [class.bg-blue-50]="selectedItem?.id === shelf.id && selectedItemType === 'Shelf'"
-                   [class.border-blue-500]="selectedItem?.id === shelf.id && selectedItemType === 'Shelf'"
-                   [class.border-gray-200]="selectedItem?.id !== shelf.id || selectedItemType !== 'Shelf'"
-                   (click)="selectShelf(shelf)">
+              <div
+                *ngFor="let shelf of filteredShelves"
+                class="p-3 rounded-lg border cursor-pointer transition-all hover:shadow-sm"
+                [class.bg-blue-50]="
+                  selectedItem?.id === shelf.id && selectedItemType === 'Shelf'
+                "
+                [class.border-blue-500]="
+                  selectedItem?.id === shelf.id && selectedItemType === 'Shelf'
+                "
+                [class.border-gray-200]="
+                  selectedItem?.id !== shelf.id || selectedItemType !== 'Shelf'
+                "
+                (click)="selectShelf(shelf)"
+              >
                 <div class="flex justify-between items-center">
                   <div class="flex-1">
-                    <strong class="text-gray-900">{{shelf.name}}</strong>
+                    <strong class="text-gray-900">{{ shelf.name }}</strong>
                     <div class="text-xs text-gray-500 mt-1">
                       <i class="fas fa-road mr-1"></i>
-                      {{shelf.aisleName}}
+                      {{ shelf.aisleName }}
                     </div>
                   </div>
-                  <span class="inline-flex items-center justify-center w-8 h-8 bg-indigo-100 text-indigo-800 rounded-full">
+                  <span
+                    class="inline-flex items-center justify-center w-8 h-8 bg-indigo-100 text-indigo-800 rounded-full"
+                  >
                     <i class="fas fa-box text-sm"></i>
                   </span>
                 </div>
               </div>
-              <div *ngIf="selectedAisle && filteredShelves.length === 0" class="text-center py-6 text-gray-400">
+              <div
+                *ngIf="selectedAisle && filteredShelves.length === 0"
+                class="text-center py-6 text-gray-400"
+              >
                 <p class="text-sm">No shelves in this aisle</p>
               </div>
             </div>
@@ -504,26 +755,45 @@
 
           <!-- Products -->
           <div>
-            <h6 class="text-lg font-semibold text-gray-900 mb-4 pb-2 border-b border-gray-200">
+            <h6
+              class="text-lg font-semibold text-gray-900 mb-4 pb-2 border-b border-gray-200"
+            >
               <i class="fas fa-shopping-bag mr-2"></i>
-              Products ({{products.length}})
+              Products ({{ products.length }})
             </h6>
             <div class="space-y-2 max-h-96 overflow-y-auto">
-              <div *ngFor="let product of products" 
-                   class="p-3 rounded-lg border cursor-pointer transition-all hover:shadow-sm"
-                   [class.bg-blue-50]="selectedItem?.id === product.id && selectedItemType === 'Product'"
-                   [class.border-blue-500]="selectedItem?.id === product.id && selectedItemType === 'Product'"
-                   [class.border-gray-200]="selectedItem?.id !== product.id || selectedItemType !== 'Product'"
-                   (click)="selectProduct(product)">
+              <div
+                *ngFor="let product of products"
+                class="p-3 rounded-lg border cursor-pointer transition-all hover:shadow-sm"
+                [class.bg-blue-50]="
+                  selectedItem?.id === product.id &&
+                  selectedItemType === 'Product'
+                "
+                [class.border-blue-500]="
+                  selectedItem?.id === product.id &&
+                  selectedItemType === 'Product'
+                "
+                [class.border-gray-200]="
+                  selectedItem?.id !== product.id ||
+                  selectedItemType !== 'Product'
+                "
+                (click)="selectProduct(product)"
+              >
                 <div class="flex justify-between items-center">
                   <div class="flex-1">
-                    <strong class="text-gray-900">{{product.productName}}</strong>
+                    <strong class="text-gray-900">{{
+                      product.productName
+                    }}</strong>
                     <div class="flex items-center gap-2 mt-1">
-                      <span class="inline-flex items-center px-2 py-0.5 rounded text-xs bg-gray-100 text-gray-700">
-                        {{product.productCode}}
+                      <span
+                        class="inline-flex items-center px-2 py-0.5 rounded text-xs bg-gray-100 text-gray-700"
+                      >
+                        {{ product.productCode }}
                       </span>
-                      <span class="inline-flex items-center px-2 py-0.5 rounded text-xs bg-green-100 text-green-700">
-                        ${{product.sellingPrice || '0.00'}}
+                      <span
+                        class="inline-flex items-center px-2 py-0.5 rounded text-xs bg-green-100 text-green-700"
+                      >
+                        ${{ product.sellingPrice || "0.00" }}
                       </span>
                     </div>
                   </div>
@@ -536,54 +806,86 @@
       </div>
 
       <!-- Selected Item Binding -->
-      <div *ngIf="selectedItem" class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+      <div
+        *ngIf="selectedItem"
+        class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 ds-card"
+      >
         <div class="flex justify-between items-center mb-6">
           <h5 class="text-lg font-semibold text-gray-900">
             <i class="fas fa-link mr-2"></i>
-            Bind {{selectedItemType}}: 
-            <span class="text-blue-900">{{selectedItem.name || selectedItem.productName}}</span>
+            Bind {{ selectedItemType }}:
+            <span class="text-blue-900">{{
+              selectedItem.name || selectedItem.productName
+            }}</span>
           </h5>
-          <button class="cursor-pointer text-gray-600 hover:text-gray-900 px-4 py-2 rounded-lg hover:bg-gray-100 transition-colors" (click)="selectedItem = null">
+          <button
+            class="cursor-pointer text-gray-600 hover:text-gray-900 px-4 py-2 rounded-lg hover:bg-gray-100 transition-colors ds-btn ds-btn--secondary"
+            (click)="selectedItem = null"
+          >
             <i class="fas fa-times mr-2"></i>Clear
           </button>
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
-            <h6 class="text-base font-semibold text-gray-900 mb-4 pb-2 border-b border-gray-200">
+            <h6
+              class="text-base font-semibold text-gray-900 mb-4 pb-2 border-b border-gray-200"
+            >
               <i class="fas fa-list-check mr-2"></i>
-              Available Combos ({{availableCombos.length}})
+              Available Combos ({{ availableCombos.length }})
             </h6>
-            
-            <div *ngIf="availableCombos.length > 0" class="space-y-2 max-h-96 overflow-y-auto">
-              <div *ngFor="let combo of availableCombos" 
-                   class="p-3 rounded-lg border transition-all"
-                   [class.bg-blue-50]="isComboSelected(combo.id)"
-                   [class.border-blue-500]="isComboSelected(combo.id)"
-                   [class.border-gray-200]="!isComboSelected(combo.id)">
+
+            <div
+              *ngIf="availableCombos.length > 0"
+              class="space-y-2 max-h-96 overflow-y-auto"
+            >
+              <div
+                *ngFor="let combo of availableCombos"
+                class="p-3 rounded-lg border transition-all"
+                [class.bg-blue-50]="isComboSelected(combo.id)"
+                [class.border-blue-500]="isComboSelected(combo.id)"
+                [class.border-gray-200]="!isComboSelected(combo.id)"
+              >
                 <div class="flex items-start">
-                  <input class="mt-1 mr-3 cursor-pointer" 
-                         type="checkbox" 
-                         [id]="'combo-' + combo.id"
-                         [checked]="isComboSelected(combo.id)"
-                         (change)="toggleComboSelection(combo.id, $event)">
-                  <label class="flex-1 cursor-pointer" [for]="'combo-' + combo.id">
+                  <input
+                    class="mt-1 mr-3 cursor-pointer"
+                    type="checkbox"
+                    [id]="'combo-' + combo.id"
+                    [checked]="isComboSelected(combo.id)"
+                    (change)="toggleComboSelection(combo.id, $event)"
+                  />
+                  <label
+                    class="flex-1 cursor-pointer"
+                    [for]="'combo-' + combo.id"
+                  >
                     <div class="flex justify-between items-start mb-2">
                       <div class="flex-1">
-                        <strong class="text-gray-900">{{combo.deviceName || combo.deviceId}}</strong>
+                        <strong class="text-gray-900">{{
+                          combo.deviceName || combo.deviceId
+                        }}</strong>
                         <i class="fas fa-arrow-right mx-2 text-gray-400"></i>
-                        <span class="text-gray-700">{{combo.templateName || combo.templateId}}</span>
+                        <span class="text-gray-700">{{
+                          combo.templateName || combo.templateId
+                        }}</span>
                       </div>
-                      <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium"
-                            [ngClass]="combo.isDefault ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-700'">
-                        {{combo.isDefault ? 'Default' : 'Normal'}}
+                      <span
+                        class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium"
+                        [ngClass]="
+                          combo.isDefault
+                            ? 'bg-green-100 text-green-800'
+                            : 'bg-gray-100 text-gray-700'
+                        "
+                      >
+                        {{ combo.isDefault ? "Default" : "Normal" }}
                       </span>
                     </div>
                     <div class="text-sm text-gray-600">
                       <i class="fas fa-expand-alt mr-1"></i>
-                      {{combo.screenWidth || '?'}}x{{combo.screenHeight || '?'}}
+                      {{ combo.screenWidth || "?" }}x{{
+                        combo.screenHeight || "?"
+                      }}
                       <i class="fas fa-battery-full ml-3 mr-1"></i>
-                      {{combo.battery || '?'}}%
+                      {{ combo.battery || "?" }}%
                     </div>
                   </label>
                 </div>
@@ -592,25 +894,35 @@
 
             <div *ngIf="availableCombos.length === 0" class="text-center py-8">
               <i class="fas fa-link-slash text-4xl text-gray-300 mb-3"></i>
-              <p class="text-gray-600 mb-4">No combos available. Create some combos first.</p>
-              <button class="cursor-pointer bg-blue-50 hover:bg-blue-100 text-blue-700 px-6 py-2 rounded-md inline-flex items-center space-x-2 transition-colors" 
-                      (click)="activeTab = 'templates'">
+              <p class="text-gray-600 mb-4">
+                No combos available. Create some combos first.
+              </p>
+              <button
+                class="cursor-pointer bg-blue-50 hover:bg-blue-100 text-blue-700 px-6 py-2 rounded-md inline-flex items-center space-x-2 transition-colors ds-btn ds-btn--secondary"
+                (click)="activeTab = 'templates'"
+              >
                 <i class="fas fa-plus"></i>
                 <span>Create Combos</span>
               </button>
             </div>
           </div>
-          
+
           <div>
-            <h6 class="text-base font-semibold text-gray-900 mb-4 pb-2 border-b border-gray-200">
+            <h6
+              class="text-base font-semibold text-gray-900 mb-4 pb-2 border-b border-gray-200"
+            >
               <i class="fas fa-eye mr-2"></i>
               Test Preview
             </h6>
-            
-            <div class="bg-gray-50 rounded-lg p-6 mb-4 min-h-[200px] flex items-center justify-center border border-gray-200">
+
+            <div
+              class="bg-gray-50 rounded-lg p-6 mb-4 min-h-[200px] flex items-center justify-center border border-gray-200"
+            >
               <div *ngIf="testPreview" class="text-center">
-                <img [src]="'data:image/png;base64,' + testPreview" 
-                     class="max-h-48 mx-auto rounded border border-gray-300 shadow-sm">
+                <img
+                  [src]="'data:image/png;base64,' + testPreview"
+                  class="max-h-48 mx-auto rounded border border-gray-300 shadow-sm"
+                />
                 <div class="mt-3 text-sm text-gray-600">
                   Preview generated from selected template
                 </div>
@@ -618,33 +930,43 @@
               <div *ngIf="!testPreview" class="text-center text-gray-400">
                 <i class="fas fa-image text-5xl mb-3"></i>
                 <p class="text-gray-600">No preview generated yet</p>
-                <p class="text-sm text-gray-500">Select a combo and click "Test Bind"</p>
+                <p class="text-sm text-gray-500">
+                  Select a combo and click "Test Bind"
+                </p>
               </div>
             </div>
 
             <div class="space-y-3">
-              <button class="cursor-pointer w-full bg-primary hover:bg-primary-light text-white px-6 py-2 rounded-md flex items-center justify-center space-x-2 transition-colors" 
-                      (click)="testBind()"
-                      [disabled]="!getSelectedCombos().length">
+              <button
+                class="cursor-pointer w-full bg-primary hover:bg-primary-light text-white px-6 py-2 rounded-md flex items-center justify-center space-x-2 transition-colors ds-btn ds-btn--primary"
+                (click)="testBind()"
+                [disabled]="!getSelectedCombos().length"
+              >
                 <i class="fas fa-play"></i>
                 <span>Test Bind</span>
               </button>
-              <button class="cursor-pointer w-full bg-success hover:bg-emerald-600 text-white px-6 py-2 rounded-md flex items-center justify-center space-x-2 transition-colors" 
-                      (click)="applyBind()"
-                      [disabled]="!getSelectedCombos().length">
+              <button
+                class="cursor-pointer w-full bg-success hover:bg-emerald-600 text-white px-6 py-2 rounded-md flex items-center justify-center space-x-2 transition-colors ds-btn ds-btn--primary"
+                (click)="applyBind()"
+                [disabled]="!getSelectedCombos().length"
+              >
                 <i class="fas fa-check"></i>
                 <span>Apply Binding</span>
               </button>
-              <button 
-               *ngIf="auth.hasAnyRole(['Admin','Manager'])"
-              class="cursor-pointer w-full bg-gray-200 hover:bg-gray-300 text-gray-700 px-6 py-2 rounded-md transition-colors" 
-                      (click)="testPreview = null">
+              <button
+                *ngIf="auth.hasAnyRole(['Admin', 'Manager'])"
+                class="cursor-pointer w-full bg-gray-200 hover:bg-gray-300 text-gray-700 px-6 py-2 rounded-md transition-colors ds-btn ds-btn--secondary"
+                (click)="testPreview = null"
+              >
                 <i class="fas fa-trash mr-2"></i>Clear Preview
               </button>
             </div>
 
             <!-- Binding Status -->
-            <div *ngIf="bindingInProgress" class="mt-4 bg-blue-50 border border-blue-200 rounded-lg p-4">
+            <div
+              *ngIf="bindingInProgress"
+              class="mt-4 bg-blue-50 border border-blue-200 rounded-lg p-4"
+            >
               <div class="flex items-center text-blue-700">
                 <i class="fas fa-spinner fa-spin mr-3"></i>
                 <span>Binding in progress...</span>
@@ -660,23 +982,29 @@
               <dl class="space-y-2 text-sm">
                 <div class="flex">
                   <dt class="w-24 text-gray-600 font-medium">Type:</dt>
-                  <dd class="flex-1 text-gray-900">{{selectedItemType}}</dd>
+                  <dd class="flex-1 text-gray-900">{{ selectedItemType }}</dd>
                 </div>
                 <div class="flex">
                   <dt class="w-24 text-gray-600 font-medium">Name:</dt>
-                  <dd class="flex-1 text-gray-900">{{selectedItem.name || selectedItem.productName}}</dd>
+                  <dd class="flex-1 text-gray-900">
+                    {{ selectedItem.name || selectedItem.productName }}
+                  </dd>
                 </div>
                 <div *ngIf="selectedItem.code" class="flex">
                   <dt class="w-24 text-gray-600 font-medium">Code:</dt>
-                  <dd class="flex-1 text-gray-900">{{selectedItem.code}}</dd>
+                  <dd class="flex-1 text-gray-900">{{ selectedItem.code }}</dd>
                 </div>
                 <div *ngIf="selectedItem.price" class="flex">
                   <dt class="w-24 text-gray-600 font-medium">Price:</dt>
-                  <dd class="flex-1 text-gray-900">${{selectedItem.price}}</dd>
+                  <dd class="flex-1 text-gray-900">
+                    ${{ selectedItem.price }}
+                  </dd>
                 </div>
                 <div *ngIf="selectedItem.location" class="flex">
                   <dt class="w-24 text-gray-600 font-medium">Location:</dt>
-                  <dd class="flex-1 text-gray-900">{{selectedItem.location}}</dd>
+                  <dd class="flex-1 text-gray-900">
+                    {{ selectedItem.location }}
+                  </dd>
                 </div>
               </dl>
             </div>
@@ -685,13 +1013,25 @@
       </div>
 
       <!-- Instructions when no item selected -->
-      <div *ngIf="!selectedItem" class="bg-white rounded-lg shadow-sm border border-gray-200 p-12 text-center">
+      <div
+        *ngIf="!selectedItem"
+        class="bg-white rounded-lg shadow-sm border border-gray-200 p-12 text-center ds-card"
+      >
         <i class="fas fa-mouse-pointer text-6xl text-gray-300 mb-4"></i>
-        <h5 class="text-lg font-medium text-gray-900 mb-2">Select an Item to Bind</h5>
-        <p class="text-gray-600 mb-4">Click on an aisle, shelf, or product from the lists above to start binding.</p>
-        <div class="inline-flex items-center bg-blue-50 border border-blue-200 text-blue-800 px-4 py-3 rounded-lg">
+        <h5 class="text-lg font-medium text-gray-900 mb-2">
+          Select an Item to Bind
+        </h5>
+        <p class="text-gray-600 mb-4">
+          Click on an aisle, shelf, or product from the lists above to start
+          binding.
+        </p>
+        <div
+          class="inline-flex items-center bg-blue-50 border border-blue-200 text-blue-800 px-4 py-3 rounded-lg"
+        >
           <i class="fas fa-lightbulb mr-2"></i>
-          <span class="text-sm">Tip: You can bind the same combo to multiple locations</span>
+          <span class="text-sm"
+            >Tip: You can bind the same combo to multiple locations</span
+          >
         </div>
       </div>
     </div>

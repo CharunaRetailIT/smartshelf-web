@@ -1,10 +1,18 @@
-import { Component, EventEmitter, Input, Output, ViewChild } from '@angular/core';
-import { MinewStore, ProductItem } from '../../../core/interfaces/minew.interface';
+import {
+  Component,
+  EventEmitter,
+  Input,
+  Output,
+  ViewChild,
+} from '@angular/core';
+import {
+  MinewStore,
+  ProductItem,
+} from '../../../core/interfaces/minew.interface';
 import { MinewService } from '../../../core/services/minew.service';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { MatPaginator, MatPaginatorModule, PageEvent } from '@angular/material/paginator';
-import { MatTableDataSource, MatTableModule } from '@angular/material/table';
+import { TableModule, TableLazyLoadEvent } from 'primeng/table';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
@@ -13,18 +21,30 @@ import { MatIconModule } from '@angular/material/icon';
 @Component({
   selector: 'app-minew-products',
   standalone: true,
-  imports: [CommonModule,FormsModule,MatTableModule,MatPaginatorModule, MatButtonModule, MatCardModule, MatProgressSpinnerModule, MatIconModule],
+  imports: [
+    CommonModule,
+    FormsModule,
+    TableModule,
+    MatButtonModule,
+    MatCardModule,
+    MatProgressSpinnerModule,
+    MatIconModule,
+  ],
   templateUrl: './minew-products.component.html',
-  styleUrl: './minew-products.component.css'
+  styleUrl: './minew-products.component.css',
 })
 export class MinewProductsComponent {
- @Input() store!: MinewStore;
- @Output() logout = new EventEmitter<void>();
+  @Input() store!: MinewStore;
+  @Output() logout = new EventEmitter<void>();
 
-  @ViewChild(MatPaginator) paginator!: MatPaginator;
-
-  dataSource = new MatTableDataSource<ProductItem>([]);
-  displayedColumns: string[] = ['id', 'specification', 'price', 'discount', 'unit'];
+  dataSource: ProductItem[] = [];
+  displayedColumns: string[] = [
+    'id',
+    'specification',
+    'price',
+    'discount',
+    'unit',
+  ];
 
   // State
   isLoading = false;
@@ -37,14 +57,6 @@ export class MinewProductsComponent {
 
   constructor(private minewService: MinewService) {}
 
-  ngOnInit() {
-    this.loadPage();
-  }
-
-  ngAfterViewInit() {
-    this.dataSource.paginator = this.paginator;
-  }
-
   loadPage(reset: boolean = false): void {
     if (reset) {
       this.pageIndex = 0;
@@ -56,26 +68,39 @@ export class MinewProductsComponent {
 
     const page = this.pageIndex + 1;
 
-    this.minewService.getProducts(this.store.storeId, page, this.pageSize).subscribe({
-      next: (resp) => {
-        if (reset) this.items = [];
-        this.items = [...this.items, ...resp.items];
-        this.totalItems = resp.totalNum;
-        this.dataSource.data = this.items;
-        this.isLoading = false;
-      },
-      error: (err) => {
-        this.errorMessage = err?.error?.message ?? 'Failed to load products';
-        this.isLoading = false;
-      },
-    });
+    this.minewService
+      .getProducts(this.store.storeId, page, this.pageSize)
+      .subscribe({
+        next: (resp) => {
+          if (reset) this.items = [];
+          this.items = [...this.items, ...resp.items];
+          this.totalItems = resp.totalNum;
+          this.dataSource = this.items;
+          this.isLoading = false;
+        },
+        error: (err) => {
+          this.errorMessage = err?.error?.message ?? 'Failed to load products';
+          this.isLoading = false;
+        },
+      });
   }
 
-  handlePageEvent(event: PageEvent) {
-    this.pageSize = event.pageSize;
-    this.pageIndex = event.pageIndex;
+  /**
+   * The grid drives loading, including the very first page - so there is no
+   * separate call in ngOnInit. `first` is a row offset, which converts back to
+   * the page index the Material paginator used to hand over directly.
+   *
+   * The append-on-next / reset-otherwise behaviour is unchanged.
+   */
+  handlePageEvent(event: TableLazyLoadEvent) {
+    const rows = event.rows ?? this.pageSize;
+    const nextIndex = Math.floor((event.first ?? 0) / rows);
+    const previousIndex = this.pageIndex;
 
-    if (event.previousPageIndex !== undefined && event.pageIndex > event.previousPageIndex) {
+    this.pageSize = rows;
+    this.pageIndex = nextIndex;
+
+    if (nextIndex > previousIndex) {
       // Load more (next page)
       this.loadPage();
     } else {
@@ -97,7 +122,7 @@ export class MinewProductsComponent {
       error: (err) => {
         this.errorMessage = err?.error?.message ?? 'Failed to sync to cloud';
         this.isSyncing = false;
-      }
+      },
     });
   }
 

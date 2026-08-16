@@ -7,15 +7,15 @@ const routes: Routes = [
   {
     path: '',
     component: MinewIntegrationComponent,
-    data: { showHeader: false, roles: ['Viewer', 'Admin', 'Manager', 'Operator'] }, 
+    data: {
+      showHeader: false,
+      roles: ['Viewer', 'Admin', 'Manager', 'Operator'],
+    },
   },
 ];
 
 @NgModule({
-  imports: [
-    CommonModule,
-    RouterModule.forChild(routes),
-  ],
+  imports: [CommonModule, RouterModule.forChild(routes)],
   exports: [RouterModule],
 })
 export class MinewModule {}

@@ -14,7 +14,7 @@
     </div>
     <button
       (click)="onCancel()"
-      class="text-gray-400 hover:text-gray-600 focus:outline-none focus:ring-2 focus:ring-emerald-600 focus:ring-offset-2 rounded-full p-2"
+      class="text-gray-400 hover:text-gray-600 focus:outline-none focus:ring-2 focus:ring-emerald-600 focus:ring-offset-2 rounded-full p-2 ds-btn-icon"
       aria-label="Close dialog"
     >
       <svg
@@ -200,7 +200,7 @@
             <button
               type="button"
               (click)="togglePasswordVisibility()"
-              class="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-400 hover:text-gray-600"
+              class="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-400 hover:text-gray-600 ds-btn-icon"
             >
               <svg
                 *ngIf="!showPassword"
@@ -352,14 +352,14 @@
       <button
         type="button"
         (click)="onCancel()"
-        class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-600 transition-colors"
+        class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-600 transition-colors ds-btn ds-btn--secondary"
       >
         Cancel
       </button>
       <button
         type="submit"
         [disabled]="userForm.invalid || isSubmitting()"
-        class="px-4 py-2 text-sm font-medium text-white bg-primary border border-transparent rounded-md shadow-sm hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center gap-2"
+        class="px-4 py-2 text-sm font-medium text-white bg-primary border border-transparent rounded-md shadow-sm hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center gap-2 ds-btn ds-btn--primary"
       >
         <svg
           *ngIf="isSubmitting()"

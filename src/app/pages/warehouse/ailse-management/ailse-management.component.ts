@@ -8,16 +8,23 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatExpansionModule } from '@angular/material/expansion';
-import { firstValueFrom, debounceTime, Subject, distinctUntilChanged } from 'rxjs';
+import {
+  firstValueFrom,
+  debounceTime,
+  Subject,
+  distinctUntilChanged,
+} from 'rxjs';
 import { AisleMaster } from '../../../core/interfaces/aisle.interface';
 import { AisleService } from '../../../core/services/aisle.service';
 import { AuthService } from '../../../core/services/auth.service';
 import { DeleteConfirmationComponent } from '../../../shared/components/dialog/delete-confirmation/delete-confirmation.component';
-import { CreateAisleComponent } from '../create-aisle/create-aisle.component';
 import { EditAisleComponent } from '../edit-aisle/edit-aisle.component';
 import { ShelfService } from '../../../core/services/shelf.service';
 // import { EditShelfComponent } from '../edit-shelf/edit-shelf.component';
-import { CustomSnackbarComponent, SnackbarData } from '../../../shared/components/alert/custom-snackbar.component';
+import {
+  CustomSnackbarComponent,
+  SnackbarData,
+} from '../../../shared/components/alert/custom-snackbar.component';
 import { RestoreConfirmationComponent } from '../../../shared/components/dialog/restore-confirmation/restore-confirmation.component';
 import { SearchParams } from '../../../core/interfaces/pagination-result.interface';
 import { ProductAssignmentComponent } from '../../products/product-assignment/product-assignment.component';
@@ -49,10 +56,10 @@ export interface AisleWithShelves extends AisleMaster {
     MatCardModule,
     MatChipsModule,
     RouterModule,
-    ImportsModule
+    ImportsModule,
   ],
   templateUrl: './ailse-management.component.html',
-  styleUrl: './ailse-management.component.css'
+  styleUrl: './ailse-management.component.css',
 })
 export class AilseManagementComponent implements OnInit {
   private messageService = inject(MessageService);
@@ -99,8 +106,8 @@ export class AilseManagementComponent implements OnInit {
     public auth: AuthService,
     private settingsService: SettingsService,
     private minewService: MinewService,
-    public router: Router
-  ) { }
+    public router: Router,
+  ) {}
   //#endregion
 
   //#region Lifecycle Hooks
@@ -110,15 +117,13 @@ export class AilseManagementComponent implements OnInit {
     this.loadAisles();
 
     // Setup search debounce
-    this.searchSubject.pipe(
-      debounceTime(300),
-      distinctUntilChanged()
-    ).subscribe(() => {
-      this.currentPage = 1;
-      this.loadAisles();
-    });
+    this.searchSubject
+      .pipe(debounceTime(300), distinctUntilChanged())
+      .subscribe(() => {
+        this.currentPage = 1;
+        this.loadAisles();
+      });
   }
-
 
   //#endregion
 
@@ -148,62 +153,70 @@ export class AilseManagementComponent implements OnInit {
     const searchParams: SearchParams = {
       pageNumber: this.currentPage,
       pageSize: this.pageSize,
-      searchTerm: this.searchValue
+      searchTerm: this.searchValue,
     };
 
-    this.aisleService.getAislesWithShelves(searchParams, this.storeId).subscribe({
-      next: (pagedResult) => {
-        // First, ensure pagedResult and items exist
-        if (!pagedResult || !pagedResult.items) {
-          console.error('Invalid response structure:', pagedResult);
+    this.aisleService
+      .getAislesWithShelves(searchParams, this.storeId)
+      .subscribe({
+        next: (pagedResult) => {
+          // First, ensure pagedResult and items exist
+          if (!pagedResult || !pagedResult.items) {
+            console.error('Invalid response structure:', pagedResult);
+            this.aisles = [];
+            this.totalCount = 0;
+            this.totalPages = 0;
+            this.loading = false;
+            return;
+          }
+
+          // Ensure items is an array
+          const items = Array.isArray(pagedResult.items)
+            ? pagedResult.items
+            : [];
+
+          // Apply status filter client-side
+          let filteredItems = items;
+
+          if (this.statusFilter !== 'all') {
+            const isActive = this.statusFilter === 'active';
+            filteredItems = filteredItems.filter(
+              (aisle) => aisle.isActive === isActive,
+            );
+          }
+
+          // Then map the filtered items
+          this.aisles = filteredItems.map((aisle) => ({
+            ...aisle,
+            shelfCount: aisle.shelves?.length || 0,
+            expanded: false,
+          }));
+
+          // Update pagination info
+          // Use the original total count for pagination, not filtered count
+          this.totalCount = pagedResult.totalCount || 0;
+          this.totalPages =
+            pagedResult.totalPages ||
+            Math.ceil(this.totalCount / this.pageSize);
+
+          console.log('Aisles loaded successfully:', {
+            totalAisles: this.aisles.length,
+            totalCount: this.totalCount,
+            totalPages: this.totalPages,
+          });
+          this.loading = false;
+        },
+        error: (error: Error) => {
+          console.error('Error loading aisles:', error);
+          this.showError(`Error loading aisles: ${error.message}`);
+          this.loading = false;
+
+          // Reset to empty state on error
           this.aisles = [];
           this.totalCount = 0;
           this.totalPages = 0;
-          this.loading = false;
-          return;
-        }
-
-        // Ensure items is an array
-        const items = Array.isArray(pagedResult.items) ? pagedResult.items : [];
-
-        // Apply status filter client-side
-        let filteredItems = items;
-
-        if (this.statusFilter !== 'all') {
-          const isActive = this.statusFilter === 'active';
-          filteredItems = filteredItems.filter(aisle => aisle.isActive === isActive);
-        }
-
-        // Then map the filtered items
-        this.aisles = filteredItems.map(aisle => ({
-          ...aisle,
-          shelfCount: aisle.shelves?.length || 0,
-          expanded: false
-        }));
-
-        // Update pagination info
-        // Use the original total count for pagination, not filtered count
-        this.totalCount = pagedResult.totalCount || 0;
-        this.totalPages = pagedResult.totalPages || Math.ceil(this.totalCount / this.pageSize);
-
-        console.log('Aisles loaded successfully:', {
-          totalAisles: this.aisles.length,
-          totalCount: this.totalCount,
-          totalPages: this.totalPages
-        });
-        this.loading = false;
-      },
-      error: (error: Error) => {
-        console.error('Error loading aisles:', error);
-        this.showError(`Error loading aisles: ${error.message}`);
-        this.loading = false;
-
-        // Reset to empty state on error
-        this.aisles = [];
-        this.totalCount = 0;
-        this.totalPages = 0;
-      }
-    });
+        },
+      });
   }
   // loadAisles(): void {
   //   this.loading = true;
@@ -279,7 +292,9 @@ export class AilseManagementComponent implements OnInit {
 
   //#region Filtering with Debounced Search
   applyFilter(event?: Event): void {
-    const filterValue = event ? (event.target as HTMLInputElement).value : this.searchValue || '';
+    const filterValue = event
+      ? (event.target as HTMLInputElement).value
+      : this.searchValue || '';
     this.searchValue = filterValue;
     this.searchSubject.next(filterValue);
   }
@@ -297,7 +312,7 @@ export class AilseManagementComponent implements OnInit {
     // Apply search filter
     if (this.shelfSearchValue.trim()) {
       const term = this.shelfSearchValue.trim().toLowerCase();
-      filteredShelves = filteredShelves.filter(shelf => {
+      filteredShelves = filteredShelves.filter((shelf) => {
         const searchData = [
           shelf.name?.toLowerCase() || '',
           shelf.location?.toLowerCase() || '',
@@ -310,14 +325,18 @@ export class AilseManagementComponent implements OnInit {
     // Apply status filter
     if (this.shelfStatusFilter !== 'all') {
       const isActive = this.shelfStatusFilter === 'active';
-      filteredShelves = filteredShelves.filter(shelf => shelf.isActive === isActive);
+      filteredShelves = filteredShelves.filter(
+        (shelf) => shelf.isActive === isActive,
+      );
     }
 
     return filteredShelves;
   }
 
   applyShelfSearch(event?: Event): void {
-    const filterValue = event ? (event.target as HTMLInputElement).value : this.shelfSearchValue || '';
+    const filterValue = event
+      ? (event.target as HTMLInputElement).value
+      : this.shelfSearchValue || '';
     this.shelfSearchValue = filterValue;
   }
 
@@ -363,7 +382,10 @@ export class AilseManagementComponent implements OnInit {
   }
 
   getDisplayStart(): number {
-    return Math.min((this.currentPage - 1) * this.pageSize + 1, this.totalCount);
+    return Math.min(
+      (this.currentPage - 1) * this.pageSize + 1,
+      this.totalCount,
+    );
   }
 
   getDisplayEnd(): number {
@@ -371,7 +393,10 @@ export class AilseManagementComponent implements OnInit {
   }
 
   getTotalShelves(): number {
-    return this.aisles.reduce((total, aisle) => total + (aisle.shelfCount || 0), 0);
+    return this.aisles.reduce(
+      (total, aisle) => total + (aisle.shelfCount || 0),
+      0,
+    );
   }
   //#endregion
 
@@ -388,10 +413,10 @@ export class AilseManagementComponent implements OnInit {
         title: 'Delete Items',
         message: `Are you sure you want to delete ${aisleIds.length + shelfIds.length} items?`,
         confirmText: 'Delete',
-        cancelText: 'Cancel'
+        cancelText: 'Cancel',
       },
       panelClass: ['rounded-lg'],
-      disableClose: true
+      disableClose: true,
     });
 
     dialogRef.afterClosed().subscribe(async (result) => {
@@ -427,16 +452,18 @@ export class AilseManagementComponent implements OnInit {
         title: 'Delete Aisle',
         message: `Are you sure you want to delete "${aisle.name}"?`,
         confirmText: 'Delete',
-        cancelText: 'Cancel'
+        cancelText: 'Cancel',
       },
       panelClass: ['rounded-lg'],
-      disableClose: true
+      disableClose: true,
     });
 
     dialogRef.afterClosed().subscribe(async (result) => {
       if (result === true) {
         try {
-          await firstValueFrom(this.aisleService.deleteAisle(aisle.id!, this.currentUserId));
+          await firstValueFrom(
+            this.aisleService.deleteAisle(aisle.id!, this.currentUserId),
+          );
           this.showSuccess('Aisle deleted successfully');
           this.loadAisles();
         } catch (error: any) {
@@ -454,16 +481,22 @@ export class AilseManagementComponent implements OnInit {
         title: 'Delete Shelf',
         message: `Are you sure you want to delete "${shelf?.name}"?`,
         confirmText: 'Delete',
-        cancelText: 'Cancel'
+        cancelText: 'Cancel',
       },
       panelClass: ['rounded-lg'],
-      disableClose: true
+      disableClose: true,
     });
 
     dialogRef.afterClosed().subscribe(async (result) => {
       if (result === true && shelf) {
         try {
-          await firstValueFrom(this.shelfService.deleteShelf(shelf.id!, this.currentUserId, this.storeId));
+          await firstValueFrom(
+            this.shelfService.deleteShelf(
+              shelf.id!,
+              this.currentUserId,
+              this.storeId,
+            ),
+          );
           this.showSuccess('Shelf deleted successfully');
           this.loadAisles();
         } catch (error: any) {
@@ -482,27 +515,31 @@ export class AilseManagementComponent implements OnInit {
       maxHeight: '90vh',
       panelClass: 'custom-dialog-container',
       disableClose: true,
-      data: { aisle, currentUserId: this.auth.getCurrentUserValue()?.id }
+      data: { aisle, currentUserId: this.auth.getCurrentUserValue()?.id },
     });
 
-    dialogRef.afterClosed().subscribe(result => {
+    dialogRef.afterClosed().subscribe((result) => {
       if (result) {
         this.loadAisles();
       }
     });
   }
 
-  openShelfModal(mode: 'create' | 'edit', shelfData?: any, aisleId?: number): void {
+  openShelfModal(
+    mode: 'create' | 'edit',
+    shelfData?: any,
+    aisleId?: number,
+  ): void {
     const dialogRef = this.dialog.open(ShelfModalComponent, {
       // The panel used to size itself to the inner p-dialog; now that the
       // Material shell is the only shell, the width lives here.
       width: '90vw',
       maxWidth: '700px',
       maxHeight: '90vh',
-      data: mode === 'edit' ? { shelf: shelfData } : { aisleID: aisleId }
+      data: mode === 'edit' ? { shelf: shelfData } : { aisleID: aisleId },
     });
-    console.log("open with", mode, shelfData)
-    dialogRef.afterClosed().subscribe(result => {
+    console.log('open with', mode, shelfData);
+    dialogRef.afterClosed().subscribe((result) => {
       if (result?.success) {
         // Handle success
         // this.loadShelves(); // Reload shelf list
@@ -513,15 +550,12 @@ export class AilseManagementComponent implements OnInit {
 
   async editShelf(shelf: Shelf): Promise<void> {
     // console.log('Opening edit dialog for shelf:', shelf);
-
     // try {
     //   // Load shelf with assignments before opening dialog
     //   const shelfWithAssignments = await firstValueFrom(
     //     this.shelfService.getShelfWithAssignments(shelf.id!)
     //   );
-
     //   console.log('Shelf with assignments loaded:', shelfWithAssignments);
-
     //   const dialogRef = this.dialog.open(EditShelfComponent, {
     //     width: '90vw',
     //     maxWidth: '600px',
@@ -529,24 +563,21 @@ export class AilseManagementComponent implements OnInit {
     //     maxHeight: '90vh',
     //     panelClass: 'custom-dialog-container',
     //     disableClose: true,
-    //     data: { 
+    //     data: {
     //       shelf: shelfWithAssignments,
-    //       currentUserId: this.auth.getCurrentUserValue()?.id 
+    //       currentUserId: this.auth.getCurrentUserValue()?.id
     //     }
     //   });
-
     //   dialogRef.afterClosed().subscribe(result => {
     //     if (result) {
     //       this.showSuccess('Shelf updated successfully!');
     //       this.loadAisles();
     //     }
     //   });
-
     // } catch (error) {
     //   console.error('Error loading shelf with assignments:', error);
     //   // Fallback to original shelf data if API fails
     //   this.showWarning('Could not load device assignments. Showing basic shelf info.');
-
     //   const dialogRef = this.dialog.open(EditShelfComponent, {
     //     width: '90vw',
     //     maxWidth: '600px',
@@ -554,12 +585,11 @@ export class AilseManagementComponent implements OnInit {
     //     maxHeight: '90vh',
     //     panelClass: 'custom-dialog-container',
     //     disableClose: true,
-    //     data: { 
+    //     data: {
     //       shelf,
-    //       currentUserId: this.auth.getCurrentUserValue()?.id 
+    //       currentUserId: this.auth.getCurrentUserValue()?.id
     //     }
     //   });
-
     //   dialogRef.afterClosed().subscribe(result => {
     //     if (result) {
     //       this.showSuccess('Shelf updated successfully!');
@@ -573,44 +603,13 @@ export class AilseManagementComponent implements OnInit {
   openCreateRackModal(): void {
     const dialogRef = this.dialog.open(CreateRackComponent, {
       width: '900px',
-      maxHeight: '90vh'
+      maxHeight: '90vh',
     });
 
-    dialogRef.afterClosed().subscribe(result => {
+    dialogRef.afterClosed().subscribe((result) => {
       if (result?.success) {
         console.log('Rack created:', result.data);
         // Refresh
-        this.loadAisles();
-      }
-    });
-  }
-
-  openAddAisleDialog(): void {
-    const isCollapsed = document.querySelector('.sidenav')?.classList.contains('sidenav-collapsed');
-    const sidebarWidthRem = isCollapsed ? 5 : 16.5625;
-    const remInPx = parseFloat(getComputedStyle(document.documentElement).fontSize);
-    const sidebarWidth = sidebarWidthRem * remInPx;
-    const dialogWidth = 1000;
-    const viewportWidth = window.innerWidth;
-    const viewportHeight = window.innerHeight;
-    const left = sidebarWidth + (viewportWidth - sidebarWidth - dialogWidth) / 2;
-    const top = (viewportHeight - 800) / 2;
-
-    const dialogRef = this.dialog.open(CreateAisleComponent, {
-      width: `${dialogWidth}px`,
-      height: '90vh',
-      maxHeight: '800px',
-      panelClass: 'custom-dialog-container',
-      position: {
-        left: `${left}px`,
-        top: `${Math.max(top, 50)}px`
-      },
-      disableClose: true
-    });
-
-    dialogRef.afterClosed().subscribe(result => {
-      if (result) {
-        this.showSuccess('Aisle created successfully!');
         this.loadAisles();
       }
     });
@@ -621,11 +620,15 @@ export class AilseManagementComponent implements OnInit {
   }
 
   exportData(): void {
-    this.snackBar.open('Export functionality to be implemented', 'Close', { duration: 2000 });
+    this.snackBar.open('Export functionality to be implemented', 'Close', {
+      duration: 2000,
+    });
   }
 
   importData(): void {
-    this.snackBar.open('Import functionality to be implemented', 'Close', { duration: 2000 });
+    this.snackBar.open('Import functionality to be implemented', 'Close', {
+      duration: 2000,
+    });
   }
 
   // addShelf(aisle: AisleWithShelves): void {
@@ -635,7 +638,7 @@ export class AilseManagementComponent implements OnInit {
   //     maxHeight: '90vh',
   //     panelClass: 'custom-dialog-container',
   //     disableClose: true,
-  //     data: { aisleID: aisle.id }  
+  //     data: { aisleID: aisle.id }
   //   });
 
   //   dialogRef.afterClosed().subscribe(result => {
@@ -653,16 +656,18 @@ export class AilseManagementComponent implements OnInit {
         title: 'Restore Aisle',
         message: `Are you sure you want to restore "${aisle.name}"?`,
         confirmText: 'Restore',
-        cancelText: 'Cancel'
+        cancelText: 'Cancel',
       },
       panelClass: ['rounded-lg'],
-      disableClose: true
+      disableClose: true,
     });
 
     dialogRef.afterClosed().subscribe(async (result) => {
       if (result === true) {
         try {
-          await firstValueFrom(this.aisleService.restoreAisle(aisle.id!, this.currentUserId));
+          await firstValueFrom(
+            this.aisleService.restoreAisle(aisle.id!, this.currentUserId),
+          );
           this.showSuccess('Aisle restored successfully');
           this.loadAisles();
         } catch (error: any) {
@@ -680,16 +685,22 @@ export class AilseManagementComponent implements OnInit {
         title: 'Restore Shelf',
         message: `Are you sure you want to restore "${shelf.name}"?`,
         confirmText: 'Restore',
-        cancelText: 'Cancel'
+        cancelText: 'Cancel',
       },
       panelClass: ['rounded-lg'],
-      disableClose: true
+      disableClose: true,
     });
 
     dialogRef.afterClosed().subscribe(async (result) => {
       if (result === true) {
         try {
-          await firstValueFrom(this.shelfService.restoreShelf(shelf.id!, this.currentUserId, this.storeId));
+          await firstValueFrom(
+            this.shelfService.restoreShelf(
+              shelf.id!,
+              this.currentUserId,
+              this.storeId,
+            ),
+          );
           this.showSuccess('Shelf restored successfully');
           this.loadAisles();
         } catch (error: any) {
@@ -728,11 +739,11 @@ export class AilseManagementComponent implements OnInit {
       disableClose: true,
       data: {
         shelf: shelf,
-        currentUserId: this.auth.getCurrentUserValue()?.id
-      }
+        currentUserId: this.auth.getCurrentUserValue()?.id,
+      },
     });
 
-    dialogRef.afterClosed().subscribe(result => {
+    dialogRef.afterClosed().subscribe((result) => {
       if (result) {
         this.showSuccess('Product assignments updated successfully!');
         // Optionally reload the shelf data to show updated product count
@@ -756,7 +767,7 @@ export class AilseManagementComponent implements OnInit {
         this.showError(errorMessage);
         this.loading = false;
         this.syncing = false;
-      }
+      },
     });
   }
   //#endregion
@@ -767,7 +778,7 @@ export class AilseManagementComponent implements OnInit {
       severity: 'success',
       summary: 'Success',
       detail: message,
-      life: 5000
+      life: 5000,
     });
   }
 
@@ -776,7 +787,7 @@ export class AilseManagementComponent implements OnInit {
       severity: 'error',
       summary: 'Error',
       detail: message,
-      life: 5000
+      life: 5000,
     });
   }
 
@@ -785,7 +796,7 @@ export class AilseManagementComponent implements OnInit {
       severity: 'warn',
       summary: 'Warning',
       detail: message,
-      life: 5000
+      life: 5000,
     });
   }
 
@@ -794,7 +805,7 @@ export class AilseManagementComponent implements OnInit {
       severity: 'info',
       summary: 'Info',
       detail: message,
-      life: 5000
+      life: 5000,
     });
   }
   // private showSuccess(message: string): void {

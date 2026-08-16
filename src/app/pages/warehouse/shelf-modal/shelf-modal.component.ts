@@ -1,10 +1,31 @@
-import { ChangeDetectorRef, Component, Inject, OnInit, ViewChild } from '@angular/core';
-import { FormGroup, FormBuilder, Validators, FormArray, FormsModule, ReactiveFormsModule } from '@angular/forms';
+import {
+  ChangeDetectorRef,
+  Component,
+  Inject,
+  OnInit,
+  ViewChild,
+} from '@angular/core';
+import {
+  FormGroup,
+  FormBuilder,
+  Validators,
+  FormArray,
+  FormsModule,
+  ReactiveFormsModule,
+} from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { Subject, debounceTime, distinctUntilChanged, firstValueFrom } from 'rxjs';
+import {
+  Subject,
+  debounceTime,
+  distinctUntilChanged,
+  firstValueFrom,
+} from 'rxjs';
 import { AisleMaster } from '../../../core/interfaces/aisle.interface';
-import { LocalDeviceDto, LocalTemplateDto } from '../../../core/interfaces/device.interface';
+import {
+  LocalDeviceDto,
+  LocalTemplateDto,
+} from '../../../core/interfaces/device.interface';
 import { MessageWithUser } from '../../../core/interfaces/message.interface';
 import { SearchParams } from '../../../core/interfaces/pagination-result.interface';
 import { Shelf } from '../../../core/interfaces/shelf.interface';
@@ -13,7 +34,10 @@ import { AuthService } from '../../../core/services/auth.service';
 import { DeviceService } from '../../../core/services/device.service';
 import { SettingsService } from '../../../core/services/settings.service';
 import { ShelfService } from '../../../core/services/shelf.service';
-import { SnackbarData, CustomSnackbarComponent } from '../../../shared/components/alert/custom-snackbar.component';
+import {
+  SnackbarData,
+  CustomSnackbarComponent,
+} from '../../../shared/components/alert/custom-snackbar.component';
 import { CommonModule } from '@angular/common';
 import { ImportsModule } from '../../../imports/imports';
 import { CustomMessageService } from '../../../core/services/message.service';
@@ -64,9 +88,15 @@ interface ProcessedComboResult {
 @Component({
   selector: 'app-shelf-modal',
   standalone: true,
-  imports: [CommonModule, FormsModule, ReactiveFormsModule, ImportsModule, TruncatePipe],
+  imports: [
+    CommonModule,
+    FormsModule,
+    ReactiveFormsModule,
+    ImportsModule,
+    TruncatePipe,
+  ],
   templateUrl: './shelf-modal.component.html',
-  styleUrl: './shelf-modal.component.css'
+  styleUrl: './shelf-modal.component.css',
 })
 export class ShelfModalComponent implements OnInit {
   // Modal properties
@@ -83,7 +113,7 @@ export class ShelfModalComponent implements OnInit {
   activeTabIndex: number = 0;
   tabs = [
     { label: 'Basic Information', icon: 'pi pi-info-circle' },
-    { label: 'Device Configuration', icon: 'pi pi-cog' }
+    { label: 'Device Configuration', icon: 'pi pi-cog' },
   ];
 
   // Data sources
@@ -101,8 +131,16 @@ export class ShelfModalComponent implements OnInit {
   // Combo mode selection
   comboMode: 'device-template' | 'device-message' = 'device-template';
   comboModeOptions: ComboModeOption[] = [
-    { label: 'Device + Template', value: 'device-template', icon: 'pi pi-sliders-h' },
-    { label: 'Device + Message', value: 'device-message', icon: 'pi pi-comment' }
+    {
+      label: 'Device + Template',
+      value: 'device-template',
+      icon: 'pi pi-sliders-h',
+    },
+    {
+      label: 'Device + Message',
+      value: 'device-message',
+      icon: 'pi pi-comment',
+    },
   ];
 
   // Existing combos (lazy loaded)
@@ -169,7 +207,6 @@ export class ShelfModalComponent implements OnInit {
   currentLoadingData: any = null;
   currentLoadingMethod: 'template' | 'message' = 'template';
 
-
   //Current User
   currentUserId: number = 0;
 
@@ -191,9 +228,9 @@ export class ShelfModalComponent implements OnInit {
 
   existingComboSearchDebounceTimer: any;
 
-
   // Validation patterns
-  private readonly IP_PATTERN = /^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/;
+  private readonly IP_PATTERN =
+    /^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/;
   private readonly MAC_PATTERN = /^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$/;
 
   Math = Math;
@@ -201,7 +238,8 @@ export class ShelfModalComponent implements OnInit {
   constructor(
     private fb: FormBuilder,
     private dialogRef: MatDialogRef<ShelfModalComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: {
+    @Inject(MAT_DIALOG_DATA)
+    public data: {
       shelf?: Shelf;
       aisleID?: number;
       devices?: LocalDeviceDto[];
@@ -216,12 +254,12 @@ export class ShelfModalComponent implements OnInit {
     private settingsService: SettingsService,
     private primemessageService: MessageService,
     private snackBar: MatSnackBar,
-    private cdRef: ChangeDetectorRef
+    private cdRef: ChangeDetectorRef,
   ) {
     this.shelfForm = this.createForm();
     this.isEditMode = !!data?.shelf;
     this.header = this.getHeaderText();
-    console.log(this.shelfForm)
+    console.log(this.shelfForm);
     if (data?.devices) this.devices = data.devices;
     if (data?.templates) this.templates = data.templates;
     if (data?.messages) this.messages = data.messages;
@@ -244,7 +282,6 @@ export class ShelfModalComponent implements OnInit {
       : 'View shelf details and assigned devices';
   }
 
-
   //#region Lifecycle Methods
   ngOnInit(): void {
     this.initCurrentUser();
@@ -253,19 +290,18 @@ export class ShelfModalComponent implements OnInit {
 
     // Add template search debounce
     // In ngOnInit, update the subscription:
-    this.templateSearchDebounce.pipe(
-      debounceTime(300),
-      distinctUntilChanged()
-    ).subscribe(searchTerm => {
-      this.templateSearchTerm = searchTerm;
-      this.templatePage = 1;
-      this.filteredTemplates = [];
-      this.templates = []; // Clear existing templates
+    this.templateSearchDebounce
+      .pipe(debounceTime(300), distinctUntilChanged())
+      .subscribe((searchTerm) => {
+        this.templateSearchTerm = searchTerm;
+        this.templatePage = 1;
+        this.filteredTemplates = [];
+        this.templates = []; // Clear existing templates
 
-      // If search term is empty, we want ALL templates
-      // If search term has value, we want filtered templates
-      this.loadTemplates();
-    });
+        // If search term is empty, we want ALL templates
+        // If search term has value, we want filtered templates
+        this.loadTemplates();
+      });
 
     if (this.isEditMode && this.data.shelf) {
       this.populateFormForEdit();
@@ -275,10 +311,9 @@ export class ShelfModalComponent implements OnInit {
         this.shelfForm.patchValue({ aisleId: this.data.aisleID });
       }
     }
-    console.log("shelf modal initialized with data:", this.data);
+    console.log('shelf modal initialized with data:', this.data);
     this.loadInitialData();
   }
-
 
   ngOnDestroy(): void {
     // Cleanup subscriptions
@@ -304,58 +339,53 @@ export class ShelfModalComponent implements OnInit {
 
   private setupFilterSubjects(): void {
     // Device filter with debounce
-    this.deviceFilterSubject.pipe(
-      debounceTime(300),
-      distinctUntilChanged()
-    ).subscribe(searchTerm => {
-      this.deviceSearchTerm = searchTerm;
-      this.devicePage = 1;
-      this.devices = [];
-      this.loadDevices();
-    });
+    this.deviceFilterSubject
+      .pipe(debounceTime(300), distinctUntilChanged())
+      .subscribe((searchTerm) => {
+        this.deviceSearchTerm = searchTerm;
+        this.devicePage = 1;
+        this.devices = [];
+        this.loadDevices();
+      });
 
     // Template filter with debounce
-    this.templateFilterSubject.pipe(
-      debounceTime(300),
-      distinctUntilChanged()
-    ).subscribe(searchTerm => {
-      this.templateSearchTerm = searchTerm;
-      this.templatePage = 1;
-      this.templates = [];
-      this.loadTemplates();
-    });
+    this.templateFilterSubject
+      .pipe(debounceTime(300), distinctUntilChanged())
+      .subscribe((searchTerm) => {
+        this.templateSearchTerm = searchTerm;
+        this.templatePage = 1;
+        this.templates = [];
+        this.loadTemplates();
+      });
 
     // Message filter with debounce
-    this.messageFilterSubject.pipe(
-      debounceTime(300),
-      distinctUntilChanged()
-    ).subscribe(searchTerm => {
-      this.messageSearchTerm = searchTerm;
-      this.messagePage = 1;
-      this.messages = [];
-      this.loadMessages();
-    });
+    this.messageFilterSubject
+      .pipe(debounceTime(300), distinctUntilChanged())
+      .subscribe((searchTerm) => {
+        this.messageSearchTerm = searchTerm;
+        this.messagePage = 1;
+        this.messages = [];
+        this.loadMessages();
+      });
 
     // Existing combo filter
-    this.existingComboFilterSubject.pipe(
-      debounceTime(300),
-      distinctUntilChanged()
-    ).subscribe(searchTerm => {
-      this.existingComboSearchTerm = searchTerm;
-      this.resetExistingComboPagination(); // Reset pagination on new search
-      this.loadExistingCombos('initial');
-    });
+    this.existingComboFilterSubject
+      .pipe(debounceTime(300), distinctUntilChanged())
+      .subscribe((searchTerm) => {
+        this.existingComboSearchTerm = searchTerm;
+        this.resetExistingComboPagination(); // Reset pagination on new search
+        this.loadExistingCombos('initial');
+      });
 
     // Existing message combo filter
-    this.existingMessageComboFilterSubject.pipe(
-      debounceTime(300),
-      distinctUntilChanged()
-    ).subscribe(searchTerm => {
-      this.existingMessageComboSearchTerm = searchTerm;
-      this.existingMessageComboPage = 1;
-      this.existingMessageCombos = [];
-      this.loadExistingMessageCombos();
-    });
+    this.existingMessageComboFilterSubject
+      .pipe(debounceTime(300), distinctUntilChanged())
+      .subscribe((searchTerm) => {
+        this.existingMessageComboSearchTerm = searchTerm;
+        this.existingMessageComboPage = 1;
+        this.existingMessageCombos = [];
+        this.loadExistingMessageCombos();
+      });
   }
 
   private setDefaultStore(): void {
@@ -375,7 +405,7 @@ export class ShelfModalComponent implements OnInit {
     await Promise.all([
       this.loadDevices(),
       this.loadTemplates(),
-      this.loadMessages()
+      this.loadMessages(),
     ]);
 
     // Then load assignments (which depends on devices/templates)
@@ -387,7 +417,7 @@ export class ShelfModalComponent implements OnInit {
     await Promise.all([
       // this.loadExistingCombos(),
       this.loadExistingCombos('initial'),
-      this.loadMessageCombos('initial')
+      this.loadMessageCombos('initial'),
 
       //this.loadExistingMessageCombos()
     ]);
@@ -412,7 +442,14 @@ export class ShelfModalComponent implements OnInit {
     return this.fb.group({
       id: [null],
       aisleId: [aisleIdFromData, [Validators.required]],
-      name: ['', [Validators.required, Validators.minLength(2), Validators.maxLength(100)]],
+      name: [
+        '',
+        [
+          Validators.required,
+          Validators.minLength(2),
+          Validators.maxLength(100),
+        ],
+      ],
       location: ['', [Validators.required, Validators.maxLength(200)]],
       description: ['', [Validators.maxLength(500)]],
       coordinates: ['', [Validators.maxLength(50)]],
@@ -422,21 +459,20 @@ export class ShelfModalComponent implements OnInit {
       // deviceName: ['', [Validators.maxLength(100)]],
       isActive: [true],
       createdUser: [currentUser?.id || 0, [Validators.required]],
-      deviceCombos: this.fb.array([])
+      deviceCombos: this.fb.array([]),
     });
   }
 
   private clearForm(): void {
     this.shelfForm.reset({
       isActive: true,
-      createdUser: this.auth.getCurrentUserValue()?.id || 0
+      createdUser: this.auth.getCurrentUserValue()?.id || 0,
     });
     this.deviceCombos.clear();
     this.comboMode = 'device-template';
     this.selectedExistingCombos = [];
     this.selectedExistingMessageCombos = [];
     this.resetTemplateSearch();
-
   }
 
   private populateFormForEdit(): void {
@@ -452,7 +488,8 @@ export class ShelfModalComponent implements OnInit {
       description: shelf.description,
       coordinates: shelf.coordinates,
       isActive: shelf.isActive !== undefined ? shelf.isActive : true,
-      createdUser: shelf.createdUser || this.auth.getCurrentUserValue()?.id || 0
+      createdUser:
+        shelf.createdUser || this.auth.getCurrentUserValue()?.id || 0,
     });
 
     // Load existing combos for edit
@@ -464,7 +501,10 @@ export class ShelfModalComponent implements OnInit {
     this.dropdownVisible = true;
 
     // If no combos loaded yet, load initial page
-    if (this.existingComboAllLoadedItems.length === 0 && !this.existingComboLoading) {
+    if (
+      this.existingComboAllLoadedItems.length === 0 &&
+      !this.existingComboLoading
+    ) {
       this.loadExistingCombos('initial');
     }
   }
@@ -475,14 +515,14 @@ export class ShelfModalComponent implements OnInit {
 
   checkIfNeedLoadMore(): void {
     // Show load more button if we're at the bottom of the list
-    this.showLoadMoreInDropdown = this.hasMoreCombos() || this.hasPreviousCombos();
+    this.showLoadMoreInDropdown =
+      this.hasMoreCombos() || this.hasPreviousCombos();
   }
-
 
   // Generic method to load combos based on mode
   private async loadCombos(
     loadDirection: 'initial' | 'next' | 'prev' = 'initial',
-    comboType: 'template' | 'message' = 'template'
+    comboType: 'template' | 'message' = 'template',
   ): Promise<void> {
     if (comboType === 'template') {
       await this.loadTemplateCombos(loadDirection);
@@ -491,9 +531,10 @@ export class ShelfModalComponent implements OnInit {
     }
   }
 
-
   // Template combos loading
-  public async loadTemplateCombos(loadDirection: 'initial' | 'next' | 'prev' = 'initial'): Promise<void> {
+  public async loadTemplateCombos(
+    loadDirection: 'initial' | 'next' | 'prev' = 'initial',
+  ): Promise<void> {
     if (this.existingComboLoading) return;
 
     this.existingComboLoading = true;
@@ -519,11 +560,11 @@ export class ShelfModalComponent implements OnInit {
       const request: SearchParams = {
         pageNumber: targetPage,
         pageSize: this.pageSize,
-        searchTerm: this.existingComboSearchTerm
+        searchTerm: this.existingComboSearchTerm,
       };
 
       const pagedResult = await firstValueFrom(
-        this.deviceService.getCombosPaged(request)
+        this.deviceService.getCombosPaged(request),
       );
 
       const result = pagedResult.result;
@@ -543,20 +584,28 @@ export class ShelfModalComponent implements OnInit {
         screenWidth: combo.screenWidth,
         screenHeight: combo.screenHeight,
         battery: combo.battery,
-        comboType: 'template' // Add type identifier
+        comboType: 'template', // Add type identifier
       }));
-      console.log("template combo", mappedCombos)
+      console.log('template combo', mappedCombos);
       this.existingComboTotalItems = result?.totalCount || 0;
-      this.existingComboTotalPages = Math.ceil(this.existingComboTotalItems / this.pageSize);
+      this.existingComboTotalPages = Math.ceil(
+        this.existingComboTotalItems / this.pageSize,
+      );
 
       // Handle loading based on direction and search
       if (this.existingComboSearchTerm) {
         // Search mode
         if (loadDirection === 'next') {
-          this.existingComboAllLoadedItems = [...this.existingComboAllLoadedItems, ...mappedCombos];
+          this.existingComboAllLoadedItems = [
+            ...this.existingComboAllLoadedItems,
+            ...mappedCombos,
+          ];
           this.existingComboCurrentPage = targetPage;
         } else if (loadDirection === 'prev') {
-          this.existingComboAllLoadedItems = [...mappedCombos, ...this.existingComboAllLoadedItems];
+          this.existingComboAllLoadedItems = [
+            ...mappedCombos,
+            ...this.existingComboAllLoadedItems,
+          ];
           this.existingComboCurrentPage = targetPage;
         } else {
           this.existingComboAllLoadedItems = mappedCombos;
@@ -565,10 +614,16 @@ export class ShelfModalComponent implements OnInit {
       } else {
         // Normal browsing
         if (loadDirection === 'next') {
-          this.existingComboAllLoadedItems = [...this.existingComboAllLoadedItems, ...mappedCombos];
+          this.existingComboAllLoadedItems = [
+            ...this.existingComboAllLoadedItems,
+            ...mappedCombos,
+          ];
           this.existingComboCurrentPage = targetPage;
         } else if (loadDirection === 'prev') {
-          this.existingComboAllLoadedItems = [...mappedCombos, ...this.existingComboAllLoadedItems];
+          this.existingComboAllLoadedItems = [
+            ...mappedCombos,
+            ...this.existingComboAllLoadedItems,
+          ];
           this.existingComboCurrentPage = targetPage;
         } else {
           this.existingComboAllLoadedItems = mappedCombos;
@@ -578,7 +633,6 @@ export class ShelfModalComponent implements OnInit {
 
       this.existingComboPage = targetPage;
       this.updateVisibleTemplateCombos();
-
     } catch (error) {
       console.error('Error loading template combos:', error);
       this.showError('Failed to load template combos');
@@ -590,7 +644,9 @@ export class ShelfModalComponent implements OnInit {
   }
 
   // Message combos loading
-  public async loadMessageCombos(loadDirection: 'initial' | 'next' | 'prev' = 'initial'): Promise<void> {
+  public async loadMessageCombos(
+    loadDirection: 'initial' | 'next' | 'prev' = 'initial',
+  ): Promise<void> {
     if (this.existingMessageComboLoading) return;
 
     this.existingMessageComboLoading = true;
@@ -613,97 +669,111 @@ export class ShelfModalComponent implements OnInit {
         this.existingMessageComboCurrentPage = 1;
       }
 
-      const request: SearchParams & { deviceId?: number; messageId?: number; isActive?: boolean } = {
+      const request: SearchParams & {
+        deviceId?: number;
+        messageId?: number;
+        isActive?: boolean;
+      } = {
         pageNumber: targetPage,
         pageSize: this.pageSize,
         searchTerm: this.existingMessageComboSearchTerm,
-        isActive: true
+        isActive: true,
       };
 
       const pagedResult = await firstValueFrom(
-        this.deviceService.getDeviceMessageCombosPagedByParams(request)
+        this.deviceService.getDeviceMessageCombosPagedByParams(request),
       );
 
       const newCombos = pagedResult.items || [];
 
       // Get device and message names
-      const mappedCombos = await Promise.all(newCombos.map(async (combo: any) => {
-        let deviceName = 'Unknown Device';
-        let messageTitle = 'Unknown Message';
+      const mappedCombos = await Promise.all(
+        newCombos.map(async (combo: any) => {
+          let deviceName = 'Unknown Device';
+          let messageTitle = 'Unknown Message';
 
-        // Get device name
-        if (combo.deviceId) {
-          const device = this.devices.find(d => d.id === combo.deviceId);
-          if (device) deviceName = device.deviceName;
-          else {
-            // Try to load device if not found
-            try {
-              const loadedDevice = await firstValueFrom(
-                this.deviceService.getDeviceById(combo.deviceId)
-              );
-              if (loadedDevice) {
-                deviceName = loadedDevice.deviceName;
-                if (!this.devices.some(d => d.id === combo.deviceId)) {
-                  this.devices.push(loadedDevice);
+          // Get device name
+          if (combo.deviceId) {
+            const device = this.devices.find((d) => d.id === combo.deviceId);
+            if (device) deviceName = device.deviceName;
+            else {
+              // Try to load device if not found
+              try {
+                const loadedDevice = await firstValueFrom(
+                  this.deviceService.getDeviceById(combo.deviceId),
+                );
+                if (loadedDevice) {
+                  deviceName = loadedDevice.deviceName;
+                  if (!this.devices.some((d) => d.id === combo.deviceId)) {
+                    this.devices.push(loadedDevice);
+                  }
                 }
+              } catch (e) {
+                console.warn('Could not load device:', combo.deviceId);
               }
-            } catch (e) {
-              console.warn('Could not load device:', combo.deviceId);
             }
           }
-        }
 
-        // Get message title
-        if (combo.messageId) {
-          const message = this.messages.find(m => m.id === combo.messageId);
-          if (message) messageTitle = message.title;
-          else {
-            // Try to load message if not found
-            try {
-              const loadedMessage = await firstValueFrom(
-                this.messageService.getMessageById(combo.messageId)
-              );
-              if (loadedMessage) {
-                messageTitle = loadedMessage.title;
-                if (!this.messages.some(m => m.id === combo.messageId)) {
-                  this.messages.push(loadedMessage);
+          // Get message title
+          if (combo.messageId) {
+            const message = this.messages.find((m) => m.id === combo.messageId);
+            if (message) messageTitle = message.title;
+            else {
+              // Try to load message if not found
+              try {
+                const loadedMessage = await firstValueFrom(
+                  this.messageService.getMessageById(combo.messageId),
+                );
+                if (loadedMessage) {
+                  messageTitle = loadedMessage.title;
+                  if (!this.messages.some((m) => m.id === combo.messageId)) {
+                    this.messages.push(loadedMessage);
+                  }
                 }
+              } catch (e) {
+                console.warn('Could not load message:', combo.messageId);
               }
-            } catch (e) {
-              console.warn('Could not load message:', combo.messageId);
             }
           }
-        }
 
-        return {
-          id: combo.id,
-          deviceId: combo.deviceId,
-          deviceName: deviceName,
-          messageId: combo.messageId,
-          messageTitle: messageTitle,
-          deviceMAC: combo.deviceMac || '',
-          status: combo.isActive ? 'Active' : 'Inactive',
-          isDefault: false,
-          isActive: combo.isActive,
-          comboType: 'message', // Add type identifier
-          // Add message specific properties
-          contentType: combo.contentType,
-          duration: combo.duration,
-          _type: 'device-message'
-        };
-      }));
+          return {
+            id: combo.id,
+            deviceId: combo.deviceId,
+            deviceName: deviceName,
+            messageId: combo.messageId,
+            messageTitle: messageTitle,
+            deviceMAC: combo.deviceMac || '',
+            status: combo.isActive ? 'Active' : 'Inactive',
+            isDefault: false,
+            isActive: combo.isActive,
+            comboType: 'message', // Add type identifier
+            // Add message specific properties
+            contentType: combo.contentType,
+            duration: combo.duration,
+            _type: 'device-message',
+          };
+        }),
+      );
 
       this.existingMessageComboTotalItems = pagedResult.totalCount || 0;
-      this.existingMessageComboTotalPages = Math.ceil(this.existingMessageComboTotalItems / this.pageSize);
+      this.existingMessageComboTotalPages = Math.ceil(
+        this.existingMessageComboTotalItems / this.pageSize,
+      );
 
       // Handle loading based on direction and search
       if (this.existingMessageComboSearchTerm) {
         // Search mode
         if (loadDirection === 'next') {
-          this.existingMessageComboAllLoadedItems = [...this.existingMessageComboAllLoadedItems, ...mappedCombos];
+          this.existingMessageComboAllLoadedItems = [
+            ...this.existingMessageComboAllLoadedItems,
+            ...mappedCombos,
+          ];
           this.existingMessageComboCurrentPage = targetPage;
         } else if (loadDirection === 'prev') {
-          this.existingMessageComboAllLoadedItems = [...mappedCombos, ...this.existingMessageComboAllLoadedItems];
+          this.existingMessageComboAllLoadedItems = [
+            ...mappedCombos,
+            ...this.existingMessageComboAllLoadedItems,
+          ];
           this.existingMessageComboCurrentPage = targetPage;
         } else {
           this.existingMessageComboAllLoadedItems = mappedCombos;
@@ -712,10 +782,16 @@ export class ShelfModalComponent implements OnInit {
       } else {
         // Normal browsing
         if (loadDirection === 'next') {
-          this.existingMessageComboAllLoadedItems = [...this.existingMessageComboAllLoadedItems, ...mappedCombos];
+          this.existingMessageComboAllLoadedItems = [
+            ...this.existingMessageComboAllLoadedItems,
+            ...mappedCombos,
+          ];
           this.existingMessageComboCurrentPage = targetPage;
         } else if (loadDirection === 'prev') {
-          this.existingMessageComboAllLoadedItems = [...mappedCombos, ...this.existingMessageComboAllLoadedItems];
+          this.existingMessageComboAllLoadedItems = [
+            ...mappedCombos,
+            ...this.existingMessageComboAllLoadedItems,
+          ];
           this.existingMessageComboCurrentPage = targetPage;
         } else {
           this.existingMessageComboAllLoadedItems = mappedCombos;
@@ -725,7 +801,6 @@ export class ShelfModalComponent implements OnInit {
 
       this.existingMessageComboPage = targetPage;
       this.updateVisibleMessageCombos();
-
     } catch (error) {
       console.error('Error loading message combos:', error);
       this.showError('Failed to load message combos');
@@ -742,18 +817,31 @@ export class ShelfModalComponent implements OnInit {
       this.existingComboVisibleItems = [...this.existingComboAllLoadedItems];
     } else {
       const startIndex = (this.existingComboCurrentPage - 1) * this.pageSize;
-      const endIndex = Math.min(startIndex + this.pageSize, this.existingComboAllLoadedItems.length);
-      this.existingComboVisibleItems = this.existingComboAllLoadedItems.slice(startIndex, endIndex);
+      const endIndex = Math.min(
+        startIndex + this.pageSize,
+        this.existingComboAllLoadedItems.length,
+      );
+      this.existingComboVisibleItems = this.existingComboAllLoadedItems.slice(
+        startIndex,
+        endIndex,
+      );
     }
   }
 
   private updateVisibleMessageCombos(): void {
     if (this.existingMessageComboSearchTerm) {
-      this.existingMessageCombosVisibleItems = [...this.existingMessageComboAllLoadedItems];
+      this.existingMessageCombosVisibleItems = [
+        ...this.existingMessageComboAllLoadedItems,
+      ];
     } else {
-      const startIndex = (this.existingMessageComboCurrentPage - 1) * this.pageSize;
-      const endIndex = Math.min(startIndex + this.pageSize, this.existingMessageComboAllLoadedItems.length);
-      this.existingMessageCombosVisibleItems = this.existingMessageComboAllLoadedItems.slice(startIndex, endIndex);
+      const startIndex =
+        (this.existingMessageComboCurrentPage - 1) * this.pageSize;
+      const endIndex = Math.min(
+        startIndex + this.pageSize,
+        this.existingMessageComboAllLoadedItems.length,
+      );
+      this.existingMessageCombosVisibleItems =
+        this.existingMessageComboAllLoadedItems.slice(startIndex, endIndex);
     }
   }
 
@@ -828,9 +916,14 @@ export class ShelfModalComponent implements OnInit {
 
   hasMoreMessageCombos(): boolean {
     if (this.existingMessageComboSearchTerm) {
-      return this.existingMessageComboCurrentPage < this.existingMessageComboTotalPages;
+      return (
+        this.existingMessageComboCurrentPage <
+        this.existingMessageComboTotalPages
+      );
     }
-    return this.existingMessageComboCurrentPage < this.existingMessageComboTotalPages;
+    return (
+      this.existingMessageComboCurrentPage < this.existingMessageComboTotalPages
+    );
   }
 
   hasPreviousMessageCombos(): boolean {
@@ -847,17 +940,23 @@ export class ShelfModalComponent implements OnInit {
   }
 
   async loadPreviousTemplateCombos(): Promise<void> {
-    if (this.existingComboLoadingPrev || !this.hasPreviousTemplateCombos()) return;
+    if (this.existingComboLoadingPrev || !this.hasPreviousTemplateCombos())
+      return;
     await this.loadTemplateCombos('prev');
   }
 
   async loadMoreMessageCombos(): Promise<void> {
-    if (this.existingMessageComboLoadingNext || !this.hasMoreMessageCombos()) return;
+    if (this.existingMessageComboLoadingNext || !this.hasMoreMessageCombos())
+      return;
     await this.loadMessageCombos('next');
   }
 
   async loadPreviousMessageCombos(): Promise<void> {
-    if (this.existingMessageComboLoadingPrev || !this.hasPreviousMessageCombos()) return;
+    if (
+      this.existingMessageComboLoadingPrev ||
+      !this.hasPreviousMessageCombos()
+    )
+      return;
     await this.loadMessageCombos('prev');
   }
 
@@ -882,18 +981,23 @@ export class ShelfModalComponent implements OnInit {
 
   onTemplateComboDropdownShow(): void {
     // If no template combos loaded yet, load initial page
-    if (this.existingComboAllLoadedItems.length === 0 && !this.existingComboLoading) {
+    if (
+      this.existingComboAllLoadedItems.length === 0 &&
+      !this.existingComboLoading
+    ) {
       this.loadTemplateCombos('initial');
     }
   }
 
   onMessageComboDropdownShow(): void {
     // If no message combos loaded yet, load initial page
-    if (this.existingMessageComboAllLoadedItems.length === 0 && !this.existingMessageComboLoading) {
+    if (
+      this.existingMessageComboAllLoadedItems.length === 0 &&
+      !this.existingMessageComboLoading
+    ) {
       this.loadMessageCombos('initial');
     }
   }
-
 
   private async loadCombosForEdit(): Promise<void> {
     if (!this.data.shelf?.id) {
@@ -905,7 +1009,10 @@ export class ShelfModalComponent implements OnInit {
 
     try {
       const apiResponse = await firstValueFrom(
-        this.shelfService.getShelfWithAssignments(this.data.shelf.id, this.storeId)
+        this.shelfService.getShelfWithAssignments(
+          this.data.shelf.id,
+          this.storeId,
+        ),
       );
 
       let shelfWithAssignments: Shelf;
@@ -922,7 +1029,9 @@ export class ShelfModalComponent implements OnInit {
       }
 
       if (shelfWithAssignments?.assignments) {
-        console.log(`Found ${shelfWithAssignments.assignments.length} assignments`);
+        console.log(
+          `Found ${shelfWithAssignments.assignments.length} assignments`,
+        );
 
         // Store assignments for later use
         this.allAssignments = shelfWithAssignments.assignments;
@@ -934,8 +1043,6 @@ export class ShelfModalComponent implements OnInit {
       console.error('Error loading shelf assignments:', error);
     }
   }
-
-
 
   // New method to process assignments based on current mode
   private processAssignmentsForCurrentMode(): void {
@@ -949,12 +1056,16 @@ export class ShelfModalComponent implements OnInit {
     }
 
     // Filter assignments for current mode
-    const filteredAssignments = this.allAssignments.filter(a =>
-      (this.comboMode === 'device-template' && a.assignmentType === 'TEMPLATE') ||
-      (this.comboMode === 'device-message' && a.assignmentType === 'MESSAGE')
+    const filteredAssignments = this.allAssignments.filter(
+      (a) =>
+        (this.comboMode === 'device-template' &&
+          a.assignmentType === 'TEMPLATE') ||
+        (this.comboMode === 'device-message' && a.assignmentType === 'MESSAGE'),
     );
 
-    console.log(`Processing ${filteredAssignments.length} assignments for ${this.comboMode} mode`);
+    console.log(
+      `Processing ${filteredAssignments.length} assignments for ${this.comboMode} mode`,
+    );
 
     // Process filtered assignments
     filteredAssignments.forEach((assignment, index) => {
@@ -965,7 +1076,6 @@ export class ShelfModalComponent implements OnInit {
       }
     });
   }
-
 
   // private async loadCombosForEdit(): Promise<void> {
   //   if (!this.data.shelf?.id) {
@@ -993,7 +1103,7 @@ export class ShelfModalComponent implements OnInit {
   //       console.log('Response has "result" property');
   //       shelfWithAssignments = (apiResponse as any).result;
   //       console.log('Extracted shelf from result:', shelfWithAssignments);
-  //     } 
+  //     }
   //     // Option 2: If service returns the Shelf object directly
   //     else if (apiResponse && 'id' in apiResponse) {
   //       console.log('Response is already a Shelf object');
@@ -1076,13 +1186,21 @@ export class ShelfModalComponent implements OnInit {
     }
 
     // Check if we have mixed assignment types
-    const hasTemplateAssignments = assignments.some(a => a.assignmentType === 'TEMPLATE');
-    const hasMessageAssignments = assignments.some(a => a.assignmentType === 'MESSAGE');
+    const hasTemplateAssignments = assignments.some(
+      (a) => a.assignmentType === 'TEMPLATE',
+    );
+    const hasMessageAssignments = assignments.some(
+      (a) => a.assignmentType === 'MESSAGE',
+    );
 
     if (hasTemplateAssignments && hasMessageAssignments) {
-      console.warn('Mixed assignment types found. Defaulting to template assignments.');
+      console.warn(
+        'Mixed assignment types found. Defaulting to template assignments.',
+      );
       // You could show a warning to the user here
-      this.showWarning('This shelf has both template and message assignments. Showing template assignments only.');
+      this.showWarning(
+        'This shelf has both template and message assignments. Showing template assignments only.',
+      );
     }
 
     // Set the combo mode based on assignments
@@ -1095,12 +1213,16 @@ export class ShelfModalComponent implements OnInit {
     console.log(`Setting combo mode to: ${this.comboMode}`);
 
     // Process only assignments that match the selected mode
-    const filteredAssignments = assignments.filter(a =>
-      (this.comboMode === 'device-template' && a.assignmentType === 'TEMPLATE') ||
-      (this.comboMode === 'device-message' && a.assignmentType === 'MESSAGE')
+    const filteredAssignments = assignments.filter(
+      (a) =>
+        (this.comboMode === 'device-template' &&
+          a.assignmentType === 'TEMPLATE') ||
+        (this.comboMode === 'device-message' && a.assignmentType === 'MESSAGE'),
     );
 
-    console.log(`Processing ${filteredAssignments.length} assignments for mode ${this.comboMode}`);
+    console.log(
+      `Processing ${filteredAssignments.length} assignments for mode ${this.comboMode}`,
+    );
 
     filteredAssignments.forEach((assignment, index) => {
       console.log(`\n=== Processing assignment ${index + 1} ===`);
@@ -1119,7 +1241,6 @@ export class ShelfModalComponent implements OnInit {
     this.cdRef.detectChanges();
   }
 
-
   private processTemplateAssignment(assignment: any, index: number): void {
     let device: LocalDeviceDto | undefined;
     let template: LocalTemplateDto | undefined;
@@ -1127,11 +1248,11 @@ export class ShelfModalComponent implements OnInit {
     // Find device
     if (assignment.deviceId) {
       const deviceId = Number(assignment.deviceId);
-      device = this.devices.find(d => d.id === deviceId);
+      device = this.devices.find((d) => d.id === deviceId);
 
       if (!device && assignment.deviceMAC) {
         const cleanMAC = assignment.deviceMAC.toLowerCase().replace(/:/g, '');
-        device = this.devices.find(d => {
+        device = this.devices.find((d) => {
           if (!d.mac) return false;
           const cleanDeviceMAC = d.mac.toLowerCase().replace(/:/g, '');
           return cleanDeviceMAC === cleanMAC;
@@ -1142,18 +1263,20 @@ export class ShelfModalComponent implements OnInit {
     // Find template
     if (assignment.templateId) {
       const templateId = assignment.templateId.toString();
-      template = this.templates.find(t => t.id.toString() === templateId);
+      template = this.templates.find((t) => t.id.toString() === templateId);
     }
 
     if (device && template) {
-      console.log(`✅ Adding template combo: Device ${device.deviceName}, Template ${template.name}`);
+      console.log(
+        `✅ Adding template combo: Device ${device.deviceName}, Template ${template.name}`,
+      );
       this.addDeviceCombo({
         deviceId: device.id,
         templateId: template.id,
         displayOrder: assignment.displayOrder || index + 1,
         isActive: assignment.isActive !== false,
         isDefault: assignment.displayOrder === 1,
-        deviceTemplateComboId: assignment.deviceTemplateComboId
+        deviceTemplateComboId: assignment.deviceTemplateComboId,
       });
     } else {
       console.warn(`❌ Incomplete data for template assignment ${index + 1}`);
@@ -1164,7 +1287,7 @@ export class ShelfModalComponent implements OnInit {
         displayOrder: assignment.displayOrder || index + 1,
         isActive: assignment.isActive !== false,
         isDefault: assignment.displayOrder === 1,
-        deviceTemplateComboId: assignment.deviceTemplateComboId
+        deviceTemplateComboId: assignment.deviceTemplateComboId,
       });
     }
   }
@@ -1179,38 +1302,48 @@ export class ShelfModalComponent implements OnInit {
     if (assignment.deviceId) {
       const deviceId = Number(assignment.deviceId);
       console.log(`Looking for device with ID: ${deviceId}`);
-      device = this.devices.find(d => d.id === deviceId);
+      device = this.devices.find((d) => d.id === deviceId);
 
       if (!device && assignment.deviceMAC) {
-        console.log(`Device not found by ID, trying MAC: ${assignment.deviceMAC}`);
+        console.log(
+          `Device not found by ID, trying MAC: ${assignment.deviceMAC}`,
+        );
         const cleanMAC = assignment.deviceMAC.toLowerCase().replace(/:/g, '');
-        device = this.devices.find(d => {
+        device = this.devices.find((d) => {
           if (!d.mac) return false;
           const cleanDeviceMAC = d.mac.toLowerCase().replace(/:/g, '');
           return cleanDeviceMAC === cleanMAC;
         });
       }
 
-      console.log('Found device:', device ? `${device.deviceName} (ID: ${device.id})` : 'NOT FOUND');
+      console.log(
+        'Found device:',
+        device ? `${device.deviceName} (ID: ${device.id})` : 'NOT FOUND',
+      );
     }
 
     // Find message
     if (assignment.messageId) {
       const messageId = Number(assignment.messageId);
       console.log(`Looking for message with ID: ${messageId}`);
-      message = this.messages.find(m => m.id === messageId);
-      console.log('Found message:', message ? `${message.title} (ID: ${message.id})` : 'NOT FOUND');
+      message = this.messages.find((m) => m.id === messageId);
+      console.log(
+        'Found message:',
+        message ? `${message.title} (ID: ${message.id})` : 'NOT FOUND',
+      );
     }
 
     if (device && message) {
-      console.log(`✅ Adding message combo: Device ${device.deviceName}, Message ${message.title}`);
+      console.log(
+        `✅ Adding message combo: Device ${device.deviceName}, Message ${message.title}`,
+      );
       this.addDeviceCombo({
         deviceId: device.id,
         messageId: message.id,
         displayOrder: assignment.displayOrder || index + 1,
         isActive: assignment.isActive !== false,
         isDefault: false,
-        deviceMessageComboId: assignment.deviceMessageComboId
+        deviceMessageComboId: assignment.deviceMessageComboId,
       });
     } else if (device && !message) {
       console.warn(`❌ Message not found for assignment ${index + 1}`);
@@ -1221,7 +1354,7 @@ export class ShelfModalComponent implements OnInit {
         displayOrder: assignment.displayOrder || index + 1,
         isActive: assignment.isActive !== false,
         isDefault: false,
-        deviceMessageComboId: assignment.deviceMessageComboId
+        deviceMessageComboId: assignment.deviceMessageComboId,
       });
     } else if (!device && message) {
       console.warn(`❌ Device not found for assignment ${index + 1}`);
@@ -1232,7 +1365,7 @@ export class ShelfModalComponent implements OnInit {
         displayOrder: assignment.displayOrder || index + 1,
         isActive: assignment.isActive !== false,
         isDefault: false,
-        deviceMessageComboId: assignment.deviceMessageComboId
+        deviceMessageComboId: assignment.deviceMessageComboId,
       });
     } else {
       console.warn(`❌ No device or message found for assignment ${index + 1}`);
@@ -1243,7 +1376,7 @@ export class ShelfModalComponent implements OnInit {
         displayOrder: assignment.displayOrder || index + 1,
         isActive: assignment.isActive !== false,
         isDefault: false,
-        deviceMessageComboId: assignment.deviceMessageComboId
+        deviceMessageComboId: assignment.deviceMessageComboId,
       });
     }
   }
@@ -1356,10 +1489,9 @@ export class ShelfModalComponent implements OnInit {
   //   this.cdRef.detectChanges();
   // }
 
-
   // Helper method to find device by MAC address
   // private findDeviceByMAC(macAddress: string): LocalDeviceDto | undefined {
-  //   return this.devices.find(device => 
+  //   return this.devices.find(device =>
   //     device.mac?.toLowerCase() === macAddress.toLowerCase()  );
   // }
 
@@ -1367,22 +1499,23 @@ export class ShelfModalComponent implements OnInit {
   private findDeviceByMAC(macAddress: string): LocalDeviceDto | undefined {
     if (!macAddress) return undefined;
 
-    return this.devices.find(device =>
-      device.mac && device.mac.toLowerCase() === macAddress.toLowerCase()
+    return this.devices.find(
+      (device) =>
+        device.mac && device.mac.toLowerCase() === macAddress.toLowerCase(),
     );
   }
 
   // Helper method to find template by name
-  private findTemplateByName(templateName: string): LocalTemplateDto | undefined {
+  private findTemplateByName(
+    templateName: string,
+  ): LocalTemplateDto | undefined {
     if (!templateName) return undefined;
 
-    return this.templates.find(template =>
-      template.name === templateName
-    );
+    return this.templates.find((template) => template.name === templateName);
   }
   // Helper method to find template by name
   // private findTemplateByName(templateName: string): LocalTemplateDto | undefined {
-  //   return this.templates.find(template => 
+  //   return this.templates.find(template =>
   //     template.name === templateName
   //   );
   // }
@@ -1402,19 +1535,29 @@ export class ShelfModalComponent implements OnInit {
       comboGroup = this.fb.group({
         deviceId: [initialData?.deviceId || '', Validators.required],
         templateId: [initialData?.templateId || '', Validators.required],
-        displayOrder: [initialData?.displayOrder || this.deviceCombos.length + 1, [Validators.required, Validators.min(1)]],
-        isActive: [initialData?.isActive !== undefined ? initialData.isActive : true],
+        displayOrder: [
+          initialData?.displayOrder || this.deviceCombos.length + 1,
+          [Validators.required, Validators.min(1)],
+        ],
+        isActive: [
+          initialData?.isActive !== undefined ? initialData.isActive : true,
+        ],
         isDefault: [initialData?.isDefault || false],
-        deviceTemplateComboId: [initialData?.deviceTemplateComboId || null]
+        deviceTemplateComboId: [initialData?.deviceTemplateComboId || null],
       });
     } else {
       comboGroup = this.fb.group({
         deviceId: [initialData?.deviceId || '', Validators.required],
         messageId: [initialData?.messageId || '', Validators.required],
-        displayOrder: [initialData?.displayOrder || this.deviceCombos.length + 1, [Validators.required, Validators.min(1)]],
-        isActive: [initialData?.isActive !== undefined ? initialData.isActive : true],
+        displayOrder: [
+          initialData?.displayOrder || this.deviceCombos.length + 1,
+          [Validators.required, Validators.min(1)],
+        ],
+        isActive: [
+          initialData?.isActive !== undefined ? initialData.isActive : true,
+        ],
         isDefault: [initialData?.isDefault || false],
-        deviceMessageComboId: [initialData?.deviceMessageComboId || null]
+        deviceMessageComboId: [initialData?.deviceMessageComboId || null],
       });
     }
 
@@ -1441,7 +1584,10 @@ export class ShelfModalComponent implements OnInit {
 
   toggleComboMode(): void {
     // Store the previous mode
-    const previousMode = this.comboMode === 'device-template' ? 'device-message' : 'device-template';
+    const previousMode =
+      this.comboMode === 'device-template'
+        ? 'device-message'
+        : 'device-template';
 
     // Clear existing combos
     while (this.deviceCombos.length) {
@@ -1492,38 +1638,42 @@ export class ShelfModalComponent implements OnInit {
     if (this.comboMode === 'device-template') {
       // First, collect all template IDs from selected combos
       const templateIdsToLoad = this.selectedExistingCombos
-        .map(combo => combo.templateId)
+        .map((combo) => combo.templateId)
         .filter((id): id is string => !!id && id !== '');
 
       // Load any missing templates
       this.loadSpecificTemplates(templateIdsToLoad).then(() => {
         // Now add the combos with templates loaded
-        this.selectedExistingCombos.forEach(combo => {
+        this.selectedExistingCombos.forEach((combo) => {
           this.addDeviceCombo({
             deviceId: combo.deviceId,
             templateId: combo.templateId || '',
             displayOrder: this.deviceCombos.length + 1,
             isActive: combo.isActive,
             isDefault: combo.isDefault,
-            deviceTemplateComboId: combo.id
+            deviceTemplateComboId: combo.id,
           });
         });
 
-        this.showSuccess(`Added ${this.selectedExistingCombos.length} template combo(s)`);
+        this.showSuccess(
+          `Added ${this.selectedExistingCombos.length} template combo(s)`,
+        );
         this.selectedExistingCombos = [];
       });
     } else {
-      this.selectedExistingMessageCombos.forEach(combo => {
+      this.selectedExistingMessageCombos.forEach((combo) => {
         this.addDeviceCombo({
           deviceId: combo.deviceId,
           messageId: combo.messageId,
           displayOrder: this.deviceCombos.length + 1,
           isActive: combo.isActive,
           isDefault: false,
-          deviceMessageComboId: combo.id
+          deviceMessageComboId: combo.id,
         });
       });
-      this.showSuccess(`Added ${this.selectedExistingMessageCombos.length} message combo(s)`);
+      this.showSuccess(
+        `Added ${this.selectedExistingMessageCombos.length} message combo(s)`,
+      );
       this.selectedExistingMessageCombos = [];
     }
   }
@@ -1533,7 +1683,7 @@ export class ShelfModalComponent implements OnInit {
   //   if (!templateIds.length) return;
 
   //   // Filter out templates already loaded
-  //   const missingIds = templateIds.filter(id => 
+  //   const missingIds = templateIds.filter(id =>
   //     !this.templates.some(t => t.id.toString() === id.toString())
   //   );
 
@@ -1564,7 +1714,9 @@ export class ShelfModalComponent implements OnInit {
   //   }
   // }
 
-  private async loadMissingItemsForSelectedCombos(selectedCombos: any[]): Promise<void> {
+  private async loadMissingItemsForSelectedCombos(
+    selectedCombos: any[],
+  ): Promise<void> {
     if (this.loadingMissingItems || !selectedCombos.length) return;
 
     this.loadingMissingItems = true;
@@ -1575,7 +1727,7 @@ export class ShelfModalComponent implements OnInit {
         const deviceIds: number[] = [];
         const templateIds: string[] = [];
 
-        selectedCombos.forEach(combo => {
+        selectedCombos.forEach((combo) => {
           if (combo.deviceId && !this.isDeviceLoaded(combo.deviceId)) {
             deviceIds.push(combo.deviceId);
           }
@@ -1587,14 +1739,13 @@ export class ShelfModalComponent implements OnInit {
         // Load missing devices and templates in parallel
         await Promise.all([
           this.loadSpecificDevices(deviceIds),
-          this.loadSpecificTemplates(templateIds)
+          this.loadSpecificTemplates(templateIds),
         ]);
-
       } else if (this.comboMode === 'device-message') {
         const deviceIds: number[] = [];
         const messageIds: number[] = [];
 
-        selectedCombos.forEach(combo => {
+        selectedCombos.forEach((combo) => {
           if (combo.deviceId && !this.isDeviceLoaded(combo.deviceId)) {
             deviceIds.push(combo.deviceId);
           }
@@ -1606,10 +1757,9 @@ export class ShelfModalComponent implements OnInit {
         // Load missing devices and messages in parallel
         await Promise.all([
           this.loadSpecificDevices(deviceIds),
-          this.loadSpecificMessages(messageIds)
+          this.loadSpecificMessages(messageIds),
         ]);
       }
-
     } catch (error) {
       console.error('Error loading missing items for selected combos:', error);
     } finally {
@@ -1619,15 +1769,17 @@ export class ShelfModalComponent implements OnInit {
 
   // Helper methods to check if items are loaded
   private isDeviceLoaded(deviceId: number): boolean {
-    return this.devices.some(d => d.id === deviceId);
+    return this.devices.some((d) => d.id === deviceId);
   }
 
   private isTemplateLoaded(templateId: string): boolean {
-    return this.templates.some(t => t.id.toString() === templateId.toString());
+    return this.templates.some(
+      (t) => t.id.toString() === templateId.toString(),
+    );
   }
 
   private isMessageLoaded(messageId: number): boolean {
-    return this.messages.some(m => m.id === messageId);
+    return this.messages.some((m) => m.id === messageId);
   }
 
   //   private clearForm(): void {
@@ -1666,12 +1818,12 @@ export class ShelfModalComponent implements OnInit {
           this.storeId,
           this.devicePage,
           this.pageSize,
-          this.deviceSearchTerm
-        )
+          this.deviceSearchTerm,
+        ),
       );
 
       const newDevices = pagedResult.items || [];
-      console.log("devices", newDevices)
+      console.log('devices', newDevices);
       if (this.devicePage === 1) {
         this.devices = newDevices;
       } else {
@@ -1697,8 +1849,8 @@ export class ShelfModalComponent implements OnInit {
           this.storeId,
           this.templatePage,
           this.pageSize,
-          this.templateSearchTerm // Pass search term to backend (empty for all)
-        )
+          this.templateSearchTerm, // Pass search term to backend (empty for all)
+        ),
       );
 
       const newTemplates = pagedResult.items || [];
@@ -1712,17 +1864,25 @@ export class ShelfModalComponent implements OnInit {
         // Update filtered templates based on current search
         if (this.templateSearchTerm) {
           // Re-filter with current search term
-          this.filteredTemplates = this.templates.filter(template =>
-            template.name.toLowerCase().includes(this.templateSearchTerm.toLowerCase()) ||
-            template.screenWidth?.toString().includes(this.templateSearchTerm) ||
-            template.screenHeight?.toString().includes(this.templateSearchTerm)
+          this.filteredTemplates = this.templates.filter(
+            (template) =>
+              template.name
+                .toLowerCase()
+                .includes(this.templateSearchTerm.toLowerCase()) ||
+              template.screenWidth
+                ?.toString()
+                .includes(this.templateSearchTerm) ||
+              template.screenHeight
+                ?.toString()
+                .includes(this.templateSearchTerm),
           );
         } else {
           this.filteredTemplates = [...this.templates]; // Show all when no search
         }
       }
 
-      this.templateHasMore = this.templates.length < (pagedResult.totalCount || 0);
+      this.templateHasMore =
+        this.templates.length < (pagedResult.totalCount || 0);
     } catch (error) {
       console.error('Error loading templates:', error);
     } finally {
@@ -1763,7 +1923,6 @@ export class ShelfModalComponent implements OnInit {
   //   }
   // }
 
-
   private async loadMessages(): Promise<void> {
     if (this.messageLoading) return;
 
@@ -1777,7 +1936,7 @@ export class ShelfModalComponent implements OnInit {
       };
 
       const response = await firstValueFrom(
-        this.messageService.getMessagesPaged(request)
+        this.messageService.getMessagesPaged(request),
       );
 
       if (response.success && response.result) {
@@ -1790,7 +1949,8 @@ export class ShelfModalComponent implements OnInit {
           this.messages = [...this.messages, ...newMessages];
         }
 
-        this.messageHasMore = this.messages.length < (pagedResult.totalCount || 0);
+        this.messageHasMore =
+          this.messages.length < (pagedResult.totalCount || 0);
         this.messagePage = pagedResult.pageNumber || this.messagePage;
       } else {
         console.warn('Failed to load messages:', response.message);
@@ -1884,7 +2044,9 @@ export class ShelfModalComponent implements OnInit {
   //   }
   // }
 
-  public async loadExistingCombos(loadDirection: 'initial' | 'next' | 'prev' = 'initial'): Promise<void> {
+  public async loadExistingCombos(
+    loadDirection: 'initial' | 'next' | 'prev' = 'initial',
+  ): Promise<void> {
     if (this.existingComboLoading) return;
 
     this.existingComboLoading = true;
@@ -1913,12 +2075,12 @@ export class ShelfModalComponent implements OnInit {
       const request: SearchParams = {
         pageNumber: targetPage,
         pageSize: this.pageSize,
-        searchTerm: this.existingComboSearchTerm // Server-side search
+        searchTerm: this.existingComboSearchTerm, // Server-side search
       };
 
       // Call API with search term
       const pagedResult = await firstValueFrom(
-        this.deviceService.getCombosPaged(request)
+        this.deviceService.getCombosPaged(request),
       );
 
       const result = pagedResult.result;
@@ -1937,24 +2099,32 @@ export class ShelfModalComponent implements OnInit {
         screenSize: combo.screenSize,
         screenWidth: combo.screenWidth,
         screenHeight: combo.screenHeight,
-        battery: combo.battery
+        battery: combo.battery,
       }));
 
-      console.log("template combo", mappedCombos)
+      console.log('template combo', mappedCombos);
       // Update totals from server response
       this.existingComboTotalItems = result?.totalCount || 0;
-      this.existingComboTotalPages = Math.ceil(this.existingComboTotalItems / this.pageSize);
+      this.existingComboTotalPages = Math.ceil(
+        this.existingComboTotalItems / this.pageSize,
+      );
 
       // Handle different loading scenarios
       if (this.existingComboSearchTerm) {
         // For search results, replace items (not accumulate)
         if (loadDirection === 'next') {
           // For search pagination, add to existing search results
-          this.existingComboAllLoadedItems = [...this.existingComboAllLoadedItems, ...mappedCombos];
+          this.existingComboAllLoadedItems = [
+            ...this.existingComboAllLoadedItems,
+            ...mappedCombos,
+          ];
           this.existingComboCurrentPage = targetPage;
         } else if (loadDirection === 'prev') {
           // Prepend previous search results
-          this.existingComboAllLoadedItems = [...mappedCombos, ...this.existingComboAllLoadedItems];
+          this.existingComboAllLoadedItems = [
+            ...mappedCombos,
+            ...this.existingComboAllLoadedItems,
+          ];
           this.existingComboCurrentPage = targetPage;
         } else {
           // Initial search - replace all items
@@ -1964,10 +2134,16 @@ export class ShelfModalComponent implements OnInit {
       } else {
         // For normal browsing (no search)
         if (loadDirection === 'next') {
-          this.existingComboAllLoadedItems = [...this.existingComboAllLoadedItems, ...mappedCombos];
+          this.existingComboAllLoadedItems = [
+            ...this.existingComboAllLoadedItems,
+            ...mappedCombos,
+          ];
           this.existingComboCurrentPage = targetPage;
         } else if (loadDirection === 'prev') {
-          this.existingComboAllLoadedItems = [...mappedCombos, ...this.existingComboAllLoadedItems];
+          this.existingComboAllLoadedItems = [
+            ...mappedCombos,
+            ...this.existingComboAllLoadedItems,
+          ];
           this.existingComboCurrentPage = targetPage;
         } else {
           this.existingComboAllLoadedItems = mappedCombos;
@@ -1980,7 +2156,6 @@ export class ShelfModalComponent implements OnInit {
 
       // Update visible items
       this.updateVisibleExistingCombos();
-
     } catch (error) {
       console.error('Error loading existing combos:', error);
       this.showError('Failed to load combos. Please try again.');
@@ -2074,7 +2249,6 @@ export class ShelfModalComponent implements OnInit {
     }, 500);
   }
 
-
   // Perform the search
   private performExistingComboSearch(): void {
     // Reset pagination on new search
@@ -2090,7 +2264,6 @@ export class ShelfModalComponent implements OnInit {
     this.resetExistingComboPaginationForSearch();
     this.loadExistingCombos('initial');
   }
-
 
   // Highlight search term in results
   highlightSearchTerm(text: string): string {
@@ -2126,8 +2299,14 @@ export class ShelfModalComponent implements OnInit {
     } else {
       // For normal browsing, show only current page items
       const startIndex = (this.existingComboCurrentPage - 1) * this.pageSize;
-      const endIndex = Math.min(startIndex + this.pageSize, this.existingComboAllLoadedItems.length);
-      this.existingComboVisibleItems = this.existingComboAllLoadedItems.slice(startIndex, endIndex);
+      const endIndex = Math.min(
+        startIndex + this.pageSize,
+        this.existingComboAllLoadedItems.length,
+      );
+      this.existingComboVisibleItems = this.existingComboAllLoadedItems.slice(
+        startIndex,
+        endIndex,
+      );
     }
   }
 
@@ -2137,56 +2316,68 @@ export class ShelfModalComponent implements OnInit {
     this.existingMessageComboLoading = true;
 
     try {
-      const request: SearchParams & { deviceId?: number; messageId?: number; isActive?: boolean } = {
+      const request: SearchParams & {
+        deviceId?: number;
+        messageId?: number;
+        isActive?: boolean;
+      } = {
         pageNumber: this.existingMessageComboPage,
         pageSize: this.pageSize,
         searchTerm: this.existingMessageComboSearchTerm,
-        isActive: true
+        isActive: true,
       };
 
       const pagedResult = await firstValueFrom(
-        this.deviceService.getDeviceMessageCombosPagedByParams(request)
+        this.deviceService.getDeviceMessageCombosPagedByParams(request),
       );
-      this.existingMessageCombos = this.normalizeMessageCombos(pagedResult.items || []);
+      this.existingMessageCombos = this.normalizeMessageCombos(
+        pagedResult.items || [],
+      );
 
       const newCombos = pagedResult.items || [];
-      console.log("newcombos for msg", newCombos);
+      console.log('newcombos for msg', newCombos);
 
-      const mappedCombos = await Promise.all(newCombos.map(async (combo: any) => {
-        let deviceName = 'Unknown Device';
-        let messageTitle = 'Unknown Message';
-        // Try to get device name
-        if (combo.deviceId) {
-          const device = this.devices.find(d => d.id === combo.deviceId);
-          if (device) deviceName = device.deviceName;
-        }
+      const mappedCombos = await Promise.all(
+        newCombos.map(async (combo: any) => {
+          let deviceName = 'Unknown Device';
+          let messageTitle = 'Unknown Message';
+          // Try to get device name
+          if (combo.deviceId) {
+            const device = this.devices.find((d) => d.id === combo.deviceId);
+            if (device) deviceName = device.deviceName;
+          }
 
-        // Try to get message title
-        if (combo.messageId) {
-          const message = this.messages.find(m => m.id === combo.messageId);
-          if (message) messageTitle = message.title;
-        }
+          // Try to get message title
+          if (combo.messageId) {
+            const message = this.messages.find((m) => m.id === combo.messageId);
+            if (message) messageTitle = message.title;
+          }
 
-        return {
-          id: combo.id,
-          deviceId: combo.deviceId,
-          deviceName: deviceName,
-          messageId: combo.messageId,
-          messageTitle: messageTitle,
-          deviceMAC: combo.deviceMac || '',
-          status: combo.isActive ? 'Active' : 'Inactive',
-          isDefault: false,
-          isActive: combo.isActive
-        };
-      }));
+          return {
+            id: combo.id,
+            deviceId: combo.deviceId,
+            deviceName: deviceName,
+            messageId: combo.messageId,
+            messageTitle: messageTitle,
+            deviceMAC: combo.deviceMac || '',
+            status: combo.isActive ? 'Active' : 'Inactive',
+            isDefault: false,
+            isActive: combo.isActive,
+          };
+        }),
+      );
 
       if (this.existingMessageComboPage === 1) {
         this.existingMessageCombos = mappedCombos;
       } else {
-        this.existingMessageCombos = [...this.existingMessageCombos, ...mappedCombos];
+        this.existingMessageCombos = [
+          ...this.existingMessageCombos,
+          ...mappedCombos,
+        ];
       }
 
-      this.existingMessageComboHasMore = this.existingMessageCombos.length < (pagedResult.totalCount || 0);
+      this.existingMessageComboHasMore =
+        this.existingMessageCombos.length < (pagedResult.totalCount || 0);
     } catch (error) {
       console.error('Error loading existing message combos:', error);
     } finally {
@@ -2207,19 +2398,18 @@ export class ShelfModalComponent implements OnInit {
 
     try {
       const loadedDevices = await firstValueFrom(
-        this.deviceService.getDevicesByIds(uniqueIds)
+        this.deviceService.getDevicesByIds(uniqueIds),
       );
 
       // Add to existing devices (avoid duplicates)
-      loadedDevices.forEach(device => {
-        if (!this.devices.some(d => d.id === device.id)) {
+      loadedDevices.forEach((device) => {
+        if (!this.devices.some((d) => d.id === device.id)) {
           this.devices.push(device);
         }
       });
 
       // Update UI if needed
       this.cdRef.detectChanges();
-
     } catch (error) {
       console.error('Error loading specific devices:', error);
     } finally {
@@ -2240,14 +2430,14 @@ export class ShelfModalComponent implements OnInit {
     try {
       // Directly pass string IDs to service
       const loadedTemplates = await firstValueFrom(
-        this.deviceService.getTemplatesByIds(uniqueIds) // Service now accepts string[]
+        this.deviceService.getTemplatesByIds(uniqueIds), // Service now accepts string[]
       );
 
       // Add to existing templates
-      loadedTemplates.forEach(template => {
+      loadedTemplates.forEach((template) => {
         // Ensure consistent ID comparison (both as strings)
         const templateIdStr = template.id.toString();
-        if (!this.templates.some(t => t.id.toString() === templateIdStr)) {
+        if (!this.templates.some((t) => t.id.toString() === templateIdStr)) {
           this.templates.push(template);
         }
       });
@@ -2258,7 +2448,6 @@ export class ShelfModalComponent implements OnInit {
       }
 
       this.cdRef.detectChanges();
-
     } catch (error) {
       console.error('Error loading specific templates:', error);
     } finally {
@@ -2278,18 +2467,17 @@ export class ShelfModalComponent implements OnInit {
 
     try {
       const loadedMessages = await firstValueFrom(
-        this.messageService.getMessagesByIds(uniqueIds)
+        this.messageService.getMessagesByIds(uniqueIds),
       );
 
       // Add to existing messages
-      loadedMessages.forEach(message => {
-        if (!this.messages.some(m => m.id === message.id)) {
+      loadedMessages.forEach((message) => {
+        if (!this.messages.some((m) => m.id === message.id)) {
           this.messages.push(message);
         }
       });
 
       this.cdRef.detectChanges();
-
     } catch (error) {
       console.error('Error loading specific messages:', error);
     } finally {
@@ -2305,7 +2493,11 @@ export class ShelfModalComponent implements OnInit {
 
     if (filter && filter !== this.deviceSearchTerm) {
       this.deviceFilterSubject.next(filter);
-    } else if (first + rows >= this.devices.length && this.deviceHasMore && !this.deviceLoading) {
+    } else if (
+      first + rows >= this.devices.length &&
+      this.deviceHasMore &&
+      !this.deviceLoading
+    ) {
       this.devicePage = pageNumber;
       this.loadDevices();
     }
@@ -2333,7 +2525,11 @@ export class ShelfModalComponent implements OnInit {
       this.templateSearchDebounce.next(filter);
     }
     // If scrolling to load more and we have more to load
-    else if (first + rows >= this.templates.length && this.templateHasMore && !this.templateLoading) {
+    else if (
+      first + rows >= this.templates.length &&
+      this.templateHasMore &&
+      !this.templateLoading
+    ) {
       this.templatePage = pageNumber;
       this.loadTemplates();
     }
@@ -2361,7 +2557,11 @@ export class ShelfModalComponent implements OnInit {
 
     if (filter && filter !== this.messageSearchTerm) {
       this.messageFilterSubject.next(filter);
-    } else if (first + rows >= this.messages.length && this.messageHasMore && !this.messageLoading) {
+    } else if (
+      first + rows >= this.messages.length &&
+      this.messageHasMore &&
+      !this.messageLoading
+    ) {
       this.messagePage = pageNumber;
       this.loadMessages();
     }
@@ -2373,7 +2573,11 @@ export class ShelfModalComponent implements OnInit {
 
     if (filter && filter !== this.existingComboSearchTerm) {
       this.existingComboFilterSubject.next(filter);
-    } else if (first + rows >= this.existingCombos.length && this.existingComboHasMore && !this.existingComboLoading) {
+    } else if (
+      first + rows >= this.existingCombos.length &&
+      this.existingComboHasMore &&
+      !this.existingComboLoading
+    ) {
       this.existingComboPage = pageNumber;
       this.loadExistingCombos();
     }
@@ -2385,7 +2589,11 @@ export class ShelfModalComponent implements OnInit {
 
     if (filter && filter !== this.existingMessageComboSearchTerm) {
       this.existingMessageComboFilterSubject.next(filter);
-    } else if (first + rows >= this.existingMessageCombos.length && this.existingMessageComboHasMore && !this.existingMessageComboLoading) {
+    } else if (
+      first + rows >= this.existingMessageCombos.length &&
+      this.existingMessageComboHasMore &&
+      !this.existingMessageComboLoading
+    ) {
       this.existingMessageComboPage = pageNumber;
       this.loadExistingMessageCombos();
     }
@@ -2431,10 +2639,11 @@ export class ShelfModalComponent implements OnInit {
     }
 
     // First filter locally from already loaded templates
-    const localFiltered = this.templates.filter(template =>
-      template.name.toLowerCase().includes(filterValue.toLowerCase()) ||
-      template.screenWidth?.toString().includes(filterValue) ||
-      template.screenHeight?.toString().includes(filterValue)
+    const localFiltered = this.templates.filter(
+      (template) =>
+        template.name.toLowerCase().includes(filterValue.toLowerCase()) ||
+        template.screenWidth?.toString().includes(filterValue) ||
+        template.screenHeight?.toString().includes(filterValue),
     );
 
     this.filteredTemplates = localFiltered;
@@ -2451,17 +2660,17 @@ export class ShelfModalComponent implements OnInit {
   }
 
   getDeviceName(deviceId: number): string {
-    const device = this.devices.find(d => d.id === deviceId);
+    const device = this.devices.find((d) => d.id === deviceId);
     return device ? device.deviceName : 'Unknown Device';
   }
 
   getTemplateName(templateId: string): string {
-    const template = this.templates.find(t => t.id === templateId);
+    const template = this.templates.find((t) => t.id === templateId);
     return template ? template.name : 'Unknown Template';
   }
 
   getMessageTitle(messageId: number): string {
-    const message = this.messages.find(m => m.id === messageId);
+    const message = this.messages.find((m) => m.id === messageId);
     return message ? message.title : 'Unknown Message';
   }
 
@@ -2470,23 +2679,27 @@ export class ShelfModalComponent implements OnInit {
       0: 'General',
       1: 'Image',
       2: 'Video',
-      3: 'Custom Image'
+      3: 'Custom Image',
     };
     return types[contentType] || 'General';
   }
 
   getDeviceStatus(deviceId: number): string {
-    const device = this.devices.find(d => d.id === deviceId);
+    const device = this.devices.find((d) => d.id === deviceId);
     return device?.status || 'Unknown';
   }
 
   getDeviceStatusClass(deviceId: number): string {
     const status = this.getDeviceStatus(deviceId);
     switch (status?.toLowerCase()) {
-      case 'active': return 'bg-green-100 text-green-800';
-      case 'inactive': return 'bg-red-100 text-red-800';
-      case 'offline': return 'bg-gray-100 text-gray-800';
-      default: return 'bg-yellow-100 text-yellow-800';
+      case 'active':
+        return 'bg-green-100 text-green-800';
+      case 'inactive':
+        return 'bg-red-100 text-red-800';
+      case 'offline':
+        return 'bg-gray-100 text-gray-800';
+      default:
+        return 'bg-yellow-100 text-yellow-800';
     }
   }
 
@@ -2511,7 +2724,7 @@ export class ShelfModalComponent implements OnInit {
 
   // In your component.ts, normalize the data:
   normalizeMessageCombos(messages: any[]) {
-    return messages.map(msg => ({
+    return messages.map((msg) => ({
       id: msg.id,
       deviceName: msg.deviceName || msg.device?.deviceName || 'Unknown Device',
       deviceMAC: msg.deviceMAC || msg.device?.mac || 'No MAC',
@@ -2523,7 +2736,7 @@ export class ShelfModalComponent implements OnInit {
       screenSize: null,
       contentType: msg.contentType,
       duration: msg.duration,
-      _type: 'device-message' // Add type identifier
+      _type: 'device-message', // Add type identifier
     }));
   }
 
@@ -2557,10 +2770,15 @@ export class ShelfModalComponent implements OnInit {
     const field = comboGroup.get(fieldName);
     if (field?.invalid && field?.touched) {
       if (field.errors?.['required']) {
-        return `${fieldName === 'deviceId' ? 'Device' :
-          fieldName === 'templateId' ? 'Template' :
-            fieldName === 'messageId' ? 'Message' :
-              fieldName} is required`;
+        return `${
+          fieldName === 'deviceId'
+            ? 'Device'
+            : fieldName === 'templateId'
+              ? 'Template'
+              : fieldName === 'messageId'
+                ? 'Message'
+                : fieldName
+        } is required`;
       }
       if (field.errors?.['min']) {
         return 'Display order must be at least 1';
@@ -2571,26 +2789,26 @@ export class ShelfModalComponent implements OnInit {
 
   private getFieldLabel(fieldName: string): string {
     const labels: { [key: string]: string } = {
-      'aisleId': 'Aisle',
-      'name': 'Shelf name',
-      'location': 'Location',
-      'description': 'Description',
-      'coordinates': 'Coordinates',
-      'ipAddress': 'IP Address',
-      'macAddress': 'MAC Address',
-      'deviceName': 'Device Name'
+      aisleId: 'Aisle',
+      name: 'Shelf name',
+      location: 'Location',
+      description: 'Description',
+      coordinates: 'Coordinates',
+      ipAddress: 'IP Address',
+      macAddress: 'MAC Address',
+      deviceName: 'Device Name',
     };
     return labels[fieldName] || fieldName;
   }
 
   markFormGroupTouched(): void {
-    Object.keys(this.shelfForm.controls).forEach(key => {
+    Object.keys(this.shelfForm.controls).forEach((key) => {
       const control = this.shelfForm.get(key);
       control?.markAsTouched();
     });
 
-    this.deviceCombos.controls.forEach(combo => {
-      Object.keys((combo as FormGroup).controls).forEach(key => {
+    this.deviceCombos.controls.forEach((combo) => {
+      Object.keys((combo as FormGroup).controls).forEach((key) => {
         (combo as FormGroup).get(key)?.markAsTouched();
       });
     });
@@ -2622,7 +2840,7 @@ export class ShelfModalComponent implements OnInit {
         storeId: this.storeId,
         createdUser: formValue.createdUser,
         createdDate: new Date(),
-        updatedDate: new Date()
+        updatedDate: new Date(),
       };
 
       let createdShelf: Shelf;
@@ -2631,11 +2849,15 @@ export class ShelfModalComponent implements OnInit {
         // Update existing shelf
         console.log('Updating shelf with data:', shelfData);
         const updateData = { ...shelfData, id: formValue.id };
-        createdShelf = await firstValueFrom(this.shelfService.updateShelf(updateData));
+        createdShelf = await firstValueFrom(
+          this.shelfService.updateShelf(updateData),
+        );
       } else {
         // Create new shelf
         console.log('Creating new shelf with data:', shelfData);
-        createdShelf = await firstValueFrom(this.shelfService.createShelf(shelfData));
+        createdShelf = await firstValueFrom(
+          this.shelfService.createShelf(shelfData),
+        );
       }
 
       // Process device combos
@@ -2643,9 +2865,9 @@ export class ShelfModalComponent implements OnInit {
         await this.processDeviceCombos(createdShelf.id, formValue.deviceCombos);
       }
 
-      const successMessage = this.isEditMode ?
-        'Shelf updated successfully!' :
-        'Shelf created successfully!';
+      const successMessage = this.isEditMode
+        ? 'Shelf updated successfully!'
+        : 'Shelf created successfully!';
 
       this.showSuccess(successMessage);
       this.dialogRef.close({ success: true, data: createdShelf });
@@ -2657,7 +2879,10 @@ export class ShelfModalComponent implements OnInit {
     }
   }
 
-  private async processDeviceCombos(shelfId: number, deviceCombos: DeviceComboForm[]): Promise<void> {
+  private async processDeviceCombos(
+    shelfId: number,
+    deviceCombos: DeviceComboForm[],
+  ): Promise<void> {
     const currentUser = this.auth.getCurrentUserValue();
     const userId = currentUser?.id || 0;
 
@@ -2665,7 +2890,7 @@ export class ShelfModalComponent implements OnInit {
     const failedCombos = [];
 
     // Track all current combo IDs for cleanup
-    const currentComboIds: { type: string, id?: number }[] = [];
+    const currentComboIds: { type: string; id?: number }[] = [];
 
     for (let i = 0; i < deviceCombos.length; i++) {
       const combo = deviceCombos[i];
@@ -2676,29 +2901,59 @@ export class ShelfModalComponent implements OnInit {
         if (this.comboMode === 'device-template') {
           if (combo.deviceTemplateComboId) {
             // Update existing combo
-            await this.updateExistingTemplateCombo(combo, shelfId, userId, i + 1);
-            currentComboIds.push({ type: 'TEMPLATE', id: combo.deviceTemplateComboId });
+            await this.updateExistingTemplateCombo(
+              combo,
+              shelfId,
+              userId,
+              i + 1,
+            );
+            currentComboIds.push({
+              type: 'TEMPLATE',
+              id: combo.deviceTemplateComboId,
+            });
           } else {
             // Create new combo
-            result = await this.processTemplateCombo(combo, shelfId, userId, i + 1);
+            result = await this.processTemplateCombo(
+              combo,
+              shelfId,
+              userId,
+              i + 1,
+            );
             if (result.success && result.id) {
               currentComboIds.push({ type: 'TEMPLATE', id: result.id });
             } else {
-              throw new Error(result.message || 'Failed to create template combo');
+              throw new Error(
+                result.message || 'Failed to create template combo',
+              );
             }
           }
         } else {
           if (combo.deviceMessageComboId) {
             // Update existing message combo
-            await this.updateExistingMessageCombo(combo, shelfId, userId, i + 1);
-            currentComboIds.push({ type: 'MESSAGE', id: combo.deviceMessageComboId });
+            await this.updateExistingMessageCombo(
+              combo,
+              shelfId,
+              userId,
+              i + 1,
+            );
+            currentComboIds.push({
+              type: 'MESSAGE',
+              id: combo.deviceMessageComboId,
+            });
           } else {
             // Create new message combo
-            result = await this.processMessageCombo(combo, shelfId, userId, i + 1);
+            result = await this.processMessageCombo(
+              combo,
+              shelfId,
+              userId,
+              i + 1,
+            );
             if (result.success && result.id) {
               currentComboIds.push({ type: 'MESSAGE', id: result.id });
             } else {
-              throw new Error(result.message || 'Failed to create message combo');
+              throw new Error(
+                result.message || 'Failed to create message combo',
+              );
             }
           }
         }
@@ -2708,7 +2963,7 @@ export class ShelfModalComponent implements OnInit {
         console.error(`Failed to process combo ${i + 1}:`, error);
         failedCombos.push({
           index: i + 1,
-          error: error instanceof Error ? error.message : 'Unknown error'
+          error: error instanceof Error ? error.message : 'Unknown error',
         });
       }
     }
@@ -2719,18 +2974,23 @@ export class ShelfModalComponent implements OnInit {
     // Show summary
     if (processedCombos.length > 0) {
       this.showSuccess(
-        `${processedCombos.length} combo(s) processed successfully`
+        `${processedCombos.length} combo(s) processed successfully`,
       );
     }
 
     if (failedCombos.length > 0) {
       this.showWarning(
-        `${failedCombos.length} combo(s) failed to process. Please check the console for details.`
+        `${failedCombos.length} combo(s) failed to process. Please check the console for details.`,
       );
     }
   }
 
-  private async updateExistingTemplateCombo(combo: DeviceComboForm, shelfId: number, userId: number, displayOrder: number): Promise<void> {
+  private async updateExistingTemplateCombo(
+    combo: DeviceComboForm,
+    shelfId: number,
+    userId: number,
+    displayOrder: number,
+  ): Promise<void> {
     try {
       const comboId = combo.deviceTemplateComboId;
       if (!comboId) {
@@ -2740,7 +3000,7 @@ export class ShelfModalComponent implements OnInit {
       // 1. First, check if the combo itself needs updating
       // Get the current combo details
       const currentComboResponse = await firstValueFrom(
-        this.deviceService.getDeviceTemplateComboById(comboId)
+        this.deviceService.getDeviceTemplateComboById(comboId),
       );
 
       if (!currentComboResponse.success || !currentComboResponse.result) {
@@ -2750,9 +3010,10 @@ export class ShelfModalComponent implements OnInit {
       const currentCombo = currentComboResponse.result;
 
       // Fix the comparison - convert deviceId to number if needed
-      const currentDeviceId = typeof currentCombo.deviceId === 'string'
-        ? parseInt(currentCombo.deviceId, 10)
-        : currentCombo.deviceId;
+      const currentDeviceId =
+        typeof currentCombo.deviceId === 'string'
+          ? parseInt(currentCombo.deviceId, 10)
+          : currentCombo.deviceId;
 
       // Check if combo details have changed
       const detailsChanged =
@@ -2768,43 +3029,46 @@ export class ShelfModalComponent implements OnInit {
             deviceId: combo.deviceId,
             templateId: combo.templateId || '',
             isDefault: combo.isDefault || false,
-            isActive: combo.isActive !== false  // Add this if your DTO supports it
-          })
+            isActive: combo.isActive !== false, // Add this if your DTO supports it
+          }),
         );
       }
       // 2. Update the assignment
       const assignmentsResponse = await firstValueFrom(
-        this.deviceService.getAssignments('SHELF', shelfId)
+        this.deviceService.getAssignments('SHELF', shelfId),
       );
 
-      const assignments = Array.isArray(assignmentsResponse) ? assignmentsResponse : [];
+      const assignments = Array.isArray(assignmentsResponse)
+        ? assignmentsResponse
+        : [];
 
       // Find the existing assignment for this combo
-      const existingAssignment = assignments.find(assignment =>
-        assignment.assignmentType === 'TEMPLATE' &&
-        assignment.deviceTemplateComboId === comboId
+      const existingAssignment = assignments.find(
+        (assignment) =>
+          assignment.assignmentType === 'TEMPLATE' &&
+          assignment.deviceTemplateComboId === comboId,
       );
 
       // const assignments = await firstValueFrom(
       //   this.deviceService.getAssignments('SHELF', shelfId)
       // );
       // // Find the existing assignment for this combo
-      //  const existingAssignment = assignments.find(assignment => 
+      //  const existingAssignment = assignments.find(assignment =>
       //   assignment.assignmentType === 'TEMPLATE' &&
       //   assignment.deviceTemplateComboId === comboId
       // );
 
-
-
       if (existingAssignment) {
         // Update the assignment if needed
-        if (existingAssignment.displayOrder !== displayOrder ||
-          existingAssignment.isActive !== (combo.isActive !== false)) {
+        if (
+          existingAssignment.displayOrder !== displayOrder ||
+          existingAssignment.isActive !== (combo.isActive !== false)
+        ) {
           await firstValueFrom(
             this.deviceService.updateAssignment(existingAssignment.id, {
               displayOrder: displayOrder,
-              isActive: combo.isActive !== false
-            })
+              isActive: combo.isActive !== false,
+            }),
           );
         }
       } else {
@@ -2819,7 +3083,7 @@ export class ShelfModalComponent implements OnInit {
             displayOrder,
             this.storeId,
             combo.isActive !== false,
-          )
+          ),
         );
       }
     } catch (error) {
@@ -2832,7 +3096,7 @@ export class ShelfModalComponent implements OnInit {
     combo: DeviceComboForm,
     shelfId: number,
     userId: number,
-    displayOrder: number
+    displayOrder: number,
   ): Promise<void> {
     try {
       const comboId = combo.deviceMessageComboId;
@@ -2849,13 +3113,14 @@ export class ShelfModalComponent implements OnInit {
 
         // 2. Update the assignment
         const assignments = await firstValueFrom(
-          this.deviceService.getAssignments('SHELF', shelfId)
+          this.deviceService.getAssignments('SHELF', shelfId),
         );
 
         // Find the existing assignment for this combo
-        const existingAssignment = assignments.find(assignment =>
-          assignment.assignmentType === 'MESSAGE' &&
-          assignment.deviceMessageComboId === comboId
+        const existingAssignment = assignments.find(
+          (assignment) =>
+            assignment.assignmentType === 'MESSAGE' &&
+            assignment.deviceMessageComboId === comboId,
         );
 
         if (existingAssignment) {
@@ -2863,8 +3128,8 @@ export class ShelfModalComponent implements OnInit {
           await firstValueFrom(
             this.deviceService.updateAssignment(existingAssignment.id, {
               displayOrder: displayOrder,
-              isActive: combo.isActive !== false
-            })
+              isActive: combo.isActive !== false,
+            }),
           );
         } else {
           // Create new assignment if not found
@@ -2877,8 +3142,8 @@ export class ShelfModalComponent implements OnInit {
               userId,
               displayOrder,
               this.storeId,
-              combo.isActive !== false
-            )
+              combo.isActive !== false,
+            ),
           );
         }
       }
@@ -2890,38 +3155,48 @@ export class ShelfModalComponent implements OnInit {
 
   private async cleanupDeletedAssignments(
     shelfId: number,
-    currentComboIds: { type: string, id?: number }[]  // Correct parameter type
+    currentComboIds: { type: string; id?: number }[], // Correct parameter type
   ): Promise<void> {
     try {
       // Get all current assignments for this shelf
       const assignments = await firstValueFrom(
-        this.deviceService.getAssignments('SHELF', shelfId)
+        this.deviceService.getAssignments('SHELF', shelfId),
       );
 
       // Find assignments to delete (those not in current combos)
-      const assignmentsToDelete = assignments.filter(assignment => {
+      const assignmentsToDelete = assignments.filter((assignment) => {
         if (this.comboMode === 'device-template') {
-          return assignment.assignmentType === 'TEMPLATE' &&
-            !currentComboIds.some(c =>
-              c.type === 'TEMPLATE' && c.id === assignment.deviceTemplateComboId
-            );
+          return (
+            assignment.assignmentType === 'TEMPLATE' &&
+            !currentComboIds.some(
+              (c) =>
+                c.type === 'TEMPLATE' &&
+                c.id === assignment.deviceTemplateComboId,
+            )
+          );
         } else {
-          return assignment.assignmentType === 'MESSAGE' &&
-            !currentComboIds.some(c =>
-              c.type === 'MESSAGE' && c.id === assignment.deviceMessageComboId
-            );
+          return (
+            assignment.assignmentType === 'MESSAGE' &&
+            !currentComboIds.some(
+              (c) =>
+                c.type === 'MESSAGE' &&
+                c.id === assignment.deviceMessageComboId,
+            )
+          );
         }
       });
 
       // Delete orphaned assignments
       for (const assignment of assignmentsToDelete) {
         await firstValueFrom(
-          this.deviceService.deleteAssignment(assignment.id)
+          this.deviceService.deleteAssignment(assignment.id),
         );
       }
 
       if (assignmentsToDelete.length > 0) {
-        console.log(`Deleted ${assignmentsToDelete.length} orphaned assignments`);
+        console.log(
+          `Deleted ${assignmentsToDelete.length} orphaned assignments`,
+        );
       }
     } catch (error) {
       console.error('Error cleaning up deleted assignments:', error);
@@ -2933,7 +3208,7 @@ export class ShelfModalComponent implements OnInit {
     combo: DeviceComboForm,
     shelfId: number,
     userId: number,
-    displayOrder: number
+    displayOrder: number,
   ): Promise<ProcessedComboResult> {
     let comboId = combo.deviceTemplateComboId;
 
@@ -2944,8 +3219,8 @@ export class ShelfModalComponent implements OnInit {
           this.deviceService.createDeviceTemplateCombo(
             combo.deviceId,
             combo.templateId || '',
-            combo.isDefault || false
-          )
+            combo.isDefault || false,
+          ),
         );
         comboId = createdCombo.id;
       }
@@ -2962,7 +3237,7 @@ export class ShelfModalComponent implements OnInit {
             displayOrder,
             this.storeId,
             combo.isActive !== false,
-          )
+          ),
         );
         return { id: comboId, success: true };
       } else {
@@ -2972,7 +3247,7 @@ export class ShelfModalComponent implements OnInit {
       console.error('Error processing template combo:', error);
       return {
         success: false,
-        message: error instanceof Error ? error.message : 'Unknown error'
+        message: error instanceof Error ? error.message : 'Unknown error',
       };
     }
   }
@@ -2981,7 +3256,7 @@ export class ShelfModalComponent implements OnInit {
     combo: DeviceComboForm,
     shelfId: number,
     userId: number,
-    displayOrder: number
+    displayOrder: number,
   ): Promise<ProcessedComboResult> {
     let comboId = combo.deviceMessageComboId;
 
@@ -2993,8 +3268,8 @@ export class ShelfModalComponent implements OnInit {
             deviceId: combo.deviceId,
             messageId: combo.messageId,
             storeId: this.storeId,
-            isActive: combo.isActive !== false
-          })
+            isActive: combo.isActive !== false,
+          }),
         );
         comboId = createdCombo.result?.id;
       }
@@ -3010,23 +3285,24 @@ export class ShelfModalComponent implements OnInit {
             userId,
             displayOrder,
             this.storeId,
-            combo.isActive !== false
-          )
+            combo.isActive !== false,
+          ),
         );
         return { id: comboId, success: true };
       } else {
-        return { success: false, message: 'No combo ID or message ID available' };
+        return {
+          success: false,
+          message: 'No combo ID or message ID available',
+        };
       }
     } catch (error) {
       console.error('Error processing message combo:', error);
       return {
         success: false,
-        message: error instanceof Error ? error.message : 'Unknown error'
+        message: error instanceof Error ? error.message : 'Unknown error',
       };
     }
   }
-
-
 
   // private async processTemplateCombo(combo: DeviceComboForm, shelfId: number, userId: number, displayOrder: number): Promise<void> {
   //   let comboId = combo.deviceTemplateComboId;
@@ -3093,7 +3369,7 @@ export class ShelfModalComponent implements OnInit {
       severity: 'success',
       summary: 'Success',
       detail: message,
-      life: 5000
+      life: 5000,
     });
   }
 
@@ -3102,7 +3378,7 @@ export class ShelfModalComponent implements OnInit {
       severity: 'error',
       summary: 'Error',
       detail: message,
-      life: 5000
+      life: 5000,
     });
   }
 
@@ -3111,7 +3387,7 @@ export class ShelfModalComponent implements OnInit {
       severity: 'warn',
       summary: 'Warning',
       detail: message,
-      life: 5000
+      life: 5000,
     });
   }
 
@@ -3120,7 +3396,7 @@ export class ShelfModalComponent implements OnInit {
       severity: 'info',
       summary: 'Info',
       detail: message,
-      life: 5000
+      life: 5000,
     });
   }
   // private showSuccess(message: string): void {

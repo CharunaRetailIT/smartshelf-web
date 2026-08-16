@@ -1,10 +1,23 @@
 import { Component, Inject, OnInit, signal } from '@angular/core';
-import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
-import { MatDialogRef, MAT_DIALOG_DATA, MatDialog } from '@angular/material/dialog';
+import {
+  FormBuilder,
+  FormGroup,
+  FormsModule,
+  ReactiveFormsModule,
+  Validators,
+} from '@angular/forms';
+import {
+  MatDialogRef,
+  MAT_DIALOG_DATA,
+  MatDialog,
+} from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Store, StoreDto } from '../../../core/interfaces/store.interface';
 import { StoreService } from '../../../core/services/store.service';
-import { SnackbarData, CustomSnackbarComponent } from '../../../shared/components/alert/custom-snackbar.component';
+import {
+  SnackbarData,
+  CustomSnackbarComponent,
+} from '../../../shared/components/alert/custom-snackbar.component';
 import { CommonModule } from '@angular/common';
 import { ConfirmationDialogComponent } from '../../../shared/components/dialog/confirmation-dialog/confirmation-dialog.component';
 import { MessageService } from 'primeng/api';
@@ -14,7 +27,7 @@ import { MessageService } from 'primeng/api';
   standalone: true,
   imports: [CommonModule, FormsModule, ReactiveFormsModule],
   templateUrl: './store-modal.component.html',
-  styleUrl: './store-modal.component.css'
+  styleUrl: './store-modal.component.css',
 })
 export class StoreModalComponent implements OnInit {
   //#region Properties
@@ -26,7 +39,7 @@ export class StoreModalComponent implements OnInit {
   // Default store settings
   readonly defaultSettings = {
     isActive: true,
-    autoSync: true
+    autoSync: true,
   };
   //#endregion
 
@@ -38,7 +51,7 @@ export class StoreModalComponent implements OnInit {
     private snackBar: MatSnackBar,
     private dialog: MatDialog,
     public dialogRef: MatDialogRef<StoreModalComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: { store?: Store; isEdit?: boolean }
+    @Inject(MAT_DIALOG_DATA) public data: { store?: Store; isEdit?: boolean },
   ) {
     this.isEditMode = data.isEdit || false;
     this.currentStoreId = data.store?.id;
@@ -48,7 +61,14 @@ export class StoreModalComponent implements OnInit {
       // Minew's store/add rejects a blank number, name or address (code 54029),
       // and every store is published to Minew, so both are required. It also
       // rejects a non-numeric code (54030), hence the digits-only pattern.
-      storeCode: ['', [Validators.required, Validators.pattern(/^\d+$/), Validators.maxLength(50)]],
+      storeCode: [
+        '',
+        [
+          Validators.required,
+          Validators.pattern(/^\d+$/),
+          Validators.maxLength(50),
+        ],
+      ],
       address: ['', [Validators.required, Validators.maxLength(500)]],
       contactPerson: ['', [Validators.maxLength(100)]],
       phone: ['', [Validators.maxLength(20)]],
@@ -58,7 +78,7 @@ export class StoreModalComponent implements OnInit {
       minewStoreId: [''],
       minewTemplateId: [''],
       isActive: [this.defaultSettings.isActive],
-      autoSync: [this.defaultSettings.autoSync]
+      autoSync: [this.defaultSettings.autoSync],
     });
   }
   //#endregion
@@ -85,7 +105,7 @@ export class StoreModalComponent implements OnInit {
       minewStoreId: store.minewStoreId || '',
       minewTemplateId: store.minewTemplateId || '',
       isActive: store.isActive,
-      autoSync: store.isSynced || true
+      autoSync: store.isSynced || true,
     });
   }
 
@@ -120,7 +140,7 @@ export class StoreModalComponent implements OnInit {
         latitude: formValue.latitude,
         longitude: formValue.longitude,
         isActive: formValue.isActive,
-        createdUser: this.getCurrentUserId() // This should come from auth service
+        createdUser: this.getCurrentUserId(), // This should come from auth service
       };
 
       if (this.isEditMode && this.currentStoreId) {
@@ -143,8 +163,8 @@ export class StoreModalComponent implements OnInit {
           message: 'You have unsaved changes. Are you sure you want to cancel?',
           confirmText: 'Yes, Cancel',
           cancelText: 'No',
-          confirmColor: 'warn'
-        }
+          confirmColor: 'warn',
+        },
       });
 
       dialogRef.afterClosed().subscribe((confirmed: boolean) => {
@@ -156,7 +176,6 @@ export class StoreModalComponent implements OnInit {
       this.dialogRef.close({ success: false });
     }
   }
-
 
   // onCancel(): void {
   //   if (this.storeForm.dirty && !this.isSubmitting()) {
@@ -172,15 +191,17 @@ export class StoreModalComponent implements OnInit {
   //#region API Calls
   private createStore(storeDto: StoreDto): void {
     this.storeService.createStore(storeDto).subscribe({
-      next: (createdStore) => this.handleSuccess('Store created successfully', createdStore),
-      error: (error) => this.handleError(error, 'Failed to create store')
+      next: (createdStore) =>
+        this.handleSuccess('Store created successfully', createdStore),
+      error: (error) => this.handleError(error, 'Failed to create store'),
     });
   }
 
   private updateStore(storeId: number, storeDto: StoreDto): void {
     this.storeService.updateStore(storeId, storeDto).subscribe({
-      next: (updatedStore) => this.handleSuccess('Store updated successfully', updatedStore),
-      error: (error) => this.handleError(error, 'Failed to update store')
+      next: (updatedStore) =>
+        this.handleSuccess('Store updated successfully', updatedStore),
+      error: (error) => this.handleError(error, 'Failed to update store'),
     });
   }
   //#endregion
@@ -193,7 +214,7 @@ export class StoreModalComponent implements OnInit {
   }
 
   private markFormAsTouched(): void {
-    Object.values(this.storeForm.controls).forEach(control => {
+    Object.values(this.storeForm.controls).forEach((control) => {
       control.markAsTouched();
     });
   }
@@ -205,7 +226,7 @@ export class StoreModalComponent implements OnInit {
     this.dialogRef.close({
       success: true,
       data: store,
-      isEdit: this.isEditMode
+      isEdit: this.isEditMode,
     });
   }
 
@@ -230,7 +251,7 @@ export class StoreModalComponent implements OnInit {
       severity: 'success',
       summary: 'Success',
       detail: message,
-      life: 5000
+      life: 5000,
     });
   }
 
@@ -239,7 +260,7 @@ export class StoreModalComponent implements OnInit {
       severity: 'error',
       summary: 'Error',
       detail: message,
-      life: 5000
+      life: 5000,
     });
   }
 
@@ -248,7 +269,7 @@ export class StoreModalComponent implements OnInit {
       severity: 'warn',
       summary: 'Warning',
       detail: message,
-      life: 5000
+      life: 5000,
     });
   }
 
@@ -257,7 +278,7 @@ export class StoreModalComponent implements OnInit {
       severity: 'info',
       summary: 'Info',
       detail: message,
-      life: 5000
+      life: 5000,
     });
   }
   // private showSuccess(message: string): void {

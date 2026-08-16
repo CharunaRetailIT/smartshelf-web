@@ -1,53 +1,62 @@
 <!-- message-list.component.html -->
-<div class="min-h-screen bg-gray-50 p-6">
+<div class="bg-gray-50 p-6 ds-page-shell ds-page-shell--fixed">
   <div class="max-w-7xl mx-auto">
-    
     <!-- Header -->
-    <div class="bg-white rounded-lg shadow-sm border border-gray-200 mb-6 p-6">
+    <div
+      class="bg-white rounded-lg shadow-sm border border-gray-200 mb-6 p-6 ds-card"
+    >
       <div class="flex items-center justify-between">
         <!-- Left content -->
         <div class="flex items-center space-x-3">
           <!-- <i class="fas fa-comments text-2xl text-secondary"></i> -->
-              <i class="pi pi-comments text-blue-600 text-2xl"></i>
+          <i class="pi pi-comments text-blue-600 text-2xl"></i>
           <div>
             <h1 class="text-2xl font-bold text-secondary-dark">Messages</h1>
-            <p class="text-secondary-light">Manage digital signage messages and content</p>
+            <p class="text-secondary-light">
+              Manage digital signage messages and content
+            </p>
           </div>
         </div>
-        
 
-    <!-- Right button -->
-    <div class="flex-shrink-0 ml-6">  
-      <a [routerLink]="['/create-message']"
-      *ngIf="auth.hasAnyRole(['Admin','Manager','Operator'])"
-         class="cursor-pointer bg-primary hover:bg-primary-light text-white px-4 py-2 rounded-lg flex items-center space-x-2 transition-colors whitespace-nowrap">
-        <i class="fas fa-plus"></i>
-        <span>Add Message</span>
-      </a>
-    </div>
+        <!-- Right button -->
+        <div class="flex-shrink-0 ml-6">
+          <a
+            [routerLink]="['/create-message']"
+            *ngIf="auth.hasAnyRole(['Admin', 'Manager', 'Operator'])"
+            class="cursor-pointer bg-primary hover:bg-primary-light text-white px-4 py-2 rounded-lg flex items-center space-x-2 transition-colors whitespace-nowrap"
+          >
+            <i class="fas fa-plus"></i>
+            <span>Add Message</span>
+          </a>
+        </div>
       </div>
     </div>
 
     <!-- Filters -->
-    <div class="bg-white rounded-lg shadow-sm border border-gray-200 mb-6 p-6">
+    <div
+      class="bg-white rounded-lg shadow-sm border border-gray-200 mb-6 p-6 ds-card"
+    >
       <div class="flex justify-between items-center gap-4">
-        
         <!-- Search Input -->
         <div class="relative w-1/2">
-          <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+          <div
+            class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"
+          >
             <i class="fas fa-search text-gray-400"></i>
           </div>
           <input
             type="text"
             placeholder="Search messages..."
             (keyup)="applyFilter($event)"
-            class="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+            class="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+          />
         </div>
 
         <!-- Status Filter -->
         <div class="w-1/4">
           <select
-            class="px-3 py-2 w-full border border-gray-300 rounded-md bg-white text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500">
+            class="px-3 py-2 w-full border border-gray-300 rounded-md bg-white text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+          >
             <option value="all">All Status</option>
             <option value="active">Active</option>
             <option value="inactive">Inactive</option>
@@ -57,7 +66,8 @@
         <!-- Type Filter -->
         <div class="w-1/4">
           <select
-            class="px-3 py-2 w-full border border-gray-300 rounded-md bg-white text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500">
+            class="px-3 py-2 w-full border border-gray-300 rounded-md bg-white text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+          >
             <option value="all">All Types</option>
             <option value="general">General</option>
             <option value="image">Image</option>
@@ -65,150 +75,186 @@
             <option value="custom_image">Custom</option>
           </select>
         </div>
-
       </div>
     </div>
 
     <!-- Messages Table -->
-    <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
-      <div class="overflow-x-auto">
-        <mat-table [dataSource]="dataSource" matSort class="mat-elevation-z0 w-full text-sm">
-          
-          <!-- ID Column -->
-          <!-- <ng-container matColumnDef="id">
-            <mat-header-cell *matHeaderCellDef mat-sort-header class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase w-1/12 bg-gray-100" style="border-bottom: 1px solid #e5e7eb !important;">
-              ID
-            </mat-header-cell>
-            <mat-cell *matCellDef="let message" class="px-6 py-4" style="border-bottom: 1px solid #e5e7eb !important;">
-              <span class="text-sm font-medium text-gray-900">{{ message.id }}</span>
-            </mat-cell>
-          </ng-container> -->
+    <div class="ds-card ds-table-panel">
+      <p-table
+        #messagesTable
+        [value]="dataSource"
+        [paginator]="true"
+        [rows]="10"
+        [rowsPerPageOptions]="[5, 10, 20]"
+        [showFirstLastIcon]="true"
+        [showCurrentPageReport]="true"
+        currentPageReportTemplate="{first} - {last} of {totalRecords}"
+        [globalFilterFields]="[
+          'title',
+          'contentTypeName',
+          'createdByName',
+          'duration',
+        ]"
+        [scrollable]="true"
+        scrollHeight="flex"
+        dataKey="id"
+      >
+        <ng-template pTemplate="header">
+          <tr>
+            <th class="w-1/3" pSortableColumn="title">
+              Message <p-sortIcon field="title"></p-sortIcon>
+            </th>
+            <th class="w-1/6">Type</th>
+            <th class="w-1/6">Status</th>
+            <th class="w-1/6">Created By</th>
+            <th class="w-1/6" pSortableColumn="createdDate">
+              Created <p-sortIcon field="createdDate"></p-sortIcon>
+            </th>
+            <th class="ds-table-actions">Actions</th>
+          </tr>
+        </ng-template>
 
-          <!-- Message Column -->
-          <ng-container matColumnDef="title">
-            <mat-header-cell *matHeaderCellDef mat-sort-header class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase w-1/3 bg-gray-100" style="border-bottom: 1px solid #e5e7eb !important;">
-              Message
-            </mat-header-cell>
-            <mat-cell *matCellDef="let message" class="px-6 py-4" style="border-bottom: 1px solid #e5e7eb !important;">
+        <ng-template pTemplate="body" let-message>
+          <tr>
+            <!-- Message -->
+            <td>
               <div class="flex items-center space-x-3">
-                <div class="w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0"
-                     [class]="getMessageTypeBackground(message.contentType)">
-                  <i [class]="getContentTypeIcon(message.contentType)" 
-                     [ngClass]="getMessageTypeIconColor(message.contentType)"></i>
+                <div
+                  class="w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0"
+                  [class]="getMessageTypeBackground(message.contentType)"
+                >
+                  <i
+                    [class]="getContentTypeIcon(message.contentType)"
+                    [ngClass]="getMessageTypeIconColor(message.contentType)"
+                  ></i>
                 </div>
                 <div class="min-w-0">
-                  <h3 class="text-sm font-medium text-gray-900 truncate">{{ message.title }}</h3>
-                  <p class="text-xs text-gray-500">Duration: {{ message.duration }}s</p>
+                  <h3 class="font-medium text-gray-900 truncate">
+                    {{ message.title }}
+                  </h3>
+                  <p class="text-xs text-gray-500">
+                    Duration: {{ message.duration }}s
+                  </p>
                 </div>
               </div>
-            </mat-cell>
-          </ng-container>
+            </td>
 
-          <!-- Content Type Column -->
-          <ng-container matColumnDef="content_type">
-            <mat-header-cell *matHeaderCellDef class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase w-1/6 bg-gray-100" style="border-bottom: 1px solid #e5e7eb !important;">
-              Type
-            </mat-header-cell>
-            <mat-cell *matCellDef="let message" class="px-6 py-4" style="border-bottom: 1px solid #e5e7eb !important;">
-              <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border"
-                    [class]="getContentTypeClass(message.contentType)">
-                <i [class]="getContentTypeIcon(message.contentType)" class="mr-1.5 text-xs"></i>
+            <!-- Type -->
+            <td>
+              <span
+                class="ds-pill border"
+                [class]="getContentTypeClass(message.contentType)"
+              >
+                <i
+                  [class]="getContentTypeIcon(message.contentType)"
+                  class="text-xs"
+                ></i>
                 {{ message.contentTypeName | titlecase }}
               </span>
-            </mat-cell>
-          </ng-container>
+            </td>
 
-          <!-- Status Column -->
-          <ng-container matColumnDef="is_active">
-            <mat-header-cell *matHeaderCellDef class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase w-1/6 bg-gray-100" style="border-bottom: 1px solid #e5e7eb !important;">
-              Status
-            </mat-header-cell>
-            <mat-cell *matCellDef="let message" class="px-6 py-4" style="border-bottom: 1px solid #e5e7eb !important;">
-              <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border"
-                    [class]="message.isActive ? 'bg-green-100 text-green-800 border-green-200' : 'bg-red-100 text-red-800 border-red-200'">
-                <i class="fas" 
-                   [ngClass]="message.isActive ? 'fa-circle text-green-400' : 'fa-circle text-red-400'"
-                   [style.font-size.px]="8"></i>
-                <span class="ml-1.5">{{ message.isActive ? 'Active' : 'Inactive' }}</span>
+            <!-- Status -->
+            <td>
+              <span
+                class="ds-pill border"
+                [class]="
+                  message.isActive
+                    ? 'bg-green-100 text-green-800 border-green-200'
+                    : 'bg-red-100 text-red-800 border-red-200'
+                "
+              >
+                <i
+                  class="fas"
+                  [ngClass]="
+                    message.isActive
+                      ? 'fa-circle text-green-400'
+                      : 'fa-circle text-red-400'
+                  "
+                  [style.font-size.px]="8"
+                ></i>
+                <span>{{ message.isActive ? "Active" : "Inactive" }}</span>
               </span>
-            </mat-cell>
-          </ng-container>
+            </td>
 
-          <!-- Created By Column -->
-          <ng-container matColumnDef="created_by">
-            <mat-header-cell *matHeaderCellDef class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase w-1/6 bg-gray-100" style="border-bottom: 1px solid #e5e7eb !important;">
-              Created By
-            </mat-header-cell>
-            <mat-cell *matCellDef="let message" class="px-6 py-4" style="border-bottom: 1px solid #e5e7eb !important;">
+            <!-- Created By -->
+            <td>
               <div class="flex items-center space-x-2">
-                <div class="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0">
-                  <span class="text-xs font-medium text-blue-600">{{ getInitials(message.createdByName) }}</span>
+                <div
+                  class="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0"
+                >
+                  <span class="text-xs font-medium text-blue-600">{{
+                    getInitials(message.createdByName)
+                  }}</span>
                 </div>
-                <span class="text-sm text-gray-900 truncate">{{ message.createdByName || 'Unknown' }}</span>
+                <span class="text-gray-900 truncate">{{
+                  message.createdByName || "Unknown"
+                }}</span>
               </div>
-            </mat-cell>
-          </ng-container>
+            </td>
 
-          <!-- Created At Column -->
-          <ng-container matColumnDef="created_at">
-            <mat-header-cell *matHeaderCellDef mat-sort-header class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase w-1/6 bg-gray-100" style="border-bottom: 1px solid #e5e7eb !important;">
-              Created
-            </mat-header-cell>
-            <mat-cell *matCellDef="let message" class="px-6 py-4 text-gray-600" style="border-bottom: 1px solid #e5e7eb !important;">
-              {{ message.createdDate | date:'MMM d, y' }}
-            </mat-cell>
-          </ng-container>
+            <!-- Created -->
+            <td class="text-gray-600">
+              {{ message.createdDate | date: "MMM d, y" }}
+            </td>
 
-          <!-- Actions Column -->
-          <ng-container matColumnDef="actions">
-            <mat-header-cell *matHeaderCellDef class="px-6 py-4 text-center text-xs font-medium text-gray-500 uppercase w-1/12 bg-gray-100" style="border-bottom: 1px solid #e5e7eb !important;">
-              Actions
-            </mat-header-cell>
-            <mat-cell *matCellDef="let message" class="px-6 py-4 text-center" style="border-bottom: 1px solid #e5e7eb !important;">
-              <div class="flex justify-center space-x-4">
-                <button class="text-blue-600 hover:text-blue-900 p-1 rounded hover:bg-blue-50 transition-colors duration-150 cursor-pointer" 
-                *ngIf="auth.hasAnyRole(['Admin','Manager','Operator'])"        
-                (click)="editMessage(message)">
+            <!-- Actions -->
+            <td class="ds-table-actions">
+              <div class="ds-btn-group">
+                <button
+                  class="text-blue-600 hover:text-blue-900 rounded hover:bg-blue-50 transition-colors duration-150 cursor-pointer ds-btn-icon"
+                  *ngIf="auth.hasAnyRole(['Admin', 'Manager', 'Operator'])"
+                  (click)="editMessage(message)"
+                  title="Edit Message"
+                >
                   <i class="fas fa-edit"></i>
                 </button>
-                             <button class="text-blue-600 hover:text-blue-900 p-1 rounded hover:bg-blue-50 transition-colors duration-150 cursor-pointer" 
-                *ngIf="auth.hasAnyRole(['Viewer'])"        
-                (click)="editMessage(message)">
+                <button
+                  class="text-blue-600 hover:text-blue-900 rounded hover:bg-blue-50 transition-colors duration-150 cursor-pointer ds-btn-icon"
+                  *ngIf="auth.hasAnyRole(['Viewer'])"
+                  (click)="editMessage(message)"
+                  title="View Message"
+                >
                   <i class="fas fa-eye"></i>
                 </button>
-                <button class="text-red-600 hover:text-red-900 p-1 rounded hover:bg-red-50 transition-colors duration-150 cursor-pointer" 
-                *ngIf="auth.hasAnyRole(['Admin','Manager'])"       
-                (click)="deleteMessage(message)">
+                <button
+                  class="text-red-600 hover:text-red-900 rounded hover:bg-red-50 transition-colors duration-150 cursor-pointer ds-btn-icon"
+                  *ngIf="auth.hasAnyRole(['Admin', 'Manager'])"
+                  (click)="deleteMessage(message)"
+                  title="Delete Message"
+                >
                   <i class="fas fa-trash"></i>
                 </button>
               </div>
-            </mat-cell>
-          </ng-container>
-
-          <!-- Header & Row Declarations -->
-          <mat-header-row *matHeaderRowDef="displayedColumns" class="bg-gray-100"></mat-header-row>
-          <mat-row *matRowDef="let row; columns: displayedColumns;" class="hover:bg-gray-50 transition-colors" style="border-bottom: 1px solid #e5e7eb !important;"></mat-row>
-        </mat-table>
+            </td>
+          </tr>
+        </ng-template>
 
         <!-- No Messages State -->
-        <div *ngIf="dataSource.data.length === 0" class="text-center py-16">
-          <div class="w-20 h-20 mx-auto rounded-full bg-gray-100 flex items-center justify-center mb-4">
-            <i class="fas fa-inbox text-2xl text-gray-400"></i>
-          </div>
-          <h3 class="text-lg font-medium text-gray-900 mb-2">No messages found</h3>
-          <p class="text-gray-500 mb-6">Get started by creating your first message.</p>
-          <a routerLink="/messages/create" 
-          *ngIf="auth.hasAnyRole(['Admin','Manager','Operator'])"
-             class="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
-            <i class="fas fa-plus mr-2"></i>Create Message
-          </a>
-        </div>
-
-        <mat-paginator [pageSizeOptions]="[5, 10, 20]"
-                       showFirstLastButtons
-                       aria-label="Select page of messages">
-        </mat-paginator>
-      </div>
+        <ng-template pTemplate="emptymessage">
+          <tr>
+            <td colspan="6">
+              <div class="ds-table-empty">
+                <div
+                  class="w-20 h-20 mx-auto rounded-full bg-gray-100 flex items-center justify-center"
+                >
+                  <i class="fas fa-inbox text-2xl text-gray-400"></i>
+                </div>
+                <h3 class="ds-table-empty__title">No messages found</h3>
+                <p class="ds-table-empty__desc">
+                  Get started by creating your first message.
+                </p>
+                <a
+                  [routerLink]="['/create-message']"
+                  *ngIf="auth.hasAnyRole(['Admin', 'Manager', 'Operator'])"
+                  class="bg-blue-600 text-white hover:bg-blue-700 transition-colors ds-btn ds-btn--primary"
+                >
+                  <i class="fas fa-plus"></i>Create Message
+                </a>
+              </div>
+            </td>
+          </tr>
+        </ng-template>
+      </p-table>
     </div>
   </div>
 </div>

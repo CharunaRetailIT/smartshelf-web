@@ -1,0 +1,313 @@
+/* =============================================================================
+   Tables
+   =============================================================================
+
+   Three table systems ship in this application: PrimeNG `p-table`, Angular
+   Material `mat-table`, and a few hand-written `<table>` elements. None of
+   them is being replaced - sorting, filtering, pagination, selection, lazy
+   loading and expansion all keep working exactly as they do today. This file
+   only makes the three look like one grid.
+
+   Density target is ERP, not marketing site: a 40px header, 44px rows, 13px
+   text and 8px/12px cells. Material's MDC defaults (56px header, 52px rows)
+   and the `px-6 py-4` utilities sprinkled through the templates are both
+   pulled back to that.
+   ========================================================================== */
+
+/* -----------------------------------------------------------------------------
+   1. PrimeNG p-table
+   -------------------------------------------------------------------------- */
+
+.p-datatable-table {
+  font-size: var(--ds-table-font);
+}
+
+.p-datatable-thead > tr > th {
+  height: var(--ds-table-header-height);
+  padding: var(--ds-table-cell-padding-y) var(--ds-table-cell-padding-x);
+  background: var(--ds-table-header-bg);
+  color: var(--ds-text-muted);
+  font-size: var(--ds-table-header-font);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  white-space: nowrap;
+}
+
+.p-datatable-tbody > tr > td {
+  height: var(--ds-table-row-height);
+  padding: var(--ds-table-cell-padding-y) var(--ds-table-cell-padding-x);
+  vertical-align: middle;
+}
+
+.p-datatable-tbody > tr:hover > td {
+  background: var(--ds-table-row-hover);
+}
+
+.p-datatable-tbody > tr.p-datatable-row-selected > td {
+  background: var(--ds-table-row-selected);
+}
+
+.p-datatable-sm .p-datatable-thead > tr > th,
+.p-datatable-sm .p-datatable-tbody > tr > td {
+  height: auto;
+  min-height: var(--ds-control-height);
+}
+
+.p-datatable-emptymessage > td {
+  padding: var(--ds-space-8) var(--ds-table-cell-padding-x);
+  text-align: center;
+  color: var(--ds-text-muted);
+}
+
+/* --- Scrollable grid -------------------------------------------------------
+
+   Used with `[scrollable]="true" scrollHeight="flex"`. The grid fills whatever
+   height its panel gives it, the body is the only scrolling box on the screen,
+   and the header row and paginator stay pinned either side of it. */
+.p-datatable {
+  min-height: 0;
+}
+
+.p-datatable-scrollable {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  flex: 1 1 auto;
+}
+
+.p-datatable-scrollable .p-datatable-table-container {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: auto;
+  overscroll-behavior: contain;
+}
+
+/* The sticky header needs an opaque background or rows show through it. */
+.p-datatable-scrollable .p-datatable-thead > tr > th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background: var(--ds-table-header-bg);
+}
+
+/* A paginator inside a scrollable grid is chrome, not content - it must not
+   scroll away with the rows. */
+.p-datatable-scrollable > .p-paginator-bottom {
+  flex: 0 0 auto;
+}
+
+.p-sortable-column-icon {
+  font-size: 0.6875rem;
+}
+
+/* -----------------------------------------------------------------------------
+   2. Angular Material mat-table
+   -------------------------------------------------------------------------- */
+
+/* Material's MDC table is much airier than the PrimeNG one out of the box.
+   These rules bring header height, row height, cell padding and typography
+   onto the shared scale. The templates' own `px-6 py-4` utilities are
+   overridden on purpose - that inconsistency is what this refactor removes. */
+
+/* Row and header height are set through Material's own theme variables rather
+   than by out-styling `.mat-mdc-header-row`: Material's rule carries the same
+   specificity and lands later in the cascade, so a plain override would need
+   `!important` to stick. Retargeting the variable it reads is both cleaner and
+   what Material intends. */
+:root {
+  --mat-table-header-container-height: var(--ds-table-header-height);
+  --mat-table-row-item-container-height: var(--ds-table-row-height);
+  --mat-table-footer-container-height: var(--ds-table-row-height);
+  --mat-table-header-headline-size: var(--ds-table-header-font);
+  --mat-table-header-headline-weight: 600;
+  --mat-table-row-item-label-text-size: var(--ds-table-font);
+}
+
+.mat-mdc-table {
+  font-size: var(--ds-table-font);
+  background: var(--ds-surface);
+}
+
+.mat-mdc-header-row {
+  background: var(--ds-table-header-bg);
+}
+
+/* Two class names on purpose: Material's own cell padding rule is a single
+   class and lands later in the cascade, so a one-class selector would tie and
+   lose. This stays one step above it without reaching for `!important`. */
+.mat-mdc-table .mat-mdc-header-cell,
+.mat-mdc-table .mat-mdc-cell,
+.mat-mdc-table .mat-mdc-footer-cell {
+  padding: var(--ds-table-cell-padding-y) var(--ds-table-cell-padding-x);
+}
+
+.mat-mdc-header-cell {
+  background: var(--ds-table-header-bg);
+  color: var(--ds-text-muted);
+  font-size: var(--ds-table-header-font);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  white-space: nowrap;
+  border-bottom: var(--ds-border-width) solid var(--ds-border);
+}
+
+.mat-mdc-cell,
+.mat-mdc-footer-cell {
+  font-size: var(--ds-table-font);
+  color: var(--ds-text);
+  border-bottom: var(--ds-border-width) solid var(--ds-border);
+  vertical-align: middle;
+}
+
+.mat-mdc-row:hover .mat-mdc-cell {
+  background: var(--ds-table-row-hover);
+}
+
+/* Material renders sort headers as buttons; keep them on the header type. */
+.mat-sort-header-content {
+  font-size: inherit;
+  font-weight: inherit;
+  text-transform: inherit;
+  letter-spacing: inherit;
+}
+
+/* -----------------------------------------------------------------------------
+   3. Hand-written tables
+   -------------------------------------------------------------------------- */
+
+/* Scoped to `.ds-table` so a plain `<table>` used for layout inside a dialog
+   or a print view is not caught by accident. Add the class to any bare table
+   that should read as a data grid. */
+.ds-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--ds-table-font);
+}
+
+.ds-table > thead > tr > th {
+  height: var(--ds-table-header-height);
+  padding: var(--ds-table-cell-padding-y) var(--ds-table-cell-padding-x);
+  background: var(--ds-table-header-bg);
+  color: var(--ds-text-muted);
+  font-size: var(--ds-table-header-font);
+  font-weight: 600;
+  text-align: left;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  white-space: nowrap;
+  border-bottom: var(--ds-border-width) solid var(--ds-border);
+}
+
+.ds-table > tbody > tr > td {
+  height: var(--ds-table-row-height);
+  padding: var(--ds-table-cell-padding-y) var(--ds-table-cell-padding-x);
+  border-bottom: var(--ds-border-width) solid var(--ds-border);
+  vertical-align: middle;
+}
+
+.ds-table > tbody > tr:hover > td {
+  background: var(--ds-table-row-hover);
+}
+
+/* -----------------------------------------------------------------------------
+   4. Shared grid chrome
+   -------------------------------------------------------------------------- */
+
+/* The scroll container a table lives in. Keeps the rounded card corner from
+   clipping the header and stops the page itself scrolling sideways. */
+.ds-table-wrap {
+  width: 100%;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+}
+
+/* Action column: right-aligned, fixed, never wraps. */
+.ds-table-actions {
+  width: 1%;
+  white-space: nowrap;
+  text-align: right;
+}
+
+/* Empty and loading states, shared by all three systems. */
+.ds-table-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--ds-space-2);
+  padding: var(--ds-space-8) var(--ds-space-6);
+  text-align: center;
+  color: var(--ds-text-muted);
+}
+
+.ds-table-empty__icon {
+  font-size: 1.5rem;
+  color: var(--ds-text-subtle);
+}
+
+.ds-table-empty__title {
+  font-size: var(--ds-font-body);
+  font-weight: 600;
+  color: var(--ds-text);
+}
+
+.ds-table-empty__desc {
+  font-size: var(--ds-font-sm);
+  max-width: 22rem;
+}
+
+/* -----------------------------------------------------------------------------
+   5. Paginators
+   -------------------------------------------------------------------------- */
+
+.p-paginator {
+  padding: var(--ds-space-2) var(--ds-space-3);
+  border-top: var(--ds-border-width) solid var(--ds-border);
+  font-size: var(--ds-font-sm);
+  color: var(--ds-text-muted);
+}
+
+.p-paginator .p-paginator-page,
+.p-paginator .p-paginator-first,
+.p-paginator .p-paginator-prev,
+.p-paginator .p-paginator-next,
+.p-paginator .p-paginator-last {
+  min-width: 2rem;
+  height: 2rem;
+  border-radius: var(--ds-radius);
+}
+
+/* Material's paginator is the tallest element on several pages; bring it down
+   to the same strip height as the PrimeNG one. */
+.mat-mdc-paginator {
+  border-top: var(--ds-border-width) solid var(--ds-border);
+  font-size: var(--ds-font-sm);
+  color: var(--ds-text-muted);
+  background: var(--ds-surface);
+}
+
+.mat-mdc-paginator .mat-mdc-paginator-container {
+  min-height: 48px;
+  padding: 0 var(--ds-space-3);
+}
+
+.mat-mdc-paginator .mat-mdc-paginator-page-size-label,
+.mat-mdc-paginator .mat-mdc-paginator-range-label {
+  font-size: var(--ds-font-sm);
+  color: var(--ds-text-muted);
+}
+
+.mat-mdc-paginator .mat-mdc-icon-button.mat-mdc-button-base {
+  width: 2rem;
+  height: 2rem;
+  padding: 0;
+}
+
+.mat-mdc-paginator .mat-mdc-paginator-page-size .mat-mdc-form-field-infix {
+  min-height: var(--ds-control-height-sm);
+  padding-block: 0;
+  display: flex;
+  align-items: center;
+}
