@@ -55,6 +55,31 @@ body {
   font-size: 18px;
 } */
 
+/* Create Message - screen size picker.
+   The dropdown uses appendTo="body", so its panel is a child of <body> and
+   component-scoped rules cannot reach it. Targeted here via panelStyleClass. */
+.screen-size-panel {
+  /* PrimeNG's own .p-select-overlay is position:absolute with no left/right/
+     width set, so as an absolutely positioned box it shrinks to fit its
+     content (the longest option label) instead of filling the positioning
+     wrapper alignOverlay() already sized to match the trigger. Only visible
+     once virtualScroll stopped implicitly stretching it to 100% via the CDK
+     viewport's own default width:100% - removing virtualScroll here is what
+     exposed this. */
+  width: 100%;
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.screen-size-panel .p-dropdown-item {
+  padding: 0.5rem 1rem;
+}
+
+.screen-size-panel .p-dropdown-header,
+.screen-size-panel .p-dropdown-footer {
+  padding: 0.75rem;
+}
+
 /* PrimeNg pagination dropdown open upwards */
 .p-paginator .p-select-overlay {
   bottom: 100% !important;

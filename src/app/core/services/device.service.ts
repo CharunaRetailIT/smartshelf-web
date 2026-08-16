@@ -173,8 +173,14 @@ export class DeviceService {
           success: response.success,
           message: response.message,
         })),
-        catchError(() =>
-          of({ success: false, message: 'Failed to delete combo' }),
+        // A combo still used by an active assignment is refused with 409 and
+        // carries the reason in the body. Surface that rather than the generic
+        // text, which told the user nothing about why the delete was blocked.
+        catchError((error: HttpErrorResponse) =>
+          of({
+            success: false,
+            message: error?.error?.message ?? 'Failed to delete combo',
+          }),
         ),
       );
   }
@@ -438,16 +444,22 @@ export class DeviceService {
   //#endregion
 
   //#region Local Device Management
+  // These two now answer with the standard response envelope, like every other
+  // read. Unwrapping here keeps the callers' contract (a plain array) unchanged.
   getLocalDevices(): Observable<LocalDeviceDto[]> {
-    return this.http.get<LocalDeviceDto[]>(
-      `${this.API_URL}/device/devices/local`,
-    );
+    return this.http
+      .get<HttpResponseData<LocalDeviceDto[]>>(
+        `${this.API_URL}/device/devices/local`,
+      )
+      .pipe(map((res) => res?.result ?? []));
   }
 
   getLocalTemplates(): Observable<LocalTemplateDto[]> {
-    return this.http.get<LocalTemplateDto[]>(
-      `${this.API_URL}/device/template/local`,
-    );
+    return this.http
+      .get<HttpResponseData<LocalTemplateDto[]>>(
+        `${this.API_URL}/device/template/local`,
+      )
+      .pipe(map((res) => res?.result ?? []));
   }
 
   createDeviceTemplateCombo(
