@@ -289,55 +289,53 @@
 
         <hr class="border-gray-200" />
 
-        <!-- Store -->
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-2"
-            >Store <span class="text-red-500">*</span></label
-          >
-          <select
-            formControlName="storeId"
-            [attr.disabled]="storesLoading() ? '' : null"
-            class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-teal-500 bg-gray-50 focus:bg-white"
-          >
-            <option [ngValue]="null" disabled>
-              {{ storesLoading() ? "Loading stores..." : "Select your store" }}
-            </option>
-            <option *ngFor="let store of stores" [ngValue]="store.id">
-              {{ store.storeName
-              }}{{ store.storeCode ? " (" + store.storeCode + ")" : "" }}
-            </option>
-          </select>
-          <p
-            *ngIf="
-              signUpForm.get('storeId')?.invalid &&
-              (signUpForm.get('storeId')?.touched ||
-                signUpForm.get('storeId')?.dirty)
-            "
-            class="text-red-500 text-sm mt-1"
-          >
-            Store is required
-          </p>
-        </div>
-
-        <hr class="border-gray-200" />
-
-        <!-- Department -->
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-2"
-            >Department (Optional)</label
-          >
-          <select
-            formControlName="department"
-            class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-teal-500 bg-gray-50 focus:bg-white"
-          >
-            <option value="">Select Department (optional)</option>
-            <option value="engineering">Engineering</option>
-            <option value="marketing">Marketing</option>
-            <option value="sales">Sales</option>
-            <option value="hr">Human Resources</option>
-            <option value="finance">Finance</option>
-            <option value="operations">Operations</option>
-          </select>
+        <!-- Store / Department -->
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2"
+              >Store <span class="text-red-500">*</span></label
+            >
+            <select
+              formControlName="storeId"
+              [attr.disabled]="storesLoading() ? '' : null"
+              class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-teal-500 bg-gray-50 focus:bg-white"
+            >
+              <option [ngValue]="null" disabled>
+                {{ storesLoading() ? "Loading stores..." : "Select your store" }}
+              </option>
+              <option *ngFor="let store of stores" [ngValue]="store.id">
+                {{ store.storeName
+                }}{{ store.storeCode ? " (" + store.storeCode + ")" : "" }}
+              </option>
+            </select>
+            <p
+              *ngIf="
+                signUpForm.get('storeId')?.invalid &&
+                (signUpForm.get('storeId')?.touched ||
+                  signUpForm.get('storeId')?.dirty)
+              "
+              class="text-red-500 text-sm mt-1"
+            >
+              Store is required
+            </p>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2"
+              >Department (Optional)</label
+            >
+            <select
+              formControlName="department"
+              class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-teal-500 bg-gray-50 focus:bg-white"
+            >
+              <option value="">Select Department (optional)</option>
+              <option value="engineering">Engineering</option>
+              <option value="marketing">Marketing</option>
+              <option value="sales">Sales</option>
+              <option value="hr">Human Resources</option>
+              <option value="finance">Finance</option>
+              <option value="operations">Operations</option>
+            </select>
+          </div>
         </div>
 
         <hr class="border-gray-200" />

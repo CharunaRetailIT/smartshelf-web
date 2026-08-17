@@ -38,6 +38,21 @@
   animation: fadeIn 0.8s ease-out;
 }
 
+/* The page wrapper is both the scroll container (`.ds-page-shell` is
+   `height: 100%; overflow-y: auto`) and a centring flex container. When the
+   card is taller than the shell - which the sign-up form is, but the sign-in
+   form is not - plain `center` splits the overflow evenly and pushes the top
+   of the card past the container's start edge, where scrolling cannot reach
+   it. That hid the header and the Sign In / Sign Up toggle entirely.
+
+   `safe center` keeps the centring while it fits and falls back to
+   start-alignment the moment it would overflow. The unprefixed `center` below
+   it is the fallback for browsers that drop the whole declaration. */
+.ds-page-shell {
+  align-items: center;
+  align-items: safe center;
+}
+
 /* Form animations */
 form {
   animation: slideIn 0.6s ease-out;
